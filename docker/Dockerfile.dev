@@ -1,0 +1,15 @@
+FROM strider2038:imgcache-service
+MAINTAINER Igor Lazarev <strider2038@rambler.ru>
+
+RUN apk add --update \
+    nano \
+    iputils \
+    autoconf \
+    g++ \
+    make && \
+    pecl install xdebug && \
+    docker-php-ext-enable xdebug
+
+EXPOSE 80 9001
+
+VOLUME /services/imgcache
