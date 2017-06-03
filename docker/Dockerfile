@@ -19,7 +19,8 @@ RUN apk --no-cache add --update \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer global require "fxp/composer-asset-plugin:^1.2.0"
 
-#   rm -rf /run/composer
+#   rm -rf /run/composer && \
+#   rm /usr/local/bin/composer
 
 WORKDIR /services/imgcache
 

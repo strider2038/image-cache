@@ -1,0 +1,22 @@
+{
+    "name": "strider2038/imgcache-service",
+    "description": "Image caching microservice with connection to cloud hostings",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Igor Lazarev",
+            "email": "strider2038@rambler.ru"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.1",
+        "nixsolutions/yandex-php-library": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Strider2038\\ImgCache\\": "src/"
+        }
+    }
+}

@@ -1,6 +1,8 @@
 FROM strider2038:imgcache-service
 MAINTAINER Igor Lazarev <strider2038@rambler.ru>
 
+COPY ./conf/php/* /usr/local/etc/php/conf.d/
+
 RUN apk add --update \
     nano \
     iputils \
