@@ -2,6 +2,7 @@ FROM php:fpm-alpine
 MAINTAINER Igor Lazarev <strider2038@rambler.ru>
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+COPY ./conf/nginx/service-prod.conf /etc/nginx/conf.d/service.conf
 COPY ./conf/supervisord.conf /etc/supervisord.conf
 COPY ./conf/supervisor/* /etc/supervisord/
 COPY ./conf/composer/auth.json /run/composer/auth.json
