@@ -1,0 +1,13 @@
+<phpunit
+    backupGlobals="true"
+    backupStaticAttributes="false"
+    cacheTokens="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    timeoutForSmallTests="1"
+    timeoutForMediumTests="10"
+    timeoutForLargeTests="60"
+    verbose="true">
+</phpunit>

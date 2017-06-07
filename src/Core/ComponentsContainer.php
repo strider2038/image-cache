@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of ImgCache.
+ *
+ * (c) Igor Lazarev <strider2038@rambler.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Strider2038\ImgCache\Core;
 
@@ -10,17 +18,39 @@ use Strider2038\ImgCache\Exception\ApplicationException;
  */
 class ComponentsContainer extends Component 
 {
-    
     /** @var array */
     private $components;
     
     public function __construct(Application $app, array $components = []) 
     {
-        $this->setApp($app);
-        $this->components = $components;
+        parent::__construct($app);
+        foreach ($components as $name => $component) {
+            $this->set($name, $component);
+        }
     }
     
-    public function get($name) 
+    /**
+     * @param string $name
+     * @param \Strider2038\ImgCache\Core\Component|callable $component
+     * @return $this
+     * @throws ApplicationException
+     */
+    public function set(string $name, $component) 
+    {
+        if (isset($this->components[$name])) {
+            throw new ApplicationException("Component '{$name}' is already exists");
+        }
+        if (!is_callable($component) && !$component instanceof Component) {
+            throw new ApplicationException(
+                "Component '{$name}' must be a callable "
+                . "or an instance of " . Component::class
+            );
+        }
+        $this->components[$name] = $component;
+        return $this;
+    }
+    
+    public function get($name): Component
     {
         if (!isset($this->components[$name])) {
             throw new ApplicationException("Component '{$name}' not found");
@@ -29,13 +59,12 @@ class ComponentsContainer extends Component
             return $this->components[$name];
         }
         if (is_callable($this->components[$name])) {
-            $obj = $this->components[$name]();
+            $obj = $this->components[$name]($this->getApp());
             if (!$obj instanceof Component) {
                 throw new ApplicationException(
-                    "Component '{$name}' must be instance of Strider2038\ImgCache\Core\Object"
+                    "Component '{$name}' must be instance of " . Component::class
                 );
             }
-            $obj->setApp($this->getApp());
             return $this->components[$name] = $obj;
         }
         throw new ApplicationException("Cannot create component '{$name}'");

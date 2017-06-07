@@ -1,17 +1,22 @@
 <?php
+/*
+ * This file is part of ImgCache.
+ *
+ * (c) Igor Lazarev <strider2038@rambler.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
- * Description of Security
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class Security extends Component 
 {
-    
     /** @var string */
     private $accessToken;
     
@@ -28,13 +33,17 @@ class Security extends Component
     
     public function isTokenValid(): bool 
     {
+        if (empty($this->accessToken)) {
+            throw new ApplicationException('Access token is not set');
+        }
         $auth = $this->getApp()->request->getHeader(
             Request::HEADER_AUTHORIZATION
         );
-        if (empty($auth)) {
-            return false;
+        if ($auth !== null && preg_match('/^Bearer\s+(.*?)$/', $auth, $matches)) {
+            return $matches[1] === $this->accessToken;
         }
         
+        return false;
     }
     
     public function isReferrerValid(): bool 

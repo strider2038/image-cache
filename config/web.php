@@ -3,8 +3,8 @@
 $configWeb = [
     'id' => 'ImgCache',
     'components' => [
-        'router' => function() {
-            return new \Strider2038\ImgCache\Service\Router();
+        'router' => function($app) {
+            return new \Strider2038\ImgCache\Service\Router($app);
         }
     ],
 ];

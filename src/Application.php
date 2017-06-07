@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of ImgCache.
+ *
+ * (c) Igor Lazarev <strider2038@rambler.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Strider2038\ImgCache;
 
@@ -21,16 +29,16 @@ class Application
      * @param array $config
      * @throws ApplicationException
      */
-    public function __construct(array $config = []) 
+    public function __construct(array $config) 
     {
         if (!isset($config['id']) || !is_string($config['id'])) {
             throw new ApplicationException('Empty application id');
         }
         $this->id = $config['id'];
         
-        $components = array_merge(
-            $config['components'] ?? [], 
-            $this->getCoreComponents()
+        $components = array_replace(
+            $this->getCoreComponents(),
+            $config['components'] ?? []
         );
         
         $this->components = new Core\ComponentsContainer(
@@ -67,7 +75,7 @@ class Application
             /** @var \Strider2038\ImgCache\Core\ControllerInterface */
             $controller = $route->getController();
      
-            /** @var \Strider2038\ImgCache\Core\Response */
+            /** @var \Strider2038\ImgCache\Core\ResponseInterface */
             $response = $controller->runAction($route->getAction(), $request);
             
             $response->send();
