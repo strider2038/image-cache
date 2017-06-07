@@ -7,18 +7,21 @@ use Strider2038\ImgCache\Application;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Object {
+class Component 
+{
     /**
      * @var \Strider2038\ImgCache\Application
      */
     private $app;
     
-    public function setApp(Application $app) {
+    public function setApp(Application $app) 
+    {
         $this->app = $app;
         return $this;
     }
     
-    public function getApp(): Application {
+    public function getApp(): Application 
+    {
         return $this->app;
     }
 }

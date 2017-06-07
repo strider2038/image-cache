@@ -1,0 +1,12 @@
+<?php
+
+namespace Strider2038\ImgCache\Core;
+
+/**
+ *
+ * @author Igor Lazarev <strider2038@rambler.ru>
+ */
+interface ResponseInterface 
+{
+    public function send(): void;
+}
