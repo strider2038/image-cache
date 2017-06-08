@@ -17,10 +17,10 @@ use Strider2038\ImgCache\Exception\RuntimeException;
  *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Controller implements ControllerInterface
+abstract class Controller implements ControllerInterface
 {
     
-    public function runAction(string $action, RequestInterface $request): Response 
+    public function runAction(string $action, RequestInterface $request): ResponseInterface 
     {
         $actionName = 'action' . ucfirst($action);
         if (!method_exists($this, $actionName)) {

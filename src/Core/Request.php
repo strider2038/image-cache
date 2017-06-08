@@ -17,7 +17,6 @@ use Strider2038\ImgCache\Exception\RequestException;
  */
 class Request extends Component implements RequestInterface 
 {
-    
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
     const METHOD_PUT = 'PUT';
@@ -32,7 +31,7 @@ class Request extends Component implements RequestInterface
 
     public function __construct() 
     {
-        $method = strtoupper($_SERVER['REQUEST_METHOD']);
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? '');
         if (!in_array($method, static::getAvailableMethods())) {
             throw new RequestException('Unknown request method');
         }
