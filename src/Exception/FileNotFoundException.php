@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of ImgCache.
  *
@@ -8,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Response;
+namespace Strider2038\ImgCache\Exception;
 
 /**
- * Description of ImageResponse
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageResponse extends FileResponse 
+class FileNotFoundException extends ApplicationException
 {
     
 }

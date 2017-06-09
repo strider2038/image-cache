@@ -19,37 +19,57 @@ class RequestTest extends TestCase
 {
 
     /**
-     * @expectedException Strider2038\ImgCache\Exception\RequestException
-     * @expectedExceptionMessage Unknown request method
+     * @dataProvider requestMethodsProvider
      */
-    public function testConstructionFailesWithoutServerRequestMethod()
+    public function testConstruct_RequestMethodIsSet_RequestMethodReturned($method)
     {
-        new Request();
-    }
-
-    public function testConstructionAvailableMethods()
-    {
-        $methods = [
-            'GET', 'POST', 'PUT', 'PATCH', 'DELETE'
-        ];
-        
-        foreach ($methods as $method) {
-            $_SERVER['REQUEST_METHOD'] = $method;
-            $request = new Request();
-            $this->assertEquals($method, $request->getMethod());
-        }
+        $_SERVER['REQUEST_METHOD'] = $method;
+        $request = new Request();
+        $this->assertEquals($method, $request->getMethod());
     }
     
-    public function testGetHeaders()
+    public function requestMethodsProvider(): array
     {
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer xxx';
+        return [
+            ['GET'], 
+            ['POST'], 
+            ['PUT'], 
+            ['PATCH'], 
+            ['DELETE']
+        ];
+    }
+    
+    public function testConstruct_RequestMethodNotSet_NullReturned()
+    {   
+        unset($_SERVER['REQUEST_METHOD']);
+        $request = new Request();
+        $this->assertNull($request->getMethod());
+    }
+    
+    /**
+     * @dataProvider headersProvider
+     */
+    public function testGetHeader_HeaderIsSet_HeaderReturned($header, $value)
+    {
+        $_SERVER[$header] = $value;
         
         $request = new Request();
         $this->assertEquals(
-            'Bearer xxx', 
+            $value, 
             $request->getHeader(Request::HEADER_AUTHORIZATION)
         );
+    }
+    
+    public function headersProvider()
+    {
+        return [
+            ['HTTP_AUTHORIZATION', 'Bearer xxx']
+        ];
+    }
+    
+    public function testGetHeader_HeaderIsNotSet_NullReturned()
+    {
+        $request = new Request();
         $this->assertNull($request->getHeader('UNKNOWN_HEADER'));
     }
 }

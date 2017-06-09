@@ -33,13 +33,13 @@ class ComponentsContainerTest extends TestCase
         };
     }
     
-    public function testApplicationInjection() 
+    public function testConstruct_ApplicationCreated_InjectionSuccess() 
     {
         $container = new ComponentsContainer($this->app);
         $this->assertEquals('test', $container->getApp()->getId());
     }
 
-    public function testSetGetComponent() 
+    public function testSet_ComponentCreated_ComponentReturned() 
     {
         $container = new ComponentsContainer($this->app);
         $component = new class($this->app) extends Component {};
@@ -53,7 +53,7 @@ class ComponentsContainerTest extends TestCase
         );
     }
     
-    public function testSetGetComponentByCallable() 
+    public function testSet_NewComponentInCallable_ComponentReturned() 
     {
         $container = new ComponentsContainer($this->app);
         $callable = function($app) {
@@ -73,7 +73,7 @@ class ComponentsContainerTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage Component 'test' is already exists
      */
-    public function testSetComponentAlreadyExists() 
+    public function testSet_ComponentAlreadyExists_ExceptionThrown() 
     {
         $container = new ComponentsContainer($this->app);
         $component = new class($this->app) extends Component {};
@@ -91,7 +91,7 @@ class ComponentsContainerTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage Component 'test' must be a callable or an instance of
      */
-    public function testSetComponentHasIncorrectType() 
+    public function testSet_ComponentIsString_ExceptionThrown() 
     {
         $container = new ComponentsContainer($this->app);
         $container->set('test', 'string');
@@ -101,7 +101,7 @@ class ComponentsContainerTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage Component 'test' not found
      */
-    public function testGetComponentNotFound() 
+    public function testGet_ComponentDoesNotExists_ExceptionThrown() 
     {
         $container = new ComponentsContainer($this->app);
         $container->get('test');
@@ -111,7 +111,7 @@ class ComponentsContainerTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage Component 'test' must be instance
      */
-    public function testGetComponentNotInstanceOfComponent() 
+    public function testGet_ComponentIsNotInstanceOfComponent_ExceptionThrown() 
     {
         $container = new ComponentsContainer($this->app);
         $component = function() {
@@ -124,7 +124,7 @@ class ComponentsContainerTest extends TestCase
         $container->get('test');
     }
     
-    public function testApplicationInjectionToComponent() 
+    public function testSet_ApplicationInjectedToComponent_ApplicationReturned() 
     {
         $container = new ComponentsContainer($this->app);
         $component = function($app) {

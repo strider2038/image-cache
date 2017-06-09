@@ -10,11 +10,13 @@
  */
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\{
     Controller,
     RequestInterface,
     ResponseInterface
 };
+use Strider2038\ImgCache\Response\ForbiddenResponse;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -26,8 +28,12 @@ class ControllerTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\RuntimeException
      * @expectedExceptionMessage does not exists
      */
-    public function testRunActionDoesNotExists() 
+    public function testRunAction_ActionDoesNotExists_ExceptionThrown() 
     {
+        $app = new class extends Application {
+            public function __construct() {}
+        };
+        
         $request = new class implements RequestInterface {
             public function getMethod(): string
             {
@@ -39,13 +45,17 @@ class ControllerTest extends TestCase
             }
         };
         
-        $controller = new class extends Controller {};
+        $controller = new class($app) extends Controller {};
         
         $controller->runAction('test', $request);
     }
     
-    public function testRunActionSuccess() 
+    public function testRunAction_ActionExists_MethodExecuted() 
     {
+        $app = new class extends Application {
+            public function __construct() {}
+        };
+        
         $request = new class implements RequestInterface {
             public function getMethod(): string
             {
@@ -57,7 +67,7 @@ class ControllerTest extends TestCase
             }
         };
         
-        $controller = new class extends Controller {
+        $controller = new class($app) extends Controller {
             public $success = false;
             public function actionTest()
             {
@@ -79,4 +89,87 @@ class ControllerTest extends TestCase
         $this->assertTrue($controller->success);
     }
 
+    public function testRunAction_ActionIsNotSecuredAndNotAuthorized_ForbiddenResponseReturned()
+    {
+        $app = new class extends Application {
+            public function __construct() {}
+            public $security;
+        };
+        
+        $app->security = new class {
+            public function isAuthorized() {
+                return false;
+            }
+        };
+        
+        $request = new class implements RequestInterface {
+            public function getMethod(): string
+            {
+                return 'getMethodResult';
+            }
+            public function getHeader(string $key): ?string
+            {
+                return 'getHeaderResult';
+            }
+        };
+        
+        $controller = new class($app) extends Controller {
+            public $success = false;
+            public function actionTest()
+            {
+                $this->success = true;
+                return new class implements ResponseInterface {
+                    public function send(): void {}
+                };
+            }
+        };
+        
+        $this->assertInstanceOf(
+            ForbiddenResponse::class, 
+            $controller->runAction('test', $request)
+        );
+        $this->assertFalse($controller->success);
+    }
+    
+    public function testRunAction_ActionIsNotSecuredAndIsAuthorized_MethodExecuted()
+    {
+        $app = new class extends Application {
+            public function __construct() {}
+            public $security;
+        };
+        
+        $app->security = new class {
+            public function isAuthorized() {
+                return true;
+            }
+        };
+        
+        $request = new class implements RequestInterface {
+            public function getMethod(): string
+            {
+                return 'getMethodResult';
+            }
+            public function getHeader(string $key): ?string
+            {
+                return 'getHeaderResult';
+            }
+        };
+        
+        $controller = new class($app) extends Controller {
+            public $success = false;
+            public function actionTest()
+            {
+                $this->success = true;
+                return new class implements ResponseInterface {
+                    public function send(): void {}
+                };
+            }
+        };
+        
+        $this->assertInstanceOf(
+            ResponseInterface::class, 
+            $controller->runAction('test', $request)
+        );
+        $this->assertTrue($controller->success);
+    }
 }

@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Exception\ApplicationException;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Security extends Component 
+class Security extends Component implements SecurityInterface
 {
     /** @var string */
     private $accessToken;

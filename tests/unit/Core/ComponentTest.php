@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ComponentTest extends TestCase 
 {
-    public function testApplicationIsInjected(): void 
+    public function testConstruct_ApplicationCreated_InjectionSuccess(): void 
     {
         $app = new class extends Application {
             public function __construct() {}

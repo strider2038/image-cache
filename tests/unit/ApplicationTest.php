@@ -19,18 +19,18 @@ class ApplicationTest extends TestCase
     /**
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      */
-    public function testIdIsRequired(): void
+    public function testConstruct_IdIsNotSet_ExceptionThrown(): void
     {
         $app = new Application([]);
     }
     
-    public function testIdIsAssigned(): void 
+    public function testConstruct_IdIsSet_ReturningAppId(): void 
     {
         $app = new Application(['id' => 'test']);
         $this->assertEquals('test', $app->getId());
     }
     
-    public function testCoreComponentsInjection(): void
+    public function testConstruct_ComponentsInjected_ComponentsAvailable(): void
     {
         $app = new Application([
             'id' => 'test',
@@ -64,4 +64,10 @@ class ApplicationTest extends TestCase
         $this->assertTrue($app->security->isAuthorized());
     }
     
+    public function testConstruct_NoComponentsAreSet_CoreComponentsAreAvailable()
+    {
+        $app = new Application(['id' => 'test']);
+        $this->assertInstanceOf(RequestInterface::class, $app->request);
+        $this->assertInstanceOf(SecurityInterface::class, $app->security);
+    }
 }

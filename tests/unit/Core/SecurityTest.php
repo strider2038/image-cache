@@ -40,7 +40,7 @@ class SecurityTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage Access token is insecure
      */
-    public function testSetTokenIsInsecure() 
+    public function testSetAccessToken_TokenIsShort_ExceptionThrown() 
     {
         $security = new Security($this->app);
         $security->setAccessToken('123');
@@ -50,7 +50,7 @@ class SecurityTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage Access token is already set
      */
-    public function testSetTokenIsAlreadySet() 
+    public function testSetAccessToken_TokenIsSet_ExceptionThrown() 
     {
         $security = new Security($this->app);
         $security->setAccessToken(self::TEST_TOKEN);
@@ -61,13 +61,13 @@ class SecurityTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage Access token is not set
      */
-    public function testIsTokenValidTokenNotSet() 
+    public function testIsTokenValid_TokenNotSet_ExceptionThrown() 
     {
         $security = new Security($this->app);
         $security->isTokenValid();
     }
     
-    public function testIsTokenValidHeaderNotSet() 
+    public function testIsTokenValid_HeaderIsNotSet_FalseReturned() 
     {
         $token = self::TEST_TOKEN;
         
@@ -92,7 +92,7 @@ class SecurityTest extends TestCase
         $this->assertFalse($security->isTokenValid());
     }
     
-    public function testIsTokenValidSuccess() 
+    public function testIsTokenValid_CorrectTokenInHeader_TrueReturned() 
     {
         $token = self::TEST_TOKEN;
         
@@ -121,7 +121,7 @@ class SecurityTest extends TestCase
         $this->assertTrue($security->isAuthorized());
     }
     
-    public function testIsTokenValidFail() 
+    public function testIsTokenValid_IncorrectTokenInHeader_FalseReturned() 
     {
         $app = new Application([
             'id' => 'test',

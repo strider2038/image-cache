@@ -10,8 +10,6 @@
 
 namespace Strider2038\ImgCache\Core;
 
-use Strider2038\ImgCache\Exception\RequestException;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -32,13 +30,12 @@ class Request extends Component implements RequestInterface
     public function __construct() 
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? '');
-        if (!in_array($method, static::getAvailableMethods())) {
-            throw new RequestException('Unknown request method');
+        if (in_array($method, static::getAvailableMethods())) {
+            $this->method = $method;
         }
-        $this->method = $method;
     }
     
-    public function getMethod(): string 
+    public function getMethod(): ?string 
     {
         return $this->method;
     }
