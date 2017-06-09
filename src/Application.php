@@ -21,9 +21,12 @@ class Application
 {
     /** @var string */
     private $id;
-
+    
     /** @var Core\ComponentsContainer */
     private $components;
+    
+    /** @var array */
+    private $params = [];
 
     /**
      * @param array $config
@@ -45,6 +48,10 @@ class Application
             $this,
             $components
         );
+        
+        if (isset($config['params']) && is_array($config['params'])) {
+            $this->params = $config['params'];
+        }
     }
     
     public function __get($name) 
@@ -60,7 +67,7 @@ class Application
         return $this->id;
     }
     
-    public function run(): void 
+    public function run(): int 
     {
         try {
             /** @var \Strider2038\ImgCache\Core\RequestInterface */
@@ -80,20 +87,27 @@ class Application
             
             $response->send();
         } catch (\Exception $ex) {
-            $response = new Response\ExceptionResponse($ex);
+            $response = new Response\ExceptionResponse($this, $ex);
             $response->send();
         }
+        return 0;
     }
     
     private function getCoreComponents(): array 
     {
+        $app = $this;
         return [
-            'request' => function() {
-                return new Core\Request();
+            'request' => function($app) {
+                return new Core\Request($app);
             },
-            'security' => function() {
-                return new Core\Security();
+            'security' => function($app) {
+                return new Core\Security($app);
             }
         ];
+    }
+    
+    public function isDebugMode(): bool
+    {
+        return !empty($this->params['debug']);
     }
 }

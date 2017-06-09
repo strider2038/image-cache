@@ -23,12 +23,19 @@ use Strider2038\ImgCache\Core\{
 class Router extends Component implements RouterInterface 
 {
     
+    protected static $methodsToActions = [
+        Request::METHOD_GET    => 'get',
+        Request::METHOD_POST   => 'create',
+        Request::METHOD_PUT    => 'replace',
+        Request::METHOD_PATCH  => 'refresh',
+        Request::METHOD_DELETE => 'delete',
+    ];
+
     public function getRoute(Request $request): Route 
     {
         return new Route(
-            new ImageController(),
-            'get',
-            []
+            new ImageController($this->getApp()),
+            self::$methodsToActions[$request->getMethod()]
         );
     }
     

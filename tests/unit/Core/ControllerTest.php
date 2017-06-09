@@ -66,6 +66,10 @@ class ControllerTest extends TestCase
                     public function send(): void {}
                 };
             }
+            protected function getInsecureActions(): array
+            {
+                return ['test'];
+            }
         };
         
         $this->assertInstanceOf(

@@ -7,6 +7,9 @@ $configWeb = [
             return new \Strider2038\ImgCache\Service\Router($app);
         }
     ],
+    'params' => [
+        'debug' => false,
+    ],
 ];
 
 $configWebLocalFilename = __DIR__ . '/web-local.php';
