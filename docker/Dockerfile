@@ -17,8 +17,7 @@ RUN apk --no-cache add --update \
     rm -rf /var/cache/apk/* && \
     mkdir -p /services/imgcache /var/log/nginx /var/log/supervisor /var/run/composer && \
     chown -R www-data:www-data /var/log && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer global require "fxp/composer-asset-plugin:^1.2.0"
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 #   rm -rf /run/composer && \
 #   rm /usr/local/bin/composer
@@ -27,4 +26,4 @@ WORKDIR /services/imgcache
 
 EXPOSE 80
 
-CMD /usr/bin/supervisord --nodaemon --configuration /etc/supervisord.conf
+CMD /usr/bin/supervisord --configuration /etc/supervisord.conf
