@@ -10,9 +10,17 @@
 
 namespace Strider2038\ImgCache\Exception;
 
+use Strider2038\ImgCache\Core\Response;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ApplicationException extends \Exception {
-    
+    public function __construct(
+        string $message = "", 
+        int $code = Response::HTTP_CODE_INTERNAL_SERVER_ERROR, 
+        Throwable $previous = null
+    ) {
+        parent::__construct($message, $code, $previous);
+    }
 }

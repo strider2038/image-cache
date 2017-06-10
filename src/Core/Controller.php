@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Core;
 
-use Strider2038\ImgCache\Exception\RuntimeException;
+use Strider2038\ImgCache\Exception\ApplicationException;
 use Strider2038\ImgCache\Response\ForbiddenResponse;
 
 /**
@@ -25,7 +25,7 @@ abstract class Controller extends Component implements ControllerInterface
     {
         $actionName = 'action' . ucfirst($action);
         if (!method_exists($this, $actionName)) {
-            throw new RuntimeException("Action '{$actionName}' does not exists");
+            throw new ApplicationException("Action '{$actionName}' does not exists");
         }
         if (
             !in_array($action, $this->getInsecureActions())

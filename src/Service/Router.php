@@ -14,8 +14,10 @@ use Strider2038\ImgCache\Core\{
     Component, 
     RouterInterface,
     Request,
+    RequestInterface,
     Route
 };
+use Strider2038\ImgCache\Exception\InvalidRouteException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -31,8 +33,12 @@ class Router extends Component implements RouterInterface
         Request::METHOD_DELETE => 'delete',
     ];
 
-    public function getRoute(Request $request): Route 
+    public function getRoute(RequestInterface $request): Route 
     {
+        if (!array_key_exists($request->getMethod(), self::$methodsToActions)) {
+            throw new InvalidRouteException('Route not found');
+        }
+        
         return new Route(
             new ImageController($this->getApp()),
             self::$methodsToActions[$request->getMethod()]

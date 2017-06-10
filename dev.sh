@@ -10,7 +10,10 @@ docker rm $(docker ps -a -q)
 echo "Building development image..."
 echo "========================================================================="
 
-docker build --file Dockerfile.dev --tag strider2038:imgcache-service-dev .
+docker build \
+    --file ./docker/Dockerfile.dev \
+    --tag strider2038:imgcache-service-dev \
+    ./docker
 
 echo "Starting container..."
 echo "========================================================================="
@@ -20,5 +23,5 @@ docker run \
     --detach \
     --name imgcache \
     --stop-signal SIGKILL \
-    --volume /projects/imgcache-service:/services/imgcache \
+    --volume $PWD:/services/imgcache \
     strider2038:imgcache-service-dev

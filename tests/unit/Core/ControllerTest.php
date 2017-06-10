@@ -25,7 +25,7 @@ class ControllerTest extends TestCase
 {
 
     /**
-     * @expectedException \Strider2038\ImgCache\Exception\RuntimeException
+     * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage does not exists
      */
     public function testRunAction_ActionDoesNotExists_ExceptionThrown() 

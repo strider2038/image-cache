@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of ImgCache.
  *
@@ -13,14 +14,15 @@ namespace Strider2038\ImgCache\Exception;
 use Strider2038\ImgCache\Core\Response;
 
 /**
- * Description of RequestException
+ * Description of InvalidRouteException
  *
- * @author Igor Lazarev <strider2038@rambler.ru>
+ * @author Igor Lazarev <lazarev@lightsoft.ru>
  */
-class RequestException extends ApplicationException {
+class InvalidRouteException extends ApplicationException
+{
     public function __construct(
         string $message = "", 
-        int $code = Response::HTTP_CODE_BAD_REQUEST, 
+        int $code = Response::HTTP_CODE_NOT_FOUND, 
         Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

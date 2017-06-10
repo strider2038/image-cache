@@ -91,6 +91,16 @@ abstract class Response implements ResponseInterface
         }
     }
     
+    public function getHttpCode(): int
+    {
+        return $this->httpCode;
+    }
+
+    public function getHttpVersion(): string
+    {
+        return $this->httpVersion;
+    }
+        
     public function setHeader(string $name, string $value): Response
     {
         $this->headers[$name] = $value;

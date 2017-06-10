@@ -16,5 +16,5 @@ namespace Strider2038\ImgCache\Core;
  */
 interface RouterInterface 
 {
-    public function getRoute(Request $request): Route;
+    public function getRoute(RequestInterface $request): Route;
 }

@@ -11,10 +11,18 @@
 
 namespace Strider2038\ImgCache\Exception;
 
+use Strider2038\ImgCache\Core\Response;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class FileNotFoundException extends ApplicationException
 {
-    
+    public function __construct(
+        string $message = "", 
+        int $code = Response::HTTP_CODE_NOT_FOUND, 
+        Throwable $previous = null
+    ) {
+        parent::__construct($message, $code, $previous);
+    }
 }
