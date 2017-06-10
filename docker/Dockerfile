@@ -5,9 +5,9 @@ COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./conf/nginx/service-prod.conf /etc/nginx/conf.d/service.conf
 COPY ./conf/supervisord.conf /etc/supervisord.conf
 COPY ./conf/supervisor/* /etc/supervisord/
-COPY ./conf/composer/auth.json /run/composer/auth.json
+COPY ./conf/composer/auth.json /var/run/composer/auth.json
 
-ENV COMPOSER_HOME=/run/composer
+ENV COMPOSER_HOME=/var/run/composer
 
 RUN apk --no-cache add --update \
     git \
@@ -15,8 +15,8 @@ RUN apk --no-cache add --update \
     nginx \
     supervisor && \
     rm -rf /var/cache/apk/* && \
-    mkdir -p /services/imgcache /logs/nginx /logs/supervisor /run/composer && \
-    chown -R www-data:www-data /logs && \
+    mkdir -p /services/imgcache /var/log/nginx /var/log/supervisor /var/run/composer && \
+    chown -R www-data:www-data /var/log && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer global require "fxp/composer-asset-plugin:^1.2.0"
 

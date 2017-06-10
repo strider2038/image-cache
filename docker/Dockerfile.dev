@@ -10,7 +10,8 @@ RUN apk add --update \
     g++ \
     make && \
     pecl install xdebug && \
-    docker-php-ext-enable xdebug
+    docker-php-ext-enable xdebug && \
+    mkdir -p /var/log/xdebug
 
 EXPOSE 80 9001
 
