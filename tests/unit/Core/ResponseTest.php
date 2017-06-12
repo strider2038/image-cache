@@ -73,7 +73,7 @@ class ResponseTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testSend_NotSend_IsSent(): void
+    public function testSend_NotSent_IsSent(): void
     {
         $request = new class(200) extends Response {
             protected function sendContent(): void {}
