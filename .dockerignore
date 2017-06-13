@@ -1,0 +1,7 @@
+/nbproject/
+vendor
+
+.gitignore
+Dockerfile
+Dockerfile.dev
+*.sh

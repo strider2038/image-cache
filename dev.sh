@@ -11,9 +11,9 @@ echo "Building development image..."
 echo "========================================================================="
 
 docker build \
-    --file ./docker/Dockerfile.dev \
+    --file Dockerfile.dev \
     --tag strider2038:imgcache-service-dev \
-    ./docker
+    .
 
 echo "Starting container..."
 echo "========================================================================="

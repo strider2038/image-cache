@@ -1,0 +1,18 @@
+FROM strider2038:imgcache-service
+MAINTAINER Igor Lazarev <strider2038@rambler.ru>
+
+COPY ./docker.conf/composer/auth.json /var/run/composer/auth.json
+COPY ./docker.conf/php/* /usr/local/etc/php/conf.d/
+
+RUN apk add --update \
+    nano \
+    iputils && \
+    pecl install xdebug && \
+    docker-php-ext-enable xdebug && \
+    mkdir -p /var/log/xdebug && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer install
+
+EXPOSE 80 9001
+
+VOLUME /services/imgcache
