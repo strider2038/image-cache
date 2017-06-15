@@ -13,10 +13,11 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Imaging\Transformation\{
-    Quality,
-    Resize,
+    QualityBuilder,
+    ResizeBuilder,
     TransformationsFactory,
-    TransformationInterface
+    TransformationInterface,
+    TransformationBuilderInterface
 };
 
 /**
@@ -34,48 +35,6 @@ class TransformationsFactoryTest extends TestCase
         };
     }
     
-    public function testConstruct_CustomConstructorsSet_DefaultConstructorsReplacedInCreate(): void
-    {
-        $customConstructors = [
-            'a' => function() {
-                return new class implements TransformationInterface {
-                    public $tid = 'custom_a';
-                    public function apply(Image $image): void {}
-                };
-            },
-            'b' => function() {
-                return new class implements TransformationInterface {
-                    public $tid = 'custom_b';
-                    public function apply(Image $image): void {}
-                };
-            },
-        ];
-        
-        $factory = new class($this->app, $customConstructors) extends TransformationsFactory {
-            public function getDefaultConstructors(): array
-            {
-                return [
-                    'b' => function() {
-                        return new class implements TransformationInterface {
-                            public $tid = 'default_b';
-                            public function apply(Image $image): void {}
-                        };
-                    },
-                    'c' => function() {
-                        return new class implements TransformationInterface {
-                            public $tid = 'default_c';
-                            public function apply(Image $image): void {}
-                        };
-                    },
-                ];
-            }
-        };
-        
-        $this->assertEquals('custom_a', $factory->create('a')->tid);
-        $this->assertEquals('custom_b', $factory->create('b')->tid);
-        $this->assertEquals('default_c', $factory->create('c')->tid);
-    }
-
     /**
      * @expectedException Strider2038\ImgCache\Exception\InvalidConfigException
      * @expectedExceptionCode 400
@@ -84,7 +43,7 @@ class TransformationsFactoryTest extends TestCase
     public function testCreate_InvalidConfig_ExceptionThrown(): void
     {
         $factory = new class($this->app) extends TransformationsFactory {
-            public function getDefaultConstructors(): array
+            public function getBuildersMap(): array
             {
                 return [];
             }
@@ -93,90 +52,73 @@ class TransformationsFactoryTest extends TestCase
         $factory->create('anything');
     }
     
-    public function testGetDefaultConstructors_Default_CallbacksReturned(): void
+    public function testGetBuildersMap_NoParams_BuildersReturned(): void
     {
         $factory = new TransformationsFactory($this->app);
-        $constructors = $factory->getDefaultConstructors();
-        $this->assertArrayHasKey('q', $constructors);
-        $this->assertArrayHasKey('s', $constructors);
-        $this->assertInstanceOf(Quality::class, $constructors['q'](50));
-        $this->assertInstanceOf(Resize::class, $constructors['s']('200x200f'));
-    }
-    
-    public function testCreateQuality_ValidConfig_ClassIsConstructed(): void
-    {
-        $factory = new TransformationsFactory($this->app);
-        $constructors = $factory->getDefaultConstructors();
-        foreach ([20, 50, 100] as $value) {
-            $this->assertInstanceOf(Quality::class, $constructors['q']($value));
-        }
+        $builders = $factory->getBuildersMap();
+        $this->assertArrayHasKey('q', $builders);
+        $this->assertArrayHasKey('s', $builders);
+        $this->assertInstanceOf(QualityBuilder::class, new $builders['q']);
+        $this->assertInstanceOf(ResizeBuilder::class, new $builders['s']);
     }
     
     /**
-     * @dataProvider qualityInvalidConfigProvider
-     * @expectedException Strider2038\ImgCache\Exception\InvalidConfigException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid config for quality transformation
+     * @dataProvider builderIndexProvider
      */
-    public function testCreateQuality_InvalidConfig_ClassIsConstructed($config): void
+    public function testGetBuilder_IndexIsSet_InstanceIsReturned($index, $instance): void
     {
         $factory = new TransformationsFactory($this->app);
-        $factory->getDefaultConstructors()['q']($config);
+        $this->assertInstanceOf($instance, $factory->getBuilder($index));
     }
     
-    public function qualityInvalidConfigProvider(): array
-    {
-        return [['20h'], ['abc'], ['']];
-    }
-    
-    /**
-     * @dataProvider resizeConfigProvider
-     */
-    public function testCreateResize_ValidConfig_ClassIsConstructed($config, $width, $height, $mode): void
-    {
-        $factory = new TransformationsFactory($this->app);
-        $constructors = $factory->getDefaultConstructors();
-        $resize = $constructors['s']($config);
-        $this->assertInstanceOf(Resize::class, $resize);
-        $this->assertEquals($width, $resize->getWidth());
-        $this->assertEquals($height, $resize->getHeigth());
-        $this->assertEquals($mode, $resize->getMode());
-    }
-    
-    public function resizeConfigProvider(): array
+    public function builderIndexProvider(): array
     {
         return [
-            ['100x100f', 100, 100, Resize::MODE_FIT_IN],
-            ['500x200s', 500, 200, Resize::MODE_STRETCH],
-            ['50x1000w', 50, 1000, Resize::MODE_PRESERVE_WIDTH],
-            ['300x200h', 300, 200, Resize::MODE_PRESERVE_HEIGHT],
-            ['400X250H', 400, 250, Resize::MODE_PRESERVE_HEIGHT],
-            ['200x300', 200, 300, Resize::MODE_STRETCH],
-            ['200f', 200, 200, Resize::MODE_FIT_IN],
-            ['150', 150, 150, Resize::MODE_STRETCH],
+            ['q', QualityBuilder::class],
+            ['s', ResizeBuilder::class],
         ];
     }
     
-    /**
-     * @dataProvider resizeInvalidConfigProvider
-     * @expectedException Strider2038\ImgCache\Exception\InvalidConfigException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid config for resize transformation
-     */
-    public function testCreateResize_InvalidConfig_ExceptionThrown($config): void
+    public function testGetBuilder_UnknownIndexIsSet_NullIsReturned(): void
     {
         $factory = new TransformationsFactory($this->app);
-        $constructors = $factory->getDefaultConstructors();
-        $resize = $constructors['s']($config);
+        $this->assertNull($factory->getBuilder('unidentified'));
     }
     
-    public function resizeInvalidConfigProvider(): array
+    public function testCreate_ConfigIsSet_TransformationIsReturned(): void
     {
-        return [
-            ['1500k'],
-            ['100x15i'],
-            ['100x156sp'],
-            ['100x'],
-        ];
+        $factory = new class($this->app) extends TransformationsFactory {
+            public function getBuilder(string $index): ?TransformationBuilderInterface
+            {
+                switch ($index) {
+                    case 'a': 
+                        return new class implements TransformationBuilderInterface {
+                            public function build(string $config): TransformationInterface
+                            {
+                                return new class implements TransformationInterface {
+                                    public $testId = 'transformation_a';
+                                    public function apply(Image $image): void {}
+                                };
+                            }
+                        };
+                    case 'ab': 
+                        return new class implements TransformationBuilderInterface {
+                            public function build(string $config): TransformationInterface
+                            {
+                                return new class implements TransformationInterface {
+                                    public $testId = 'transformation_ab';
+                                    public function apply(Image $image): void {}
+                                };
+                            }
+                        };
+                }
+                return null;
+            }
+        };
+        
+        $transformationA = $factory->create('a');
+        $this->assertEquals('transformation_a', $transformationA->testId);
+        $transformationAB = $factory->create('ab');
+        $this->assertEquals('transformation_ab', $transformationAB->testId);
     }
 }
