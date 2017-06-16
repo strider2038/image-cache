@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Exception\ApplicationException;
  * @author Igor Lazarev <strider2038@rambler.ru>
  * @property Core\RequestInterface $request Web request object
  * @property Core\SecurityInterface $security Security control component
+ * @property Core\TemporaryFilesManagerInterface $temporaryFileManager Class for handling temporary files
  */
 class Application
 {
@@ -95,14 +96,16 @@ class Application
     
     private function getCoreComponents(): array 
     {
-        $app = $this;
         return [
             'request' => function($app) {
                 return new Core\Request($app);
             },
             'security' => function($app) {
                 return new Core\Security($app);
-            }
+            },
+            'temporaryFileManager' => function($app) {
+                return new Core\TemporaryFilesManager($app);
+            },
         ];
     }
     

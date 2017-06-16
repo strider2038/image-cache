@@ -9,14 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source;
-
-use Strider2038\ImgCache\Imaging\Image;
+namespace Strider2038\ImgCache\Core;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SourceInterface
+interface TemporaryFilesManagerInterface
 {
-    public function get(string $filename): Image;
+    public function getFilename(string $fileKey): ?string;
+    public function putFile(string $fileKey, $data): string;
 }

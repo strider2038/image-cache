@@ -4,7 +4,8 @@ use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\{
     Component,
     RequestInterface,
-    SecurityInterface
+    SecurityInterface,
+    TemporaryFilesManagerInterface
 };
 use PHPUnit\Framework\TestCase;
 
@@ -59,6 +60,7 @@ class ApplicationTest extends TestCase
         ]);
         $this->assertInstanceOf(RequestInterface::class, $app->request);
         $this->assertInstanceOf(SecurityInterface::class, $app->security);
+        $this->assertInstanceOf(TemporaryFilesManagerInterface::class, $app->temporaryFileManager);
         $this->assertEquals('requestGetMethodResult', $app->request->getMethod());
         $this->assertEquals('requestGetHeaderResult', $app->request->getHeader(''));
         $this->assertTrue($app->security->isAuthorized());
@@ -69,5 +71,6 @@ class ApplicationTest extends TestCase
         $app = new Application(['id' => 'test']);
         $this->assertInstanceOf(RequestInterface::class, $app->request);
         $this->assertInstanceOf(SecurityInterface::class, $app->security);
+        $this->assertInstanceOf(TemporaryFilesManagerInterface::class, $app->temporaryFileManager);
     }
 }

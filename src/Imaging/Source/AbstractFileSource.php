@@ -11,12 +11,17 @@
 
 namespace Strider2038\ImgCache\Imaging\Source;
 
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SourceInterface
+abstract class AbstractFileSource implements SourceInterface
 {
-    public function get(string $filename): Image;
+    protected $temporaryFilesManager;
+            
+    function __construct(TemporaryFilesManagerInterface $temporaryFilesManager)
+    {
+        $this->temporaryFilesManager = $temporaryFilesManager;
+    }
 }

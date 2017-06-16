@@ -52,14 +52,15 @@ class TransformationsFactoryTest extends TestCase
         $factory->create('anything');
     }
     
-    public function testGetBuildersMap_NoParams_BuildersReturned(): void
+    /**
+     * @dataProvider builderIndexProvider
+     */
+    public function testGetBuildersMap_NoParams_BuildersReturned($index, $instance): void
     {
         $factory = new TransformationsFactory($this->app);
         $builders = $factory->getBuildersMap();
-        $this->assertArrayHasKey('q', $builders);
-        $this->assertArrayHasKey('s', $builders);
-        $this->assertInstanceOf(QualityBuilder::class, new $builders['q']);
-        $this->assertInstanceOf(ResizeBuilder::class, new $builders['s']);
+        $this->assertArrayHasKey($index, $builders);
+        $this->assertInstanceOf($instance, new $builders[$index]);
     }
     
     /**

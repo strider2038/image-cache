@@ -15,7 +15,8 @@ RUN apk --no-cache add --update \
     docker-php-ext-enable imagick && \
     rm -rf /var/cache/apk/* && \
     mkdir -p /var/log/nginx /var/log/supervisor /var/run/composer && \
-    chown -R www-data:www-data /var/log
+    chown -R www-data:www-data /var/log && \
+    chown -R www-data:www-data /tmp
 
 WORKDIR /services/imgcache
 
@@ -32,7 +33,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     composer install --no-dev && \
     rm -rf /var/run/composer && \
     rm /usr/local/bin/composer && \
-    rm -rf /services/imgcache/docker.conf
+    rm -rf /services/imgcache/docker.conf && \
+    rm -rf /tmp/*
 
 EXPOSE 80
 
