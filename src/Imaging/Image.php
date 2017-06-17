@@ -12,6 +12,7 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Exception\FileNotFoundException;
+use Strider2038\ImgCache\Exception\InvalidImageException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -22,14 +23,40 @@ class Image
     
     public function __construct(string $filename)
     {
-        if (!file_exists($filename)) {
-            throw new FileNotFoundException("File '{$filename}' not found");
+        if (!$this->hasValidMimeType($filename)) {
+            throw new InvalidImageException("File '{$filename}' has unsupported mime type");
         }
         $this->filename = $filename;
     }
     
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+
     public function getData()
     {
         
+    }
+    
+    /**
+     * @return string[]
+     */
+    public static function getSupportedMimeTypes(): array
+    {
+        return [
+            // 'image/gif', not implemented yet
+            'image/jpeg',
+            'image/png',
+        ];
+    }
+    
+    public function hasValidMimeType(string $filename): bool
+    {
+        if (!file_exists($filename)) {
+            throw new FileNotFoundException("File '{$filename}' not found");
+        }
+        $mime = mime_content_type($filename);
+        return in_array($mime, static::getSupportedMimeTypes());
     }
 }

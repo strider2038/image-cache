@@ -1,3 +1,3 @@
 #!/bin/sh
 
-/usr/local/bin/php ./../vendor/phpunit/phpunit/phpunit ./unit
+/usr/local/bin/php ./../vendor/phpunit/phpunit/phpunit ./Unit

@@ -18,6 +18,7 @@ use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
  */
 abstract class AbstractFileSource implements SourceInterface
 {
+    /** @var Strider2038\ImgCache\Core\TemporaryFilesManagerInterface */
     protected $temporaryFilesManager;
             
     function __construct(TemporaryFilesManagerInterface $temporaryFilesManager)

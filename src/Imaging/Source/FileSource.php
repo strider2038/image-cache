@@ -13,7 +13,10 @@ namespace Strider2038\ImgCache\Imaging\Source;
 
 use Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Helper\FileHelper;
-use Strider2038\ImgCache\Exception\ApplicationException;
+use Strider2038\ImgCache\Exception\{
+    ApplicationException,
+    FileNotFoundException
+};
 use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
 
 /**
@@ -24,21 +27,47 @@ class FileSource extends AbstractFileSource
     /** @var string */
     private $baseDirectory;
     
-    function __construct(
+    public function __construct(
         TemporaryFilesManagerInterface $temporaryFilesManager, 
         string $baseDirectory
     ) {
         parent::__construct($temporaryFilesManager);
+        
+        if (substr($baseDirectory, -1) === '/') {
+            $baseDirectory = substr($baseDirectory, 0, -1);
+        }
         $this->baseDirectory = $baseDirectory;
+        
         FileHelper::createDirectory($this->baseDirectory);
         if (!is_dir($this->baseDirectory)) {
             throw new ApplicationException("Cannot create directory '{$this->baseDirectory}'");
         }
     }
     
+    public function getBaseDirectory(): string
+    {
+        return $this->baseDirectory;
+    }
+    
     public function get(string $filename): Image
     {
+        $sourceFilename = $this->baseDirectory;
+        if (substr($filename, 0, 1) === '/') {
+            $sourceFilename .= $filename;
+        } else {
+            $sourceFilename .= '/' . $filename;
+        }
         
+        if (!file_exists($sourceFilename)) {
+            throw new FileNotFoundException("File '{$sourceFilename}' not found");
+        }
+        
+        // Copying file by contents for testing purposes.
+        // Actually, FileSource needed only for local testing.
+        $data = file_get_contents($sourceFilename);
+        $tempFilename = $this->temporaryFilesManager->putFile($filename, $data);
+        
+        return new Image($tempFilename);
     }
 
 }
