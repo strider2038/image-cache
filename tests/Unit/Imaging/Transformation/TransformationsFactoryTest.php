@@ -11,7 +11,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Transformation\{
     QualityBuilder,
     ResizeBuilder,
@@ -98,7 +98,7 @@ class TransformationsFactoryTest extends TestCase
                             {
                                 return new class implements TransformationInterface {
                                     public $testId = 'transformation_a';
-                                    public function apply(Image $image): void {}
+                                    public function apply(ProcessingImageInterface $image): void {}
                                 };
                             }
                         };
@@ -108,7 +108,7 @@ class TransformationsFactoryTest extends TestCase
                             {
                                 return new class implements TransformationInterface {
                                     public $testId = 'transformation_ab';
-                                    public function apply(Image $image): void {}
+                                    public function apply(ProcessingImageInterface $image): void {}
                                 };
                             }
                         };

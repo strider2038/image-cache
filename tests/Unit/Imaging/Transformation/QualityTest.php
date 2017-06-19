@@ -10,7 +10,7 @@
  */
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Transformation\Quality;
 
 /**
@@ -45,8 +45,11 @@ class QualityTest extends TestCase
      */
     public function testApply_Created_ExceptionThrown()
     {
-        $image = new class extends Image {
-            public function __construct() {}
+        $image = new class implements ProcessingImageInterface {
+            public function getWidth(): int {}
+            public function getHeight(): int {}
+            public function resize(int $width, int $heigth): void {}
+            public function crop(int $left, int $right, int $top, int $bottom): void {}
         };
         $quality = new Quality(50);
         $quality->apply($image);

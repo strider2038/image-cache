@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
-
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+namespace Strider2038\ImgCache\Imaging\Processing;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface TransformationInterface
+interface ProcessingEngineInterface
 {
-    public function apply(ProcessingImageInterface $image): void;
+    public function open(string $filename): ProcessingImageInterface;
 }

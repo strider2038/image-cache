@@ -10,11 +10,8 @@
  */
 
 use PHPUnit\Framework\TestCase;
-
-use Strider2038\ImgCache\Imaging\{
-    Image,
-    ImageRequest
-};
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\ImageRequest;
 use Strider2038\ImgCache\Imaging\Transformation\{
     Quality,
     TransformationInterface,
@@ -34,7 +31,7 @@ class ImageRequestTest extends TestCase
             public function create(string $config): TransformationInterface
             {
                 return new class implements TransformationInterface {
-                    public function apply(Image $image): void {}
+                    public function apply(ProcessingImageInterface $image): void {}
                 };
             }
         };

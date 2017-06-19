@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Exception\{
     ApplicationException,
     InvalidImageException
@@ -22,21 +22,19 @@ use Strider2038\ImgCache\Exception\{
  */
 class Quality implements TransformationInterface
 {
+    const MIN_VALUE = 15;
+    const MAX_VALUE = 100;
+    
     /** @var int */
     private $value;
     
-    /** @var int */
-    private $min = 15;
-    
-    /** @var int */
-    private $max = 100;
-    
     public function __construct(int $value)
     {
-        if ($value < $this->min || $value > $this->max) {
+        if ($value < static::MIN_VALUE || $value > static::MAX_VALUE) {
             throw new InvalidImageException(
                 "Wrong value for quality transformation. "
-                . "Value must be between {$this->min} and {$this->max}."
+                . "Value must be between " . static::MIN_VALUE . " and " 
+                . static::MAX_VALUE . "."
             );
         }
         $this->value = $value;
@@ -47,7 +45,7 @@ class Quality implements TransformationInterface
         return $this->value;
     }
     
-    public function apply(Image $image): void
+    public function apply(ProcessingImageInterface $image): void
     {
         throw new ApplicationException('This transformation cannot be applied to image');
     }

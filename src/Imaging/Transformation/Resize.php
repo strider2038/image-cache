@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Exception\InvalidImageException;
 
 /**
@@ -24,17 +24,10 @@ class Resize implements TransformationInterface
     const MODE_PRESERVE_WIDTH = 'preserveWidth';
     const MODE_PRESERVE_HEIGHT = 'preserveHeight';
     
-    /** @var int */
-    private $minWidth = 20;
-    
-    /** @var int */
-    private $maxWidth = 1500;
-    
-    /** @var int */
-    private $minHeigth = 20;
-    
-    /** @var int */
-    private $maxHeigth = 1500;
+    const MIN_WIDTH = 20;
+    const MAX_WIDTH = 2000;
+    const MIN_HEIGHT = 20;
+    const MAX_HEIGHT = 2000;
     
     /** @var int */
     private $width;
@@ -50,14 +43,16 @@ class Resize implements TransformationInterface
         if ($heigth === null) {
             $heigth = $width;
         }
-        if ($width < $this->minWidth || $width > $this->maxWidth) {
+        if ($width < static::MIN_WIDTH || $width > static::MAX_WIDTH) {
             throw new InvalidImageException(
-                "Width of the image must be between {$this->minWidth} and {$this->maxWidth}"
+                "Width of the image must be between " . static::MIN_WIDTH 
+                    . " and " . static::MAX_HEIGHT
             );
         }
-        if ($heigth < $this->minHeigth || $heigth > $this->maxHeigth) {
+        if ($heigth < static::MIN_HEIGHT || $heigth > static::MAX_HEIGHT) {
             throw new InvalidImageException(
-                "Height of the image must be between {$this->minHeigth} and {$this->maxHeigth}"
+                "Height of the image must be between " . static::MIN_HEIGHT 
+                    . " and " . static::MAX_HEIGHT
             );
         }
         if (!in_array($mode, self::getAvailableModes())) {
@@ -83,9 +78,36 @@ class Resize implements TransformationInterface
         return $this->mode;
     }
 
-    public function apply(Image $image): void
+    public function apply(ProcessingImageInterface $image): void
     {
+        $sourceWidth = $image->getWidth();
+        $sourceHeight = $image->getHeight();
         
+        $ratios = [
+            (float) $this->width / (float) $sourceWidth,
+            (float) $this->heigth / (float) $sourceHeight,
+        ];
+        
+        $ratio = 1;
+        switch ($this->mode) {
+            case self::MODE_FIT_IN: $ratio = min($ratios); break;
+            case self::MODE_STRETCH: $ratio = max($ratios); break;
+            case self::MODE_PRESERVE_WIDTH: $ratio = $ratios[0]; break;
+            case self::MODE_PRESERVE_HEIGHT: $ratio = $ratios[1]; break;
+        }
+        
+        $newWidth = round($sourceWidth * $ratio);
+        $newHeight = round($sourceHeight * $ratio);
+        $image->resize($newWidth, $newHeight);
+        
+        if ($this->mode === self::MODE_STRETCH) {
+            $image->crop(
+                $this->width,
+                $this->heigth, 
+                max(0, round(($newWidth - $this->width) / 2)), 
+                max(0, round(($newHeight - $this->heigth) / 2))
+            );
+        }
     }
     
     public static function getAvailableModes(): array

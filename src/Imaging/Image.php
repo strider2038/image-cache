@@ -11,14 +11,17 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Exception\{
+    FileNotFoundException,
+    InvalidImageException
+};
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class Image
 {
+    /** @var string */
     private $filename;
     
     public function __construct(string $filename)
@@ -51,7 +54,7 @@ class Image
         ];
     }
     
-    public function hasValidMimeType(string $filename): bool
+    public static function hasValidMimeType(string $filename): bool
     {
         if (!file_exists($filename)) {
             throw new FileNotFoundException("File '{$filename}' not found");

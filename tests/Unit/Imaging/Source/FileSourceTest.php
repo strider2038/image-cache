@@ -9,18 +9,19 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Imaging\Source\FileSource;
 use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
-use Strider2038\ImgCache\Tests\Support\TestImages;
+use Strider2038\ImgCache\Tests\Support\{
+    TestImages,
+    FileTestCase
+};
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FileSourceTest extends TestCase
+class FileSourceTest extends FileTestCase
 {
-    const DIR_NAME = '/tmp/imgcache-test';
     const IMAGE_NAME = 'cat300.jpg';
     
     /** @var TemporaryFilesManagerInterface */
@@ -28,6 +29,7 @@ class FileSourceTest extends TestCase
     
     public function setUp() 
     {
+        parent::setUp();
         $this->manager = new class implements TemporaryFilesManagerInterface {
             public function getFilename(string $fileKey): ?string 
             {
@@ -38,24 +40,20 @@ class FileSourceTest extends TestCase
                 return '';
             }
         };
-                
-        exec('rm -rf ' . self::DIR_NAME);
     }
     
     public function testConstruct_BaseDirectoryIsSet_BaseDirectoryCreated(): void
     {
-        $this->assertDirectoryNotExists(self::DIR_NAME);
+        $source = new FileSource($this->manager, self::TEST_DIR);
         
-        $source = new FileSource($this->manager, self::DIR_NAME);
+        $this->assertDirectoryExists(self::TEST_DIR);
+        $this->assertDirectoryIsReadable(self::TEST_DIR);
+        $this->assertDirectoryIsWritable(self::TEST_DIR);
+        $this->assertEquals(self::TEST_DIR, $source->getBaseDirectory());
         
-        $this->assertDirectoryExists(self::DIR_NAME);
-        $this->assertDirectoryIsReadable(self::DIR_NAME);
-        $this->assertDirectoryIsWritable(self::DIR_NAME);
-        $this->assertEquals(self::DIR_NAME, $source->getBaseDirectory());
-        
-        $source2 = new FileSource($this->manager, self::DIR_NAME . '/');
+        $source2 = new FileSource($this->manager, self::TEST_DIR . '/');
         $this->assertEquals(
-            self::DIR_NAME, 
+            self::TEST_DIR, 
             $source2->getBaseDirectory(),
             'Base directory name should be without trailing slash'
         );
@@ -67,7 +65,7 @@ class FileSourceTest extends TestCase
      */
     public function testGet_FileDoesNotExist_FileNotFoundExceptionThrown(): void
     {
-        $source = new FileSource($this->manager, self::DIR_NAME);
+        $source = new FileSource($this->manager, self::TEST_DIR);
         $source->get('not.exist');
     }
     
@@ -88,9 +86,9 @@ class FileSourceTest extends TestCase
                 return $this->testTempFilename;
             }
         };
-        $manager->testTempFilename = self::DIR_NAME . '/test.jpg';
-        $source = new FileSource($manager, self::DIR_NAME);
-        mkdir(self::DIR_NAME . '/somedir');
+        $manager->testTempFilename = self::TEST_DIR . '/test.jpg';
+        $source = new FileSource($manager, self::TEST_DIR);
+        mkdir(self::TEST_DIR . '/somedir');
         copy(TestImages::getFilename(self::IMAGE_NAME), $sourceFilename);
         
         $image = $source->get($fileKey);
@@ -102,9 +100,9 @@ class FileSourceTest extends TestCase
     public function imageFilenameProvider(): array
     {
         return [
-            [self::DIR_NAME . '/a.jpg', 'a.jpg'],
-            [self::DIR_NAME . '/somedir/b.jpg', 'somedir/b.jpg'],
-            [self::DIR_NAME . '/somedir/c.jpg', '/somedir/c.jpg'],
+            [self::TEST_DIR . '/a.jpg', 'a.jpg'],
+            [self::TEST_DIR . '/somedir/b.jpg', 'somedir/b.jpg'],
+            [self::TEST_DIR . '/somedir/c.jpg', '/somedir/c.jpg'],
         ];
     }
 }
