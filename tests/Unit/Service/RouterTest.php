@@ -11,6 +11,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
+use Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Core\{
     Route,
     RequestInterface
@@ -25,6 +26,29 @@ use Strider2038\ImgCache\Service\{
  */
 class RouterTest extends TestCase
 {
+    /** @var \Strider2038\ImgCache\Core\RequestInterface */
+    private $request;
+    
+    protected function setUp()
+    {
+        $this->request = new class implements RequestInterface {
+            public $method;
+            public $url = '/a.jpg';
+            public function getMethod(): ?string
+            {
+                return $this->method;
+            }
+            public function getHeader(string $key): ?string
+            {
+                return null;
+            }
+            public function getUrl(int $component = null): string
+            {
+                return $this->url;
+            }
+        };
+    }
+    
     /**
      * @dataProvider requestMethodsProvider
      */
@@ -37,22 +61,8 @@ class RouterTest extends TestCase
         };
         
         $router = new Router($app);
-        
-        $request = new class implements RequestInterface {
-            public $method;
-            public function getMethod(): ?string
-            {
-                return $this->method;
-            }
-            public function getHeader(string $key): ?string
-            {
-                return null;
-            }
-        };
-        
-        $request->method = $requestMethod;
-        
-        $route = $router->getRoute($request);
+        $this->request->method = $requestMethod;
+        $route = $router->getRoute($this->request);
         
         $this->assertInstanceOf(Route::class, $route);
         $this->assertInstanceOf(ImageController::class, $route->getController());
@@ -79,19 +89,52 @@ class RouterTest extends TestCase
             public function __construct() {}
         };
         
-        $router = new \Strider2038\ImgCache\Service\Router($app);
+        $router = new Router($app);
         
-        $request = new class implements RequestInterface {
-            public function getMethod(): ?string
-            {
-                return null;
-            }
-            public function getHeader(string $key): ?string
-            {
-                return null;
-            }
+        $router->getRoute($this->request);
+    }
+    
+    /**
+     * @dataProvider allowedExtensionsProvider
+     */
+    public function testGetRoute_RequestedFileHasAllowedExtension_ControllerAndActionReturned(string $url) {
+        $app = new class extends Application {
+            public function __construct() {}
         };
         
-        $router->getRoute($request);
+        $router = new Router($app);
+        $this->request->method = 'GET';
+        $this->request->url = $url;
+        
+        $route = $router->getRoute($this->request);
+        
+        $this->assertInstanceOf(Route::class, $route);
+        $this->assertInstanceOf(ImageController::class, $route->getController());
+        $this->assertEquals('get', $route->getAction());
+    }
+    
+    public function allowedExtensionsProvider(): array
+    {
+        return [
+            ['/a.' . Image::EXTENSION_JPG],
+            ['/a.' . Image::EXTENSION_JPEG],
+            ['/a.' . Image::EXTENSION_PNG],
+        ];
+    }
+    
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\RequestException
+     * @expectedExceptionMessage Requested file has incorrect extension
+     */
+    public function testGetRoute_RequestedFileHasNotAllowedExtension_ExceptionThrown() {
+        $app = new class extends Application {
+            public function __construct() {}
+        };
+        
+        $router = new Router($app);
+        $this->request->method = 'GET';
+        $this->request->url = '/a.php';
+        
+        $router->getRoute($this->request);
     }
 }

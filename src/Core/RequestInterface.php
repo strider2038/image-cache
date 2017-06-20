@@ -18,4 +18,5 @@ interface RequestInterface
 {
     public function getMethod(): ?string;
     public function getHeader(string $key): ?string;
+    public function getUrl(int $component = null): string;
 }

@@ -17,7 +17,11 @@ use Strider2038\ImgCache\Core\{
     RequestInterface,
     Route
 };
-use Strider2038\ImgCache\Exception\InvalidRouteException;
+use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Exception\{
+    InvalidRouteException,
+    RequestException
+};
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -33,15 +37,29 @@ class Router extends Component implements RouterInterface
         Request::METHOD_DELETE => 'delete',
     ];
 
+    protected static $allowedExtensions = [
+        Image::EXTENSION_JPG,
+        Image::EXTENSION_JPEG,
+        Image::EXTENSION_PNG,
+    ];
+    
     public function getRoute(RequestInterface $request): Route 
     {
-        if (!array_key_exists($request->getMethod(), self::$methodsToActions)) {
+        $requestMethod = $request->getMethod();
+        
+        if (!array_key_exists($requestMethod, self::$methodsToActions)) {
             throw new InvalidRouteException('Route not found');
+        }
+        
+        $url = $request->getUrl(PHP_URL_PATH);
+        $ext = pathinfo($url, PATHINFO_EXTENSION);
+        if (!in_array($ext, self::$allowedExtensions)) {
+            throw new RequestException('Requested file has incorrect extension');
         }
         
         return new Route(
             new ImageController($this->getApp()),
-            self::$methodsToActions[$request->getMethod()]
+            self::$methodsToActions[$requestMethod]
         );
     }
     

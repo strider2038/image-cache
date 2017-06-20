@@ -30,13 +30,17 @@ class ImageCacheApiTest extends ApiTestCase
     
     public function testGet_ImageExist_Http200Returned(): void
     {
-        $this->havePublicImage();
+        [$imageFilename, $imageUrl] = $this->havePublicImage();
         
         /** @var \GuzzleHttp\Psr7\Response */
-        $response = $this->client->request('GET', '/i/' . self::IMAGE_CAT300);
+        $response = $this->client->request('GET', $imageUrl);
         
+        $this->assertFileExists($imageFilename);
         $this->assertEquals(Response::HTTP_CODE_OK, $response->getStatusCode());
-        $this->assertEquals('image/jpeg', $response->getHeader(Response::HTTP_HEADER_CONTENT_TYPE)[0]);
+        $this->assertEquals(
+            Response::CONTENT_TYPE_IMAGE_JPEG, 
+            $response->getHeader(Response::HTTP_HEADER_CONTENT_TYPE)[0]
+        );
     }
     
 }

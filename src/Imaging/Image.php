@@ -21,6 +21,10 @@ use Strider2038\ImgCache\Exception\{
  */
 class Image
 {
+    const EXTENSION_JPG = 'jpg';
+    const EXTENSION_JPEG = 'jpeg';
+    const EXTENSION_PNG = 'png';
+    
     /** @var string */
     private $filename;
     

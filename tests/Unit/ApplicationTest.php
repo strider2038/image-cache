@@ -46,6 +46,10 @@ class ApplicationTest extends TestCase
                         {
                             return 'requestGetHeaderResult';
                         }
+                        public function getUrl(int $component = null): string
+                        {
+                            return 'requestUrl';
+                        }
                     };
                 },
                 'security' => function($app) {
@@ -63,6 +67,7 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf(TemporaryFilesManagerInterface::class, $app->temporaryFileManager);
         $this->assertEquals('requestGetMethodResult', $app->request->getMethod());
         $this->assertEquals('requestGetHeaderResult', $app->request->getHeader(''));
+        $this->assertEquals('requestUrl', $app->request->getUrl());
         $this->assertTrue($app->security->isAuthorized());
     }
     

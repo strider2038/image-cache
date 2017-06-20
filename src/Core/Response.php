@@ -33,6 +33,8 @@ abstract class Response implements ResponseInterface
     
     const HTTP_HEADER_CONTENT_TYPE = 'Content-Type';
     
+    const CONTENT_TYPE_IMAGE_JPEG = 'image/jpeg';
+    
     public static function getAvailableHttpStatuses(): array
     {
         return [

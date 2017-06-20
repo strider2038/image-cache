@@ -5,6 +5,9 @@ $configWeb = [
     'components' => [
         'router' => function($app) {
             return new \Strider2038\ImgCache\Service\Router($app);
+        },
+        'imgcache' => function($app) {
+            return new Strider2038\ImgCache\Imaging\ImageCache($app);
         }
     ],
     'params' => [

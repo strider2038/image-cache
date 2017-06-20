@@ -32,6 +32,7 @@ class ImageController extends Controller
     
     public function actionGet(Request $request): ResponseInterface
     {
+        $filename = $request->getUrl(PHP_URL_PATH);
         return new NotFoundResponse();
     }
     

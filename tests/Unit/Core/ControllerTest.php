@@ -24,6 +24,27 @@ use Strider2038\ImgCache\Response\ForbiddenResponse;
 class ControllerTest extends TestCase 
 {
 
+    private $request;
+    
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->request = new class implements RequestInterface {
+            public function getMethod(): string
+            {
+                return 'getMethodResult';
+            }
+            public function getHeader(string $key): ?string
+            {
+                return 'getHeaderResult';
+            }
+            public function getUrl(int $component = null): string
+            {
+                return 'requestUrl';
+            }
+        };
+    }
+    
     /**
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage does not exists
@@ -34,37 +55,15 @@ class ControllerTest extends TestCase
             public function __construct() {}
         };
         
-        $request = new class implements RequestInterface {
-            public function getMethod(): string
-            {
-                return 'getMethodResult';
-            }
-            public function getHeader(string $key): ?string
-            {
-                return 'getHeaderResult';
-            }
-        };
-        
         $controller = new class($app) extends Controller {};
         
-        $controller->runAction('test', $request);
+        $controller->runAction('test', $this->request);
     }
     
     public function testRunAction_ActionExists_MethodExecuted() 
     {
         $app = new class extends Application {
             public function __construct() {}
-        };
-        
-        $request = new class implements RequestInterface {
-            public function getMethod(): string
-            {
-                return 'getMethodResult';
-            }
-            public function getHeader(string $key): ?string
-            {
-                return 'getHeaderResult';
-            }
         };
         
         $controller = new class($app) extends Controller {
@@ -84,7 +83,7 @@ class ControllerTest extends TestCase
         
         $this->assertInstanceOf(
             ResponseInterface::class, 
-            $controller->runAction('test', $request)
+            $controller->runAction('test', $this->request)
         );
         $this->assertTrue($controller->success);
     }
@@ -102,17 +101,6 @@ class ControllerTest extends TestCase
             }
         };
         
-        $request = new class implements RequestInterface {
-            public function getMethod(): string
-            {
-                return 'getMethodResult';
-            }
-            public function getHeader(string $key): ?string
-            {
-                return 'getHeaderResult';
-            }
-        };
-        
         $controller = new class($app) extends Controller {
             public $success = false;
             public function actionTest()
@@ -126,7 +114,7 @@ class ControllerTest extends TestCase
         
         $this->assertInstanceOf(
             ForbiddenResponse::class, 
-            $controller->runAction('test', $request)
+            $controller->runAction('test', $this->request)
         );
         $this->assertFalse($controller->success);
     }
@@ -144,17 +132,6 @@ class ControllerTest extends TestCase
             }
         };
         
-        $request = new class implements RequestInterface {
-            public function getMethod(): string
-            {
-                return 'getMethodResult';
-            }
-            public function getHeader(string $key): ?string
-            {
-                return 'getHeaderResult';
-            }
-        };
-        
         $controller = new class($app) extends Controller {
             public $success = false;
             public function actionTest()
@@ -168,7 +145,7 @@ class ControllerTest extends TestCase
         
         $this->assertInstanceOf(
             ResponseInterface::class, 
-            $controller->runAction('test', $request)
+            $controller->runAction('test', $this->request)
         );
         $this->assertTrue($controller->success);
     }

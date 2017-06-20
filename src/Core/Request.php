@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Exception\ApplicationException;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -26,6 +28,8 @@ class Request extends Component implements RequestInterface
     /** @var string */
     private $method;
 
+    /** @var string */
+    private $requestUri;
 
     public function __construct() 
     {
@@ -42,9 +46,26 @@ class Request extends Component implements RequestInterface
     
     public function getHeader(string $key): ?string 
     {
+        if (!in_array($key, self::getAvailableHeaders())) {
+            return null;
+        }
         return $_SERVER[$key] ?? null;
     }
     
+    public function getUrl(int $component = null): string
+    {
+        if ($this->requestUri === null) {
+            $this->requestUri = $_SERVER['REQUEST_URI'];
+        }
+        if ($component === null || $component <= 0) {
+            return $this->requestUri;
+        }
+        return parse_url($this->requestUri, $component);
+    }
+    
+    /**
+     * @return string[]
+     */
     public static function getAvailableMethods(): array
     {
         return [
@@ -53,6 +74,16 @@ class Request extends Component implements RequestInterface
             self::METHOD_PUT,
             self::METHOD_PATCH,
             self::METHOD_DELETE,
+        ];
+    }
+    
+    /**
+     * @return string[]
+     */
+    public static function getAvailableHeaders(): array
+    {
+        return [
+            self::HEADER_AUTHORIZATION,
         ];
     }
 }
