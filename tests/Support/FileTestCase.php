@@ -33,7 +33,7 @@ class FileTestCase extends TestCase
         exec('rm -rf ' . self::TEST_DIR);
     }
 
-    public function getImageFilename(string $name): string
+    public function haveFile(string $name): string
     {
         return TestImages::getFilename($name);
     }

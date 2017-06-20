@@ -31,6 +31,8 @@ abstract class Response implements ResponseInterface
     const HTTP_CODE_UNSUPPORTED_MEDIA_TYPE = 415;
     const HTTP_CODE_INTERNAL_SERVER_ERROR  = 500;
     
+    const HTTP_HEADER_CONTENT_TYPE = 'Content-Type';
+    
     public static function getAvailableHttpStatuses(): array
     {
         return [

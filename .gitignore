@@ -1,3 +1,24 @@
-/nbproject/
+# phpstorm project files
+.idea
 
-/vendor/
+# netbeans project files
+nbproject
+
+# zend studio for eclipse project files
+.buildpath
+.project
+.settings
+
+# windows thumbnail cache
+Thumbs.db
+
+# Mac DS_Store Files
+.DS_Store
+
+# composer vendor dir
+/vendor
+
+/web/*
+/web-test/*
+!/web/index.php
+!/web-test/index.php

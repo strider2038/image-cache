@@ -2,9 +2,9 @@
 
 build_prod=0
 for i in $@; do
-   if [[ "$i" == "--build-prod" || "$i" == "-p" ]]; then
-       build_prod=1
-   fi
+    if [[ "$i" == "--build-prod" || "$i" == "-p" ]]; then
+        build_prod=1
+    fi
 done
 
 echo "Cleaning old images..."
@@ -15,6 +15,13 @@ docker rm $(docker ps -a -q)
 if [ $build_prod -eq 1 ]; then
     ./build.sh
 fi
+
+echo "Building testing image..."
+echo "========================================================================="
+docker build \
+    --file Dockerfile.test \
+    --tag strider2038:imgcache-service-test \
+    .
 
 echo "Building development image..."
 echo "========================================================================="

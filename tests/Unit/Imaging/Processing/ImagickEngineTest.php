@@ -47,7 +47,7 @@ class ImagickEngineTest extends FileTestCase
     public function testOpen_FileExist_ImagickImageIsReturned(): void
     {
         $engine = new ImagickEngine($this->app);
-        $image = $engine->open($this->getImageFilename(self::IMAGE_CAT300));
+        $image = $engine->open($this->haveFile(self::IMAGE_CAT300));
         $this->assertInstanceOf(ProcessingImageInterface::class, $image);
         $this->assertInstanceOf(ImagickImage::class, $image);
     }
