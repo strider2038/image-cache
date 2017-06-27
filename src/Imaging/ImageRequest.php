@@ -19,6 +19,7 @@ use Strider2038\ImgCache\Imaging\Transformation\{
 };
 
 /**
+ * Request for retrieving image from cache
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageRequest implements ImageRequestInterface

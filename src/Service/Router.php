@@ -57,8 +57,10 @@ class Router extends Component implements RouterInterface
             throw new RequestException('Requested file has incorrect extension');
         }
         
+        $app = $this->getApp();
+        
         return new Route(
-            new ImageController($this->getApp()),
+            new ImageController($app->security, $app->imgcache),
             self::$methodsToActions[$requestMethod]
         );
     }

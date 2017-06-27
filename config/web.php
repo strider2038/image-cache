@@ -7,7 +7,16 @@ $configWeb = [
             return new \Strider2038\ImgCache\Service\Router($app);
         },
         'imgcache' => function($app) {
-            return new Strider2038\ImgCache\Imaging\ImageCache($app);
+            return new \Strider2038\ImgCache\Imaging\ImageCache($app);
+        },
+        'transformationsFactory' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory($app);
+        },
+        'imageSource' => function($app) {
+            return new Strider2038\ImgCache\Imaging\Source\FileSource(
+                $temporaryFilesManager, 
+                $baseDirectory
+            );
         }
     ],
     'params' => [

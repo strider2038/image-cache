@@ -10,12 +10,15 @@
 
 namespace Strider2038\ImgCache\Service;
 
+use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Core\{
     Controller,
-    Request,
-    ResponseInterface
+    RequestInterface,
+    ResponseInterface,
+    SecurityInterface
 };
 use Strider2038\ImgCache\Response\{
+    ImageResponse,
     ErrorResponse,
     NotFoundResponse
 };
@@ -25,33 +28,48 @@ use Strider2038\ImgCache\Response\{
  */
 class ImageController extends Controller 
 {
-    protected function getInsecureActions(): array
+    /** @var \Strider2038\ImgCache\Imaging\ImageCacheInterface */
+    private $imgcache;
+
+    public function __construct(SecurityInterface $security, ImageCacheInterface $imgcache)
+    {
+        parent::__construct($security);
+        $this->imgcache = $imgcache;
+    }
+    
+    protected function getSafeActions(): array
     {
         return ['get'];
     }
     
-    public function actionGet(Request $request): ResponseInterface
+    public function actionGet(RequestInterface $request): ResponseInterface
     {
         $filename = $request->getUrl(PHP_URL_PATH);
-        return new NotFoundResponse();
+        
+        $image = $this->imgcache->get($filename);
+        if ($image === null) {
+            return new NotFoundResponse();
+        }
+        
+        return new ImageResponse($image->getFilename());
     }
     
-    public function actionCreate(Request $request): ResponseInterface
+    public function actionCreate(RequestInterface $request): ResponseInterface
     {
         return new NotFoundResponse();
     }
     
-    public function actionReplace(Request $request): ResponseInterface
+    public function actionReplace(RequestInterface $request): ResponseInterface
     {
         return new NotFoundResponse();
     }
     
-    public function actionRefresh(Request $request): ResponseInterface
+    public function actionRefresh(RequestInterface $request): ResponseInterface
     {
         return new NotFoundResponse();
     }
     
-    public function actionDelete(Request $request): ResponseInterface
+    public function actionDelete(RequestInterface $request): ResponseInterface
     {
         return new NotFoundResponse();
     }

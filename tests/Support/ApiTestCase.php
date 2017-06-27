@@ -21,7 +21,7 @@ class ApiTestCase extends FileTestCase
     /** @var \GuzzleHttp\Client */
     protected $client;
     
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->client = new Client([

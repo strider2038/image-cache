@@ -38,35 +38,37 @@ class ComponentsContainer extends Component
     public function set(string $name, $component) 
     {
         if (isset($this->components[$name])) {
-            throw new ApplicationException("Component '{$name}' is already exists");
+            throw new ApplicationException("Component '{$name}' already exists");
         }
-        if (!is_callable($component) && !$component instanceof Component) {
+        if (!is_callable($component) && !is_object($component)) {
             throw new ApplicationException(
-                "Component '{$name}' must be a callable "
-                . "or an instance of " . Component::class
+                "Component '{$name}' must be a callable or an object."
             );
         }
         $this->components[$name] = $component;
         return $this;
     }
     
-    public function get($name): Component
+    public function get($name)
     {
         if (!isset($this->components[$name])) {
             throw new ApplicationException("Component '{$name}' not found");
         }
-        if ($this->components[$name] instanceof Component) {
+        if (!is_object($this->components[$name])) {
+            throw new ApplicationException("Cannot create component '{$name}'");
+        }
+        if (!is_callable($this->components[$name])) {
             return $this->components[$name];
         }
-        if (is_callable($this->components[$name])) {
-            $obj = $this->components[$name]($this->getApp());
-            if (!$obj instanceof Component) {
-                throw new ApplicationException(
-                    "Component '{$name}' must be instance of " . Component::class
-                );
-            }
-            return $this->components[$name] = $obj;
+        
+        // component construction via callable function
+        $obj = $this->components[$name]($this->getApp());
+        if (!is_object($obj) || is_callable($obj)) {
+            throw new ApplicationException(
+                "Incorrect instance of object '{$name}'. It must be an"
+                . " object and cannot be callable."
+            );
         }
-        throw new ApplicationException("Cannot create component '{$name}'");
+        return $this->components[$name] = $obj;
     }
 }

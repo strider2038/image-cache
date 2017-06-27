@@ -12,33 +12,48 @@ namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Exception\ApplicationException;
 use Strider2038\ImgCache\Response\ForbiddenResponse;
+use Strider2038\ImgCache\Core\SecurityInterface;
 
 /**
  * Description of Controller
  *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-abstract class Controller extends Component implements ControllerInterface
+abstract class Controller implements ControllerInterface
 {
-    
+    protected $security;
+
+    public function __construct(SecurityInterface $security = null)
+    {
+        $this->security = $security;
+    }
+
     public function runAction(string $action, RequestInterface $request): ResponseInterface 
     {
         $actionName = 'action' . ucfirst($action);
         if (!method_exists($this, $actionName)) {
             throw new ApplicationException("Action '{$actionName}' does not exists");
         }
-        if (
-            !in_array($action, $this->getInsecureActions())
-            && !$this->getApp()->security->isAuthorized()
-        ) {
+        if (!$this->isActionSafe($action)) {
             return new ForbiddenResponse();
         }
         
         return call_user_func([$this, $actionName], $request);
     }
     
-    protected function getInsecureActions(): array
+    protected function getSafeActions(): array
     {
         return [];
+    }
+    
+    private function isActionSafe(string $action): bool
+    {
+        if ($this->security === null) {
+            return true;
+        }
+        if (in_array($action, $this->getSafeActions())) {
+            return true;
+        }
+        return $this->security->isAuthorized();
     }
 }

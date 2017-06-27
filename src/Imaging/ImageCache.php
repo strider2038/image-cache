@@ -11,16 +11,32 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Core\Component;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
+use Strider2038\ImgCache\Imaging\Source\SourceInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageCache extends Component implements ImageCacheInterface
+class ImageCache implements ImageCacheInterface
 {
+    /** @var Strider2038\ImgCache\Imaging\Source\SourceInterface */
+    private $source;
+    
+    /** @var Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface */
+    private $transformationsFactory;
+    
+    public function __construct(
+        SourceInterface $source, 
+        TransformationsFactoryInterface $transformationsFactory
+    ) {
+        $this->source = $source;
+        $this->transformationsFactory = $transformationsFactory;
+    }
 
-    public function get(string $key): Image
+    public function get(string $key): ?Image
     {
+        $imageRequest = new ImageRequest($this->transformationsFactory, $key);
+        
         
     }
 

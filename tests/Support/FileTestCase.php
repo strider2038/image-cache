@@ -22,13 +22,13 @@ class FileTestCase extends TestCase
     const IMAGE_CAT300 = 'cat300.jpg';
     const IMAGE_CAT2000 = 'cat2000.jpg';
     
-    public function setUp() 
+    protected function setUp() 
     {
         exec('rm -rf ' . self::TEST_DIR);
         mkdir(self::TEST_DIR);
     }
     
-    public function tearDown()
+    protected function tearDown()
     {
         exec('rm -rf ' . self::TEST_DIR);
     }

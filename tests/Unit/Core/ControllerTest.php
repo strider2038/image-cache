@@ -14,7 +14,8 @@ use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\{
     Controller,
     RequestInterface,
-    ResponseInterface
+    ResponseInterface,
+    SecurityInterface
 };
 use Strider2038\ImgCache\Response\ForbiddenResponse;
 
@@ -23,7 +24,7 @@ use Strider2038\ImgCache\Response\ForbiddenResponse;
  */
 class ControllerTest extends TestCase 
 {
-
+    /** @var \Strider2038\ImgCache\Core\RequestInterface */
     private $request;
     
     protected function setUp()
@@ -49,24 +50,20 @@ class ControllerTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionMessage does not exists
      */
-    public function testRunAction_ActionDoesNotExists_ExceptionThrown() 
+    public function testRunAction_ActionDoesNotExists_ExceptionThrown(): void
     {
         $app = new class extends Application {
             public function __construct() {}
         };
         
-        $controller = new class($app) extends Controller {};
+        $controller = new class extends Controller {};
         
         $controller->runAction('test', $this->request);
     }
     
-    public function testRunAction_ActionExists_MethodExecuted() 
+    public function testRunAction_ActionExistsNoSecurityControl_MethodExecuted(): void
     {
-        $app = new class extends Application {
-            public function __construct() {}
-        };
-        
-        $controller = new class($app) extends Controller {
+        $controller = new class extends Controller {
             public $success = false;
             public function actionTest()
             {
@@ -75,12 +72,9 @@ class ControllerTest extends TestCase
                     public function send(): void {}
                 };
             }
-            protected function getInsecureActions(): array
-            {
-                return ['test'];
-            }
         };
         
+        $this->assertFalse($controller->success);
         $this->assertInstanceOf(
             ResponseInterface::class, 
             $controller->runAction('test', $this->request)
@@ -88,20 +82,15 @@ class ControllerTest extends TestCase
         $this->assertTrue($controller->success);
     }
 
-    public function testRunAction_ActionIsNotSecuredAndNotAuthorized_ForbiddenResponseReturned()
+    public function testRunAction_ActionIsNotSafeAndNotAuthorized_ForbiddenResponseReturned(): void
     {
-        $app = new class extends Application {
-            public function __construct() {}
-            public $security;
-        };
-        
-        $app->security = new class {
-            public function isAuthorized() {
+        $security = new class implements SecurityInterface {
+            public function isAuthorized(): bool {
                 return false;
             }
         };
         
-        $controller = new class($app) extends Controller {
+        $controller = new class($security) extends Controller {
             public $success = false;
             public function actionTest()
             {
@@ -112,6 +101,7 @@ class ControllerTest extends TestCase
             }
         };
         
+        $this->assertFalse($controller->success);
         $this->assertInstanceOf(
             ForbiddenResponse::class, 
             $controller->runAction('test', $this->request)
@@ -119,20 +109,15 @@ class ControllerTest extends TestCase
         $this->assertFalse($controller->success);
     }
     
-    public function testRunAction_ActionIsNotSecuredAndIsAuthorized_MethodExecuted()
+    public function testRunAction_ActionIsNotSafeAndIsAuthorized_MethodExecuted(): void
     {
-        $app = new class extends Application {
-            public function __construct() {}
-            public $security;
-        };
-        
-        $app->security = new class {
-            public function isAuthorized() {
+        $security = new class implements SecurityInterface {
+            public function isAuthorized(): bool {
                 return true;
             }
         };
         
-        $controller = new class($app) extends Controller {
+        $controller = new class($security) extends Controller {
             public $success = false;
             public function actionTest()
             {
@@ -143,6 +128,7 @@ class ControllerTest extends TestCase
             }
         };
         
+        $this->assertFalse($controller->success);
         $this->assertInstanceOf(
             ResponseInterface::class, 
             $controller->runAction('test', $this->request)
