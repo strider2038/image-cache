@@ -97,16 +97,20 @@ class Application
     private function getCoreComponents(): array 
     {
         return [
-            'request' => function($app) {
-                return new Core\Request($app);
+            'request' => Core\Request::class,
+            'security' => function(Application $app) {
+                return new Core\Security($app->request, $app->getParam('securityToken'));
             },
-            'security' => function($app) {
-                return new Core\Security($app);
-            },
-            'temporaryFileManager' => function($app) {
-                return new Core\TemporaryFilesManager($app);
-            },
+            'temporaryFileManager' => Core\TemporaryFilesManager::class,
         ];
+    }
+    
+    public function getParam(string $key)
+    {
+        if (!isset($this->params[$key])) {
+            throw new ApplicationException("Parameter '$key' is not set");
+        }
+        return $this->params[$key];
     }
     
     public function isDebugMode(): bool

@@ -11,16 +11,43 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Core\Component;
 use Strider2038\ImgCache\Exception\InvalidConfigException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TransformationsFactory extends Component implements TransformationsFactoryInterface
+class TransformationsFactory implements TransformationsFactoryInterface
 {
-    /** @var array */
+    /** @var TransformationBuilderInterface[] */
     private $builders = [];
+    
+    /** @var string[] */
+    private $buildersMap = [];
+    
+    public function __construct(array $buildersMap = null)
+    {
+        if ($buildersMap === null) {
+            $this->buildersMap = self::getDefaultBuildersMap();
+            return;
+        }
+        if (count($buildersMap) <= 0) {
+            throw new InvalidConfigException('Builders map cannot be empty');
+        }
+        foreach ($buildersMap as $class) {
+            if (!class_exists($class)) {
+                throw new InvalidConfigException(
+                    "Class with name '{$class}' does not exist"
+                );
+            }
+            $implements = class_implements($class);
+            if (!isset($implements[TransformationBuilderInterface::class])) {
+                throw new InvalidConfigException(
+                    "Class '{$class}' must implement " . TransformationBuilderInterface::class
+                );
+            }
+        }
+        $this->buildersMap = $buildersMap;
+    }
     
     public function create(string $config): TransformationInterface
     {
@@ -40,14 +67,13 @@ class TransformationsFactory extends Component implements TransformationsFactory
         if (isset($this->builders[$index])) {
             return $this->builders[$index];
         }
-        $map = $this->getBuildersMap();
-        if (isset($map[$index])) {
-            return $this->builders[$index] = new $map[$index];
+        if (isset($this->buildersMap[$index])) {
+            return $this->builders[$index] = new $this->buildersMap[$index];
         }
         return null;
     }
     
-    public function getBuildersMap(): array
+    public static function getDefaultBuildersMap(): array
     {
         return [
             'q' => QualityBuilder::class,

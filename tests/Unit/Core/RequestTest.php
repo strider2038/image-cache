@@ -39,7 +39,7 @@ class RequestTest extends TestCase
         ];
     }
     
-    public function testConstruct_RequestMethodNotSet_NullReturned()
+    public function testConstruct_RequestMethodNotSet_NullReturned(): void
     {   
         unset($_SERVER['REQUEST_METHOD']);
         $request = new Request();
@@ -49,7 +49,7 @@ class RequestTest extends TestCase
     /**
      * @dataProvider headersProvider
      */
-    public function testGetHeader_HeaderIsSet_HeaderReturned($header, $value)
+    public function testGetHeader_HeaderIsSet_HeaderReturned($header, $value): void
     {
         $_SERVER[$header] = $value;
         
@@ -60,14 +60,14 @@ class RequestTest extends TestCase
         );
     }
     
-    public function headersProvider()
+    public function headersProvider(): array
     {
         return [
             ['HTTP_AUTHORIZATION', 'Bearer xxx']
         ];
     }
     
-    public function testGetHeader_HeaderIsNotSet_NullReturned()
+    public function testGetHeader_HeaderIsNotSet_NullReturned(): void
     {
         $request = new Request();
         $this->assertNull($request->getHeader('UNKNOWN_HEADER'));

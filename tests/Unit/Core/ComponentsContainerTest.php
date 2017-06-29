@@ -12,6 +12,7 @@
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\ComponentsContainer;
+use Strider2038\ImgCache\Tests\Support\ComponentMock;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -36,7 +37,7 @@ class ComponentsContainerTest extends TestCase
         $this->assertEquals('test', $container->getApp()->getId());
     }
 
-    public function testSet_ComponentCreated_ComponentReturned(): void
+    public function testSet_NewComponentAsObject_ComponentReturned(): void
     {
         $container = new ComponentsContainer($this->app);
         $component = new class {
@@ -50,7 +51,7 @@ class ComponentsContainerTest extends TestCase
         $this->assertEquals('test', $container->get('testComponent')->id);
     }
     
-    public function testSet_NewComponentInCallable_ComponentReturned(): void
+    public function testSet_NewComponentReturnedByCallable_ComponentReturned(): void
     {
         $container = new ComponentsContainer($this->app);
         $callable = function() {
@@ -66,6 +67,18 @@ class ComponentsContainerTest extends TestCase
         $this->assertEquals('test', $container->get('testComponent')->id);
     }
     
+    public function testSet_NewComponentAsClassName_ComponentReturned(): void
+    {
+        $container = new ComponentsContainer($this->app);
+        
+        $this->assertInstanceOf(
+            ComponentsContainer::class, 
+            $container->set('testComponent', ComponentMock::class)
+        );
+        $this->assertTrue(is_object($container->get('testComponent')));
+        $this->assertEquals('componentMock', $container->get('testComponent')->id);
+    }
+
     /**
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionCode 500
@@ -88,7 +101,7 @@ class ComponentsContainerTest extends TestCase
     /**
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionCode 500
-     * @expectedExceptionMessage Component 'test' must be a callable or an object
+     * @expectedExceptionMessage Component 'test' must be a callable, an object or a class name
      */
     public function testSet_ComponentIsString_ExceptionThrown(): void
     {

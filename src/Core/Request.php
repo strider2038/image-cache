@@ -10,12 +10,10 @@
 
 namespace Strider2038\ImgCache\Core;
 
-use Strider2038\ImgCache\Exception\ApplicationException;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Request extends Component implements RequestInterface 
+class Request implements RequestInterface 
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';

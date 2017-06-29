@@ -10,7 +10,7 @@
  */
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Application;
+use Strider2038\ImgCache\Tests\Support\TransformationsBuilderInterfaceMock;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Transformation\{
     QualityBuilder,
@@ -25,14 +25,55 @@ use Strider2038\ImgCache\Imaging\Transformation\{
  */
 class TransformationsFactoryTest extends TestCase
 {
-    /** @var \Strider2038\ImgCache\Application */
-    private $app;
-    
-    public function setUp()
+    /**
+     * @dataProvider builderIndexProvider
+     */
+    public function testConstruct_NoBuildersMap_DefaultMapIsUsed(string $index, string $instance): void
     {
-        $this->app = new class extends Application {
-            public function __construct() {}
-        };
+        $factory = new TransformationsFactory();
+        $this->assertInstanceOf($instance, $factory->getBuilder($index));
+    }
+
+    public function testConstruct_CustomBuildersMap_CustomMapIsUsed(): void
+    {
+        $factory = new TransformationsFactory([
+            'a' => TransformationsBuilderInterfaceMock::class,
+        ]);
+        $this->assertInstanceOf(
+            TransformationBuilderInterface::class, 
+            $factory->getBuilder('a')
+        );
+        $this->assertNull($factory->getBuilder('b'));
+    }
+    
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Builders map cannot be empty
+     */
+    public function testConstruct_EmptyBuildersMap_ExceptionThrown(): void
+    {
+        new TransformationsFactory([]);
+    }
+    
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage does not exist
+     */
+    public function testConstruct_NotAClassInBuildersMap_ExceptionThrown(): void
+    {
+        new TransformationsFactory(['a' => 'notAClass']);
+    }
+    
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage must implement
+     */
+    public function testConstruct_IncorrectClassInBuildersMap_ExceptionThrown(): void
+    {
+        new TransformationsFactory(['a' => self::class]);
     }
     
     /**
@@ -42,7 +83,7 @@ class TransformationsFactoryTest extends TestCase
      */
     public function testCreate_InvalidConfig_ExceptionThrown(): void
     {
-        $factory = new class($this->app) extends TransformationsFactory {
+        $factory = new class extends TransformationsFactory {
             public function getBuildersMap(): array
             {
                 return [];
@@ -55,10 +96,9 @@ class TransformationsFactoryTest extends TestCase
     /**
      * @dataProvider builderIndexProvider
      */
-    public function testGetBuildersMap_NoParams_BuildersReturned($index, $instance): void
+    public function testGetDefaultBuildersMap_NoParams_BuildersReturned(string $index, string $instance): void
     {
-        $factory = new TransformationsFactory($this->app);
-        $builders = $factory->getBuildersMap();
+        $builders = TransformationsFactory::getDefaultBuildersMap();
         $this->assertArrayHasKey($index, $builders);
         $this->assertInstanceOf($instance, new $builders[$index]);
     }
@@ -66,9 +106,9 @@ class TransformationsFactoryTest extends TestCase
     /**
      * @dataProvider builderIndexProvider
      */
-    public function testGetBuilder_IndexIsSet_InstanceIsReturned($index, $instance): void
+    public function testGetBuilder_IndexIsSet_InstanceIsReturned(string $index, string $instance): void
     {
-        $factory = new TransformationsFactory($this->app);
+        $factory = new TransformationsFactory();
         $this->assertInstanceOf($instance, $factory->getBuilder($index));
     }
     
@@ -82,13 +122,13 @@ class TransformationsFactoryTest extends TestCase
     
     public function testGetBuilder_UnknownIndexIsSet_NullIsReturned(): void
     {
-        $factory = new TransformationsFactory($this->app);
+        $factory = new TransformationsFactory();
         $this->assertNull($factory->getBuilder('unidentified'));
     }
     
     public function testCreate_ConfigIsSet_TransformationIsReturned(): void
     {
-        $factory = new class($this->app) extends TransformationsFactory {
+        $factory = new class extends TransformationsFactory {
             public function getBuilder(string $index): ?TransformationBuilderInterface
             {
                 switch ($index) {

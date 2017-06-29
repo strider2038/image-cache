@@ -11,21 +11,19 @@
 
 namespace Strider2038\ImgCache\Core;
 
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Helper\FileHelper;
 use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TemporaryFilesManager extends Component implements TemporaryFilesManagerInterface
+class TemporaryFilesManager implements TemporaryFilesManagerInterface
 {
     /** @var string Root directory for temporary files */
     protected $directory;
 
-    public function __construct(Application $app, $directory = '/tmp/imgcache')
+    public function __construct(string $directory = '/tmp/imgcache')
     {
-        parent::__construct($app);
         FileHelper::createDirectory($directory);
         if (substr($directory, -1) !== '/') {
             $directory .= '/';
