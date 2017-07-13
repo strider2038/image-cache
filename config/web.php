@@ -8,17 +8,20 @@ $configWeb = [
         },
         'imgcache' => function($app) {
             return new \Strider2038\ImgCache\Imaging\ImageCache(
+                __DIR__ . '/../web',
                 $app->imageSource,
-                $app->transformationsFactory
+                $app->transformationsFactory,
+                $app->processingEngine
             );
         },
         'transformationsFactory' => \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory::class,
+        'processingEngine' => \Strider2038\ImgCache\Imaging\Processing\ImagickEngine::class,
         'imageSource' => function(\Strider2038\ImgCache\Application $app) {
             return new \Strider2038\ImgCache\Imaging\Source\FileSource(
                 $app->temporaryFileManager, 
-                '/services/imgcache/isource'
+                __DIR__ . '/../isource'
             );
-        },
+        },        
     ],
     'params' => [
         'debug' => false,

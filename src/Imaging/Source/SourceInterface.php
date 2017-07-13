@@ -18,5 +18,5 @@ use Strider2038\ImgCache\Imaging\Image;
  */
 interface SourceInterface
 {
-    public function get(string $filename): Image;
+    public function get(string $filename): ?Image;
 }

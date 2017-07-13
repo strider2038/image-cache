@@ -1,16 +1,20 @@
 FROM strider2038:imgcache-service-test
 MAINTAINER Igor Lazarev <strider2038@rambler.ru>
 
-COPY ./docker.conf/composer/auth.json /var/run/composer/auth.json
-COPY ./docker.conf/php/* /usr/local/etc/php/conf.d/
-
 RUN apk add --update \
+    openssh \
     nano \
     iputils && \
     pecl install xdebug && \
     docker-php-ext-enable xdebug && \
     mkdir -p /var/log/xdebug
 
-EXPOSE 80 9001
+COPY ./.docker/supervisor/sshd.conf /etc/supervisord/sshd.conf
+COPY ./.docker/composer/auth.json /var/run/composer/auth.json
+COPY ./.docker/php/* /usr/local/etc/php/conf.d/
+COPY ./.docker/sshd/* /etc/ssh/
+COPY ./.docker/env/dev.sh /etc/profile.d/dev.sh
+
+EXPOSE 22 80 9001
 
 VOLUME /services/imgcache

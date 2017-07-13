@@ -27,22 +27,26 @@ class ImagickImage implements ProcessingImageInterface
     
     public function getHeight(): int
     {
-        $this->imagick->getimageheight();
+        $this->imagick->getImageHeight();
     }
 
     public function getWidth(): int
     {
-        $this->imagick->getimagewidth();
+        $this->imagick->getImageWidth();
     }
 
-    public function crop(int $width, int $heigth, int $x, int $y): void
+    public function crop(int $width, int $height, int $x, int $y): void
     {
-        $this->imagick->cropimage($width, $heigth, $x, $y);
+        $this->imagick->cropImage($width, $height, $x, $y);
     }
 
-    public function resize(int $width, int $heigth): void
+    public function resize(int $width, int $height): void
     {
-        $this->imagick->resizeimage($width, $heigth, \Imagick::FILTER_LANCZOS, 1);
+        $this->imagick->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
     }
 
+    public function save(string $filename): void
+    {
+        $this->imagick->writeImage($filename);
+    }
 }

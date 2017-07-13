@@ -10,7 +10,6 @@
  */
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\TemporaryFilesManager;
 
 /**
@@ -19,7 +18,7 @@ use Strider2038\ImgCache\Core\TemporaryFilesManager;
 class TemporaryFilesManagerTest extends TestCase
 {
 
-    const TEMP_DIR = '/tmp/imgcache/';
+    const TEMP_DIR = '/tmp/imgcache-test/';
     
     public function setUp() 
     {
@@ -28,7 +27,7 @@ class TemporaryFilesManagerTest extends TestCase
     
     public function testConstruct_NoParams_NoErrors(): void
     {
-        $manager = new TemporaryFilesManager();
+        $manager = new TemporaryFilesManager(self::TEMP_DIR);
         $this->assertInstanceOf(TemporaryFilesManager::class, $manager);
     }
     
@@ -43,7 +42,7 @@ class TemporaryFilesManagerTest extends TestCase
      */
     public function testGetHashedName_fileKeyIsSet_fileHashIsReturned(string $key, string $hash): void
     {
-        $manager = new TemporaryFilesManager();
+        $manager = new TemporaryFilesManager(self::TEMP_DIR);
         $this->assertEquals($hash, $manager->getHashedName($key));
     }
 
@@ -59,14 +58,14 @@ class TemporaryFilesManagerTest extends TestCase
     
     public function testGetFilename_fileDoesNotExist_NullIsReturned(): void
     {
-        $manager = new TemporaryFilesManager();
+        $manager = new TemporaryFilesManager(self::TEMP_DIR);
         $this->assertNull($manager->getFilename('notexisting.file'));
     }
     
     public function testGetFilename_fileExists_FilenameIsReturned(): void
     {
         $filename = 'some.file';
-        $manager = new TemporaryFilesManager();
+        $manager = new TemporaryFilesManager(self::TEMP_DIR);
         file_put_contents($manager->getHashedName($filename), 'test');
         $tempFilename = $manager->getFilename($filename);
         $this->assertStringEndsWith('.file', $tempFilename);
@@ -80,7 +79,7 @@ class TemporaryFilesManagerTest extends TestCase
     {
         $filename = 'some.file';
         $contents = 'testdata';
-        $manager = new TemporaryFilesManager();
+        $manager = new TemporaryFilesManager(self::TEMP_DIR);
         $hashedName = $manager->getHashedName($filename);
         $this->assertEquals($hashedName, $manager->putFile($filename, $contents));
         $this->assertEquals(file_get_contents($hashedName), $contents);
@@ -91,7 +90,7 @@ class TemporaryFilesManagerTest extends TestCase
         $filename = 'some.file';
         $contents1 = 'testdata-1';
         $contents2 = 'testdata-2';
-        $manager = new TemporaryFilesManager();
+        $manager = new TemporaryFilesManager(self::TEMP_DIR);
         $hashedName = $manager->getHashedName($filename);
         $this->assertEquals($hashedName, $manager->putFile($filename, $contents1));
         $this->assertEquals(file_get_contents($hashedName), $contents1);

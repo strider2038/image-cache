@@ -18,19 +18,21 @@ use PHPUnit\Framework\TestCase;
  */
 class FileTestCase extends TestCase
 {
-    const TEST_DIR = '/tmp/imgcache-test';
+    const TEST_CACHE_DIR = '/tmp/imgcache-test';
     const IMAGE_CAT300 = 'cat300.jpg';
     const IMAGE_CAT2000 = 'cat2000.jpg';
     
     protected function setUp() 
     {
-        exec('rm -rf ' . self::TEST_DIR);
-        mkdir(self::TEST_DIR);
+        exec('rm -rf ' . self::TEST_CACHE_DIR);
+        if (!mkdir(self::TEST_CACHE_DIR)) {
+            throw new \Exception('Cannot create test directory');
+        }
     }
     
     protected function tearDown()
     {
-        exec('rm -rf ' . self::TEST_DIR);
+        //exec('rm -rf ' . self::TEST_CACHE_DIR);
     }
 
     public function haveFile(string $name): string

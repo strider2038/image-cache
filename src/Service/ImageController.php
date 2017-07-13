@@ -28,7 +28,7 @@ use Strider2038\ImgCache\Response\{
  */
 class ImageController extends Controller 
 {
-    /** @var \Strider2038\ImgCache\Imaging\ImageCacheInterface */
+    /** @var ImageCacheInterface */
     private $imgcache;
 
     public function __construct(SecurityInterface $security, ImageCacheInterface $imgcache)

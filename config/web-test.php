@@ -7,10 +7,20 @@ return [
             return new \Strider2038\ImgCache\Service\Router($app);
         },
         'imgcache' => function($app) {
-            return new \Strider2038\ImgCache\Imaging\ImageCache($app);
+            return new \Strider2038\ImgCache\Imaging\ImageCache(
+                __DIR__ . '/../web-test',
+                $app->imageSource,
+                $app->transformationsFactory,
+                $app->processingEngine
+            );
         },
-        'transformationsFactory' => function($app) {
-            return new \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory($app);
+        'transformationsFactory' => \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory::class,
+        'processingEngine' => \Strider2038\ImgCache\Imaging\Processing\ImagickEngine::class,
+        'imageSource' => function(\Strider2038\ImgCache\Application $app) {
+            return new \Strider2038\ImgCache\Imaging\Source\FileSource(
+                $app->temporaryFileManager, 
+                __DIR__ . '/../isource-test'
+            );
         },
     ],
     'params' => [

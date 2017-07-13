@@ -20,6 +20,7 @@ Thumbs.db
 
 # directory with images for dummy source
 /isource
+/isource-test
 
 .gitignore
 Dockerfile

@@ -37,7 +37,7 @@ class ApiTestCase extends FileTestCase
 
     public static function getTestWebDir(): string
     {
-        return __DIR__ . '/../../web-test/i/';
+        return __DIR__ . '/../../web/i/';
     }
     
     /**

@@ -10,4 +10,12 @@
     timeoutForMediumTests="10"
     timeoutForLargeTests="60"
     verbose="true">
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./../src</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="/tmp/coverage.xml"/>
+    </logging>
 </phpunit>

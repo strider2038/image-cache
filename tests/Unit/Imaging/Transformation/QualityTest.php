@@ -48,8 +48,9 @@ class QualityTest extends TestCase
         $image = new class implements ProcessingImageInterface {
             public function getWidth(): int {}
             public function getHeight(): int {}
-            public function resize(int $width, int $heigth): void {}
+            public function resize(int $width, int $height): void {}
             public function crop(int $left, int $right, int $top, int $bottom): void {}
+            public function save(string $filename): void {}
         };
         $quality = new Quality(50);
         $quality->apply($image);

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Imaging;
+
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\ImageRequest;

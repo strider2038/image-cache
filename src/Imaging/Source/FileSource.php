@@ -49,8 +49,12 @@ class FileSource extends AbstractFileSource
         return $this->baseDirectory;
     }
     
-    public function get(string $filename): Image
+    public function get(string $filename): ?Image
     {
+        /**
+         * @todo check for cached file
+         */
+
         $sourceFilename = $this->baseDirectory;
         if (substr($filename, 0, 1) === '/') {
             $sourceFilename .= $filename;
@@ -59,7 +63,7 @@ class FileSource extends AbstractFileSource
         }
         
         if (!file_exists($sourceFilename)) {
-            throw new FileNotFoundException("File '{$sourceFilename}' not found");
+            return null;
         }
         
         // Copying file by contents for testing purposes.

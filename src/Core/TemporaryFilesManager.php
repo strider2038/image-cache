@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Helper\FileHelper;
 use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
+ * @todo do not hash image file names
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class TemporaryFilesManager implements TemporaryFilesManagerInterface

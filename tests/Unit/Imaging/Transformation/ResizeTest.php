@@ -69,7 +69,8 @@ class ResizeTest extends TestCase
         int $finalHeight,
         int $cropX,
         int $cropY
-    ): void {
+    ): void
+    {
         $image = new class implements ProcessingImageInterface {
             public $width;
             public $height;
@@ -95,6 +96,7 @@ class ResizeTest extends TestCase
                 $this->cropX = $x;
                 $this->cropY = $y;
             }
+            public function save(string $filename): void {}
         };
         $image->width = $sourceWidth;
         $image->height = $sourceHeight;

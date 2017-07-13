@@ -20,13 +20,13 @@ use Strider2038\ImgCache\Core\Response;
 class ImageCacheApiTest extends ApiTestCase
 {
 
-    public function testGet_ImageDoesNotExist_Http404Returned(): void
-    {
-        /** @var \GuzzleHttp\Psr7\Response */
-        $response = $this->client->request('GET', '/i/' . self::IMAGE_CAT300);
-        
-        $this->assertEquals(Response::HTTP_CODE_NOT_FOUND, $response->getStatusCode());
-    }
+//    public function testGet_ImageDoesNotExist_Http404Returned(): void
+//    {
+//        /** @var \GuzzleHttp\Psr7\Response */
+//        $response = $this->client->request('GET', '/i/' . self::IMAGE_CAT300);
+//
+//        $this->assertEquals(Response::HTTP_CODE_NOT_FOUND, $response->getStatusCode());
+//    }
     
     public function testGet_ImageExist_Http200Returned(): void
     {

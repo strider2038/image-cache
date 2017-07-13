@@ -34,9 +34,6 @@ class Security implements SecurityInterface
 
     public function isTokenValid(): bool 
     {
-        if (empty($this->accessToken)) {
-            throw new ApplicationException('Access token is not set');
-        }
         $auth = $this->request->getHeader(Request::HEADER_AUTHORIZATION);
         if ($auth !== null && preg_match('/^Bearer\s+(.*?)$/', $auth, $matches)) {
             return $matches[1] === $this->accessToken;

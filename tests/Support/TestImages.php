@@ -16,7 +16,7 @@ namespace Strider2038\ImgCache\Tests\Support;
  */
 class TestImages
 {
-    const FILES_DIR = '/Files/';
+    const FILES_DIR = '/../assets/';
     
     public static function getFilename(string $name): string
     {

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Imaging;
+
 use Strider2038\ImgCache\Tests\Support\{
     TestImages,
     FileTestCase
@@ -21,12 +23,12 @@ use Strider2038\ImgCache\Imaging\Image;
 class ImageTest extends FileTestCase
 {
     /**
-     * @expectedException Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
      * @expectedExceptionCode 404
      */
     public function testConstruct_FileDoesNotExist_ExceptionThrown(): void
     {
-        new Image(self::TEST_DIR . '/not.existing');
+        new Image(self::TEST_CACHE_DIR . '/not.existing');
     }
 
     public function testConstruct_FileExists_FileNameIsCorrect(): void
@@ -46,7 +48,7 @@ class ImageTest extends FileTestCase
      */
     public function testConstruct_FileHasInvalidMimeType_ExceptionThrown(): void
     {
-        $filename = self::TEST_DIR . '/text.txt';
+        $filename = self::TEST_CACHE_DIR . '/text.txt';
         file_put_contents($filename, 'test_data');
         
         new Image($filename);

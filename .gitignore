@@ -20,9 +20,10 @@ Thumbs.db
 
 # directory with images for dummy source
 /isource
+/tests/isource
 
 # web directories
 /web/*
-/web-test/*
 !/web/index.php
-!/web-test/index.php
+/tests/web/*
+!/tests/web/index.php

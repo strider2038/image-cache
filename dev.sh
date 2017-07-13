@@ -35,7 +35,7 @@ echo "Starting container..."
 echo "========================================================================="
 
 docker run \
-    -p 80:80 -p 9002:9001 \
+    -p 23:22 -p 80:80 -p 9002:9001 \
     --detach \
     --name imgcache \
     --stop-signal SIGKILL \

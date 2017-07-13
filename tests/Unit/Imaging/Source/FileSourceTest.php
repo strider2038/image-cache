@@ -44,29 +44,25 @@ class FileSourceTest extends FileTestCase
     
     public function testConstruct_BaseDirectoryIsSet_BaseDirectoryCreated(): void
     {
-        $source = new FileSource($this->manager, self::TEST_DIR);
+        $source = new FileSource($this->manager, self::TEST_CACHE_DIR);
         
-        $this->assertDirectoryExists(self::TEST_DIR);
-        $this->assertDirectoryIsReadable(self::TEST_DIR);
-        $this->assertDirectoryIsWritable(self::TEST_DIR);
-        $this->assertEquals(self::TEST_DIR, $source->getBaseDirectory());
+        $this->assertDirectoryExists(self::TEST_CACHE_DIR);
+        $this->assertDirectoryIsReadable(self::TEST_CACHE_DIR);
+        $this->assertDirectoryIsWritable(self::TEST_CACHE_DIR);
+        $this->assertEquals(self::TEST_CACHE_DIR, $source->getBaseDirectory());
         
-        $source2 = new FileSource($this->manager, self::TEST_DIR . '/');
+        $source2 = new FileSource($this->manager, self::TEST_CACHE_DIR . '/');
         $this->assertEquals(
-            self::TEST_DIR, 
+            self::TEST_CACHE_DIR,
             $source2->getBaseDirectory(),
             'Base directory name should be without trailing slash'
         );
     }
     
-    /**
-     * @expectedException Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     */
     public function testGet_FileDoesNotExist_FileNotFoundExceptionThrown(): void
     {
-        $source = new FileSource($this->manager, self::TEST_DIR);
-        $source->get('not.exist');
+        $source = new FileSource($this->manager, self::TEST_CACHE_DIR);
+        $this->assertNull($source->get('not.exist'));
     }
     
     /**
@@ -86,9 +82,9 @@ class FileSourceTest extends FileTestCase
                 return $this->testTempFilename;
             }
         };
-        $manager->testTempFilename = self::TEST_DIR . '/test.jpg';
-        $source = new FileSource($manager, self::TEST_DIR);
-        mkdir(self::TEST_DIR . '/somedir');
+        $manager->testTempFilename = self::TEST_CACHE_DIR . '/test.jpg';
+        $source = new FileSource($manager, self::TEST_CACHE_DIR);
+        mkdir(self::TEST_CACHE_DIR . '/somedir');
         copy(TestImages::getFilename(self::IMAGE_NAME), $sourceFilename);
         
         $image = $source->get($fileKey);
@@ -100,9 +96,9 @@ class FileSourceTest extends FileTestCase
     public function imageFilenameProvider(): array
     {
         return [
-            [self::TEST_DIR . '/a.jpg', 'a.jpg'],
-            [self::TEST_DIR . '/somedir/b.jpg', 'somedir/b.jpg'],
-            [self::TEST_DIR . '/somedir/c.jpg', '/somedir/c.jpg'],
+            [self::TEST_CACHE_DIR . '/a.jpg', 'a.jpg'],
+            [self::TEST_CACHE_DIR . '/somedir/b.jpg', 'somedir/b.jpg'],
+            [self::TEST_CACHE_DIR . '/somedir/c.jpg', '/somedir/c.jpg'],
         ];
     }
 }

@@ -11,12 +11,10 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Core\Component;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImagickEngine extends Component implements ProcessingEngineInterface
+class ImagickEngine implements ProcessingEngineInterface
 {
     public function open(string $filename): ProcessingImageInterface
     {

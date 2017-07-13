@@ -18,6 +18,7 @@ interface ProcessingImageInterface
 {
     public function getWidth(): int;
     public function getHeight(): int;
-    public function resize(int $width, int $heigth): void;
-    public function crop(int $width, int $heigth, int $x, int $y): void;
+    public function resize(int $width, int $height): void;
+    public function crop(int $width, int $height, int $x, int $y): void;
+    public function save(string $filename): void;
 }
