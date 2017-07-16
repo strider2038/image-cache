@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Exception\ApplicationException;
 use Strider2038\ImgCache\Response\ForbiddenResponse;
-use Strider2038\ImgCache\Core\SecurityInterface;
 
 /**
  * Description of Controller
@@ -21,6 +20,7 @@ use Strider2038\ImgCache\Core\SecurityInterface;
  */
 abstract class Controller implements ControllerInterface
 {
+    /** @var SecurityInterface */
     protected $security;
 
     public function __construct(SecurityInterface $security = null)

@@ -17,16 +17,17 @@ use Strider2038\ImgCache\Core\Response;
  */
 class ResponseTest extends TestCase
 {
+    const HEADER_TEST = 'test';
+    const HEADER_VALUE = 'value';
+
     /**
      * @dataProvider httpCodeProvider
      */
     public function testConstruct_HttpCodeIsSet_HttpCodeReturned($httpCode): void
     {
-        $request = new class($httpCode) extends Response {
-            protected function sendContent(): void {}
-        };
+        $response = $this->buildResponse($httpCode);
         
-        $this->assertEquals($httpCode, $request->getHttpCode());
+        $this->assertEquals($httpCode, $response->getHttpCode());
     }
 
     public function httpCodeProvider(): array
@@ -44,43 +45,70 @@ class ResponseTest extends TestCase
     
     public function testConstruct_HttpCodeIsIncorrect_Http500Returned(): void
     {
-        $request = new class(23523) extends Response {
-            protected function sendContent(): void {}
-        };
+        $response = $this->buildResponse(0);
         
-        $this->assertEquals(500, $request->getHttpCode());
+        $this->assertEquals(500, $response->getHttpCode());
     }
     
     public function testConstruct_HttpVersionIs10_HttpVersion10Returned(): void
     {
         $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.0';
-        $request = new class(200) extends Response {
-            protected function sendContent(): void {}
-        };
+        $response = $this->buildResponse();
         
-        $this->assertEquals('1.0', $request->getHttpVersion());
+        $this->assertEquals('1.0', $response->getHttpVersion());
     }
     
     public function testConstruct_HttpVersionIsNotSet_HttpVersion11Returned(): void
     {
-        $request = new class(200) extends Response {
-            protected function sendContent(): void {}
-        };
+        $response = $this->buildResponse();
         
-        $this->assertEquals('1.1', $request->getHttpVersion());
+        $this->assertEquals('1.1', $response->getHttpVersion());
     }
     
     /**
      * @runInSeparateProcess
      */
-    public function testSend_NotSent_IsSent(): void
+    public function testSend_NotSent_SentOnlyOnce(): void
     {
-        $request = new class(200) extends Response {
-            protected function sendContent(): void {}
+        $response = $this->buildResponse();
+
+        $this->assertFalse($response->isSent());
+        $this->assertEquals(0, $response->testSendCount);
+        $response->send();
+
+        $this->assertTrue($response->isSent());
+        $this->assertEquals(1, $response->testSendCount);
+
+        $response->send();
+        $this->assertEquals(1, $response->testSendCount);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testSend_HeaderIsSet_HeaderIsSent(): void
+    {
+        $response = $this->buildResponse();
+        $response->setHeader(self::HEADER_TEST, self::HEADER_VALUE);
+
+        $response->send();
+
+        $this->assertTrue($response->isSent());
+        $headers = xdebug_get_headers();
+        $this->assertContains(self::HEADER_TEST . ': ' . self::HEADER_VALUE, $headers);
+    }
+
+    private function buildResponse(int $httpCode = 200): Response
+    {
+        $response = new class($httpCode) extends Response
+        {
+            public $testSendCount = 0;
+
+            public function sendContent(): void
+            {
+                $this->testSendCount++;
+            }
         };
-        
-        $this->assertFalse($request->isSent());
-        $request->send();
-        $this->assertTrue($request->isSent());
+        return $response;
     }
 }

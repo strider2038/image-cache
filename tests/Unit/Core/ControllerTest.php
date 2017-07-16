@@ -46,16 +46,7 @@ class ControllerTest extends TestCase
     
     public function testRunAction_ActionExistsNoSecurityControl_MethodExecuted(): void
     {
-        $controller = new class extends Controller {
-            public $success = false;
-            public function actionTest()
-            {
-                $this->success = true;
-                return new class implements ResponseInterface {
-                    public function send(): void {}
-                };
-            }
-        };
+        $controller = $this->buildController();
         
         $this->assertFalse($controller->success);
         $result = $controller->runAction('test', $this->request);
@@ -68,17 +59,8 @@ class ControllerTest extends TestCase
     {
         $security = \Phake::mock(SecurityInterface::class);
         \Phake::when($security)->isAuthorized()->thenReturn(false);
-        $controller = new class($security) extends Controller {
-            public $success = false;
-            public function actionTest()
-            {
-                $this->success = true;
-                return new class implements ResponseInterface {
-                    public function send(): void {}
-                };
-            }
-        };
-        
+        $controller = $this->buildController($security);
+
         $this->assertFalse($controller->success);
         $result = $controller->runAction('test', $this->request);
 
@@ -90,21 +72,63 @@ class ControllerTest extends TestCase
     {
         $security = \Phake::mock(SecurityInterface::class);
         \Phake::when($security)->isAuthorized()->thenReturn(true);
-        $controller = new class($security) extends Controller {
-            public $success = false;
-            public function actionTest()
-            {
-                $this->success = true;
-                return new class implements ResponseInterface {
-                    public function send(): void {}
-                };
-            }
-        };
+        $controller = $this->buildController($security);
         
         $this->assertFalse($controller->success);
         $result = $controller->runAction('test', $this->request);
 
         $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertTrue($controller->success);
+    }
+
+    public function testRunAction_ActionIsSafeAndSecurityIsDefined_MethodExecuted(): void
+    {
+        $security = \Phake::mock(SecurityInterface::class);
+        $controller = new class($security) extends Controller
+        {
+            public $success = false;
+
+            protected function getSafeActions(): array
+            {
+                return ['test'];
+            }
+
+            public function actionTest()
+            {
+                $this->success = true;
+                return new class implements ResponseInterface
+                {
+                    public function send(): void
+                    {
+                    }
+                };
+            }
+        };
+
+        $this->assertFalse($controller->success);
+        $result = $controller->runAction('test', $this->request);
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertTrue($controller->success);
+    }
+
+    private function buildController(SecurityInterface $security = null): Controller
+    {
+        $controller = new class($security) extends Controller
+        {
+            public $success = false;
+
+            public function actionTest()
+            {
+                $this->success = true;
+                return new class implements ResponseInterface
+                {
+                    public function send(): void
+                    {
+                    }
+                };
+            }
+        };
+        return $controller;
     }
 }

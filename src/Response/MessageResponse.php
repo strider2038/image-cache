@@ -28,8 +28,6 @@ class MessageResponse extends Response
 
     protected function sendContent(): void
     {
-        if (!empty($this->message)) {
-            echo $this->message;
-        }
+        echo $this->message;
     }
 }

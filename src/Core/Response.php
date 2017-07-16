@@ -134,7 +134,6 @@ abstract class Response implements ResponseInterface
         }
         if (!empty($this->headers)) {
             foreach ($this->headers as $name => $value) {
-                $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
                 header("$name: $value");
             }
         }
