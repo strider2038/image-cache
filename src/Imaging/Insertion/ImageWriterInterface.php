@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Extraction;
+namespace Strider2038\ImgCache\Imaging\Insertion;
 
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ImageExtractorInterface
+interface ImageWriterInterface
 {
-    public function extract(string $key): ?ExtractedImageInterface;
-    public function exists(string $key): bool;
+    public function insert(string $key, $data): void;
+    public function delete(string $key): void;
 }

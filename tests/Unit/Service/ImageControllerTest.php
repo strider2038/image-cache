@@ -47,6 +47,7 @@ class ImageControllerTest extends FileTestCase
     
     protected function setUp()
     {
+        parent::setUp();
         $this->imageCache = \Phake::mock(ImageCacheInterface::class);
         $this->security = \Phake::mock(SecurityInterface::class);
         \Phake::when($this->security)->isAuthorized()->thenReturn(true);

@@ -15,9 +15,10 @@ use Strider2038\ImgCache\Imaging\Extraction\{
     ExtractedImageInterface,
     ImageExtractorInterface
 };
+use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Exception\{
     InvalidConfigException,
-    ApplicationException
+    NotAllowedException
 };
 
 /**
@@ -35,16 +36,23 @@ class ImageCache implements ImageCacheInterface
      * @var ImageExtractorInterface
      */
     private $imageExtractor;
+
+    /**
+     * @var ImageWriterInterface
+     */
+    private $imageWriter;
     
     public function __construct(
-        string $cacheDirectory,    
-        ImageExtractorInterface $imageExtractor
+        string $cacheDirectory,
+        ImageExtractorInterface $imageExtractor,
+        ImageWriterInterface $imageWriter = null
     ) {
         if (!is_dir($cacheDirectory)) {
             throw new InvalidConfigException("Directory '{$cacheDirectory}' does not exist");
         }
         $this->cacheDirectory = rtrim($cacheDirectory, '/');
         $this->imageExtractor = $imageExtractor;
+        $this->imageWriter = $imageWriter;
     }
 
     /**
@@ -70,21 +78,42 @@ class ImageCache implements ImageCacheInterface
 
     public function put(string $key, $data): void
     {
-        
+        if ($this->imageWriter === null) {
+            throw new NotAllowedException(
+                "Operation 'put' is not allowed for this type of cache"
+            );
+        }
+
+        $this->imageWriter->insert($key, $data);
     }
     
     public function delete(string $key): void
     {
-        
+        if ($this->imageWriter === null) {
+            throw new NotAllowedException(
+                "Operation 'delete' is not allowed for this type of cache"
+            );
+        }
+
+        $this->imageWriter->delete($key);
+
+        unlink($this->cacheDirectory . $key);
+        // @todo delete all thumbnails
     }
     
     public function exists(string $key): bool
     {
-        
+        return $this->imageExtractor->exists($key);
     }
 
     public function rebuild(string $key): void
     {
+        // @todo cascade thumbnail rebuild
+        $destinationFilename = $this->cacheDirectory . $key;
+        if (file_exists($destinationFilename)) {
+            unlink($this->cacheDirectory . $key);
+        }
 
+        $this->get($key);
     }
 }
