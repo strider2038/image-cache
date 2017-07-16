@@ -33,7 +33,7 @@ class Router extends Component implements RouterInterface
         Request::METHOD_GET    => 'get',
         Request::METHOD_POST   => 'create',
         Request::METHOD_PUT    => 'replace',
-        Request::METHOD_PATCH  => 'refresh',
+        Request::METHOD_PATCH  => 'rebuild',
         Request::METHOD_DELETE => 'delete',
     ];
 

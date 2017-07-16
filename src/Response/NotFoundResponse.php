@@ -17,7 +17,7 @@ namespace Strider2038\ImgCache\Response;
  */
 class NotFoundResponse extends ErrorResponse
 {
-    public function __construct() {
-        parent::__construct(self::HTTP_CODE_NOT_FOUND);
+    public function __construct(string $message = null) {
+        parent::__construct(self::HTTP_CODE_NOT_FOUND, $message);
     }
 }

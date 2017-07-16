@@ -11,13 +11,9 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Source\SourceInterface;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
-use Strider2038\ImgCache\Imaging\Transformation\{
-    TransformationInterface,
-    TransformationsFactoryInterface,
-    TransformationsCollection
+use Strider2038\ImgCache\Imaging\Extraction\{
+    ExtractedImageInterface,
+    ImageExtractorInterface
 };
 use Strider2038\ImgCache\Exception\{
     InvalidConfigException,
@@ -34,29 +30,21 @@ class ImageCache implements ImageCacheInterface
      * @var string
      */
     private $cacheDirectory;
-    
-    /** @var SourceInterface */
-    private $source;
-    
-    /** @var TransformationsFactoryInterface */
-    private $transformationsFactory;
-    
-    /** @var ProcessingEngineInterface */
-    private $processingEngine;
+
+    /**
+     * @var ImageExtractorInterface
+     */
+    private $imageExtractor;
     
     public function __construct(
         string $cacheDirectory,    
-        SourceInterface $source, 
-        TransformationsFactoryInterface $transformationsFactory,
-        ProcessingEngineInterface $processingEngine
+        ImageExtractorInterface $imageExtractor
     ) {
         if (!is_dir($cacheDirectory)) {
             throw new InvalidConfigException("Directory '{$cacheDirectory}' does not exist");
         }
         $this->cacheDirectory = rtrim($cacheDirectory, '/');
-        $this->source = $source;
-        $this->transformationsFactory = $transformationsFactory;
-        $this->processingEngine = $processingEngine;
+        $this->imageExtractor = $imageExtractor;
     }
 
     /**
@@ -64,34 +52,18 @@ class ImageCache implements ImageCacheInterface
      * directory. Next requests will be processed by nginx.
      * @param string $key
      * @return null|Image
-     * @throws ApplicationException
      */
     public function get(string $key): ?Image
     {
-        $imageRequest = new ImageRequest($this->transformationsFactory, $key);
-        
-        $sourceImage = $this->source->get($imageRequest->getFileName());
-        if ($sourceImage === null) {
+        /** @var ExtractedImageInterface $extractedImage */
+        $extractedImage = $this->imageExtractor->extract($key);
+        if ($extractedImage === null) {
             return null;
         }
-        
-        $transformations = $imageRequest->getTransformations();
 
         $destinationFilename = $this->cacheDirectory . $key;
 
-        if (count($transformations) <= 0) {
-            $sourceFilename = $sourceImage->getFilename();
-
-            if (!copy($sourceFilename, $destinationFilename)) {
-                throw new ApplicationException(
-                    "Cannot copy file '{$sourceFilename}' to '{$destinationFilename}'"
-                );
-            }
-        } else {
-            $transformedImage = $this->getTransformedImage($sourceImage, $transformations);
-            $transformedImage->save($destinationFilename);
-            // @todo save options
-        }
+        $extractedImage->saveTo($destinationFilename);
 
         return new Image($destinationFilename);
     }
@@ -110,14 +82,9 @@ class ImageCache implements ImageCacheInterface
     {
         
     }
-    
-    protected function getTransformedImage(Image $image, TransformationsCollection $transformations): ProcessingImageInterface
+
+    public function rebuild(string $key): void
     {
-        $processingImage = $this->processingEngine->open($image->getFilename());
-        /** @var TransformationInterface[] $transformations */
-        foreach ($transformations as $transformation) {
-            $transformation->apply($processingImage);
-        }
-        return $processingImage;
+
     }
 }

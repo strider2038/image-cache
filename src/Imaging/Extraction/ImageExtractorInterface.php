@@ -8,16 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Imaging\Extraction;
+
 
 /**
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface RequestInterface 
+interface ImageExtractorInterface
 {
-    public function getMethod(): ?string;
-    public function getHeader(string $key): ?string;
-    public function getUrl(int $component = null): string;
-    public function getBody();
+    public function extract(string $key): ?ExtractedImageInterface;
 }

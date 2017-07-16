@@ -19,5 +19,6 @@ interface ImageCacheInterface
     public function get(string $key): ?Image;
     public function put(string $key, $data): void;
     public function delete(string $key): void;
+    public function rebuild(string $key): void;
     public function exists(string $key): bool;
 }

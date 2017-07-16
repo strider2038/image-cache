@@ -24,26 +24,13 @@ use Strider2038\ImgCache\Response\ForbiddenResponse;
  */
 class ControllerTest extends TestCase 
 {
-    /** @var \Strider2038\ImgCache\Core\RequestInterface */
+    /** @var RequestInterface */
     private $request;
     
     protected function setUp()
     {
         parent::setUp();
-        $this->request = new class implements RequestInterface {
-            public function getMethod(): string
-            {
-                return 'getMethodResult';
-            }
-            public function getHeader(string $key): ?string
-            {
-                return 'getHeaderResult';
-            }
-            public function getUrl(int $component = null): string
-            {
-                return 'requestUrl';
-            }
-        };
+        $this->request = \Phake::mock(RequestInterface::class);
     }
     
     /**
@@ -52,10 +39,6 @@ class ControllerTest extends TestCase
      */
     public function testRunAction_ActionDoesNotExists_ExceptionThrown(): void
     {
-        $app = new class extends Application {
-            public function __construct() {}
-        };
-        
         $controller = new class extends Controller {};
         
         $controller->runAction('test', $this->request);
@@ -75,21 +58,16 @@ class ControllerTest extends TestCase
         };
         
         $this->assertFalse($controller->success);
-        $this->assertInstanceOf(
-            ResponseInterface::class, 
-            $controller->runAction('test', $this->request)
-        );
+        $result = $controller->runAction('test', $this->request);
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 
     public function testRunAction_ActionIsNotSafeAndNotAuthorized_ForbiddenResponseReturned(): void
     {
-        $security = new class implements SecurityInterface {
-            public function isAuthorized(): bool {
-                return false;
-            }
-        };
-        
+        $security = \Phake::mock(SecurityInterface::class);
+        \Phake::when($security)->isAuthorized()->thenReturn(false);
         $controller = new class($security) extends Controller {
             public $success = false;
             public function actionTest()
@@ -102,21 +80,16 @@ class ControllerTest extends TestCase
         };
         
         $this->assertFalse($controller->success);
-        $this->assertInstanceOf(
-            ForbiddenResponse::class, 
-            $controller->runAction('test', $this->request)
-        );
+        $result = $controller->runAction('test', $this->request);
+
+        $this->assertInstanceOf(ForbiddenResponse::class, $result);
         $this->assertFalse($controller->success);
     }
     
     public function testRunAction_ActionIsNotSafeAndIsAuthorized_MethodExecuted(): void
     {
-        $security = new class implements SecurityInterface {
-            public function isAuthorized(): bool {
-                return true;
-            }
-        };
-        
+        $security = \Phake::mock(SecurityInterface::class);
+        \Phake::when($security)->isAuthorized()->thenReturn(true);
         $controller = new class($security) extends Controller {
             public $success = false;
             public function actionTest()
@@ -129,10 +102,9 @@ class ControllerTest extends TestCase
         };
         
         $this->assertFalse($controller->success);
-        $this->assertInstanceOf(
-            ResponseInterface::class, 
-            $controller->runAction('test', $this->request)
-        );
+        $result = $controller->runAction('test', $this->request);
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 }

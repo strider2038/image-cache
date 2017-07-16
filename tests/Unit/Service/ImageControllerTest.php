@@ -17,7 +17,10 @@ use Strider2038\ImgCache\Core\{
 };
 use Strider2038\ImgCache\Response\{
     ImageResponse,
-    NotFoundResponse
+    NotFoundResponse,
+    ConflictResponse,
+    CreatedResponse,
+    SuccessResponse
 };
 use Strider2038\ImgCache\Imaging\{
     Image,
@@ -30,78 +33,145 @@ use Strider2038\ImgCache\Imaging\{
  */
 class ImageControllerTest extends FileTestCase
 {
-    /** @var \Strider2038\ImgCache\Core\SecurityInterface */
+    const IMAGE_FILENAME = 'a.jpg';
+    const IMAGE_BODY = '0';
+
+    /** @var SecurityInterface */
     private $security;
     
-    /** @var \Strider2038\ImgCache\Core\RequestInterface */
+    /** @var RequestInterface */
     private $request;
     
-    /** @var Strider2038\ImgCache\Imaging\ImageCacheInterface */
-    private $imgcache;
+    /** @var ImageCacheInterface */
+    private $imageCache;
     
     protected function setUp()
     {
-        $this->imgcache = new class implements ImageCacheInterface {
-            public $testImage = null;
-            public function get(string $key): ?Image
-            {
-                return $this->testImage;
-            }
-            public function put(string $key, $data): void {}
-            public function delete(string $key): void {}
-            public function exists(string $key): bool
-            {
-                return true;
-            }
-        };
-        
-        $this->request = new class implements RequestInterface {
-            public function getMethod(): ?string
-            {
-                return null;
-            }
-            public function getHeader(string $key): ?string
-            {
-                return null;
-            }
-            public function getUrl(int $component = null): string
-            {
-                return 'testUrl';
-            }
-        };
-        
-        $this->security = new class implements SecurityInterface {
-            public $isAuth = false;
-            public function isAuthorized(): bool
-            {
-                return $this->isAuth;
-            }
-        };
-    }
-    
-    public function testGet_FileDoesNotExistInCache_NotFoundResponseReturned(): void
-    {
-        $controller = new ImageController($this->security, $this->imgcache);
-        
-        $this->assertInstanceOf(NotFoundResponse::class, $controller->actionGet($this->request));
+        $this->imageCache = \Phake::mock(ImageCacheInterface::class);
+        $this->security = \Phake::mock(SecurityInterface::class);
+        \Phake::when($this->security)->isAuthorized()->thenReturn(true);
+        $this->request = $request = \Phake::mock(RequestInterface::class);
     }
 
-    public function testGet_FileExistsInCache_ImageResponseReturned(): void
+    public function testActionGet_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
     {
-        $this->imgcache->testImage = new class extends Image {
-            public $testFile;
-            public function __construct(){}
-            public function getFilename(): string
-            {
-                return $this->testFile;
-            }
-        };
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->imageCache)->get(self::IMAGE_FILENAME)->thenReturn(null);
+
+        $response = $controller->actionGet($this->request);
         
-        // hard mocks ...
-        $this->imgcache->testImage->testFile = $this->haveFile(self::IMAGE_CAT300);
-        
-        $controller = new ImageController($this->security, $this->imgcache);
-        
-        $this->assertInstanceOf(ImageResponse::class, $controller->actionGet($this->request));
+        $this->assertInstanceOf(NotFoundResponse::class, $response);
+    }
+
+    public function testActionGet_FileExistsInCache_ImageResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        $image = \Phake::mock(Image::class);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->imageCache)->get(self::IMAGE_FILENAME)->thenReturn($image);
+        \Phake::when($image)->getFilename()->thenReturn($this->haveFile(self::IMAGE_CAT300));
+
+        $response = $controller->actionGet($this->request);
+
+        $this->assertInstanceOf(ImageResponse::class, $response);
+    }
+
+    public function testActionCreate_FileAlreadyExistsInCache_ConflictResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
+
+        $response = $controller->actionCreate($this->request);
+
+        $this->assertInstanceOf(ConflictResponse::class, $response);
+    }
+
+    public function testActionCreate_FileDoesNotExistInCache_CreatedResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->request)->getBody()->thenReturn(self::IMAGE_BODY);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
+
+        $response = $controller->actionCreate($this->request);
+
+        \Phake::verify($this->imageCache)->put(self::IMAGE_FILENAME, self::IMAGE_BODY);
+        $this->assertInstanceOf(CreatedResponse::class, $response);
+    }
+
+    public function testActionReplace_FileDoesNotExistInCache_DeleteNotCalledAndCreatedResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->request)->getBody()->thenReturn(self::IMAGE_BODY);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
+
+        $response = $controller->actionReplace($this->request);
+
+        \Phake::verify($this->imageCache, \Phake::never())->delete(\Phake::anyParameters());
+        \Phake::verify($this->imageCache)->put(self::IMAGE_FILENAME, self::IMAGE_BODY);
+        $this->assertInstanceOf(CreatedResponse::class, $response);
+    }
+
+    public function testActionReplace_FileExistsInCache_DeleteIsCalledAndCreatedResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->request)->getBody()->thenReturn(self::IMAGE_BODY);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
+
+        $response = $controller->actionReplace($this->request);
+
+        \Phake::verify($this->imageCache)->delete(self::IMAGE_FILENAME);
+        \Phake::verify($this->imageCache)->put(self::IMAGE_FILENAME, self::IMAGE_BODY);
+        $this->assertInstanceOf(CreatedResponse::class, $response);
+    }
+
+    public function testDelete_FileExistsInCache_DeleteIsCalledAndOkResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
+
+        $response = $controller->actionDelete($this->request);
+
+        \Phake::verify($this->imageCache)->delete(self::IMAGE_FILENAME);
+        $this->assertInstanceOf(SuccessResponse::class, $response);
+    }
+
+    public function testDelete_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
+
+        $response = $controller->actionDelete($this->request);
+
+        $this->assertInstanceOf(NotFoundResponse::class, $response);
+    }
+
+    public function testRebuild_FileExistsInCache_RebuildIsCalledAndOkResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
+
+        $response = $controller->actionRebuild($this->request);
+
+        \Phake::verify($this->imageCache)->rebuild(self::IMAGE_FILENAME);
+        $this->assertInstanceOf(SuccessResponse::class, $response);
+    }
+
+    public function testRebuild_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
+
+        $response = $controller->actionRebuild($this->request);
+
+        $this->assertInstanceOf(NotFoundResponse::class, $response);
     }
 }

@@ -28,6 +28,7 @@ abstract class Response implements ResponseInterface
     const HTTP_CODE_FORBIDDEN              = 403;
     const HTTP_CODE_NOT_FOUND              = 404;
     const HTTP_CODE_METHOD_NOT_ALLOWED     = 405;
+    const HTTP_CODE_CONFLICT               = 409;
     const HTTP_CODE_UNSUPPORTED_MEDIA_TYPE = 415;
     const HTTP_CODE_INTERNAL_SERVER_ERROR  = 500;
     

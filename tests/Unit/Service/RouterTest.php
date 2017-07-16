@@ -30,10 +30,10 @@ use Strider2038\ImgCache\Service\{
  */
 class RouterTest extends TestCase
 {
-    /** @var \Strider2038\ImgCache\Core\RequestInterface */
+    /** @var RequestInterface */
     private $request;
     
-    /** @var \Strider2038\ImgCache\Application */
+    /** @var Application */
     private $app;
     
     protected function setUp()
@@ -42,34 +42,12 @@ class RouterTest extends TestCase
             public $security;
             public $imgcache;
             public function __construct() {
-                $this->security = new class implements SecurityInterface {
-                    public function isAuthorized(): bool {}
-                };
-                $this->imgcache = new class implements ImageCacheInterface {
-                    public function get(string $key): ?Image {}
-                    public function put(string $key, $data): void {}
-                    public function delete(string $key): void {}
-                    public function exists(string $key): bool {}
-                };
+                $this->security = \Phake::mock(SecurityInterface::class);
+                $this->imgcache = \Phake::mock(ImageCacheInterface::class);
             }
         };
         
-        $this->request = new class implements RequestInterface {
-            public $method;
-            public $url = '/a.jpg';
-            public function getMethod(): ?string
-            {
-                return $this->method;
-            }
-            public function getHeader(string $key): ?string
-            {
-                return null;
-            }
-            public function getUrl(int $component = null): string
-            {
-                return $this->url;
-            }
-        };
+        $this->request = \Phake::mock(RequestInterface::class);
     }
     
     /**
@@ -80,7 +58,9 @@ class RouterTest extends TestCase
         string $actionName
     ): void {
         $router = new Router($this->app);
-        $this->request->method = $requestMethod;
+        \Phake::when($this->request)->getMethod()->thenReturn($requestMethod);
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn('/a.jpg');
+
         $route = $router->getRoute($this->request);
         
         $this->assertInstanceOf(Route::class, $route);
@@ -94,7 +74,7 @@ class RouterTest extends TestCase
             ['GET', 'get'],
             ['POST', 'create'],
             ['PUT', 'replace'],
-            ['PATCH', 'refresh'],
+            ['PATCH', 'rebuild'],
             ['DELETE', 'delete'],
         ];
     }
@@ -116,8 +96,8 @@ class RouterTest extends TestCase
     public function testGetRoute_RequestedFileHasAllowedExtension_ControllerAndActionReturned(string $url): void
     {
         $router = new Router($this->app);
-        $this->request->method = 'GET';
-        $this->request->url = $url;
+        \Phake::when($this->request)->getMethod()->thenReturn('GET');
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn($url);
         
         $route = $router->getRoute($this->request);
         
@@ -142,8 +122,8 @@ class RouterTest extends TestCase
     public function testGetRoute_RequestedFileHasNotAllowedExtension_ExceptionThrown(): void 
     {
         $router = new Router($this->app);
-        $this->request->method = 'GET';
-        $this->request->url = '/a.php';
+        \Phake::when($this->request)->getMethod()->thenReturn('GET');
+        \Phake::when($this->request)->getUrl()->thenReturn('/a.php');
         
         $router->getRoute($this->request);
     }

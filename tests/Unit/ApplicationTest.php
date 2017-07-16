@@ -22,7 +22,7 @@ class ApplicationTest extends TestCase
      */
     public function testConstruct_IdIsNotSet_ExceptionThrown(): void
     {
-        $app = new Application([]);
+        new Application([]);
     }
     
     public function testConstruct_IdIsSet_ReturningAppId(): void 
@@ -36,39 +36,21 @@ class ApplicationTest extends TestCase
         $app = new Application([
             'id' => 'test',
             'components' => [
-                'request' => function($app) {
-                    return new class($app) extends Component implements RequestInterface {
-                        public function getMethod(): string 
-                        {
-                            return 'requestGetMethodResult';
-                        }
-                        public function getHeader(string $key): ?string 
-                        {
-                            return 'requestGetHeaderResult';
-                        }
-                        public function getUrl(int $component = null): string
-                        {
-                            return 'requestUrl';
-                        }
-                    };
+                'request' => function() {
+                    return \Phake::mock(RequestInterface::class);
                 },
-                'security' => function($app) {
-                    return new class($app) extends Component implements SecurityInterface {
-                        public function isAuthorized(): bool 
-                        {
-                            return true;
-                        }
-                    };
+                'security' => function() {
+                    return \Phake::mock(SecurityInterface::class);
+                },
+                'temporaryFileManager' => function() {
+                    return \Phake::mock(TemporaryFilesManagerInterface::class);
                 }
             ],
         ]);
+
         $this->assertInstanceOf(RequestInterface::class, $app->request);
         $this->assertInstanceOf(SecurityInterface::class, $app->security);
         $this->assertInstanceOf(TemporaryFilesManagerInterface::class, $app->temporaryFileManager);
-        $this->assertEquals('requestGetMethodResult', $app->request->getMethod());
-        $this->assertEquals('requestGetHeaderResult', $app->request->getHeader(''));
-        $this->assertEquals('requestUrl', $app->request->getUrl());
-        $this->assertTrue($app->security->isAuthorized());
     }
     
     public function testConstruct_NoComponentsAreSet_CoreComponentsAreAvailable()

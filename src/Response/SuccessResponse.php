@@ -8,16 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Response;
+
 
 /**
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface RequestInterface 
+class SuccessResponse extends MessageResponse
 {
-    public function getMethod(): ?string;
-    public function getHeader(string $key): ?string;
-    public function getUrl(int $component = null): string;
-    public function getBody();
+    public function __construct($message = null)
+    {
+        parent::__construct(self::HTTP_CODE_OK, $message);
+    }
 }

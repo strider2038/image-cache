@@ -10,19 +10,26 @@
 
 namespace Strider2038\ImgCache\Response;
 
+use Strider2038\ImgCache\Core\Response;
+
 /**
- * Description of ErrorResponse
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ErrorResponse extends MessageResponse
+class MessageResponse extends Response
 {
     /** @var string */
     private $message;
-    
+
     public function __construct(int $httpCode = null, string $message = null)
     {
-        parent::__construct($httpCode ?? self::HTTP_CODE_INTERNAL_SERVER_ERROR);
+        parent::__construct($httpCode ?? self::HTTP_CODE_OK);
         $this->message = $message;
+    }
+
+    protected function sendContent(): void
+    {
+        if (!empty($this->message)) {
+            echo $this->message;
+        }
     }
 }

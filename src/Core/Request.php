@@ -60,7 +60,12 @@ class Request implements RequestInterface
         }
         return parse_url($this->requestUri, $component);
     }
-    
+
+    public function getBody()
+    {
+        // @todo implement getBody()
+    }
+
     /**
      * @return string[]
      */
