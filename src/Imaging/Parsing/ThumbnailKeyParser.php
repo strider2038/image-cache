@@ -9,26 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging;
+namespace Strider2038\ImgCache\Imaging\Parsing;
 
 use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Imaging\Extraction\FileExtractionRequest;
+use Strider2038\ImgCache\Imaging\Extraction\FileExtractionRequestInterface;
 use Strider2038\ImgCache\Imaging\Transformation\{
-    Quality,
-    TransformationsCollection,
-    TransformationsFactoryInterface
+    Quality, SaveOptions, TransformationsCollection, TransformationsFactoryInterface
 };
 
 /**
  * Request for retrieving image from cache
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageRequest implements ImageRequestInterface
+class ThumbnailKeyParser implements ThumbnailKeyParserInterface
 {
-    /** @var string */
-    protected $filename;
+    /** @var FileExtractionRequestInterface */
+    private $extractionRequest;
     
     /** @var TransformationsCollection */
-    protected $transformations;
+    private $transformations;
 
     /**
      * Quality of the final image
@@ -79,19 +79,31 @@ class ImageRequest implements ImageRequestInterface
             }
         }
         
-        $this->filename = "{$dirname}/{$filenameParts[0]}.{$path['extension']}";
+        $this->extractionRequest = new FileExtractionRequest(
+            "{$dirname}/{$filenameParts[0]}.{$path['extension']}"
+        );
     }
     
-    public function getFileName(): string
+    public function getExtractionRequest(): FileExtractionRequestInterface
     {
-        return $this->filename;
+        return $this->extractionRequest;
     }
     
     public function getTransformations(): TransformationsCollection
     {
         return $this->transformations;
     }
-    
+
+    public function hasTransformations(): bool
+    {
+        return $this->transformations->count() > 0;
+    }
+
+    public function getSaveOptions(): ?SaveOptions
+    {
+        // TODO: Implement getSaveOptions() method.
+    }
+
     public function getQuality(): ?int
     {
         return $this->quality;

@@ -11,13 +11,12 @@
 namespace Strider2038\ImgCache\Tests\Imaging;
 
 use Strider2038\ImgCache\Imaging\{
-    Image, ImageCache
+    Image, ImageCache, Processing\ProcessingEngineInterface, Processing\ProcessingImageInterface, Transformation\SaveOptions
+};
+use Strider2038\ImgCache\Imaging\Extraction\{
+    ExtractedImageInterface, ImageExtractorInterface
 };
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
-use Strider2038\ImgCache\Imaging\Extraction\{
-    ImageExtractorInterface,
-    ExtractedImageInterface
-};
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class ImageCacheTest extends FileTestCase
@@ -164,6 +163,11 @@ class ImageCacheTest extends FileTestCase
                 $this->called = true;
                 copy($this->sourceFilename, $filename);
             }
+
+            public function setSaveOptions(SaveOptions $saveOptions): void {}
+
+            public function open(ProcessingEngineInterface $engine): ProcessingImageInterface {}
+
         };
         $extractedImage->sourceFilename = $testFilename;
         $extractedImage->testCase = $this;

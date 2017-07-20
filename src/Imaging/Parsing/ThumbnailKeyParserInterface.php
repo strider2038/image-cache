@@ -9,15 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging;
+namespace Strider2038\ImgCache\Imaging\Parsing;
 
+use Strider2038\ImgCache\Imaging\Extraction\FileExtractionRequestInterface;
+use Strider2038\ImgCache\Imaging\Transformation\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ImageRequestInterface
+interface ThumbnailKeyParserInterface
 {
-    public function getFileName(): string;
+    public function getExtractionRequest(): FileExtractionRequestInterface;
     public function getTransformations(): TransformationsCollection;
+    public function hasTransformations(): bool;
+    public function getSaveOptions(): ?SaveOptions;
 }

@@ -10,9 +10,9 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Response;
 
+use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Response;
 use Strider2038\ImgCache\Response\MessageResponse;
-use PHPUnit\Framework\TestCase;
 
 class MessageResponseTest extends TestCase
 {
@@ -20,6 +20,7 @@ class MessageResponseTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @group separate
      */
     public function testSend_MessageIsSet_MessageIsEchoed(): void
     {

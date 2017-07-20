@@ -67,6 +67,7 @@ class ResponseTest extends TestCase
     
     /**
      * @runInSeparateProcess
+     * @group separate
      */
     public function testSend_NotSent_SentOnlyOnce(): void
     {
@@ -85,6 +86,7 @@ class ResponseTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     * @group separate
      */
     public function testSend_HeaderIsSet_HeaderIsSent(): void
     {
