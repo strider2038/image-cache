@@ -10,8 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Source;
 
-use Strider2038\ImgCache\Imaging\Extraction\ExtractedImageInterface;
-use Strider2038\ImgCache\Imaging\Extraction\FileExtractionRequestInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

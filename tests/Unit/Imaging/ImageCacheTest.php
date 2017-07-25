@@ -10,13 +10,14 @@
 
 namespace Strider2038\ImgCache\Tests\Imaging;
 
-use Strider2038\ImgCache\Imaging\{
-    Image, ImageCache, Processing\ProcessingEngineInterface, Processing\ProcessingImageInterface, Transformation\SaveOptions
-};
-use Strider2038\ImgCache\Imaging\Extraction\{
-    ExtractedImageInterface, ImageExtractorInterface
-};
+use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
+use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class ImageCacheTest extends FileTestCase
@@ -27,12 +28,6 @@ class ImageCacheTest extends FileTestCase
 
     /** @var ImageExtractorInterface */
     private $imageExtractor;
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->imageExtractor = \Phake::mock(ImageExtractorInterface::class);
-    }
 
     public function testGet_ImageDoesNotExistInSource_NullIsReturned(): void
     {
@@ -132,18 +127,6 @@ class ImageCacheTest extends FileTestCase
         $this->assertTrue($extractedImage->called);
     }
 
-    public function testRebuild_CachedImageNotExists_SourceImageSavedToWebDirectory(): void
-    {
-        $testFilename = $this->haveFile(self::IMAGE_CAT300);
-        [$imageKey, $imageFilename, $cache, $extractedImage] = $this->getImageFileNameForRebuild($testFilename);
-
-        $this->assertFileNotExists($imageFilename);
-        $cache->rebuild($imageKey);
-
-        $this->assertFileExists($imageFilename);
-        $this->assertTrue($extractedImage->called);
-    }
-
     /**
      * @param $testFilename
      * @return array
@@ -173,5 +156,23 @@ class ImageCacheTest extends FileTestCase
         $extractedImage->testCase = $this;
         \Phake::when($this->imageExtractor)->extract($imageKey)->thenReturn($extractedImage);
         return [$imageKey, $imageFilename, $cache, $extractedImage];
+    }
+
+    public function testRebuild_CachedImageNotExists_SourceImageSavedToWebDirectory(): void
+    {
+        $testFilename = $this->haveFile(self::IMAGE_CAT300);
+        [$imageKey, $imageFilename, $cache, $extractedImage] = $this->getImageFileNameForRebuild($testFilename);
+
+        $this->assertFileNotExists($imageFilename);
+        $cache->rebuild($imageKey);
+
+        $this->assertFileExists($imageFilename);
+        $this->assertTrue($extractedImage->called);
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->imageExtractor = \Phake::mock(ImageExtractorInterface::class);
     }
 }

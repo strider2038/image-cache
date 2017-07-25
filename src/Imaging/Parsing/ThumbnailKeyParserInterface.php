@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of ImgCache.
  *
@@ -11,17 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing;
 
-use Strider2038\ImgCache\Imaging\Extraction\FileExtractionRequestInterface;
-use Strider2038\ImgCache\Imaging\Transformation\SaveOptions;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
+use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ThumbnailKeyParserInterface
 {
-    public function getExtractionRequest(): FileExtractionRequestInterface;
-    public function getTransformations(): TransformationsCollection;
-    public function hasTransformations(): bool;
-    public function getSaveOptions(): ?SaveOptions;
+    public function getRequestConfiguration(string $filename): RequestConfigurationInterface;
 }

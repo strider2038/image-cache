@@ -13,8 +13,6 @@ namespace Strider2038\ImgCache\Tests\Imaging\Parsing;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParser;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Transformation\Quality;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
 
@@ -23,30 +21,24 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
  */
 class ThumbnailKeyParserTest extends TestCase
 {
-    private $factory;
-    
-    protected function setUp()
-    {
-        $this->markTestSkipped();
-
-        $this->factory = new class implements TransformationsFactoryInterface {
-            public function create(string $config): TransformationInterface
-            {
-                return new class implements TransformationInterface {
-                    public function apply(ProcessingImageInterface $image): void {}
-                };
-            }
-        };
-    }
+    /** @var TransformationsFactoryInterface */
+    private $transformationsFactory;
     
     /**
      * @dataProvider incorrectFilenamesProvider
      * @expectedException \Strider2038\ImgCache\Exception\InvalidImageException
      * @expectedExceptionCode 400
      */
-    public function testConstruct_FilenameWithIllegalChars_ExceptionThrown(string $filename): void
+    public function testGetRequestConfiguration_FilenameWithIllegalChars_ExceptionThrown(string $filename): void
     {
-        new ThumbnailKeyParser($this->factory, $filename);
+        $parser = $this->createThumbnailKeyParser();
+
+        $parser->getRequestConfiguration($filename);
+    }
+
+    private function createThumbnailKeyParser(): ThumbnailKeyParser
+    {
+        return new ThumbnailKeyParser($this->transformationsFactory);
     }
 
     public function incorrectFilenamesProvider(): array
@@ -70,10 +62,26 @@ class ThumbnailKeyParserTest extends TestCase
     /**
      * @dataProvider filenamesProvider
      */
-    public function testConstruct_Filename_ModifiedFilenameReturned(string $src, string $dst): void
+    public function testGetRequestConfiguration_Filename_ModifiedFilenameSetToExtractionRequest(
+        string $sourceFilename,
+        string $destinationFilename
+    ): void
     {
-        $imageRequest = new ThumbnailKeyParser($this->factory, $src);
-        $this->assertEquals($dst, $imageRequest->getExtractionRequest());
+        $parser = $this->createThumbnailKeyParser();
+        $this->givenTransformationsFactoryReturnsTransformation();
+
+        $requestConfiguration = $parser->getRequestConfiguration($sourceFilename);
+
+        $extractionRequest = $requestConfiguration->getExtractionRequest();
+        $this->assertEquals($destinationFilename, $extractionRequest->getFilename());
+    }
+
+    private function givenTransformationsFactoryReturnsTransformation(): void
+    {
+        $transformation = \Phake::mock(TransformationInterface::class);
+        \Phake::when($this->transformationsFactory)
+            ->create(\Phake::anyParameters())
+            ->thenReturn($transformation);
     }
     
     public function filenamesProvider(): array
@@ -91,12 +99,20 @@ class ThumbnailKeyParserTest extends TestCase
     /**
      * @dataProvider filenamesWithTransformationsProvider
      */
-    public function testConstruct_Filename_CountOfTransformationsReturned(string $filename, int $count): void
+    public function testGetRequestConfiguration_Filename_CountOfTransformationsReturned(
+        string $filename,
+        int $count
+    ): void
     {
-        $imageRequest = new ThumbnailKeyParser($this->factory, $filename);
-        $this->assertEquals($count, $imageRequest->getTransformations()->count());
+        $parser = $this->createThumbnailKeyParser();
+        $this->givenTransformationsFactoryReturnsTransformation();
+
+        $requestConfiguration = $parser->getRequestConfiguration($filename);
+
+        $transformations = $requestConfiguration->getTransformations();
+        $this->assertEquals($count, $transformations->count());
     }
-    
+
     public function filenamesWithTransformationsProvider(): array
     {
         return [
@@ -105,26 +121,9 @@ class ThumbnailKeyParserTest extends TestCase
             ['i_sz85_q7.jpg', 2],
         ];
     }
-    
-    public function testConstruct_FilenameWithQuality_QualityValueReturned(): void
+
+    protected function setUp()
     {
-        $factory = new class implements TransformationsFactoryInterface {
-            public function create(string $config): TransformationInterface
-            {
-                return new class extends Quality {
-                    public function __construct() {}
-                    public function getValue(): int
-                    {
-                        return 50;
-                    }
-                };
-            }
-        };
-        
-        $imageRequest = new ThumbnailKeyParser($factory, 'i_q.jpg');
-        $this->assertEquals(50, $imageRequest->getQuality());
-        
-        $imageRequest = new ThumbnailKeyParser($factory, 'i.jpg');
-        $this->assertNull($imageRequest->getQuality());
+        $this->transformationsFactory = \Phake::mock(TransformationsFactoryInterface::class);
     }
 }

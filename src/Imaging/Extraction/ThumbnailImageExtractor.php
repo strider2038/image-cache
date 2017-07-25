@@ -10,7 +10,9 @@
 
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
-use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserFactoryInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\FileSourceInterface;
 
@@ -22,29 +24,29 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     /** @var FileSourceInterface */
     private $source;
 
-    /** @var ThumbnailKeyParserFactoryInterface */
-    private $keyParserFactory;
+    /** @var ThumbnailKeyParserInterface */
+    private $keyParser;
 
     /** @var ThumbnailImageFactoryInterface */
     private $thumbnailImageFactory;
 
     public function __construct(
         FileSourceInterface $source,
-        ThumbnailKeyParserFactoryInterface $keyParserFactory,
+        ThumbnailKeyParserInterface $keyParserFactory,
         ThumbnailImageFactoryInterface $thumbnailImageFactory
     ) {
         $this->source = $source;
-        $this->keyParserFactory = $keyParserFactory;
+        $this->keyParser = $keyParserFactory;
         $this->thumbnailImageFactory = $thumbnailImageFactory;
     }
 
     public function extract(string $key): ?ExtractedImageInterface
     {
-        /** @var ThumbnailKeyParserInterface $keyParser */
-        $keyParser = $this->keyParserFactory->create($key);
+        /** @var RequestConfigurationInterface $requestConfiguration */
+        $requestConfiguration = $this->keyParser->getRequestConfiguration($key);
 
         /** @var FileExtractionRequestInterface $extractionRequest */
-        $extractionRequest = $keyParser->getExtractionRequest();
+        $extractionRequest = $requestConfiguration->getExtractionRequest();
 
         /** @var ExtractedImageInterface $sourceImage */
         $sourceImage = $this->source->get($extractionRequest);
@@ -53,20 +55,20 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
             return null;
         }
 
-        if (!$keyParser->hasTransformations()) {
+        if (!$requestConfiguration->hasTransformations()) {
             return $sourceImage;
         }
 
-        return $this->thumbnailImageFactory->create($keyParser, $sourceImage);
+        return $this->thumbnailImageFactory->create($requestConfiguration, $sourceImage);
     }
 
     public function exists(string $key): bool
     {
-        /** @var ThumbnailKeyParserInterface $keyParser */
-        $keyParser = $this->keyParserFactory->create($key);
+        /** @var RequestConfigurationInterface $requestConfiguration */
+        $requestConfiguration = $this->keyParser->getRequestConfiguration($key);
 
         /** @var FileExtractionRequestInterface $extractionRequest */
-        $extractionRequest = $keyParser->getExtractionRequest();
+        $extractionRequest = $requestConfiguration->getExtractionRequest();
 
         return $this->source->exists($extractionRequest);
     }

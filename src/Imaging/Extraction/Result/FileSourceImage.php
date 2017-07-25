@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Extraction;
+namespace Strider2038\ImgCache\Imaging\Extraction\Result;
 
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Transformation\SaveOptions;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 
 /**

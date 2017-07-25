@@ -10,7 +10,9 @@
 
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
-use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -18,7 +20,7 @@ use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
 interface ThumbnailImageFactoryInterface
 {
     public function create(
-        ThumbnailKeyParserInterface $keyParser,
+        RequestConfigurationInterface $keyParser,
         ExtractedImageInterface $extractedImage
     ): ThumbnailImage;
 }

@@ -8,13 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
+namespace Strider2038\ImgCache\Imaging\Extraction\Request;
 
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class SaveOptions
+interface FileExtractionRequestInterface
 {
-
+    public function getFilename(): string;
 }

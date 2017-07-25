@@ -10,10 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
-use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Transformation\SaveOptions;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 
@@ -32,7 +34,7 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
     }
 
     public function create(
-        ThumbnailKeyParserInterface $keyParser,
+        RequestConfigurationInterface $keyParser,
         ExtractedImageInterface $image
     ): ThumbnailImage {
         /** @var ProcessingImageInterface $processingImage */

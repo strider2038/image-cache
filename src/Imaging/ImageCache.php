@@ -11,15 +11,11 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Imaging\Extraction\{
-    ExtractedImageInterface,
-    ImageExtractorInterface
-};
+use Strider2038\ImgCache\Exception\InvalidConfigException;
+use Strider2038\ImgCache\Exception\NotAllowedException;
+use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
-use Strider2038\ImgCache\Exception\{
-    InvalidConfigException,
-    NotAllowedException
-};
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -55,27 +51,6 @@ class ImageCache implements ImageCacheInterface
         $this->imageWriter = $imageWriter;
     }
 
-    /**
-     * First request for image file extracts image from the source and puts it into cache
-     * directory. Next requests will be processed by nginx.
-     * @param string $key
-     * @return null|Image
-     */
-    public function get(string $key): ?Image
-    {
-        /** @var ExtractedImageInterface $extractedImage */
-        $extractedImage = $this->imageExtractor->extract($key);
-        if ($extractedImage === null) {
-            return null;
-        }
-
-        $destinationFilename = $this->cacheDirectory . $key;
-
-        $extractedImage->saveTo($destinationFilename);
-
-        return new Image($destinationFilename);
-    }
-
     public function put(string $key, $data): void
     {
         if ($this->imageWriter === null) {
@@ -86,7 +61,7 @@ class ImageCache implements ImageCacheInterface
 
         $this->imageWriter->insert($key, $data);
     }
-    
+
     public function delete(string $key): void
     {
         if ($this->imageWriter === null) {
@@ -115,5 +90,26 @@ class ImageCache implements ImageCacheInterface
         }
 
         $this->get($key);
+    }
+
+    /**
+     * First request for image file extracts image from the source and puts it into cache
+     * directory. Next requests will be processed by nginx.
+     * @param string $key
+     * @return null|Image
+     */
+    public function get(string $key): ?Image
+    {
+        /** @var ExtractedImageInterface $extractedImage */
+        $extractedImage = $this->imageExtractor->extract($key);
+        if ($extractedImage === null) {
+            return null;
+        }
+
+        $destinationFilename = $this->cacheDirectory . $key;
+
+        $extractedImage->saveTo($destinationFilename);
+
+        return new Image($destinationFilename);
     }
 }

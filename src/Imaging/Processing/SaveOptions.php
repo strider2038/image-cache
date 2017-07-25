@@ -8,13 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing;
+namespace Strider2038\ImgCache\Imaging\Processing;
 
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ThumbnailKeyParserFactoryInterface
+class SaveOptions
 {
-    public function create(string $filename): ThumbnailKeyParserInterface;
+
 }
