@@ -27,3 +27,6 @@ Thumbs.db
 !/web/index.php
 /tests/web/*
 !/tests/web/index.php
+
+# test reports
+/tests/report
