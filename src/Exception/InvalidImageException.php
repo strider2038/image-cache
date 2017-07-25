@@ -21,7 +21,7 @@ class InvalidImageException extends ApplicationException
     public function __construct(
         string $message = "", 
         int $code = Response::HTTP_CODE_BAD_REQUEST, 
-        Throwable $previous = null
+        \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
     }

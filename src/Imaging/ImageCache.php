@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Exception\InvalidConfigException;
+use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Exception\NotAllowedException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
@@ -44,7 +44,7 @@ class ImageCache implements ImageCacheInterface
         ImageWriterInterface $imageWriter = null
     ) {
         if (!is_dir($cacheDirectory)) {
-            throw new InvalidConfigException("Directory '{$cacheDirectory}' does not exist");
+            throw new InvalidRequestValueException("Directory '{$cacheDirectory}' does not exist");
         }
         $this->cacheDirectory = rtrim($cacheDirectory, '/');
         $this->imageExtractor = $imageExtractor;

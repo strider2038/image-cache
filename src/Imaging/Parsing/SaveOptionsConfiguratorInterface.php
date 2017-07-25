@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of ImgCache.
  *
@@ -9,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
+namespace Strider2038\ImgCache\Imaging\Parsing;
+
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface TransformationsFactoryInterface
+interface SaveOptionsConfiguratorInterface
 {
-    public function create(string $config): ?TransformationInterface;
+    public function configure(SaveOptions $saveOptions, string $config): void;
 }

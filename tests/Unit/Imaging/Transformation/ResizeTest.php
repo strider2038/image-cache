@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Imaging\Transformation;
+
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Transformation\Resize;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\Transformation\Resize;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -39,7 +41,7 @@ class ResizeTest extends TestCase
             [100, 100, 'unknown'],
         ];
     }
-    
+
     public function testConstruct_ModeIsNotSet_DefaultModeReturned(): void
     {
         $resize = new Resize(100, 200);
@@ -47,7 +49,7 @@ class ResizeTest extends TestCase
         $this->assertEquals(200, $resize->getHeigth());
         $this->assertEquals(Resize::MODE_STRETCH, $resize->getMode());
     }
-    
+
     public function testConstruct_HeightAndModeAreNotSet_DefaultsReturned(): void
     {
         $resize = new Resize(100);
@@ -55,7 +57,7 @@ class ResizeTest extends TestCase
         $this->assertEquals(100, $resize->getHeigth());
         $this->assertEquals(Resize::MODE_STRETCH, $resize->getMode());
     }
-    
+
     /**
      * @dataProvider imagePropertiesProvider
      */
@@ -76,19 +78,23 @@ class ResizeTest extends TestCase
             public $height;
             public $cropX = 0;
             public $cropY = 0;
+
             public function getWidth(): int
             {
                 return $this->width;
             }
+
             public function getHeight(): int
             {
                 return $this->height;
             }
+
             public function resize(int $width, int $heigth): void
             {
                 $this->width = $width;
                 $this->height = $heigth;
             }
+
             public function crop(int $width, int $heigth, int $x, int $y): void
             {
                 $this->width = $width;
@@ -96,20 +102,21 @@ class ResizeTest extends TestCase
                 $this->cropX = $x;
                 $this->cropY = $y;
             }
+
             public function save(string $filename): void {}
         };
         $image->width = $sourceWidth;
         $image->height = $sourceHeight;
-        
+
         $transformation = new Resize($resizeWidth, $resizeHeight, $resizeMode);
         $transformation->apply($image);
-        
+
         $this->assertEquals($finalWidth, $image->width);
         $this->assertEquals($finalHeight, $image->height);
         $this->assertEquals($cropX, $image->cropX);
         $this->assertEquals($cropY, $image->cropY);
     }
-    
+
     public function imagePropertiesProvider(): array
     {
         return [

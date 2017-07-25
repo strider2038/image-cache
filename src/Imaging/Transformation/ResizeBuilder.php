@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Exception\InvalidConfigException;
+use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -26,7 +26,7 @@ class ResizeBuilder implements TransformationBuilderInterface
             $matches
         );
         if (!$isValid) {
-            throw new InvalidConfigException('Invalid config for resize transformation');
+            throw new InvalidRequestValueException('Invalid config for resize transformation');
         }
         $width = $matches[1] ?? 0;
         $heigth = !empty($matches[3]) ? (int) $matches[3] : null;

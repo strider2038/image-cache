@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Core\Response;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class InvalidConfigException extends ApplicationException
+class InvalidValueException extends ApplicationException
 {
     public function __construct(
         $message = "",

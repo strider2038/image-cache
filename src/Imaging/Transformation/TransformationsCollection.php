@@ -25,7 +25,7 @@ class TransformationsCollection implements \IteratorAggregate, \Countable
     }
     
     /**
-     * @return \ArrayIterator
+     * @return \Traversable
      */
     public function getIterator(): \Traversable
     {

@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Imaging\Transformation;
+
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Transformation\{
-    Resize,
-    ResizeBuilder
-};
+use Strider2038\ImgCache\Imaging\Transformation\Resize;
+use Strider2038\ImgCache\Imaging\Transformation\ResizeBuilder;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -33,7 +33,7 @@ class ResizeBuilderTest extends TestCase
         $this->assertEquals($height, $resize->getHeigth());
         $this->assertEquals($mode, $resize->getMode());
     }
-    
+
     public function resizeConfigProvider(): array
     {
         return [
@@ -47,10 +47,10 @@ class ResizeBuilderTest extends TestCase
             ['150', 150, 150, Resize::MODE_STRETCH],
         ];
     }
-    
+
     /**
      * @dataProvider resizeInvalidConfigProvider
-     * @expectedException Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid config for resize transformation
      */
@@ -59,7 +59,7 @@ class ResizeBuilderTest extends TestCase
         $builder = new ResizeBuilder();
         $builder->build($config);
     }
-    
+
     public function resizeInvalidConfigProvider(): array
     {
         return [

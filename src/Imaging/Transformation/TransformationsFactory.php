@@ -27,7 +27,7 @@ class TransformationsFactory implements TransformationsFactoryInterface
     public function __construct(array $buildersMap = null)
     {
         if ($buildersMap === null) {
-            $this->buildersMap = self::getDefaultBuildersMap();
+            $this->buildersMap = static::getDefaultBuildersMap();
             return;
         }
         if (count($buildersMap) <= 0) {
@@ -48,8 +48,15 @@ class TransformationsFactory implements TransformationsFactoryInterface
         }
         $this->buildersMap = $buildersMap;
     }
-    
-    public function create(string $config): TransformationInterface
+
+    public static function getDefaultBuildersMap(): array
+    {
+        return [
+            's' => ResizeBuilder::class,
+        ];
+    }
+
+    public function create(string $config): ?TransformationInterface
     {
         $builder = $this->getBuilder(substr($config, 0, 2));
         if ($builder !== null) {
@@ -59,7 +66,7 @@ class TransformationsFactory implements TransformationsFactoryInterface
         if ($builder !== null) {
             return $builder->build(substr($config, 1));
         }
-        throw new InvalidConfigException("Cannot create transformation for '{$config}'");
+        return null;
     }
     
     public function getBuilder(string $index): ?TransformationBuilderInterface
@@ -71,13 +78,5 @@ class TransformationsFactory implements TransformationsFactoryInterface
             return $this->builders[$index] = new $this->buildersMap[$index];
         }
         return null;
-    }
-    
-    public static function getDefaultBuildersMap(): array
-    {
-        return [
-            'q' => QualityBuilder::class,
-            's' => ResizeBuilder::class,
-        ];
     }
 }

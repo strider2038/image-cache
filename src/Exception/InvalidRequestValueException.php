@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of ImgCache.
  *
@@ -15,11 +16,11 @@ use Strider2038\ImgCache\Core\Response;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class InvalidConfigException extends ApplicationException
+class InvalidRequestValueException extends ApplicationException
 {
     public function __construct(
-        $message = "",
-        $code = Response::HTTP_CODE_INTERNAL_SERVER_ERROR,
+        string $message = "",
+        int $code = Response::HTTP_CODE_BAD_REQUEST,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

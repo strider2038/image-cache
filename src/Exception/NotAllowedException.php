@@ -20,7 +20,7 @@ class NotAllowedException extends ApplicationException
     public function __construct(
         $message = "",
         $code = Response::HTTP_CODE_METHOD_NOT_ALLOWED,
-        Throwable $previous = null
+        \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
     }

@@ -9,16 +9,15 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Imaging\Transformation;
+
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Tests\Support\TransformationsBuilderInterfaceMock;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Transformation\{
-    QualityBuilder,
-    ResizeBuilder,
-    TransformationsFactory,
-    TransformationInterface,
-    TransformationBuilderInterface
-};
+use Strider2038\ImgCache\Imaging\Transformation\ResizeBuilder;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationBuilderInterface;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory;
+use Strider2038\ImgCache\Tests\Support\TransformationsBuilderInterfaceMock;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -31,7 +30,10 @@ class TransformationsFactoryTest extends TestCase
     public function testConstruct_NoBuildersMap_DefaultMapIsUsed(string $index, string $instance): void
     {
         $factory = new TransformationsFactory();
-        $this->assertInstanceOf($instance, $factory->getBuilder($index));
+
+        $builder = $factory->getBuilder($index);
+
+        $this->assertInstanceOf($instance, $builder);
     }
 
     public function testConstruct_CustomBuildersMap_CustomMapIsUsed(): void
@@ -39,115 +41,121 @@ class TransformationsFactoryTest extends TestCase
         $factory = new TransformationsFactory([
             'a' => TransformationsBuilderInterfaceMock::class,
         ]);
-        $this->assertInstanceOf(
-            TransformationBuilderInterface::class, 
-            $factory->getBuilder('a')
-        );
-        $this->assertNull($factory->getBuilder('b'));
+
+        $builderA = $factory->getBuilder('a');
+        $builderS = $factory->getBuilder('s');
+
+        $this->assertInstanceOf(TransformationBuilderInterface::class, $builderA);
+        $this->assertNull($builderS);
     }
-    
+
     /**
      * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
-     * @expectedExceptionCode 400
+     * @expectedExceptionCode 500
      * @expectedExceptionMessage Builders map cannot be empty
      */
     public function testConstruct_EmptyBuildersMap_ExceptionThrown(): void
     {
         new TransformationsFactory([]);
     }
-    
+
     /**
      * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
-     * @expectedExceptionCode 400
+     * @expectedExceptionCode 500
      * @expectedExceptionMessage does not exist
      */
     public function testConstruct_NotAClassInBuildersMap_ExceptionThrown(): void
     {
         new TransformationsFactory(['a' => 'notAClass']);
     }
-    
+
     /**
      * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
-     * @expectedExceptionCode 400
+     * @expectedExceptionCode 500
      * @expectedExceptionMessage must implement
      */
     public function testConstruct_IncorrectClassInBuildersMap_ExceptionThrown(): void
     {
         new TransformationsFactory(['a' => self::class]);
     }
-    
-    /**
-     * @expectedException Strider2038\ImgCache\Exception\InvalidConfigException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Cannot create transformation
-     */
-    public function testCreate_InvalidConfig_ExceptionThrown(): void
+
+    public function testCreate_InvalidConfig_NullIsReturned(): void
     {
         $factory = new class extends TransformationsFactory {
-            public function getBuildersMap(): array
+            public static function getDefaultBuildersMap(): array
             {
                 return [];
             }
         };
-        
-        $factory->create('anything');
+
+        $transformation = $factory->create('anything');
+
+        $this->assertNull($transformation);
     }
-    
+
     /**
      * @dataProvider builderIndexProvider
      */
     public function testGetDefaultBuildersMap_NoParams_BuildersReturned(string $index, string $instance): void
     {
         $builders = TransformationsFactory::getDefaultBuildersMap();
+
         $this->assertArrayHasKey($index, $builders);
         $this->assertInstanceOf($instance, new $builders[$index]);
     }
-    
+
     /**
      * @dataProvider builderIndexProvider
      */
     public function testGetBuilder_IndexIsSet_InstanceIsReturned(string $index, string $instance): void
     {
         $factory = new TransformationsFactory();
-        $this->assertInstanceOf($instance, $factory->getBuilder($index));
+
+        $builder = $factory->getBuilder($index);
+
+        $this->assertInstanceOf($instance, $builder);
     }
-    
+
     public function builderIndexProvider(): array
     {
         return [
-            ['q', QualityBuilder::class],
             ['s', ResizeBuilder::class],
         ];
     }
-    
+
     public function testGetBuilder_UnknownIndexIsSet_NullIsReturned(): void
     {
         $factory = new TransformationsFactory();
-        $this->assertNull($factory->getBuilder('unidentified'));
+
+        $builder = $factory->getBuilder('unidentified');
+
+        $this->assertNull($builder);
     }
-    
+
     public function testCreate_ConfigIsSet_TransformationIsReturned(): void
     {
         $factory = new class extends TransformationsFactory {
             public function getBuilder(string $index): ?TransformationBuilderInterface
             {
                 switch ($index) {
-                    case 'a': 
+                    case 'a':
                         return new class implements TransformationBuilderInterface {
                             public function build(string $config): TransformationInterface
                             {
                                 return new class implements TransformationInterface {
                                     public $testId = 'transformation_a';
+
                                     public function apply(ProcessingImageInterface $image): void {}
                                 };
                             }
                         };
-                    case 'ab': 
+                    case 'ab':
                         return new class implements TransformationBuilderInterface {
                             public function build(string $config): TransformationInterface
                             {
                                 return new class implements TransformationInterface {
                                     public $testId = 'transformation_ab';
+
                                     public function apply(ProcessingImageInterface $image): void {}
                                 };
                             }
@@ -156,10 +164,13 @@ class TransformationsFactoryTest extends TestCase
                 return null;
             }
         };
-        
+
         $transformationA = $factory->create('a');
-        $this->assertEquals('transformation_a', $transformationA->testId);
         $transformationAB = $factory->create('ab');
+        $transformationA1 = $factory->create('a1');
+
+        $this->assertEquals('transformation_a', $transformationA->testId);
         $this->assertEquals('transformation_ab', $transformationAB->testId);
+        $this->assertEquals('transformation_a', $transformationA1->testId);
     }
 }
