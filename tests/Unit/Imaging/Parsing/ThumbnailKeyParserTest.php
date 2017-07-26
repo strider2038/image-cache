@@ -12,9 +12,11 @@
 namespace Strider2038\ImgCache\Tests\Imaging\Parsing;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParser;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
@@ -27,12 +29,16 @@ class ThumbnailKeyParserTest extends TestCase
     /** @var TransformationsFactoryInterface */
     private $transformationsFactory;
 
+    /** @var SaveOptionsFactoryInterface */
+    private $saveOptionsFactory;
+
     /** @var SaveOptionsConfiguratorInterface */
     private $saveOptionsConfigurator;
 
     protected function setUp()
     {
         $this->transformationsFactory = \Phake::mock(TransformationsFactoryInterface::class);
+        $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
         $this->saveOptionsConfigurator = \Phake::mock(SaveOptionsConfiguratorInterface::class);
     }
 
@@ -46,11 +52,6 @@ class ThumbnailKeyParserTest extends TestCase
         $parser = $this->createThumbnailKeyParser();
 
         $parser->getRequestConfiguration($filename);
-    }
-
-    private function createThumbnailKeyParser(): ThumbnailKeyParser
-    {
-        return new ThumbnailKeyParser($this->transformationsFactory, $this->saveOptionsConfigurator);
     }
 
     public function incorrectFilenamesProvider(): array
@@ -80,26 +81,13 @@ class ThumbnailKeyParserTest extends TestCase
     ): void {
         $parser = $this->createThumbnailKeyParser();
         $this->givenTransformationsFactoryReturnsTransformation();
+        $defaultSaveOptions = $this->givenDefaultSaveOptions();
 
         $requestConfiguration = $parser->getRequestConfiguration($sourceFilename);
 
         $extractionRequest = $requestConfiguration->getExtractionRequest();
         $this->assertEquals($destinationFilename, $extractionRequest->getFilename());
-        $this->verifyRequestConfiguration($requestConfiguration);
-    }
-
-    private function givenTransformationsFactoryReturnsTransformation(): void
-    {
-        $transformation = \Phake::mock(TransformationInterface::class);
-        \Phake::when($this->transformationsFactory)
-            ->create(\Phake::anyParameters())
-            ->thenReturn($transformation);
-    }
-
-    private function verifyRequestConfiguration($requestConfiguration): void
-    {
-        $this->assertInstanceOf(TransformationsCollection::class, $requestConfiguration->getTransformations());
-        $this->assertInstanceOf(SaveOptions::class, $requestConfiguration->getSaveOptions());
+        $this->verifyRequestConfiguration($requestConfiguration, $defaultSaveOptions);
     }
 
     public function filenamesProvider(): array
@@ -123,13 +111,70 @@ class ThumbnailKeyParserTest extends TestCase
     ): void {
         $parser = $this->createThumbnailKeyParser();
         $this->givenTransformationsFactoryReturnsTransformation();
+        $defaultSaveOptions = $this->givenDefaultSaveOptions();
 
         $requestConfiguration = $parser->getRequestConfiguration($filename);
 
         $this->assertTransformationsCount($count, $requestConfiguration);
         $this->assertTransformationsFactoryCreateCalled($count);
         $this->assertSaveOptionsConfiguratorConfigureCalled(0);
-        $this->verifyRequestConfiguration($requestConfiguration);
+        $this->verifyRequestConfiguration($requestConfiguration, $defaultSaveOptions);
+    }
+
+    /**
+     * @dataProvider filenamesWithTransformationsProvider
+     */
+    public function testGetRequestConfiguration_Filename_CountOfSaveOptionsConfiguratorConfigureVerified(
+        string $filename,
+        int $count
+    ): void {
+        $parser = $this->createThumbnailKeyParser();
+        $this->givenTransformationsFactoryReturnsNull();
+        $defaultSaveOptions = $this->givenDefaultSaveOptions();
+
+        $requestConfiguration = $parser->getRequestConfiguration($filename);
+
+        $this->assertTransformationsCount(0, $requestConfiguration);
+        $this->assertTransformationsFactoryCreateCalled($count);
+        $this->assertSaveOptionsConfiguratorConfigureCalled($count);
+        $this->verifyRequestConfiguration($requestConfiguration, $defaultSaveOptions);
+    }
+
+    public function filenamesWithTransformationsProvider(): array
+    {
+        return [
+            ['i.jpg', 0],
+            ['i_q95.jpg', 1],
+            ['i_sz85_q7.jpg', 2],
+        ];
+    }
+
+    private function createThumbnailKeyParser(): ThumbnailKeyParser
+    {
+        $thumbnailKeyParser = new ThumbnailKeyParser(
+            $this->transformationsFactory,
+            $this->saveOptionsFactory,
+            $this->saveOptionsConfigurator
+        );
+
+        return $thumbnailKeyParser;
+    }
+
+    private function givenTransformationsFactoryReturnsTransformation(): void
+    {
+        $transformation = \Phake::mock(TransformationInterface::class);
+        \Phake::when($this->transformationsFactory)
+            ->create(\Phake::anyParameters())
+            ->thenReturn($transformation);
+    }
+
+    private function verifyRequestConfiguration(
+        ThumbnailRequestConfigurationInterface $requestConfiguration,
+        SaveOptions $defaultSaveOptions
+    ): void {
+        $this->assertInstanceOf(TransformationsCollection::class, $requestConfiguration->getTransformations());
+        $this->assertSaveOptionsFactoryCreateIsCalledOnce();
+        $this->assertSame($defaultSaveOptions, $requestConfiguration->getSaveOptions());
     }
 
     private function assertTransformationsCount(int $count, $requestConfiguration): void
@@ -150,24 +195,6 @@ class ThumbnailKeyParserTest extends TestCase
             ->configure(\Phake::anyParameters());
     }
 
-    /**
-     * @dataProvider filenamesWithTransformationsProvider
-     */
-    public function testGetRequestConfiguration_Filename_CountOfSaveOptionsConfiguratorConfigureVerified(
-        string $filename,
-        int $count
-    ): void {
-        $parser = $this->createThumbnailKeyParser();
-        $this->givenTransformationsFactoryReturnsNull();
-
-        $requestConfiguration = $parser->getRequestConfiguration($filename);
-
-        $this->assertTransformationsCount(0, $requestConfiguration);
-        $this->assertTransformationsFactoryCreateCalled($count);
-        $this->assertSaveOptionsConfiguratorConfigureCalled($count);
-        $this->verifyRequestConfiguration($requestConfiguration);
-    }
-
     private function givenTransformationsFactoryReturnsNull(): void
     {
         \Phake::when($this->transformationsFactory)
@@ -175,14 +202,20 @@ class ThumbnailKeyParserTest extends TestCase
             ->thenReturn(null);
     }
 
-    public function filenamesWithTransformationsProvider(): array
+    private function givenDefaultSaveOptions(): SaveOptions
     {
-        return [
-            ['i.jpg', 0],
-            ['i_q95.jpg', 1],
-            ['i_sz85_q7.jpg', 2],
-        ];
+        $defaultSaveOptions = \Phake::mock(SaveOptions::class);
+
+        \Phake::when($this->saveOptionsFactory)
+            ->create()
+            ->thenReturn($defaultSaveOptions);
+
+        return $defaultSaveOptions;
     }
 
+    private function assertSaveOptionsFactoryCreateIsCalledOnce(): void
+    {
+        \Phake::verify($this->saveOptionsFactory, \Phake::times(1))->create();
+    }
 
 }

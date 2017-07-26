@@ -51,6 +51,27 @@ class ImageCache implements ImageCacheInterface
         $this->imageWriter = $imageWriter;
     }
 
+    /**
+     * First request for image file extracts image from the source and puts it into cache
+     * directory. Next requests will be processed by nginx.
+     * @param string $key
+     * @return null|Image
+     */
+    public function get(string $key): ?Image
+    {
+        /** @var ExtractedImageInterface $extractedImage */
+        $extractedImage = $this->imageExtractor->extract($key);
+        if ($extractedImage === null) {
+            return null;
+        }
+
+        $destinationFilename = $this->cacheDirectory . $key;
+
+        $extractedImage->saveTo($destinationFilename);
+
+        return new Image($destinationFilename);
+    }
+
     public function put(string $key, $data): void
     {
         if ($this->imageWriter === null) {
@@ -90,26 +111,5 @@ class ImageCache implements ImageCacheInterface
         }
 
         $this->get($key);
-    }
-
-    /**
-     * First request for image file extracts image from the source and puts it into cache
-     * directory. Next requests will be processed by nginx.
-     * @param string $key
-     * @return null|Image
-     */
-    public function get(string $key): ?Image
-    {
-        /** @var ExtractedImageInterface $extractedImage */
-        $extractedImage = $this->imageExtractor->extract($key);
-        if ($extractedImage === null) {
-            return null;
-        }
-
-        $destinationFilename = $this->cacheDirectory . $key;
-
-        $extractedImage->saveTo($destinationFilename);
-
-        return new Image($destinationFilename);
     }
 }

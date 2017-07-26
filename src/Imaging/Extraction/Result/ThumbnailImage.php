@@ -25,17 +25,15 @@ class ThumbnailImage implements ExtractedImageInterface
     /** @var SaveOptions */
     private $saveOptions;
 
-    public function __construct(ProcessingImageInterface $processingImage)
-    {
+    public function __construct(
+        ProcessingImageInterface $processingImage,
+        SaveOptions $saveOptions
+    ) {
         $this->processingImage = $processingImage;
-    }
-
-    public function setSaveOptions(SaveOptions $saveOptions): void
-    {
         $this->saveOptions = $saveOptions;
     }
 
-    public function getSaveOptions(): ?SaveOptions
+    public function getSaveOptions(): SaveOptions
     {
         return $this->saveOptions;
     }

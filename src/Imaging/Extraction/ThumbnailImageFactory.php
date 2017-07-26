@@ -40,26 +40,18 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
         /** @var ProcessingImageInterface $processingImage */
         $processingImage = $extractedImage->open($this->processingEngine);
 
-        if ($requestConfiguration->hasTransformations()) {
-            /** @var TransformationsCollection $transformations */
-            $transformations = $requestConfiguration->getTransformations();
-
-            foreach ($transformations as $transformation) {
-                /** @var TransformationInterface $transformation */
-                $transformation->apply($processingImage);
-            }
-        }
-
-        $thumbnailImage = new ThumbnailImage($processingImage);
-
         /** @var SaveOptions $saveOptions */
         $saveOptions = $requestConfiguration->getSaveOptions();
 
-        if ($saveOptions !== null) {
-            $thumbnailImage->setSaveOptions($saveOptions);
+        /** @var TransformationsCollection $transformations */
+        $transformations = $requestConfiguration->getTransformations();
+
+        foreach ($transformations as $transformation) {
+            /** @var TransformationInterface $transformation */
+            $transformation->apply($processingImage);
         }
 
-        return $thumbnailImage;
+        return new ThumbnailImage($processingImage, $saveOptions);
     }
 
 }

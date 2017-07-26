@@ -14,7 +14,7 @@ use Strider2038\ImgCache\Exception\InvalidImageException;
 use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequest;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfiguration;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
 
@@ -26,15 +26,20 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
     /** @var TransformationsFactoryInterface */
     private $transformationsFactory;
 
+    /** @var SaveOptionsFactoryInterface */
+    private $saveOptionsFactory;
+
     /** @var SaveOptionsConfiguratorInterface */
     private $saveOptionsConfigurator;
 
     public function __construct(
         TransformationsFactoryInterface $transformationsFactory,
+        SaveOptionsFactoryInterface $saveOptionsFactory,
         SaveOptionsConfiguratorInterface $saveOptionsConfigurator
     )
     {
         $this->transformationsFactory = $transformationsFactory;
+        $this->saveOptionsFactory = $saveOptionsFactory;
         $this->saveOptionsConfigurator = $saveOptionsConfigurator;
     }
 
@@ -54,12 +59,13 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
             "{$directory}/{$filenameParts[0]}.{$path['extension']}"
         );
 
-        $requestConfiguration = new ThumbnailRequestConfiguration($extractionRequest);
-
         [$transformations, $saveOptions] = $this->parseThumbnailConfig($filenameParts);
 
-        $requestConfiguration->setTransformations($transformations);
-        $requestConfiguration->setSaveOptions($saveOptions);
+        $requestConfiguration = new ThumbnailRequestConfiguration(
+            $extractionRequest,
+            $transformations,
+            $saveOptions
+        );
 
         return $requestConfiguration;
     }
@@ -102,7 +108,7 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         $filenamePartsCount = count($filenameParts);
 
         $transformations = new TransformationsCollection();
-        $saveOptions = new SaveOptions();
+        $saveOptions = $this->saveOptionsFactory->create();
 
         if ($filenamePartsCount > 1) {
             for ($i = 1; $i < $filenamePartsCount; $i++) {

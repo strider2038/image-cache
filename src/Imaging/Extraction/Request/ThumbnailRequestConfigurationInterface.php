@@ -21,9 +21,9 @@ interface ThumbnailRequestConfigurationInterface
 {
     public function getExtractionRequest(): FileExtractionRequestInterface;
 
-    public function getTransformations(): ?TransformationsCollection;
+    public function getTransformations(): TransformationsCollection;
 
     public function hasTransformations(): bool;
 
-    public function getSaveOptions(): ?SaveOptions;
+    public function getSaveOptions(): SaveOptions;
 }

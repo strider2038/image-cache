@@ -15,19 +15,21 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 class SaveOptionsTest extends TestCase
 {
-    public function testGetQuality_QualityIsNull_ReturnedValuesIsNull(): void
+    const QUALITY_VALUE_DEFAULT = 85;
+
+    public function testGetQuality_ClassConstructed_ReturnedValuesHasDefaultValue(): void
     {
         $saveOptions = new SaveOptions();
 
         $result = $saveOptions->getQuality();
 
-        $this->assertNull($result);
+        $this->assertEquals(self::QUALITY_VALUE_DEFAULT, $result);
     }
 
     /**
      * @dataProvider getValidQualityValues
      */
-    public function testSetQuality_ValidQualityValueIsSet_ReturnedValuesMatchesSetValue(?int $quality): void
+    public function testSetQuality_ValidQualityValueIsSet_ReturnedValuesMatchesSetValue(int $quality): void
     {
         $saveOptions = new SaveOptions();
 
@@ -40,7 +42,6 @@ class SaveOptionsTest extends TestCase
     public function getValidQualityValues(): array
     {
         return [
-            [null],
             [15],
             [100],
         ];

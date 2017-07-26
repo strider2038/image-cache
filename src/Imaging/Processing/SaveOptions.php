@@ -19,11 +19,12 @@ class SaveOptions
 {
     const QUALITY_VALUE_MIN = 15;
     const QUALITY_VALUE_MAX = 100;
+    const QUALITY_VALUE_DEFAULT = 85;
 
     /** @var int */
-    private $quality;
+    private $quality = self::QUALITY_VALUE_DEFAULT;
 
-    public function getQuality(): ?int
+    public function getQuality(): int
     {
         return $this->quality;
     }
@@ -32,9 +33,9 @@ class SaveOptions
      * @param int|null $quality
      * @throws InvalidValueException
      */
-    public function setQuality(?int $quality): void
+    public function setQuality(int $quality): void
     {
-        if ($quality !== null && ($quality < self::QUALITY_VALUE_MIN || $quality > self::QUALITY_VALUE_MAX)) {
+        if ($quality < self::QUALITY_VALUE_MIN || $quality > self::QUALITY_VALUE_MAX) {
             throw new InvalidValueException(sprintf(
                 "Quality value must be between %d and %d",
                 self::QUALITY_VALUE_MIN,

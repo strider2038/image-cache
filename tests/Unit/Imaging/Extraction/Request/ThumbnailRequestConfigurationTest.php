@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction\Request;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfiguration;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 
 class ThumbnailRequestConfigurationTest extends TestCase
@@ -21,40 +21,41 @@ class ThumbnailRequestConfigurationTest extends TestCase
     /** @var FileExtractionRequestInterface */
     private $extractionRequest;
 
+    /** @var TransformationsCollection */
+    private $transformations;
+
+    /** @var SaveOptions */
+    private $saveOptions;
+
     protected function setUp()
     {
         $this->extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
+        $this->transformations = \Phake::mock(TransformationsCollection::class);
+        $this->saveOptions = \Phake::mock(SaveOptions::class);
     }
 
-    public function testGetExtractionRequest_GivenFileExtractionRequest_FileExtractionRequestIsReturned(): void
+    public function testConstruct_Nop_AllInjectedClassesAreAvailable(): void
     {
         $requestConfiguration = $this->createRequestConfiguration();
 
         $extractionRequest = $requestConfiguration->getExtractionRequest();
+        $transformations = $requestConfiguration->getTransformations();
+        $saveOptions = $requestConfiguration->getSaveOptions();
 
         $this->assertInstanceOf(FileExtractionRequestInterface::class, $extractionRequest);
-    }
-
-    public function testHasTransformations_TransformationsIsNotSet_FalseIsReturned(): void
-    {
-        $requestConfiguration = $this->createRequestConfiguration();
-
-        $hasTransformations = $requestConfiguration->hasTransformations();
-
-        $this->assertFalse($hasTransformations);
+        $this->assertInstanceOf(TransformationsCollection::class, $transformations);
+        $this->assertInstanceOf(SaveOptions::class, $saveOptions);
     }
 
     /**
-     * @param TransformationsCollection $collection
-     * @param bool $expectedHasTransformations
      * @dataProvider hasTransformationsProvider
      */
-    public function testHasTransformations_TransformationsIsSet_BoolIsReturned(
-        TransformationsCollection $collection,
+    public function testHasTransformations_GivenTransformationsCount_TrueIsReturned(
+        int $transformationsCount,
         bool $expectedHasTransformations
     ): void {
         $requestConfiguration = $this->createRequestConfiguration();
-        $requestConfiguration->setTransformations($collection);
+        $this->givenTransformationsCount($transformationsCount);
 
         $hasTransformations = $requestConfiguration->hasTransformations();
 
@@ -64,25 +65,25 @@ class ThumbnailRequestConfigurationTest extends TestCase
     public function hasTransformationsProvider(): array
     {
         return [
-            [$this->givenTransformationsCount(0), false],
-            [$this->givenTransformationsCount(1), true],
-            [$this->givenTransformationsCount(2), true],
+            [0, false],
+            [1, true],
+            [2, true],
         ];
     }
 
     private function createRequestConfiguration(): ThumbnailRequestConfiguration
     {
-        return new ThumbnailRequestConfiguration($this->extractionRequest);
+        return new ThumbnailRequestConfiguration(
+            $this->extractionRequest,
+            $this->transformations,
+            $this->saveOptions
+        );
     }
 
-    private function givenTransformationsCount(int $count = 0): TransformationsCollection
+    private function givenTransformationsCount(int $transformationsCount): void
     {
-        $collection = new TransformationsCollection();
-
-        for ($i = 0; $i < $count; $i++) {
-            $collection->add(\Phake::mock(TransformationInterface::class));
-        }
-
-        return $collection;
+        \Phake::when($this->transformations)
+            ->count()
+            ->thenReturn($transformationsCount);
     }
 }

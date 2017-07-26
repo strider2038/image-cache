@@ -29,9 +29,14 @@ class ThumbnailRequestConfiguration implements ThumbnailRequestConfigurationInte
     /** @var SaveOptions */
     private $saveOptions;
 
-    public function __construct(FileExtractionRequestInterface $extractionRequest)
-    {
+    public function __construct(
+        FileExtractionRequestInterface $extractionRequest,
+        TransformationsCollection $transformations,
+        SaveOptions $saveOptions
+    ) {
         $this->extractionRequest = $extractionRequest;
+        $this->transformations = $transformations;
+        $this->saveOptions = $saveOptions;
     }
     
     public function getExtractionRequest(): FileExtractionRequestInterface
@@ -39,31 +44,18 @@ class ThumbnailRequestConfiguration implements ThumbnailRequestConfigurationInte
         return $this->extractionRequest;
     }
 
-    public function getTransformations(): ?TransformationsCollection
+    public function getTransformations(): TransformationsCollection
     {
         return $this->transformations;
     }
 
-    public function setTransformations(TransformationsCollection $transformations): void
-    {
-        $this->transformations = $transformations;
-    }
-
     public function hasTransformations(): bool
     {
-        if ($this->transformations === null) {
-            return false;
-        }
         return $this->transformations->count() > 0;
     }
 
-    public function getSaveOptions(): ?SaveOptions
+    public function getSaveOptions(): SaveOptions
     {
         return $this->saveOptions;
-    }
-
-    public function setSaveOptions(SaveOptions $saveOptions)
-    {
-        $this->saveOptions = $saveOptions;
     }
 }
