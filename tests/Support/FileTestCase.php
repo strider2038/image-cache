@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
  */
 class FileTestCase extends TestCase
 {
+    private const FILES_DIR = '/../assets/';
+
     const TEST_CACHE_DIR = '/tmp/imgcache-test';
     const IMAGE_CAT300 = 'cat300.jpg';
     const IMAGE_CAT2000 = 'cat2000.jpg';
@@ -35,8 +37,14 @@ class FileTestCase extends TestCase
         //exec('rm -rf ' . self::TEST_CACHE_DIR);
     }
 
-    public function haveFile(string $name): string
+    public function givenFile(string $name): string
     {
-        return TestImages::getFilename($name);
+        $filename = __DIR__ . self::FILES_DIR . $name;
+
+        if (!file_exists($filename)) {
+            throw new \Exception("File '{$filename}' not found");
+        }
+
+        return $filename;
     }
 }

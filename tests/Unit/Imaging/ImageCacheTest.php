@@ -43,7 +43,7 @@ class ImageCacheTest extends FileTestCase
     {
         $imageKey = '/' . self::IMAGE_CAT300;
         $imageFilename = self::TEST_CACHE_DIR . $imageKey;
-        copy($this->haveFile(self::IMAGE_CAT300), $imageFilename);
+        copy($this->givenFile(self::IMAGE_CAT300), $imageFilename);
         $cache = new ImageCache(self::TEST_CACHE_DIR, $this->imageExtractor);
         $extractedImage = \Phake::mock(ExtractedImageInterface::class);
         \Phake::when($this->imageExtractor)->extract($imageKey)->thenReturn($extractedImage);
@@ -92,7 +92,7 @@ class ImageCacheTest extends FileTestCase
     {
         $imageKey = '/' . self::IMAGE_CAT300;
         $imageFilename = self::TEST_CACHE_DIR . $imageKey;
-        copy($this->haveFile(self::IMAGE_CAT300), $imageFilename);
+        copy($this->givenFile(self::IMAGE_CAT300), $imageFilename);
         $writer = \Phake::mock(ImageWriterInterface::class);
         $cache = new ImageCache(self::TEST_CACHE_DIR, $this->imageExtractor, $writer);
 
@@ -116,7 +116,7 @@ class ImageCacheTest extends FileTestCase
 
     public function testRebuild_CachedImageExists_ImageRemovedFromCacheAndSavedFromSourceToWebDirectory(): void
     {
-        $testFilename = $this->haveFile(self::IMAGE_CAT300);
+        $testFilename = $this->givenFile(self::IMAGE_CAT300);
         [$imageKey, $imageFilename, $cache, $extractedImage] = $this->getImageFileNameForRebuild($testFilename);
         copy($testFilename, $imageFilename);
 
@@ -160,7 +160,7 @@ class ImageCacheTest extends FileTestCase
 
     public function testRebuild_CachedImageNotExists_SourceImageSavedToWebDirectory(): void
     {
-        $testFilename = $this->haveFile(self::IMAGE_CAT300);
+        $testFilename = $this->givenFile(self::IMAGE_CAT300);
         [$imageKey, $imageFilename, $cache, $extractedImage] = $this->getImageFileNameForRebuild($testFilename);
 
         $this->assertFileNotExists($imageFilename);

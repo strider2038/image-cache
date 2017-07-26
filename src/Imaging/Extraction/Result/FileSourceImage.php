@@ -10,28 +10,27 @@
 
 namespace Strider2038\ImgCache\Imaging\Extraction\Result;
 
+use Strider2038\ImgCache\Exception\FileOperationException;
+use Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FileSourceImage implements ExtractedImageInterface
+class FileSourceImage extends Image implements ExtractedImageInterface
 {
-    public function setSaveOptions(SaveOptions $saveOptions): void
-    {
-        // TODO: Implement setSaveOptions() method.
-    }
-
     public function saveTo(string $filename): void
     {
-        // TODO: Implement saveTo() method.
+        $sourceFilename = $this->getFilename();
+
+        if (!copy($sourceFilename, $filename)) {
+            throw new FileOperationException("Cannot copy file '{$sourceFilename}' to '{$filename}'");
+        }
     }
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        // TODO: Implement open() method.
+        return $engine->open($this->getFilename());
     }
 }

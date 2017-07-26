@@ -9,12 +9,11 @@
  * file that was distributed with this source code.
  */
 
+use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
 use Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Imaging\Source\FileSource;
-use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
 use Strider2038\ImgCache\Tests\Support\{
-    TestImages,
-    FileTestCase
+    FileTestCase, TestImages
 };
 
 /**
@@ -22,8 +21,6 @@ use Strider2038\ImgCache\Tests\Support\{
  */
 class FileSourceTest extends FileTestCase
 {
-    const IMAGE_NAME = 'cat300.jpg';
-    
     /** @var TemporaryFilesManagerInterface */
     private $manager;
     
@@ -85,7 +82,7 @@ class FileSourceTest extends FileTestCase
         $manager->testTempFilename = self::TEST_CACHE_DIR . '/test.jpg';
         $source = new FileSource($manager, self::TEST_CACHE_DIR);
         mkdir(self::TEST_CACHE_DIR . '/somedir');
-        copy(TestImages::getFilename(self::IMAGE_NAME), $sourceFilename);
+        copy($this->givenFile(self::IMAGE_CAT300), $sourceFilename);
         
         $image = $source->get($fileKey);
         

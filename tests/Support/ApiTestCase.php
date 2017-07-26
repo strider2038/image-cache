@@ -24,6 +24,7 @@ class ApiTestCase extends FileTestCase
     protected function setUp()
     {
         parent::setUp();
+
         $this->client = new Client([
             'base_uri' => 'http://localhost:8080/',
             'timeout' => 5,
@@ -45,10 +46,12 @@ class ApiTestCase extends FileTestCase
      * @param string $name
      * @return string[] imageFilename, imageUrl
      */
-    public function havePublicImage(string $urlPrefix = '', string $name = self::IMAGE_CAT300): array
+    public function givenPublicImage(string $urlPrefix = '', string $name = self::IMAGE_CAT300): array
     {
         $filename = static::getTestWebDir() . $urlPrefix . $name;
-        copy(TestImages::getFilename($name), $filename);
+
+        copy($this->givenFile($name), $filename);
+
         return [$filename, '/i/' . $name];
     }
 }

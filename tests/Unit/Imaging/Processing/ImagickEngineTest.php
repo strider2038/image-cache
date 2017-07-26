@@ -11,13 +11,10 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 
-use Strider2038\ImgCache\Tests\Support\FileTestCase;
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Imaging\Processing\{
-    ImagickEngine,
-    ImagickImage,
-    ProcessingImageInterface
+    ImagickEngine, ImagickImage, ProcessingImageInterface
 };
+use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -36,7 +33,7 @@ class ImagickEngineTest extends FileTestCase
     public function testOpen_FileExist_ImagickImageIsReturned(): void
     {
         $engine = new ImagickEngine();
-        $image = $engine->open($this->haveFile(self::IMAGE_CAT300));
+        $image = $engine->open($this->givenFile(self::IMAGE_CAT300));
         $this->assertInstanceOf(ProcessingImageInterface::class, $image);
         $this->assertInstanceOf(ImagickImage::class, $image);
     }

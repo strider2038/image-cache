@@ -9,23 +9,17 @@
  * file that was distributed with this source code.
  */
 
-use Strider2038\ImgCache\Tests\Support\FileTestCase;
-use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Core\{
-    RequestInterface,
-    SecurityInterface
-};
-use Strider2038\ImgCache\Response\{
-    ImageResponse,
-    NotFoundResponse,
-    ConflictResponse,
-    CreatedResponse,
-    SuccessResponse
+    RequestInterface, SecurityInterface
 };
 use Strider2038\ImgCache\Imaging\{
-    Image,
-    ImageCacheInterface
+    Image, ImageCacheInterface
 };
+use Strider2038\ImgCache\Response\{
+    ConflictResponse, CreatedResponse, ImageResponse, NotFoundResponse, SuccessResponse
+};
+use Strider2038\ImgCache\Service\ImageController;
+use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 
 /**
@@ -71,7 +65,7 @@ class ImageControllerTest extends FileTestCase
         $image = \Phake::mock(Image::class);
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->get(self::IMAGE_FILENAME)->thenReturn($image);
-        \Phake::when($image)->getFilename()->thenReturn($this->haveFile(self::IMAGE_CAT300));
+        \Phake::when($image)->getFilename()->thenReturn($this->givenFile(self::IMAGE_CAT300));
 
         $response = $controller->actionGet($this->request);
 

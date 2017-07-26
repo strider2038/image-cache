@@ -11,8 +11,8 @@
 
 namespace Strider2038\ImgCache\Tests\Functional\Api;
 
-use Strider2038\ImgCache\Tests\Support\ApiTestCase;
 use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Tests\Support\ApiTestCase;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -30,7 +30,7 @@ class ImageCacheApiTest extends ApiTestCase
     
     public function testGet_ImageExist_Http200Returned(): void
     {
-        [$imageFilename, $imageUrl] = $this->havePublicImage();
+        [$imageFilename, $imageUrl] = $this->givenPublicImage();
         
         /** @var \GuzzleHttp\Psr7\Response */
         $response = $this->client->request('GET', $imageUrl);

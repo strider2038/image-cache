@@ -11,11 +11,10 @@
 
 namespace Strider2038\ImgCache\Tests\Imaging;
 
-use Strider2038\ImgCache\Tests\Support\{
-    TestImages,
-    FileTestCase
-};
 use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Tests\Support\{
+    FileTestCase, TestImages
+};
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -33,7 +32,7 @@ class ImageTest extends FileTestCase
 
     public function testConstruct_FileExists_FileNameIsCorrect(): void
     {
-        $filename = TestImages::getFilename('cat300.jpg');
+        $filename = $this->givenFile(self::IMAGE_CAT300);
         
         $image = new Image($filename);
         

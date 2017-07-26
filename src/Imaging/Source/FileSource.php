@@ -11,13 +11,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Source;
 
-use Strider2038\ImgCache\Imaging\Image;
-use Strider2038\ImgCache\Helper\FileHelper;
-use Strider2038\ImgCache\Exception\{
-    ApplicationException,
-    FileNotFoundException
-};
 use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
+use Strider2038\ImgCache\Exception\{
+    ApplicationException
+};
+use Strider2038\ImgCache\Helper\FileHelper;
+use Strider2038\ImgCache\Imaging\Image;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -51,27 +50,35 @@ class FileSource extends AbstractFileSource
     
     public function get(string $filename): ?Image
     {
-        /**
-         * @todo check for cached file
-         */
-
-        $sourceFilename = $this->baseDirectory;
-        if (substr($filename, 0, 1) === '/') {
-            $sourceFilename .= $filename;
-        } else {
-            $sourceFilename .= '/' . $filename;
-        }
+        $sourceFilename = $this->composeSourceFilename($filename);
         
         if (!file_exists($sourceFilename)) {
             return null;
         }
-        
+
+        /**
+         * @todo check for cached file
+         */
+
         // Copying file by contents for testing purposes.
         // Actually, FileSource needed only for local testing.
         $data = file_get_contents($sourceFilename);
         $tempFilename = $this->temporaryFilesManager->putFile($filename, $data);
         
         return new Image($tempFilename);
+    }
+
+    private function composeSourceFilename(string $filename): string
+    {
+        $sourceFilename = $this->baseDirectory;
+
+        if (substr($filename, 0, 1) === '/') {
+            $sourceFilename .= $filename;
+        } else {
+            $sourceFilename .= '/' . $filename;
+        }
+
+        return $sourceFilename;
     }
 
 }
