@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
@@ -33,10 +33,17 @@ class ThumbnailImageExtractorTest extends TestCase
     /** @var ThumbnailImageFactoryInterface */
     private $thumbnailImageFactory;
 
+    protected function setUp()
+    {
+        $this->source = \Phake::mock(FileSourceInterface::class);
+        $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
+        $this->thumbnailImageFactory = \Phake::mock(ThumbnailImageFactoryInterface::class);
+    }
+
     public function testExtract_SourceImageNotFound_NullIsReturned(): void
     {
         $imageExtractor = new ThumbnailImageExtractor($this->source, $this->keyParser, $this->thumbnailImageFactory);
-        $keyParser = \Phake::mock(RequestConfigurationInterface::class);
+        $keyParser = \Phake::mock(ThumbnailRequestConfigurationInterface::class);
         \Phake::when($this->keyParser)->getRequestConfiguration(self::KEY)->thenReturn($keyParser);
         $extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
         \Phake::when($keyParser)->getExtractionRequest()->thenReturn($extractionRequest);
@@ -50,7 +57,7 @@ class ThumbnailImageExtractorTest extends TestCase
     public function testExtract_SourceImageFoundAndNoTransformationsNeeded_SourceImageIsReturned(): void
     {
         $imageExtractor = new ThumbnailImageExtractor($this->source, $this->keyParser, $this->thumbnailImageFactory);
-        $keyParser = \Phake::mock(RequestConfigurationInterface::class);
+        $keyParser = \Phake::mock(ThumbnailRequestConfigurationInterface::class);
         \Phake::when($this->keyParser)->getRequestConfiguration(self::KEY)->thenReturn($keyParser);
         $extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
         \Phake::when($keyParser)->getExtractionRequest()->thenReturn($extractionRequest);
@@ -66,7 +73,7 @@ class ThumbnailImageExtractorTest extends TestCase
     public function testExtract_SourceImageFoundAndTransformationsNeeded_ThumbnailImageIsReturned(): void
     {
         $imageExtractor = new ThumbnailImageExtractor($this->source, $this->keyParser, $this->thumbnailImageFactory);
-        $keyParser = \Phake::mock(RequestConfigurationInterface::class);
+        $keyParser = \Phake::mock(ThumbnailRequestConfigurationInterface::class);
         \Phake::when($this->keyParser)->getRequestConfiguration(self::KEY)->thenReturn($keyParser);
         $extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
         \Phake::when($keyParser)->getExtractionRequest()->thenReturn($extractionRequest);
@@ -86,7 +93,7 @@ class ThumbnailImageExtractorTest extends TestCase
     public function testExists_SourceImageExistsCalled_BoolIsReturned(bool $expectedExists): void
     {
         $imageExtractor = new ThumbnailImageExtractor($this->source, $this->keyParser, $this->thumbnailImageFactory);
-        $keyParser = \Phake::mock(RequestConfigurationInterface::class);
+        $keyParser = \Phake::mock(ThumbnailRequestConfigurationInterface::class);
         \Phake::when($this->keyParser)->getRequestConfiguration(self::KEY)->thenReturn($keyParser);
         $extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
         \Phake::when($keyParser)->getExtractionRequest()->thenReturn($extractionRequest);
@@ -103,12 +110,5 @@ class ThumbnailImageExtractorTest extends TestCase
             [true],
             [false],
         ];
-    }
-
-    protected function setUp()
-    {
-        $this->source = \Phake::mock(FileSourceInterface::class);
-        $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
-        $this->thumbnailImageFactory = \Phake::mock(ThumbnailImageFactoryInterface::class);
     }
 }

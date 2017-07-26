@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
-use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
@@ -34,17 +34,17 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
     }
 
     public function create(
-        RequestConfigurationInterface $keyParser,
+        ThumbnailRequestConfigurationInterface $requestConfiguration,
         ExtractedImageInterface $image
     ): ThumbnailImage {
         /** @var ProcessingImageInterface $processingImage */
         $processingImage = $image->open($this->processingEngine);
 
         /** @var TransformationsCollection $transformations */
-        $transformations = $keyParser->getTransformations();
+        $transformations = $requestConfiguration->getTransformations();
 
         /** @var SaveOptions $saveOptions */
-        $saveOptions = $keyParser->getSaveOptions();
+        $saveOptions = $requestConfiguration->getSaveOptions();
 
         foreach ($transformations as $transformation) {
             /** @var TransformationInterface $transformation */

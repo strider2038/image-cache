@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing;
 
-use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ThumbnailKeyParserInterface
 {
-    public function getRequestConfiguration(string $filename): RequestConfigurationInterface;
+    public function getRequestConfiguration(string $filename): ThumbnailRequestConfigurationInterface;
 }

@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Imaging\Parsing;
 
 use Strider2038\ImgCache\Exception\InvalidImageException;
 use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequest;
-use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfiguration;
-use Strider2038\ImgCache\Imaging\Extraction\Request\RequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfiguration;
+use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
@@ -38,7 +38,12 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         $this->saveOptionsConfigurator = $saveOptionsConfigurator;
     }
 
-    public function getRequestConfiguration(string $filename): RequestConfigurationInterface
+    public static function getSupportedExtensions(): array
+    {
+        return ['jpg', 'jpeg'];
+    }
+
+    public function getRequestConfiguration(string $filename): ThumbnailRequestConfigurationInterface
     {
         $path = $this->extractPath($filename);
         $directory = $this->extractDirectory($path);
@@ -49,7 +54,7 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
             "{$directory}/{$filenameParts[0]}.{$path['extension']}"
         );
 
-        $requestConfiguration = new RequestConfiguration($extractionRequest);
+        $requestConfiguration = new ThumbnailRequestConfiguration($extractionRequest);
 
         [$transformations, $saveOptions] = $this->parseThumbnailConfig($filenameParts);
 
@@ -90,11 +95,6 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         }
 
         return $directory;
-    }
-
-    public static function getSupportedExtensions(): array
-    {
-        return ['jpg', 'jpeg'];
     }
 
     private function parseThumbnailConfig(array $filenameParts): array

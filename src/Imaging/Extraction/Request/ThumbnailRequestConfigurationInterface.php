@@ -17,7 +17,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface RequestConfigurationInterface
+interface ThumbnailRequestConfigurationInterface
 {
     public function getExtractionRequest(): FileExtractionRequestInterface;
 

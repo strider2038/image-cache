@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
  * Request for retrieving image from cache
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class RequestConfiguration implements RequestConfigurationInterface
+class ThumbnailRequestConfiguration implements ThumbnailRequestConfigurationInterface
 {
     /** @var FileExtractionRequestInterface */
     private $extractionRequest;
@@ -29,7 +29,7 @@ class RequestConfiguration implements RequestConfigurationInterface
     /** @var SaveOptions */
     private $saveOptions;
 
-    public function __construct(FileExtractionRequest $extractionRequest)
+    public function __construct(FileExtractionRequestInterface $extractionRequest)
     {
         $this->extractionRequest = $extractionRequest;
     }
