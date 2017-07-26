@@ -35,23 +35,31 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
 
     public function create(
         ThumbnailRequestConfigurationInterface $requestConfiguration,
-        ExtractedImageInterface $image
+        ExtractedImageInterface $extractedImage
     ): ThumbnailImage {
         /** @var ProcessingImageInterface $processingImage */
-        $processingImage = $image->open($this->processingEngine);
+        $processingImage = $extractedImage->open($this->processingEngine);
 
-        /** @var TransformationsCollection $transformations */
-        $transformations = $requestConfiguration->getTransformations();
+        if ($requestConfiguration->hasTransformations()) {
+            /** @var TransformationsCollection $transformations */
+            $transformations = $requestConfiguration->getTransformations();
+
+            foreach ($transformations as $transformation) {
+                /** @var TransformationInterface $transformation */
+                $transformation->apply($processingImage);
+            }
+        }
+
+        $thumbnailImage = new ThumbnailImage($processingImage);
 
         /** @var SaveOptions $saveOptions */
         $saveOptions = $requestConfiguration->getSaveOptions();
 
-        foreach ($transformations as $transformation) {
-            /** @var TransformationInterface $transformation */
-            $transformation->apply($processingImage);
+        if ($saveOptions !== null) {
+            $thumbnailImage->setSaveOptions($saveOptions);
         }
 
-        return new ThumbnailImage($processingImage, $saveOptions);
+        return $thumbnailImage;
     }
 
 }

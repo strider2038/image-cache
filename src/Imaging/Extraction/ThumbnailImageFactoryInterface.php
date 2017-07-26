@@ -21,6 +21,6 @@ interface ThumbnailImageFactoryInterface
 {
     public function create(
         ThumbnailRequestConfigurationInterface $requestConfiguration,
-        ExtractedImageInterface $extractedImage
+        ExtractedImageInterface $extractedExtractedImage
     ): ThumbnailImage;
 }
