@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of ImgCache.
  *
@@ -9,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source;
+namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SourceInterface
+interface ImageFactoryInterface
 {
-    public function get(string $filename): ?ImageFile;
+    public function createImageFile(string $filename): ImageFile;
+    public function createImageBlob(string $blob): ImageBlob;
 }

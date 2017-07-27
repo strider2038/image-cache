@@ -14,7 +14,8 @@ namespace Strider2038\ImgCache\Imaging;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Exception\NotAllowedException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 
 /**
@@ -37,16 +38,23 @@ class ImageCache implements ImageCacheInterface
      * @var ImageWriterInterface
      */
     private $imageWriter;
+
+    /**
+     * @var ImageFactoryInterface
+     */
+    private $imageFactory;
     
     public function __construct(
         string $cacheDirectory,
+        ImageFactoryInterface $imageFactory,
         ImageExtractorInterface $imageExtractor,
         ImageWriterInterface $imageWriter = null
     ) {
         if (!is_dir($cacheDirectory)) {
             throw new InvalidRequestValueException("Directory '{$cacheDirectory}' does not exist");
         }
-        $this->cacheDirectory = rtrim($cacheDirectory, '/');
+        $this->cacheDirectory = rtrim($cacheDirectory, '/') . '/';
+        $this->imageFactory = $imageFactory;
         $this->imageExtractor = $imageExtractor;
         $this->imageWriter = $imageWriter;
     }
@@ -55,21 +63,21 @@ class ImageCache implements ImageCacheInterface
      * First request for image file extracts image from the source and puts it into cache
      * directory. Next requests will be processed by nginx.
      * @param string $key
-     * @return null|Image
+     * @return null|ImageInterface
      */
-    public function get(string $key): ?Image
+    public function get(string $key): ?ImageInterface
     {
-        /** @var ExtractedImageInterface $extractedImage */
+        /** @var ImageInterface $extractedImage */
         $extractedImage = $this->imageExtractor->extract($key);
         if ($extractedImage === null) {
             return null;
         }
 
-        $destinationFilename = $this->cacheDirectory . $key;
+        $destinationFilename = $this->composeDestinationFilename($key);
 
         $extractedImage->saveTo($destinationFilename);
 
-        return new Image($destinationFilename);
+        return $this->imageFactory->createImageFile($destinationFilename);
     }
 
     public function put(string $key, $data): void
@@ -105,11 +113,16 @@ class ImageCache implements ImageCacheInterface
     public function rebuild(string $key): void
     {
         // @todo cascade thumbnail rebuild
-        $destinationFilename = $this->cacheDirectory . $key;
+        $destinationFilename = $this->composeDestinationFilename($key);
         if (file_exists($destinationFilename)) {
-            unlink($this->cacheDirectory . $key);
+            unlink($destinationFilename);
         }
 
         $this->get($key);
+    }
+
+    private function composeDestinationFilename(string $key): string
+    {
+        return $this->cacheDirectory . $key;
     }
 }

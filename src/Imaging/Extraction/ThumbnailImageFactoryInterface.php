@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -21,6 +21,6 @@ interface ThumbnailImageFactoryInterface
 {
     public function create(
         ThumbnailRequestConfigurationInterface $requestConfiguration,
-        ExtractedImageInterface $extractedExtractedImage
-    ): ThumbnailImage;
+        ImageInterface $extractedExtractedImage
+    ): ProcessingImageInterface;
 }

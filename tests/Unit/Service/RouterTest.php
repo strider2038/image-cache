@@ -11,18 +11,14 @@
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
+use Strider2038\ImgCache\Core\{
+    RequestInterface, Route, SecurityInterface
+};
 use Strider2038\ImgCache\Imaging\{
-    Image,
     ImageCacheInterface
 };
-use Strider2038\ImgCache\Core\{
-    Route,
-    RequestInterface,
-    SecurityInterface
-};
 use Strider2038\ImgCache\Service\{
-    ImageController,
-    Router
+    ImageController, Router
 };
 
 /**

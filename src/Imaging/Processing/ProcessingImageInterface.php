@@ -11,14 +11,15 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ProcessingImageInterface
+interface ProcessingImageInterface extends ImageInterface
 {
     public function getWidth(): int;
     public function getHeight(): int;
     public function resize(int $width, int $height): void;
     public function crop(int $width, int $height, int $x, int $y): void;
-    public function save(string $filename): void;
 }

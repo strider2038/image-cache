@@ -10,7 +10,7 @@
  */
 
 use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Source\FileSource;
 use Strider2038\ImgCache\Tests\Support\{
     FileTestCase, TestImages
@@ -86,7 +86,7 @@ class FileSourceTest extends FileTestCase
         
         $image = $source->get($fileKey);
         
-        $this->assertInstanceOf(Image::class, $image);
+        $this->assertInstanceOf(ImageFile::class, $image);
         $this->assertFileExists($manager->testTempFilename);
     }
 

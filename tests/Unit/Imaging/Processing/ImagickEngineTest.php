@@ -27,13 +27,13 @@ class ImagickEngineTest extends FileTestCase
     public function testOpen_FileDoesNotExist_ExceptionThrown(): void
     {
         $engine = new ImagickEngine();
-        $engine->open(self::TEST_CACHE_DIR . '/a.jpg');
+        $engine->openFromFile(self::TEST_CACHE_DIR . '/a.jpg');
     }
 
     public function testOpen_FileExist_ImagickImageIsReturned(): void
     {
         $engine = new ImagickEngine();
-        $image = $engine->open($this->givenFile(self::IMAGE_CAT300));
+        $image = $engine->openFromFile($this->givenFile(self::IMAGE_CAT300));
         $this->assertInstanceOf(ProcessingImageInterface::class, $image);
         $this->assertInstanceOf(ImagickImage::class, $image);
     }

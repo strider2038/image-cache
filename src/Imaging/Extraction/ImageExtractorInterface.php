@@ -10,14 +10,14 @@
 
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
-use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageExtractorInterface
 {
-    public function extract(string $key): ?ExtractedImageInterface;
+    public function extract(string $key): ?ImageInterface;
 
     public function exists(string $key): bool;
 }

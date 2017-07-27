@@ -11,8 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -35,13 +34,10 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
 
     public function create(
         ThumbnailRequestConfigurationInterface $requestConfiguration,
-        ExtractedImageInterface $extractedImage
-    ): ThumbnailImage {
+        ImageInterface $extractedImage
+    ): ProcessingImageInterface {
         /** @var ProcessingImageInterface $processingImage */
         $processingImage = $extractedImage->open($this->processingEngine);
-
-        /** @var SaveOptions $saveOptions */
-        $saveOptions = $requestConfiguration->getSaveOptions();
 
         /** @var TransformationsCollection $transformations */
         $transformations = $requestConfiguration->getTransformations();
@@ -51,7 +47,12 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
             $transformation->apply($processingImage);
         }
 
-        return new ThumbnailImage($processingImage, $saveOptions);
+        /** @var SaveOptions $saveOptions */
+        $saveOptions = $requestConfiguration->getSaveOptions();
+
+        $processingImage->setSaveOptions($saveOptions);
+
+        return $processingImage;
     }
 
 }

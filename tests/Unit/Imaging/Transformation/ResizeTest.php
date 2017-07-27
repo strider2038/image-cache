@@ -71,8 +71,9 @@ class ResizeTest extends TestCase
         int $finalHeight,
         int $cropX,
         int $cropY
-    ): void
-    {
+    ): void {
+        $this->markTestSkipped();
+
         $image = new class implements ProcessingImageInterface {
             public $width;
             public $height;

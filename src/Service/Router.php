@@ -11,17 +11,12 @@
 namespace Strider2038\ImgCache\Service;
 
 use Strider2038\ImgCache\Core\{
-    Component, 
-    RouterInterface,
-    Request,
-    RequestInterface,
-    Route
+    Component, Request, RequestInterface, Route, RouterInterface
 };
-use Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Exception\{
-    InvalidRouteException,
-    RequestException
+    InvalidRouteException, RequestException
 };
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -38,9 +33,9 @@ class Router extends Component implements RouterInterface
     ];
 
     protected static $allowedExtensions = [
-        Image::EXTENSION_JPG,
-        Image::EXTENSION_JPEG,
-        Image::EXTENSION_PNG,
+        ImageFile::EXTENSION_JPG,
+        ImageFile::EXTENSION_JPEG,
+        ImageFile::EXTENSION_PNG,
     ];
     
     public function getRoute(RequestInterface $request): Route 

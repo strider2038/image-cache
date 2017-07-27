@@ -13,7 +13,7 @@ use Strider2038\ImgCache\Core\{
     RequestInterface, SecurityInterface
 };
 use Strider2038\ImgCache\Imaging\{
-    Image, ImageCacheInterface
+    Image\ImageFile, ImageCacheInterface
 };
 use Strider2038\ImgCache\Response\{
     ConflictResponse, CreatedResponse, ImageResponse, NotFoundResponse, SuccessResponse
@@ -62,7 +62,7 @@ class ImageControllerTest extends FileTestCase
     public function testActionGet_FileExistsInCache_ImageResponseIsReturned(): void
     {
         $controller = new ImageController($this->security, $this->imageCache);
-        $image = \Phake::mock(Image::class);
+        $image = \Phake::mock(ImageFile::class);
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->get(self::IMAGE_FILENAME)->thenReturn($image);
         \Phake::when($image)->getFilename()->thenReturn($this->givenFile(self::IMAGE_CAT300));

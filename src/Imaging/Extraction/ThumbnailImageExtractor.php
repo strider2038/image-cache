@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\FileSourceInterface;
 
@@ -40,7 +40,7 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         $this->thumbnailImageFactory = $thumbnailImageFactory;
     }
 
-    public function extract(string $key): ?ExtractedImageInterface
+    public function extract(string $key): ?ImageInterface
     {
         /** @var ThumbnailRequestConfigurationInterface $requestConfiguration */
         $requestConfiguration = $this->keyParser->getRequestConfiguration($key);
@@ -48,7 +48,7 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         /** @var FileExtractionRequestInterface $extractionRequest */
         $extractionRequest = $requestConfiguration->getExtractionRequest();
 
-        /** @var ExtractedImageInterface $sourceImage */
+        /** @var ImageInterface $sourceImage */
         $sourceImage = $this->source->get($extractionRequest);
 
         if ($sourceImage === null) {

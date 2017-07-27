@@ -10,20 +10,13 @@
 
 namespace Strider2038\ImgCache\Service;
 
-use Strider2038\ImgCache\Imaging\Image;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Core\{
-    Controller,
-    RequestInterface,
-    ResponseInterface,
-    SecurityInterface
+    Controller, RequestInterface, ResponseInterface, SecurityInterface
 };
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Response\{
-    ConflictResponse,
-    CreatedResponse,
-    ImageResponse,
-    NotFoundResponse,
-    SuccessResponse
+    ConflictResponse, CreatedResponse, ImageResponse, NotFoundResponse, SuccessResponse
 };
 
 /**
@@ -55,7 +48,7 @@ class ImageController extends Controller
     {
         $filename = $request->getUrl(PHP_URL_PATH);
 
-        /** @var Image $image */
+        /** @var ImageFile $image */
         $image = $this->imageCache->get($filename);
         if ($image === null) {
             return new NotFoundResponse();

@@ -11,14 +11,16 @@
 namespace Strider2038\ImgCache\Imaging\Extraction\Result;
 
 use Strider2038\ImgCache\Exception\FileOperationException;
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
-class FileSourceImage extends Image implements ExtractedImageInterface
+class FileSourceImageFile extends ImageFile implements ImageInterface
 {
     public function saveTo(string $filename): void
     {
@@ -31,6 +33,6 @@ class FileSourceImage extends Image implements ExtractedImageInterface
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        return $engine->open($this->getFilename());
+        return $engine->openFromFile($this->getFilename());
     }
 }

@@ -9,15 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging;
+namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Image
+class ImageFile extends AbstractImage implements ImageInterface
 {
     const EXTENSION_JPG = 'jpg';
     const EXTENSION_JPEG = 'jpeg';
@@ -26,12 +29,13 @@ class Image
     /** @var string */
     private $filename;
     
-    public function __construct(string $filename)
+    public function __construct(string $filename, SaveOptions $saveOptions)
     {
         if (!$this->hasValidMimeType($filename)) {
             throw new InvalidImageException("File '{$filename}' has unsupported mime type");
         }
         $this->filename = $filename;
+        parent::__construct($saveOptions);
     }
     
     public function getFilename(): string
@@ -39,11 +43,21 @@ class Image
         return $this->filename;
     }
 
-    public function getData()
+    public function saveTo(string $filename): void
     {
-        
+        // TODO: Implement saveTo() method.
     }
-    
+
+    public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
+    {
+        // TODO: Implement open() method.
+    }
+
+    public function render(): void
+    {
+        // TODO: Implement render() method.
+    }
+
     /**
      * @return string[]
      */

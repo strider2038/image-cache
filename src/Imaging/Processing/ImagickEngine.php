@@ -16,9 +16,18 @@ namespace Strider2038\ImgCache\Imaging\Processing;
  */
 class ImagickEngine implements ProcessingEngineInterface
 {
-    public function open(string $filename): ProcessingImageInterface
+    public function openFromFile(string $filename): ProcessingImageInterface
     {
         $processor = new \Imagick($filename);
+
+        return new ImagickImage($processor);
+    }
+
+    public function openFromBlob(string $data): ProcessingImageInterface
+    {
+        $processor = new \Imagick();
+        $processor->readImageBlob($data);
+
         return new ImagickImage($processor);
     }
 }

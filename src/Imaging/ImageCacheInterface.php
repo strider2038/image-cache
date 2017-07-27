@@ -10,13 +10,14 @@
  */
 
 namespace Strider2038\ImgCache\Imaging;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageCacheInterface
 {
-    public function get(string $key): ?Image;
+    public function get(string $key): ?ImageInterface;
     public function put(string $key, $data): void;
     public function delete(string $key): void;
     public function rebuild(string $key): void;

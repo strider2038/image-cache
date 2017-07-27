@@ -11,27 +11,21 @@
 
 namespace Strider2038\ImgCache\Imaging\Source;
 
-use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
-use Strider2038\ImgCache\Exception\{
-    ApplicationException
-};
+use Strider2038\ImgCache\Exception\ApplicationException;
 use Strider2038\ImgCache\Helper\FileHelper;
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FileSource extends AbstractFileSource
+class FileSource implements FileSourceInterface
 {
     /** @var string */
     private $baseDirectory;
     
-    public function __construct(
-        TemporaryFilesManagerInterface $temporaryFilesManager, 
-        string $baseDirectory
-    ) {
-        parent::__construct($temporaryFilesManager);
-        
+    public function __construct(string $baseDirectory) {
         if (substr($baseDirectory, -1) === '/') {
             $baseDirectory = substr($baseDirectory, 0, -1);
         }
@@ -48,7 +42,7 @@ class FileSource extends AbstractFileSource
         return $this->baseDirectory;
     }
     
-    public function get(string $filename): ?Image
+    public function get(FileExtractionRequestInterface $request): ?ImageInterface
     {
         $sourceFilename = $this->composeSourceFilename($filename);
         
@@ -56,16 +50,15 @@ class FileSource extends AbstractFileSource
             return null;
         }
 
-        /**
-         * @todo check for cached file
-         */
-
-        // Copying file by contents for testing purposes.
-        // Actually, FileSource needed only for local testing.
         $data = file_get_contents($sourceFilename);
         $tempFilename = $this->temporaryFilesManager->putFile($filename, $data);
         
-        return new Image($tempFilename);
+        return new ImageFile($tempFilename);
+    }
+
+    public function exists(FileExtractionRequestInterface $request): bool
+    {
+        // TODO: Implement exists() method.
     }
 
     private function composeSourceFilename(string $filename): string

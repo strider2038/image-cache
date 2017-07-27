@@ -12,9 +12,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageFactory;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -40,7 +39,7 @@ class ThumbnailImageFactoryTest extends TestCase
 
         $thumbnailImage = $factory->create($requestConfiguration, $extractedImage);
 
-        $this->assertInstanceOf(ThumbnailImage::class, $thumbnailImage);
+        $this->assertInstanceOf(ProcessingImageInterface::class, $thumbnailImage);
     }
 
     public function testCreate_RequestConfigurationHasTransformations_TransformationsAppliedToProcessingImage(): void
@@ -54,7 +53,7 @@ class ThumbnailImageFactoryTest extends TestCase
 
         $thumbnailImage = $factory->create($requestConfiguration, $extractedImage);
 
-        $this->assertInstanceOf(ThumbnailImage::class, $thumbnailImage);
+        $this->assertInstanceOf(ProcessingImageInterface::class, $thumbnailImage);
         $this->assertTransformationIsAppliedToProcessingImage($transformation, $processingImage);
     }
 
@@ -142,7 +141,7 @@ class ThumbnailImageFactoryTest extends TestCase
         return $requestConfiguration;
     }
 
-    private function givenProcessingImage(ExtractedImageInterface $extractedImage): ProcessingImageInterface
+    private function givenProcessingImage(ImageInterface $extractedImage): ProcessingImageInterface
     {
         $processingImage = \Phake::mock(ProcessingImageInterface::class);
         \Phake::when($extractedImage)
@@ -152,9 +151,9 @@ class ThumbnailImageFactoryTest extends TestCase
         return $processingImage;
     }
 
-    private function givenExtractedImage(): ExtractedImageInterface
+    private function givenExtractedImage(): ImageInterface
     {
-        $extractedImage = \Phake::mock(ExtractedImageInterface::class);
+        $extractedImage = \Phake::mock(ImageInterface::class);
 
         return $extractedImage;
     }

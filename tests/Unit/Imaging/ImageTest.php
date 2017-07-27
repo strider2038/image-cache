@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Tests\Imaging;
 
-use Strider2038\ImgCache\Imaging\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Tests\Support\{
     FileTestCase, TestImages
 };
@@ -27,16 +27,16 @@ class ImageTest extends FileTestCase
      */
     public function testConstruct_FileDoesNotExist_ExceptionThrown(): void
     {
-        new Image(self::TEST_CACHE_DIR . '/not.existing');
+        new ImageFile(self::TEST_CACHE_DIR . '/not.existing');
     }
 
     public function testConstruct_FileExists_FileNameIsCorrect(): void
     {
         $filename = $this->givenFile(self::IMAGE_CAT300);
         
-        $image = new Image($filename);
+        $image = new ImageFile($filename);
         
-        $this->assertInstanceOf(Image::class, $image);
+        $this->assertInstanceOf(ImageFile::class, $image);
         $this->assertEquals($filename, $image->getFilename());
     }
     
@@ -50,6 +50,6 @@ class ImageTest extends FileTestCase
         $filename = self::TEST_CACHE_DIR . '/text.txt';
         file_put_contents($filename, 'test_data');
         
-        new Image($filename);
+        new ImageFile($filename);
     }
 }

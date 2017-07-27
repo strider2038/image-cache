@@ -13,10 +13,10 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Result\ExtractedImageInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Result\ThumbnailImage;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageFactoryInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\FileSourceInterface;
 
@@ -61,13 +61,13 @@ class ThumbnailImageExtractorTest extends TestCase
         \Phake::when($this->keyParser)->getRequestConfiguration(self::KEY)->thenReturn($keyParser);
         $extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
         \Phake::when($keyParser)->getExtractionRequest()->thenReturn($extractionRequest);
-        $sourceImage = \Phake::mock(ExtractedImageInterface::class);
+        $sourceImage = \Phake::mock(ImageInterface::class);
         \Phake::when($this->source)->get($extractionRequest)->thenReturn($sourceImage);
         \Phake::when($keyParser)->hasTransformations()->thenReturn(false);
 
         $extractedImage = $imageExtractor->extract(self::KEY);
 
-        $this->assertInstanceOf(ExtractedImageInterface::class, $extractedImage);
+        $this->assertInstanceOf(ImageInterface::class, $extractedImage);
     }
 
     public function testExtract_SourceImageFoundAndTransformationsNeeded_ThumbnailImageIsReturned(): void
@@ -77,7 +77,7 @@ class ThumbnailImageExtractorTest extends TestCase
         \Phake::when($this->keyParser)->getRequestConfiguration(self::KEY)->thenReturn($keyParser);
         $extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
         \Phake::when($keyParser)->getExtractionRequest()->thenReturn($extractionRequest);
-        $sourceImage = \Phake::mock(ExtractedImageInterface::class);
+        $sourceImage = \Phake::mock(ImageInterface::class);
         \Phake::when($this->source)->get($extractionRequest)->thenReturn($sourceImage);
         \Phake::when($keyParser)->hasTransformations()->thenReturn(true);
         $thumbnailImage = \Phake::mock(ThumbnailImage::class);
@@ -85,7 +85,7 @@ class ThumbnailImageExtractorTest extends TestCase
 
         $extractedImage = $imageExtractor->extract(self::KEY);
 
-        $this->assertInstanceOf(ExtractedImageInterface::class, $extractedImage);
+        $this->assertInstanceOf(ImageInterface::class, $extractedImage);
         $this->assertInstanceOf(ThumbnailImage::class, $extractedImage);
     }
 

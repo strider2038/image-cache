@@ -8,35 +8,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Extraction\Result;
+namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
- * @deprecated
  */
-class ThumbnailImage
+class ImageBlob extends AbstractImage implements ImageInterface
 {
-    /** @var ProcessingImageInterface */
-    private $processingImage;
+    /** @var string */
+    private $data;
 
-    /** @var SaveOptions */
-    private $saveOptions;
-
-    public function __construct(
-        ProcessingImageInterface $processingImage,
-        SaveOptions $saveOptions
-    ) {
-        $this->processingImage = $processingImage;
-        $this->saveOptions = $saveOptions;
-    }
-
-    public function getSaveOptions(): SaveOptions
+    public function __construct(string $data, SaveOptions $saveOptions)
     {
-        return $this->saveOptions;
+        $this->data = $data;
+        parent::__construct($saveOptions);
     }
 
     public function saveTo(string $filename): void
@@ -47,5 +37,10 @@ class ThumbnailImage
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
         // TODO: Implement open() method.
+    }
+
+    public function render(): void
+    {
+        // TODO: Implement render() method.
     }
 }

@@ -11,12 +11,10 @@
 
 namespace Strider2038\ImgCache\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FileTestCase extends TestCase
+class FileTestCase extends ProjectTestCase
 {
     private const FILES_DIR = '/../assets/';
 
@@ -37,7 +35,7 @@ class FileTestCase extends TestCase
         //exec('rm -rf ' . self::TEST_CACHE_DIR);
     }
 
-    public function givenFile(string $name): string
+    public function givenFile(string $name, string $copyFilename = null): string
     {
         $filename = __DIR__ . self::FILES_DIR . $name;
 
@@ -45,6 +43,13 @@ class FileTestCase extends TestCase
             throw new \Exception("File '{$filename}' not found");
         }
 
+        if ($copyFilename !== null) {
+            if (!copy($filename, $copyFilename)) {
+                throw new \Exception("Cannot copy '{$filename}' to '{$copyFilename}'");
+            }
+        }
+
         return $filename;
     }
+
 }

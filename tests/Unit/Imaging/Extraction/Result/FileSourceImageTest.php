@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction\Result;
 
-use Strider2038\ImgCache\Imaging\Extraction\Result\FileSourceImage;
+use Strider2038\ImgCache\Imaging\Extraction\Result\FileSourceImageFile;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
@@ -40,10 +40,10 @@ class FileSourceImageTest extends FileTestCase
         $this->assertSame($expectedProcessingImage, $processingImage);
     }
 
-    private function createFileSourceImage(): FileSourceImage
+    private function createFileSourceImage(): FileSourceImageFile
     {
         $filename = $this->givenFile(self::IMAGE_CAT300);
-        $fileSourceImage = new FileSourceImage($filename);
+        $fileSourceImage = new FileSourceImageFile($filename);
 
         return $fileSourceImage;
     }

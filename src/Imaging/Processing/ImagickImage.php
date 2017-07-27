@@ -11,11 +11,13 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
+use Strider2038\ImgCache\Imaging\Image\AbstractImage;
+
 /**
  * @todo Add layer support http://php.net/manual/ru/imagick.coalesceimages.php
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImagickImage implements ProcessingImageInterface
+class ImagickImage extends AbstractImage implements ProcessingImageInterface
 {
     /** @var \Imagick */
     private $imagick;
@@ -45,8 +47,18 @@ class ImagickImage implements ProcessingImageInterface
         $this->imagick->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
     }
 
-    public function save(string $filename): void
+    public function saveTo(string $filename): void
     {
         $this->imagick->writeImage($filename);
+    }
+
+    public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
+    {
+        // TODO: Implement open() method.
+    }
+
+    public function render(): void
+    {
+        // TODO: Implement render() method.
     }
 }
