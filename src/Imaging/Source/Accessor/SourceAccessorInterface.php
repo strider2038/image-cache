@@ -8,14 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
+namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ThumbnailKeyInterface extends SourceKeyInterface
+interface SourceAccessorInterface
 {
-    public function getProcessingConfiguration(): string;
+    public function get(string $key): ?ImageInterface;
+    public function exists(string $key): bool;
 }

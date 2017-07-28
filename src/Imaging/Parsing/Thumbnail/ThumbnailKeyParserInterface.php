@@ -10,11 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
 
+use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ThumbnailKeyParserInterface
+interface ThumbnailKeyParserInterface extends SourceKeyInterface
 {
     public function parse(string $key): ThumbnailKeyInterface;
 }

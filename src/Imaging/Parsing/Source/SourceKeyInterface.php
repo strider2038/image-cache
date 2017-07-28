@@ -8,14 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
+namespace Strider2038\ImgCache\Imaging\Parsing\Source;
 
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ThumbnailKeyInterface extends SourceKeyInterface
+interface SourceKeyInterface
 {
-    public function getProcessingConfiguration(): string;
+    public function getSourceFilename(): string;
 }
