@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageFactory;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageProcessor;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -72,9 +72,9 @@ class ThumbnailImageFactoryTest extends TestCase
         $this->assertSaveOptionsIsCalledOnProcessingImage($processingImage, $saveOptions);
     }
 
-    private function createThumbnailImageFactory(): ThumbnailImageFactory
+    private function createThumbnailImageFactory(): ImageProcessor
     {
-        $factory = new ThumbnailImageFactory($this->processingEngine);
+        $factory = new ImageProcessor($this->processingEngine);
 
         return $factory;
     }

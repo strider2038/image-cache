@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
-use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\DeprecatedThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
@@ -32,7 +32,7 @@ class ThumbnailImageExtractorTest extends TestCase
     /** @var DeprecatedThumbnailKeyParserInterface */
     private $keyParser;
 
-    /** @var ThumbnailImageFactoryInterface */
+    /** @var ImageProcessorInterface */
     private $thumbnailImageFactory;
 
     protected function setUp()
@@ -41,7 +41,7 @@ class ThumbnailImageExtractorTest extends TestCase
 
         $this->source = \Phake::mock(FilesystemSourceInterface::class);
         $this->keyParser = \Phake::mock(DeprecatedThumbnailKeyParserInterface::class);
-        $this->thumbnailImageFactory = \Phake::mock(ThumbnailImageFactoryInterface::class);
+        $this->thumbnailImageFactory = \Phake::mock(ImageProcessorInterface::class);
     }
 
     public function testExtract_SourceImageNotFound_NullIsReturned(): void

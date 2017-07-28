@@ -14,34 +14,41 @@ use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ThumbnailImageExtractor extends SourceImageExtractor implements ImageExtractorInterface
+class ThumbnailImageExtractor implements ImageExtractorInterface
 {
+    /** @var ThumbnailKeyParserInterface */
+    private $keyParser;
+
+    /** @var SourceImageExtractor */
+    private $sourceImageExtractor;
+
     /** @var ProcessingConfigurationParserInterface */
     private $processingConfigurationParser;
 
-    /** @var ThumbnailImageFactoryInterface */
+    /** @var ImageProcessorInterface */
     private $thumbnailImageFactory;
 
     public function __construct(
         ThumbnailKeyParserInterface $keyParser,
-        SourceAccessorInterface $sourceAccessor,
+        SourceImageExtractor $sourceImageExtractor,
         ProcessingConfigurationParserInterface $processingConfigurationParser,
-        ThumbnailImageFactoryInterface $thumbnailImageFactory
+        ImageProcessorInterface $thumbnailImageFactory
     ) {
-        parent::__construct($keyParser, $sourceAccessor);
+        $this->keyParser = $keyParser;
+        $this->sourceImageExtractor = $sourceImageExtractor;
         $this->processingConfigurationParser = $processingConfigurationParser;
         $this->thumbnailImageFactory = $thumbnailImageFactory;
     }
 
     public function extract(string $key): ?ImageInterface
     {
-        $sourceImage = parent::extract($key);
+        $sourceImage = $this->sourceImageExtractor->extract($key);
 
         if ($sourceImage === null) {
             return null;
@@ -50,11 +57,16 @@ class ThumbnailImageExtractor extends SourceImageExtractor implements ImageExtra
         /** @var ThumbnailKeyInterface $thumbnailKey */
         $thumbnailKey = $this->keyParser->parse($key);
 
-        $processingConfigurationRaw = $thumbnailKey->getProcessingConfiguration();
+        $unparsedConfiguration = $thumbnailKey->getProcessingConfiguration();
 
         /** @var ProcessingConfigurationInterface $processingConfiguration */
-        $processingConfiguration = $this->processingConfigurationParser->parse($processingConfigurationRaw);
+        $processingConfiguration = $this->processingConfigurationParser->parse($unparsedConfiguration);
 
-        return $this->thumbnailImageFactory->create($processingConfiguration, $sourceImage);
+        return $this->thumbnailImageFactory->process($processingConfiguration, $sourceImage);
+    }
+
+    public function exists(string $key): bool
+    {
+        return $this->sourceImageExtractor->exists($key);
     }
 }

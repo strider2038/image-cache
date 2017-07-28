@@ -21,10 +21,10 @@ use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 class SourceImageExtractor implements ImageExtractorInterface
 {
     /** @var SourceKeyParserInterface */
-    protected $keyParser;
+    private $keyParser;
 
     /** @var SourceAccessorInterface */
-    protected $sourceAccessor;
+    private $sourceAccessor;
 
     public function __construct(
         SourceKeyParserInterface $keyParser,
@@ -36,21 +36,25 @@ class SourceImageExtractor implements ImageExtractorInterface
 
     public function extract(string $key): ?ImageInterface
     {
-        /** @var SourceKeyInterface $thumbnailKey */
-        $thumbnailKey = $this->keyParser->parse($key);
-
-        $sourceFilename = $thumbnailKey->getSourceFilename();
+        $sourceFilename = $this->getSourceFilename($key);
 
         return $this->sourceAccessor->get($sourceFilename);
     }
 
     public function exists(string $key): bool
     {
+        $sourceFilename = $this->getSourceFilename($key);
+
+        return $this->sourceAccessor->exists($sourceFilename);
+    }
+
+    private function getSourceFilename(string $key): string
+    {
         /** @var SourceKeyInterface $thumbnailKey */
         $thumbnailKey = $this->keyParser->parse($key);
 
         $sourceFilename = $thumbnailKey->getSourceFilename();
 
-        return $this->sourceAccessor->exists($sourceFilename);
+        return $sourceFilename;
     }
 }

@@ -8,13 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Extraction;
+namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 
@@ -22,7 +18,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
+class ImageProcessor implements ImageProcessorInterface
 {
     /** @var ProcessingEngineInterface */
     private $processingEngine;
@@ -32,15 +28,13 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
         $this->processingEngine = $processingEngine;
     }
 
-    public function create(
-        ThumbnailRequestConfigurationInterface $requestConfiguration,
-        ImageInterface $extractedImage
-    ): ProcessingImageInterface {
+    public function process(ProcessingConfigurationInterface $configuration, ImageInterface $image): ProcessingImageInterface
+    {
         /** @var ProcessingImageInterface $processingImage */
-        $processingImage = $extractedImage->open($this->processingEngine);
+        $processingImage = $image->open($this->processingEngine);
 
         /** @var TransformationsCollection $transformations */
-        $transformations = $requestConfiguration->getTransformations();
+        $transformations = $configuration->getTransformations();
 
         foreach ($transformations as $transformation) {
             /** @var TransformationInterface $transformation */
@@ -48,7 +42,7 @@ class ThumbnailImageFactory implements ThumbnailImageFactoryInterface
         }
 
         /** @var SaveOptions $saveOptions */
-        $saveOptions = $requestConfiguration->getSaveOptions();
+        $saveOptions = $configuration->getSaveOptions();
 
         $processingImage->setSaveOptions($saveOptions);
 

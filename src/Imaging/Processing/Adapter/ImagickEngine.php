@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Processing;
+namespace Strider2038\ImgCache\Imaging\Processing\Adapter;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
