@@ -16,7 +16,7 @@ use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfiguratio
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
-use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\DeprecatedThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
@@ -29,7 +29,7 @@ class ThumbnailImageExtractorTest extends TestCase
     /** @var FilesystemSourceInterface */
     private $source;
 
-    /** @var ThumbnailKeyParserInterface */
+    /** @var DeprecatedThumbnailKeyParserInterface */
     private $keyParser;
 
     /** @var ThumbnailImageFactoryInterface */
@@ -40,7 +40,7 @@ class ThumbnailImageExtractorTest extends TestCase
         $this->markTestSkipped();
 
         $this->source = \Phake::mock(FilesystemSourceInterface::class);
-        $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
+        $this->keyParser = \Phake::mock(DeprecatedThumbnailKeyParserInterface::class);
         $this->thumbnailImageFactory = \Phake::mock(ThumbnailImageFactoryInterface::class);
     }
 

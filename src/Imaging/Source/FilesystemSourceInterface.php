@@ -11,12 +11,13 @@
 namespace Strider2038\ImgCache\Imaging\Source;
 
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface FilesystemSourceInterface
 {
-    public function get(string $filename): ?ImageInterface;
-    public function exists(string $filename): bool;
+    public function get(FilenameKeyInterface $key): ?ImageInterface;
+    public function exists(FilenameKeyInterface $key): bool;
 }

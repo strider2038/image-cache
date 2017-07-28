@@ -20,8 +20,9 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
-class ThumbnailKeyParser implements ThumbnailKeyParserInterface
+class DeprecatedThumbnailKeyParser implements DeprecatedThumbnailKeyParserInterface
 {
     /** @var TransformationsFactoryInterface */
     private $transformationsFactory;

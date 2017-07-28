@@ -14,6 +14,7 @@ namespace Strider2038\ImgCache\Imaging\Source;
 use Strider2038\ImgCache\Exception\ApplicationException;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -41,9 +42,9 @@ class FilesystemSource implements FilesystemSourceInterface
         return $this->baseDirectory;
     }
     
-    public function get(string $filename): ?ImageInterface
+    public function get(FilenameKeyInterface $key): ?ImageInterface
     {
-        $sourceFilename = $this->composeSourceFilename($filename);
+        $sourceFilename = $this->composeSourceFilename($key);
         
         if (!file_exists($sourceFilename)) {
             return null;
@@ -52,7 +53,7 @@ class FilesystemSource implements FilesystemSourceInterface
         return $this->imageFactory->createImageFile($sourceFilename);
     }
 
-    public function exists(string $filename): bool
+    public function exists(FilenameKeyInterface $key): bool
     {
         // TODO: Implement exists() method.
     }

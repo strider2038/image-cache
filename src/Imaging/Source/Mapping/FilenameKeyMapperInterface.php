@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing;
+namespace Strider2038\ImgCache\Imaging\Source\Mapping;
 
-use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ThumbnailKeyParserInterface
+interface FilenameKeyMapperInterface
 {
-    public function getRequestConfiguration(string $filename): ThumbnailRequestConfigurationInterface;
+    public function getKey(string $filename): FilenameKeyInterface;
 }

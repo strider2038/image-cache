@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Tests\Imaging\Parsing;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Parsing\DeprecatedThumbnailKeyParser;
 use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
-use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParser;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
@@ -24,7 +24,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ThumbnailKeyParserTest extends TestCase
+class DeprecatedThumbnailKeyParserTest extends TestCase
 {
     /** @var TransformationsFactoryInterface */
     private $transformationsFactory;
@@ -37,6 +37,7 @@ class ThumbnailKeyParserTest extends TestCase
 
     protected function setUp()
     {
+        $this->markTestSkipped();
         $this->transformationsFactory = \Phake::mock(TransformationsFactoryInterface::class);
         $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
         $this->saveOptionsConfigurator = \Phake::mock(SaveOptionsConfiguratorInterface::class);
@@ -149,9 +150,9 @@ class ThumbnailKeyParserTest extends TestCase
         ];
     }
 
-    private function createThumbnailKeyParser(): ThumbnailKeyParser
+    private function createThumbnailKeyParser(): DeprecatedThumbnailKeyParser
     {
-        $thumbnailKeyParser = new ThumbnailKeyParser(
+        $thumbnailKeyParser = new DeprecatedThumbnailKeyParser(
             $this->transformationsFactory,
             $this->saveOptionsFactory,
             $this->saveOptionsConfigurator
