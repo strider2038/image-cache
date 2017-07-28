@@ -44,6 +44,9 @@ class FileTestCase extends ProjectTestCase
         }
 
         if ($copyFilename !== null) {
+            if (file_exists($copyFilename)) {
+                throw new \Exception("File {$copyFilename} already exists");
+            }
             if (!copy($filename, $copyFilename)) {
                 throw new \Exception("Cannot copy '{$filename}' to '{$copyFilename}'");
             }

@@ -12,29 +12,28 @@
 namespace Strider2038\ImgCache\Imaging\Source;
 
 use Strider2038\ImgCache\Exception\ApplicationException;
-use Strider2038\ImgCache\Helper\FileHelper;
-use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FileSource implements FileSourceInterface
+class FilesystemSource implements FilesystemSourceInterface
 {
     /** @var string */
     private $baseDirectory;
+
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
     
-    public function __construct(string $baseDirectory) {
-        if (substr($baseDirectory, -1) === '/') {
-            $baseDirectory = substr($baseDirectory, 0, -1);
-        }
-        $this->baseDirectory = $baseDirectory;
-        
-        FileHelper::createDirectory($this->baseDirectory);
+    public function __construct(string $baseDirectory, ImageFactoryInterface $imageFactory) {
+        $this->baseDirectory = rtrim($baseDirectory, '/') . '/';
+
         if (!is_dir($this->baseDirectory)) {
             throw new ApplicationException("Cannot create directory '{$this->baseDirectory}'");
         }
+
+        $this->imageFactory = $imageFactory;
     }
     
     public function getBaseDirectory(): string
@@ -42,7 +41,7 @@ class FileSource implements FileSourceInterface
         return $this->baseDirectory;
     }
     
-    public function get(FileExtractionRequestInterface $request): ?ImageInterface
+    public function get(string $filename): ?ImageInterface
     {
         $sourceFilename = $this->composeSourceFilename($filename);
         
@@ -50,26 +49,17 @@ class FileSource implements FileSourceInterface
             return null;
         }
 
-        $data = file_get_contents($sourceFilename);
-        $tempFilename = $this->temporaryFilesManager->putFile($filename, $data);
-        
-        return new ImageFile($tempFilename);
+        return $this->imageFactory->createImageFile($sourceFilename);
     }
 
-    public function exists(FileExtractionRequestInterface $request): bool
+    public function exists(string $filename): bool
     {
         // TODO: Implement exists() method.
     }
 
     private function composeSourceFilename(string $filename): string
     {
-        $sourceFilename = $this->baseDirectory;
-
-        if (substr($filename, 0, 1) === '/') {
-            $sourceFilename .= $filename;
-        } else {
-            $sourceFilename .= '/' . $filename;
-        }
+        $sourceFilename = $this->baseDirectory . $filename;
 
         return $sourceFilename;
     }

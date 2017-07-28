@@ -14,14 +14,14 @@ use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterfa
 use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ThumbnailKeyParserInterface;
-use Strider2038\ImgCache\Imaging\Source\FileSourceInterface;
+use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ThumbnailImageExtractor implements ImageExtractorInterface
 {
-    /** @var FileSourceInterface */
+    /** @var FilesystemSourceInterface */
     private $source;
 
     /** @var ThumbnailKeyParserInterface */
@@ -31,7 +31,7 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     private $thumbnailImageFactory;
 
     public function __construct(
-        FileSourceInterface $source,
+        FilesystemSourceInterface $source,
         ThumbnailKeyParserInterface $keyParserFactory,
         ThumbnailImageFactoryInterface $thumbnailImageFactory
     ) {

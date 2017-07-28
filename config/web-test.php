@@ -17,7 +17,7 @@ return [
         'transformationsFactory' => \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory::class,
         'processingEngine' => \Strider2038\ImgCache\Imaging\Processing\ImagickEngine::class,
         'imageSource' => function(\Strider2038\ImgCache\Application $app) {
-            return new \Strider2038\ImgCache\Imaging\Source\FileSource(
+            return new \Strider2038\ImgCache\Imaging\Source\FilesystemSource(
                 $app->temporaryFileManager, 
                 __DIR__ . '/../isource-test'
             );

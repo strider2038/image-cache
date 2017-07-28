@@ -20,10 +20,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 interface ThumbnailRequestConfigurationInterface
 {
     public function getExtractionRequest(): FileExtractionRequestInterface;
-
     public function getTransformations(): TransformationsCollection;
-
     public function hasTransformations(): bool;
-
     public function getSaveOptions(): SaveOptions;
 }

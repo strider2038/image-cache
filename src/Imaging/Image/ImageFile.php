@@ -12,6 +12,7 @@
 namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Exception\FileNotFoundException;
+use Strider2038\ImgCache\Exception\FileOperationException;
 use Strider2038\ImgCache\Exception\InvalidImageException;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -45,12 +46,14 @@ class ImageFile extends AbstractImage implements ImageInterface
 
     public function saveTo(string $filename): void
     {
-        // TODO: Implement saveTo() method.
+        if (!copy($this->filename, $filename)) {
+            throw new FileOperationException("Cannot copy file '{$this->filename}' to '{$filename}'");
+        }
     }
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        // TODO: Implement open() method.
+        return $engine->openFromFile($this->filename);
     }
 
     public function render(): void

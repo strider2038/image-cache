@@ -63,13 +63,13 @@ class ThumbnailImageFactoryTest extends TestCase
         $saveOptions = $this->givenSaveOptions();
         $requestConfiguration = $this->givenThumbnailRequestConfiguration(null, $saveOptions);
         $extractedImage = $this->givenExtractedImage();
-        $this->givenProcessingImage($extractedImage);
+        $processingImage = $this->givenProcessingImage($extractedImage);
 
         $thumbnailImage = $factory->create($requestConfiguration, $extractedImage);
 
         $this->assertInstanceOf(SaveOptions::class, $thumbnailImage->getSaveOptions());
         $this->assertGetSaveOptionsIsCalledOnRequestConfiguration($requestConfiguration);
-        $this->assertSame($saveOptions, $thumbnailImage->getSaveOptions());
+        $this->assertSaveOptionsIsCalledOnProcessingImage($processingImage, $saveOptions);
     }
 
     private function createThumbnailImageFactory(): ThumbnailImageFactory
@@ -144,6 +144,7 @@ class ThumbnailImageFactoryTest extends TestCase
     private function givenProcessingImage(ImageInterface $extractedImage): ProcessingImageInterface
     {
         $processingImage = \Phake::mock(ProcessingImageInterface::class);
+
         \Phake::when($extractedImage)
             ->open($this->processingEngine)
             ->thenReturn($processingImage);
@@ -170,5 +171,12 @@ class ThumbnailImageFactoryTest extends TestCase
         ThumbnailRequestConfigurationInterface $requestConfiguration
     ): void {
         \Phake::verify($requestConfiguration, \Phake::times(1))->getSaveOptions();
+    }
+
+    private function assertSaveOptionsIsCalledOnProcessingImage(
+        ProcessingImageInterface $processingImage,
+        SaveOptions $saveOptions
+    ): void {
+        \Phake::verify($processingImage, \Phake::times(1))->setSaveOptions($saveOptions);
     }
 }
