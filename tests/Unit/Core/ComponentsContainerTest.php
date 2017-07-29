@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Unit\Core;
+
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\ComponentsContainer;
@@ -135,7 +137,7 @@ class ComponentsContainerTest extends TestCase
     }
     
     /**
-     * @expectedException Strider2038\ImgCache\Exception\ApplicationException
+     * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage It must be an object and cannot be callable
      */
@@ -153,7 +155,7 @@ class ComponentsContainerTest extends TestCase
     }
     
     /**
-     * @expectedException Strider2038\ImgCache\Exception\ApplicationException
+     * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage It must be an object and cannot be callable
      */
@@ -171,7 +173,7 @@ class ComponentsContainerTest extends TestCase
     }
     
     /**
-     * @expectedException Strider2038\ImgCache\Exception\ApplicationException
+     * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage It must be an object and cannot be callable
      */

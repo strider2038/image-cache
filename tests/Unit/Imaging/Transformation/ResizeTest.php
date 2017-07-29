@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;

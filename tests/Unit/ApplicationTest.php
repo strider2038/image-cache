@@ -1,13 +1,11 @@
 <?php
 
-use Strider2038\ImgCache\Application;
-use Strider2038\ImgCache\Core\{
-    Component,
-    RequestInterface,
-    SecurityInterface,
-    TemporaryFilesManagerInterface
-};
+namespace Strider2038\ImgCache\Tests\Unit;
+
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Application;
+use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\SecurityInterface;
 
 /**
  * Description of ApplicationTest
@@ -42,15 +40,11 @@ class ApplicationTest extends TestCase
                 'security' => function() {
                     return \Phake::mock(SecurityInterface::class);
                 },
-                'temporaryFileManager' => function() {
-                    return \Phake::mock(TemporaryFilesManagerInterface::class);
-                }
             ],
         ]);
 
         $this->assertInstanceOf(RequestInterface::class, $app->request);
         $this->assertInstanceOf(SecurityInterface::class, $app->security);
-        $this->assertInstanceOf(TemporaryFilesManagerInterface::class, $app->temporaryFileManager);
     }
     
     public function testConstruct_NoComponentsAreSet_CoreComponentsAreAvailable()
@@ -63,7 +57,6 @@ class ApplicationTest extends TestCase
         ]);
         $this->assertInstanceOf(RequestInterface::class, $app->request);
         $this->assertInstanceOf(SecurityInterface::class, $app->security);
-        $this->assertInstanceOf(TemporaryFilesManagerInterface::class, $app->temporaryFileManager);
     }
     
     public function testConstruct_ParamIsSet_ParamValueReturned(): void
@@ -78,7 +71,7 @@ class ApplicationTest extends TestCase
     }
     
     /**
-     * @expectedException Strider2038\ImgCache\Exception\ApplicationException
+     * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage is not set
      */

@@ -9,13 +9,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Unit\Core;
+
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\{
-    Controller,
-    RequestInterface,
-    ResponseInterface,
-    SecurityInterface
+    Controller, RequestInterface, ResponseInterface, SecurityInterface
 };
 use Strider2038\ImgCache\Response\ForbiddenResponse;
 

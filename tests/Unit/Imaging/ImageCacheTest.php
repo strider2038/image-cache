@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Imaging;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging;
 
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;

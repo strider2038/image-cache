@@ -53,6 +53,6 @@ class ImageFile extends AbstractImage implements ImageInterface
 
     public function render(): void
     {
-        // TODO: Implement render() method.
+        echo file_get_contents($this->filename);
     }
 }

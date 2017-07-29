@@ -1,8 +1,10 @@
 <?php
 
+namespace Strider2038\ImgCache\Tests\Unit\Core;
+
+use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\Component;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Description of ComponentTest

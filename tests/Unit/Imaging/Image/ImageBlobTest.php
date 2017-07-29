@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of ImgCache.
  *
@@ -11,18 +10,14 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\Image\ImageBlob;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Tests\Support\{
-    FileTestCase, Phake\ImageTrait, TestImages
-};
+use Strider2038\ImgCache\Tests\Support\FileTestCase;
+use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
-/**
- * @author Igor Lazarev <strider2038@rambler.ru>
- */
-class ImageFileTest extends FileTestCase
+class ImageBlobTest extends FileTestCase
 {
     use ImageTrait;
 
@@ -37,30 +32,10 @@ class ImageFileTest extends FileTestCase
         $this->saveOptions = \Phake::mock(SaveOptions::class);
     }
 
-    /**
-     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessageRegExp /File .* not found/
-     */
-    public function testConstruct_FileDoesNotExist_ExceptionThrown(): void
-    {
-        $this->createImage(self::TEST_CACHE_DIR . '/not.existing');
-    }
-
-    public function testConstruct_FileExists_FileNameIsCorrect(): void
-    {
-        $filename = $this->givenFile(self::IMAGE_CAT300);
-
-        $image = $this->createImage($filename);
-
-        $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertEquals($filename, $image->getFilename());
-    }
-
     public function testSaveTo_FileExists_FileCopiedToDestination(): void
     {
-        $image = $this->createImage($this->givenFile(self::IMAGE_CAT300));
-        $this->assertFileNotExists(self::VALID_DESTINATION_FILENAME);
+        $filename = $this->givenFile(self::IMAGE_CAT300);
+        $image = $this->createImage(file_get_contents($filename));
 
         $image->saveTo(self::VALID_DESTINATION_FILENAME);
 
@@ -70,9 +45,10 @@ class ImageFileTest extends FileTestCase
     public function testOpen_FileExists_ProcessingImageInterfaceIsReturned(): void
     {
         $filename = $this->givenFile(self::IMAGE_CAT300);
-        $image = $this->createImage($filename);
+        $blob = file_get_contents($filename);
+        $image = $this->createImage($blob);
         $expectedProcessingImage = $this->givenProcessingImage();
-        $processingEngine = $this->givenProcessingEngine_OpenFromFile_Returns($filename, $expectedProcessingImage);
+        $processingEngine = $this->givenProcessingEngine_OpenFromBlob_Returns($blob, $expectedProcessingImage);
 
         $processingImage = $image->open($processingEngine);
 
@@ -86,30 +62,30 @@ class ImageFileTest extends FileTestCase
     public function testRender_GivenFile_ContentsIsEchoed(): void
     {
         $filename = $this->givenFile(self::IMAGE_BOX_PNG);
-        $image = $this->createImage($filename);
-        $this->expectOutputString(file_get_contents($filename));
+        $blob = file_get_contents($filename);
+        $image = $this->createImage($blob);
+        $this->expectOutputString($blob);
 
         $image->render();
     }
 
-    private function createImage(string $filename): ImageFile
+    private function createImage(string $blob): ImageBlob
     {
-        $image = new ImageFile($filename, $this->saveOptions);
+        $image = new ImageBlob($blob, $this->saveOptions);
 
         return $image;
     }
 
-    private function givenProcessingEngine_OpenFromFile_Returns(
-        string $filename,
+    private function givenProcessingEngine_OpenFromBlob_Returns(
+        string $data,
         ProcessingImageInterface $processingImage
     ): ProcessingEngineInterface {
         $processingEngine = \Phake::mock(ProcessingEngineInterface::class);
 
         \Phake::when($processingEngine)
-            ->openFromFile($filename)
+            ->openFromBlob($data)
             ->thenReturn($processingImage);
 
         return $processingEngine;
     }
-
 }

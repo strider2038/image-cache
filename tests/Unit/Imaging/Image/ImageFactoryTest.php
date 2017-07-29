@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Imaging\Image;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 
 use Strider2038\ImgCache\Imaging\Image\ImageBlob;

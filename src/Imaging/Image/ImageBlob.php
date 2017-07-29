@@ -31,16 +31,16 @@ class ImageBlob extends AbstractImage implements ImageInterface
 
     public function saveTo(string $filename): void
     {
-        // TODO: Implement saveTo() method.
+        file_put_contents($filename, $this->data);
     }
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        // TODO: Implement open() method.
+        return $engine->openFromBlob($this->data);
     }
 
     public function render(): void
     {
-        // TODO: Implement render() method.
+        echo $this->data;
     }
 }

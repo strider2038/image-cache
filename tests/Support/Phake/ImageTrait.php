@@ -25,7 +25,7 @@ trait ImageTrait
         return $image;
     }
 
-    protected function givenProcessingEngine_Open_ReturnsProcessingImage(): ProcessingImageInterface
+    protected function givenProcessingImage(): ProcessingImageInterface
     {
         $image = \Phake::mock(ProcessingImageInterface::class);
 

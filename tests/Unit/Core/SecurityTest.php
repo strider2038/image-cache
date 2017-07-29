@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Unit\Core;
+
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\{
-    Security,
-    Request,
-    RequestInterface
+    RequestInterface, Security
 };
 
 /**

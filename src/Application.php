@@ -10,20 +10,26 @@
 
 namespace Strider2038\ImgCache;
 
+use Strider2038\ImgCache\Core\ComponentsContainer;
+use Strider2038\ImgCache\Core\ControllerInterface;
+use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\ResponseInterface;
+use Strider2038\ImgCache\Core\Route;
+use Strider2038\ImgCache\Core\RouterInterface;
+use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
- * @property Core\RequestInterface $request Web request object
- * @property Core\SecurityInterface $security Security control component
- * @property Core\TemporaryFilesManagerInterface $temporaryFileManager Class for handling temporary files
+ * @property RequestInterface $request Web request object
+ * @property SecurityInterface $security Security control component
  */
 class Application
 {
     /** @var string */
     private $id;
     
-    /** @var Core\ComponentsContainer */
+    /** @var ComponentsContainer */
     private $components;
     
     /** @var array */
@@ -71,19 +77,19 @@ class Application
     public function run(): int 
     {
         try {
-            /** @var \Strider2038\ImgCache\Core\RequestInterface */
+            /** @var RequestInterface */
             $request = $this->components->get('request');
 
-            /** @var \Strider2038\ImgCache\Core\RouterInterface */
+            /** @var RouterInterface */
             $router = $this->components->get('router');
 
-            /** @var \Strider2038\ImgCache\Core\Route */
+            /** @var Route */
             $route = $router->getRoute($request);
 
-            /** @var \Strider2038\ImgCache\Core\ControllerInterface */
+            /** @var ControllerInterface */
             $controller = $route->getController();
      
-            /** @var \Strider2038\ImgCache\Core\ResponseInterface */
+            /** @var ResponseInterface */
             $response = $controller->runAction($route->getAction(), $request);
             
             $response->send();
@@ -101,7 +107,6 @@ class Application
             'security' => function(Application $app) {
                 return new Core\Security($app->request, $app->getParam('securityToken'));
             },
-            'temporaryFileManager' => Core\TemporaryFilesManager::class,
         ];
     }
     

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Imaging\Parsing\Processing;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Processing;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
