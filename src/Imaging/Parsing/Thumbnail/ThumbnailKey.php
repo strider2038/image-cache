@@ -16,13 +16,25 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
  */
 class ThumbnailKey implements ThumbnailKeyInterface
 {
+    /** @var string */
+    private $publicFilename;
+
+    /** @var string */
+    private $processingConfiguration;
+
+    public function __construct(string $publicFilename, string $processingConfiguration)
+    {
+        $this->publicFilename = $publicFilename;
+        $this->processingConfiguration = $processingConfiguration;
+    }
+
     public function getPublicFilename(): string
     {
-        // TODO: Implement getPublicFilename() method.
+        return $this->publicFilename;
     }
 
     public function getProcessingConfiguration(): string
     {
-        // TODO: Implement getProcessingConfiguration() method.
+        return $this->processingConfiguration;
     }
 }

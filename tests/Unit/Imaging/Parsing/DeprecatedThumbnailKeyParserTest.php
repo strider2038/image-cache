@@ -12,7 +12,6 @@
 namespace Strider2038\ImgCache\Tests\Imaging\Parsing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Parsing\DeprecatedThumbnailKeyParser;
 use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -43,36 +42,6 @@ class DeprecatedThumbnailKeyParserTest extends TestCase
         $this->saveOptionsConfigurator = \Phake::mock(SaveOptionsConfiguratorInterface::class);
     }
 
-    /**
-     * @dataProvider incorrectFilenamesProvider
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidImageException
-     * @expectedExceptionCode 400
-     */
-    public function testGetRequestConfiguration_FilenameWithIllegalChars_ExceptionThrown(string $filename): void
-    {
-        $parser = $this->createThumbnailKeyParser();
-
-        $parser->getRequestConfiguration($filename);
-    }
-
-    public function incorrectFilenamesProvider(): array
-    {
-        return [
-            [''],
-            ['/'],
-            ['file .jpg'],
-            ['кириллица.jpg'],
-            ['/path/\1'],
-            ['file.err'],
-            ['../file.jpg'],
-            ['.../i.jpg'],
-            ['f../i.jpg'],
-            ['/../file.jpg'],
-            ['dir.name/f.jpeg'],
-            ['/.dir/f.jpg'],
-        ];
-    }
-    
     /**
      * @dataProvider filenamesProvider
      */
