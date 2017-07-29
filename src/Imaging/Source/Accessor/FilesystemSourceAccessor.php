@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
+use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Imaging\Source\Mapping\FilenameKeyMapperInterface;
 
 /**
@@ -35,11 +36,22 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
 
     public function get(string $key): ?ImageInterface
     {
-        // TODO: Implement get() method.
+        $filenameKey = $this->composeFilenameKey($key);
+
+        return $this->source->get($filenameKey);
     }
 
     public function exists(string $key): bool
     {
-        // TODO: Implement exists() method.
+        $filenameKey = $this->composeFilenameKey($key);
+
+        return $this->source->exists($filenameKey);
+    }
+
+    private function composeFilenameKey(string $key): FilenameKeyInterface
+    {
+        $filenameKey = $this->keyMapper->getKey($key);
+
+        return $filenameKey;
     }
 }
