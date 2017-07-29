@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Source;
 
-use Strider2038\ImgCache\Exception\ApplicationException;
+use Strider2038\ImgCache\Exception\InvalidConfigException;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
@@ -31,7 +31,7 @@ class FilesystemSource implements FilesystemSourceInterface
         $this->baseDirectory = rtrim($baseDirectory, '/') . '/';
 
         if (!is_dir($this->baseDirectory)) {
-            throw new ApplicationException("Cannot create directory '{$this->baseDirectory}'");
+            throw new InvalidConfigException("Directory '{$this->baseDirectory}' does not exist");
         }
 
         $this->imageFactory = $imageFactory;
@@ -55,12 +55,14 @@ class FilesystemSource implements FilesystemSourceInterface
 
     public function exists(FilenameKeyInterface $key): bool
     {
-        // TODO: Implement exists() method.
+        $sourceFilename = $this->composeSourceFilename($key);
+
+        return file_exists($sourceFilename);
     }
 
-    private function composeSourceFilename(string $filename): string
+    private function composeSourceFilename(FilenameKeyInterface $key): string
     {
-        $sourceFilename = $this->baseDirectory . $filename;
+        $sourceFilename = $this->baseDirectory . $key->getValue();
 
         return $sourceFilename;
     }

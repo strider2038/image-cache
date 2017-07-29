@@ -11,9 +11,10 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source;
 
-use Strider2038\ImgCache\Core\TemporaryFilesManagerInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSource;
+use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 /**
@@ -21,82 +22,103 @@ use Strider2038\ImgCache\Tests\Support\FileTestCase;
  */
 class FilesystemSourceTest extends FileTestCase
 {
-    /** @var TemporaryFilesManagerInterface */
-    private $manager;
+    const FILENAME_NOT_EXIST = 'not.exist';
+    const FILENAME_EXISTS_FULL = self::TEST_CACHE_DIR . '/cat.jpg';
+    const FILENAME_EXISTS = 'cat.jpg';
+
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
     
     public function setUp() 
     {
-        $this->markTestSkipped();
         parent::setUp();
-        $this->manager = new class implements TemporaryFilesManagerInterface {
-            public function getFilename(string $fileKey): ?string 
-            {
-                return null;
-            }
-            public function putFile(string $fileKey, $data): string
-            {
-                return '';
-            }
-        };
+        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
     }
     
-    public function testConstruct_BaseDirectoryIsSet_BaseDirectoryCreated(): void
+    public function testConstruct_BaseDirectoryExists_BaseDirectoryIsReturned(): void
     {
-        $source = new FilesystemSource($this->manager, self::TEST_CACHE_DIR);
-        
-        $this->assertDirectoryExists(self::TEST_CACHE_DIR);
-        $this->assertDirectoryIsReadable(self::TEST_CACHE_DIR);
-        $this->assertDirectoryIsWritable(self::TEST_CACHE_DIR);
-        $this->assertEquals(self::TEST_CACHE_DIR, $source->getBaseDirectory());
-        
-        $source2 = new FilesystemSource($this->manager, self::TEST_CACHE_DIR . '/');
-        $this->assertEquals(
-            self::TEST_CACHE_DIR,
-            $source2->getBaseDirectory(),
-            'Base directory name should be without trailing slash'
-        );
-    }
-    
-    public function testGet_FileDoesNotExist_FileNotFoundExceptionThrown(): void
-    {
-        $source = new FilesystemSource($this->manager, self::TEST_CACHE_DIR);
-        $this->assertNull($source->get('not.exist'));
-    }
-    
-    /**
-     * @dataProvider imageFilenameProvider
-     */
-    public function testGet_FileExists_ImageReturned(string $sourceFilename, string $fileKey): void
-    {
-        $manager = new class implements TemporaryFilesManagerInterface {
-            public $testTempFilename;
-            public function getFilename(string $fileKey): ?string 
-            {
-                return null;
-            }
-            public function putFile(string $fileKey, $data): string
-            {
-                file_put_contents($this->testTempFilename, $data);
-                return $this->testTempFilename;
-            }
-        };
-        $manager->testTempFilename = self::TEST_CACHE_DIR . '/test.jpg';
-        $source = new FilesystemSource($manager, self::TEST_CACHE_DIR);
-        mkdir(self::TEST_CACHE_DIR . '/somedir');
-        copy($this->givenFile(self::IMAGE_CAT300), $sourceFilename);
-        
-        $image = $source->get($fileKey);
-        
-        $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertFileExists($manager->testTempFilename);
+        $source = $this->createFilesystemSource();
+
+        $this->assertEquals(self::TEST_CACHE_DIR . '/', $source->getBaseDirectory());
     }
 
-    public function imageFilenameProvider(): array
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessageRegExp /Directory .* does not exist/
+     */
+    public function testConstruct_BaseDirectoryDoesNotExist_ExceptionThrown(): void
     {
-        return [
-            [self::TEST_CACHE_DIR . '/a.jpg', 'a.jpg'],
-            [self::TEST_CACHE_DIR . '/somedir/b.jpg', 'somedir/b.jpg'],
-            [self::TEST_CACHE_DIR . '/somedir/c.jpg', '/somedir/c.jpg'],
-        ];
+        $this->createFilesystemSource(self::TEST_CACHE_DIR . '/not-exist');
+    }
+    
+    public function testGet_FileDoesNotExist_NullIsReturned(): void
+    {
+        $source = $this->createFilesystemSource();
+        $filenameKey = $this->givenFilenameKey(self::FILENAME_NOT_EXIST);
+
+        $image = $source->get($filenameKey);
+
+        $this->assertNull($image);
+    }
+
+    public function testGet_FileExists_ImageIsReturned(): void
+    {
+        $source = $this->createFilesystemSource();
+        $this->givenFile(self::IMAGE_CAT300, self::FILENAME_EXISTS_FULL);
+        $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
+        $this->givenImageFactory_CreateImageFile_ReturnsImageFile(self::FILENAME_EXISTS);
+
+        $image = $source->get($filenameKey);
+
+        $this->assertInstanceOf(ImageFile::class, $image);
+    }
+
+    public function testExists_FileDoesNotExist_FalseIsReturned(): void
+    {
+        $source = $this->createFilesystemSource();
+        $filenameKey = $this->givenFilenameKey(self::FILENAME_NOT_EXIST);
+
+        $exists = $source->exists($filenameKey);
+
+        $this->assertFalse($exists);
+    }
+
+    public function testExists_FileExists_TrueIsReturned(): void
+    {
+        $source = $this->createFilesystemSource();
+        $this->givenFile(self::IMAGE_CAT300, self::FILENAME_EXISTS_FULL);
+        $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
+
+        $exists = $source->exists($filenameKey);
+
+        $this->assertTrue($exists);
+    }
+
+    private function createFilesystemSource(string $baseDirectory = self::TEST_CACHE_DIR): FilesystemSource
+    {
+        $source = new FilesystemSource($baseDirectory, $this->imageFactory);
+
+        return $source;
+    }
+
+    private function givenFilenameKey($filename): FilenameKeyInterface
+    {
+        $filenameKey = \Phake::mock(FilenameKeyInterface::class);
+
+        \Phake::when($filenameKey)->getValue()->thenReturn($filename);
+
+        return $filenameKey;
+    }
+
+    private function givenImageFactory_CreateImageFile_ReturnsImageFile($imageFilename): ImageFile
+    {
+        $imageFile = \Phake::mock(ImageFile::class);
+
+        \Phake::when($this->imageFactory)
+            ->createImageFile($imageFilename)
+            ->thenReturn($imageFile);
+
+        return $imageFile;
     }
 }
