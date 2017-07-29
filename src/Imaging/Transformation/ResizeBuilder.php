@@ -25,19 +25,23 @@ class ResizeBuilder implements TransformationBuilderInterface
             strtolower($config), 
             $matches
         );
+
         if (!$isValid) {
             throw new InvalidRequestValueException('Invalid config for resize transformation');
         }
+
         $width = $matches[1] ?? 0;
         $heigth = !empty($matches[3]) ? (int) $matches[3] : null;
         $mode = Resize::MODE_STRETCH;
         $modeCode = $matches[4] ?? null;
+
         switch ($modeCode) {
             case 'f': $mode = Resize::MODE_FIT_IN; break;
             case 's': $mode = Resize::MODE_STRETCH; break;
             case 'w': $mode = Resize::MODE_PRESERVE_WIDTH; break;
             case 'h': $mode = Resize::MODE_PRESERVE_HEIGHT; break;
         }
+
         return new Resize($width, $heigth, $mode);
     }
 }

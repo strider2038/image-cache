@@ -12,7 +12,9 @@
 namespace Strider2038\ImgCache\Tests\Imaging\Transformation;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\Resize;
 
 /**
@@ -20,7 +22,6 @@ use Strider2038\ImgCache\Imaging\Transformation\Resize;
  */
 class ResizeTest extends TestCase
 {
-
     /**
      * @dataProvider incorrectParamsProvider
      * @expectedException \Strider2038\ImgCache\Exception\InvalidImageException
@@ -28,7 +29,7 @@ class ResizeTest extends TestCase
      */
     public function testConstruct_IncorrectWidthHeigthOrMode_ExceptionThrown($width, $height, $mode): void
     {
-        new Resize($width, $height, $mode);
+        $this->createResize($width, $height, $mode);
     }
 
     public function incorrectParamsProvider(): array
@@ -45,6 +46,7 @@ class ResizeTest extends TestCase
     public function testConstruct_ModeIsNotSet_DefaultModeReturned(): void
     {
         $resize = new Resize(100, 200);
+
         $this->assertEquals(100, $resize->getWidth());
         $this->assertEquals(200, $resize->getHeigth());
         $this->assertEquals(Resize::MODE_STRETCH, $resize->getMode());
@@ -53,6 +55,7 @@ class ResizeTest extends TestCase
     public function testConstruct_HeightAndModeAreNotSet_DefaultsReturned(): void
     {
         $resize = new Resize(100);
+
         $this->assertEquals(100, $resize->getWidth());
         $this->assertEquals(100, $resize->getHeigth());
         $this->assertEquals(Resize::MODE_STRETCH, $resize->getMode());
@@ -72,9 +75,46 @@ class ResizeTest extends TestCase
         int $cropX,
         int $cropY
     ): void {
-        $this->markTestSkipped();
+        $image = $this->givenProcessingImage();
+        $image->width = $sourceWidth;
+        $image->height = $sourceHeight;
 
-        $image = new class implements ProcessingImageInterface {
+        $transformation = new Resize($resizeWidth, $resizeHeight, $resizeMode);
+        $transformation->apply($image);
+
+        $this->assertEquals($finalWidth, $image->width);
+        $this->assertEquals($finalHeight, $image->height);
+        $this->assertEquals($cropX, $image->cropX);
+        $this->assertEquals($cropY, $image->cropY);
+    }
+
+    public function imagePropertiesProvider(): array
+    {
+        return [
+            [200, 150, 300, 200, Resize::MODE_FIT_IN, 267, 200, 0, 0],
+            [200, 150, 300, 200, Resize::MODE_STRETCH, 300, 200, 0, 13],
+            [200, 150, 300, 200, Resize::MODE_PRESERVE_WIDTH, 300, 225, 0, 0],
+            [200, 150, 300, 200, Resize::MODE_PRESERVE_HEIGHT, 267, 200, 0, 0],
+            [200, 100, 60, 40, Resize::MODE_FIT_IN, 60, 30, 0, 0],
+            [200, 100, 60, 40, Resize::MODE_STRETCH, 60, 40, 10, 0],
+            [200, 100, 60, 40, Resize::MODE_PRESERVE_WIDTH, 60, 30, 0, 0],
+            [200, 100, 60, 40, Resize::MODE_PRESERVE_HEIGHT, 80, 40, 0, 0],
+            [200, 100, 40, 60, Resize::MODE_FIT_IN, 40, 20, 0, 0],
+            [200, 100, 40, 60, Resize::MODE_STRETCH, 40, 60, 40, 0],
+            [200, 100, 40, 60, Resize::MODE_PRESERVE_WIDTH, 40, 20, 0, 0],
+            [200, 100, 40, 60, Resize::MODE_PRESERVE_HEIGHT, 120, 60, 0, 0],
+        ];
+    }
+
+    private function createResize($width, $height, $mode): Resize
+    {
+        return new Resize($width, $height, $mode);
+    }
+
+    private function givenProcessingImage()
+    {
+        $image = new class implements ProcessingImageInterface
+        {
             public $width;
             public $height;
             public $cropX = 0;
@@ -104,35 +144,13 @@ class ResizeTest extends TestCase
                 $this->cropY = $y;
             }
 
-            public function save(string $filename): void {}
+            public function setSaveOptions(SaveOptions $saveOptions): void {}
+            public function getSaveOptions(): SaveOptions {}
+            public function saveTo(string $filename): void {}
+            public function open(ProcessingEngineInterface $engine): ProcessingImageInterface {}
+            public function render(): void {}
         };
-        $image->width = $sourceWidth;
-        $image->height = $sourceHeight;
 
-        $transformation = new Resize($resizeWidth, $resizeHeight, $resizeMode);
-        $transformation->apply($image);
-
-        $this->assertEquals($finalWidth, $image->width);
-        $this->assertEquals($finalHeight, $image->height);
-        $this->assertEquals($cropX, $image->cropX);
-        $this->assertEquals($cropY, $image->cropY);
-    }
-
-    public function imagePropertiesProvider(): array
-    {
-        return [
-            [200, 150, 300, 200, Resize::MODE_FIT_IN, 267, 200, 0, 0],
-            [200, 150, 300, 200, Resize::MODE_STRETCH, 300, 200, 0, 13],
-            [200, 150, 300, 200, Resize::MODE_PRESERVE_WIDTH, 300, 225, 0, 0],
-            [200, 150, 300, 200, Resize::MODE_PRESERVE_HEIGHT, 267, 200, 0, 0],
-            [200, 100, 60, 40, Resize::MODE_FIT_IN, 60, 30, 0, 0],
-            [200, 100, 60, 40, Resize::MODE_STRETCH, 60, 40, 10, 0],
-            [200, 100, 60, 40, Resize::MODE_PRESERVE_WIDTH, 60, 30, 0, 0],
-            [200, 100, 60, 40, Resize::MODE_PRESERVE_HEIGHT, 80, 40, 0, 0],
-            [200, 100, 40, 60, Resize::MODE_FIT_IN, 40, 20, 0, 0],
-            [200, 100, 40, 60, Resize::MODE_STRETCH, 40, 60, 40, 0],
-            [200, 100, 40, 60, Resize::MODE_PRESERVE_WIDTH, 40, 20, 0, 0],
-            [200, 100, 40, 60, Resize::MODE_PRESERVE_HEIGHT, 120, 60, 0, 0],
-        ];
+        return $image;
     }
 }

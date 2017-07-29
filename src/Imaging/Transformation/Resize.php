@@ -11,8 +11,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -43,21 +43,25 @@ class Resize implements TransformationInterface
         if ($heigth === null) {
             $heigth = $width;
         }
+
         if ($width < static::MIN_WIDTH || $width > static::MAX_WIDTH) {
             throw new InvalidImageException(
                 "Width of the image must be between " . static::MIN_WIDTH 
                     . " and " . static::MAX_HEIGHT
             );
         }
+
         if ($heigth < static::MIN_HEIGHT || $heigth > static::MAX_HEIGHT) {
             throw new InvalidImageException(
                 "Height of the image must be between " . static::MIN_HEIGHT 
                     . " and " . static::MAX_HEIGHT
             );
         }
+
         if (!in_array($mode, self::getAvailableModes())) {
             throw new InvalidImageException("Undefined resize mode: '{$mode}'");
         }
+
         $this->width = $width;
         $this->heigth = $heigth;
         $this->mode = $mode;

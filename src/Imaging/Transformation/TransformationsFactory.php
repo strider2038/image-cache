@@ -30,9 +30,11 @@ class TransformationsFactory implements TransformationsFactoryInterface
             $this->buildersMap = static::getDefaultBuildersMap();
             return;
         }
+
         if (count($buildersMap) <= 0) {
             throw new InvalidConfigException('Builders map cannot be empty');
         }
+
         foreach ($buildersMap as $class) {
             if (!class_exists($class)) {
                 throw new InvalidConfigException(
@@ -46,6 +48,7 @@ class TransformationsFactory implements TransformationsFactoryInterface
                 );
             }
         }
+
         $this->buildersMap = $buildersMap;
     }
 
@@ -62,10 +65,12 @@ class TransformationsFactory implements TransformationsFactoryInterface
         if ($builder !== null) {
             return $builder->build(substr($config, 2));
         }
+
         $builder = $this->getBuilder(substr($config, 0, 1));
         if ($builder !== null) {
             return $builder->build(substr($config, 1));
         }
+
         return null;
     }
     
@@ -74,9 +79,11 @@ class TransformationsFactory implements TransformationsFactoryInterface
         if (isset($this->builders[$index])) {
             return $this->builders[$index];
         }
+
         if (isset($this->buildersMap[$index])) {
             return $this->builders[$index] = new $this->buildersMap[$index];
         }
+
         return null;
     }
 }
