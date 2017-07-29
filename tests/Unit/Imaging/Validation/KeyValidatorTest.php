@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Imaging\Parsing\Validation;
+namespace Strider2038\ImgCache\Tests\Imaging\Validation;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Parsing\Validation\KeyValidator;
+use Strider2038\ImgCache\Imaging\Validation\KeyValidator;
 
 class KeyValidatorTest extends TestCase
 {
@@ -57,32 +57,6 @@ class KeyValidatorTest extends TestCase
             /* 22 */ ['/path/image_sz80x100.jpg', true],
             /* 23 */ ['//path//image_sz80x100.jpg', false],
             /* 24 */ ['_root/i_q95.jpeg', true],
-        ];
-    }
-
-    /**
-     * @param string $filename
-     * @param bool $expectedIsValid
-     * @dataProvider imageFilenamesProvider
-     */
-    public function testHasValidImageExtension_GivenFilename_BoolIsReturned(string $filename, bool $expectedIsValid): void
-    {
-        $validator = $this->createKeyValidator();
-
-        $isValid = $validator->hasValidImageExtension($filename);
-
-        $this->assertEquals($expectedIsValid, $isValid);
-    }
-
-    public function imageFilenamesProvider(): array
-    {
-        return [
-            ['a.jpg', true],
-            ['a.jpeg', true],
-            ['a.png', true],
-            ['a.PNG', false],
-            ['a.exe', false],
-            ['/a.php', false],
         ];
     }
 

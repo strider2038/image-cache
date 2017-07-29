@@ -40,6 +40,7 @@ class ImageFileTest extends FileTestCase
     /**
      * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
      * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* not found/
      */
     public function testConstruct_FileDoesNotExist_ExceptionThrown(): void
     {
@@ -54,19 +55,6 @@ class ImageFileTest extends FileTestCase
 
         $this->assertInstanceOf(ImageFile::class, $image);
         $this->assertEquals($filename, $image->getFilename());
-    }
-    
-    /**
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidImageException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage has unsupported mime type
-     */
-    public function testConstruct_FileHasInvalidMimeType_ExceptionThrown(): void
-    {
-        $filename = self::TEST_CACHE_DIR . '/text.txt';
-        file_put_contents($filename, 'test_data');
-
-        $this->createImage($filename);
     }
 
     public function testSaveTo_FileExists_FileCopiedToDestination(): void

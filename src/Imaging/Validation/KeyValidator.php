@@ -8,8 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Validation;
-
+namespace Strider2038\ImgCache\Imaging\Validation;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -40,12 +39,5 @@ class KeyValidator implements KeyValidatorInterface
         }
 
         return true;
-    }
-
-    public function hasValidImageExtension(string $filename): bool
-    {
-        $ext = pathinfo($filename, PATHINFO_EXTENSION);
-
-        return in_array($ext, ['jpg', 'jpeg', 'png']);
     }
 }

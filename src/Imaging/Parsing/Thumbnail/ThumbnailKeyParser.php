@@ -11,7 +11,8 @@
 namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Parsing\Validation\KeyValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -19,20 +20,24 @@ use Strider2038\ImgCache\Imaging\Parsing\Validation\KeyValidatorInterface;
 class ThumbnailKeyParser implements ThumbnailKeyParserInterface
 {
     /** @var KeyValidatorInterface */
-    private $validator;
+    private $keyValidator;
 
-    public function __construct(KeyValidatorInterface $validator)
+    /** @var ImageValidatorInterface */
+    private $imageValidator;
+
+    public function __construct(KeyValidatorInterface $keyValidator, ImageValidatorInterface $imageValidator)
     {
-        $this->validator = $validator;
+        $this->keyValidator = $keyValidator;
+        $this->imageValidator = $imageValidator;
     }
 
     public function parse(string $key): ThumbnailKeyInterface
     {
-        if (!$this->validator->isValidPublicFilename($key)) {
+        if (!$this->keyValidator->isValidPublicFilename($key)) {
             throw new InvalidRequestValueException("Invalid filename '{$key}' in request");
         }
 
-        if (!$this->validator->hasValidImageExtension($key)) {
+        if (!$this->imageValidator->hasValidImageExtension($key)) {
             throw new InvalidRequestValueException("Unsupported image extension for '{$key}'");
         }
 

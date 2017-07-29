@@ -9,18 +9,21 @@
  * file that was distributed with this source code.
  */
 
-use Strider2038\ImgCache\Core\{
-    RequestInterface, SecurityInterface
-};
-use Strider2038\ImgCache\Imaging\{
-    Image\ImageFile, ImageCacheInterface
-};
-use Strider2038\ImgCache\Response\{
-    ConflictResponse, CreatedResponse, ImageResponse, NotFoundResponse, SuccessResponse
-};
+namespace Strider2038\ImgCache\Tests\Unit\Service;
+
+use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\ResponseInterface;
+use Strider2038\ImgCache\Core\SecurityInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Response\ConflictResponse;
+use Strider2038\ImgCache\Response\CreatedResponse;
+use Strider2038\ImgCache\Response\ForbiddenResponse;
+use Strider2038\ImgCache\Response\ImageResponse;
+use Strider2038\ImgCache\Response\NotFoundResponse;
+use Strider2038\ImgCache\Response\SuccessResponse;
 use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
-
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -44,13 +47,12 @@ class ImageControllerTest extends FileTestCase
         parent::setUp();
         $this->imageCache = \Phake::mock(ImageCacheInterface::class);
         $this->security = \Phake::mock(SecurityInterface::class);
-        \Phake::when($this->security)->isAuthorized()->thenReturn(true);
         $this->request = $request = \Phake::mock(RequestInterface::class);
     }
 
     public function testActionGet_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->get(self::IMAGE_FILENAME)->thenReturn(null);
 
@@ -61,7 +63,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testActionGet_FileExistsInCache_ImageResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         $image = \Phake::mock(ImageFile::class);
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->get(self::IMAGE_FILENAME)->thenReturn($image);
@@ -74,7 +76,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testActionCreate_FileAlreadyExistsInCache_ConflictResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
 
@@ -85,7 +87,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testActionCreate_FileDoesNotExistInCache_CreatedResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->request)->getBody()->thenReturn(self::IMAGE_BODY);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
@@ -98,7 +100,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testActionReplace_FileDoesNotExistInCache_DeleteNotCalledAndCreatedResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->request)->getBody()->thenReturn(self::IMAGE_BODY);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
@@ -112,7 +114,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testActionReplace_FileExistsInCache_DeleteIsCalledAndCreatedResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->request)->getBody()->thenReturn(self::IMAGE_BODY);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
@@ -126,7 +128,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testDelete_FileExistsInCache_DeleteIsCalledAndOkResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
 
@@ -138,7 +140,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testDelete_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
 
@@ -149,7 +151,7 @@ class ImageControllerTest extends FileTestCase
 
     public function testRebuild_FileExistsInCache_RebuildIsCalledAndOkResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(true);
 
@@ -161,12 +163,82 @@ class ImageControllerTest extends FileTestCase
 
     public function testRebuild_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
     {
-        $controller = new ImageController($this->security, $this->imageCache);
+        $controller = $this->createImageController();
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->exists(self::IMAGE_FILENAME)->thenReturn(false);
 
         $response = $controller->actionRebuild($this->request);
 
         $this->assertInstanceOf(NotFoundResponse::class, $response);
+    }
+
+    /**
+     * @param string $action
+     * @param string $expectedResponse
+     * @dataProvider safeActionsProvider
+     */
+    public function testRunAction_GivenActionAndSecurityReturnsFalse_ResponseIsReturned(
+        string $action,
+        string $expectedResponse
+    ): void {
+        $controller = $this->createImageControllerWithStubbedActions();
+        \Phake::when($this->security)->isAuthorized()->thenReturn(false);
+
+        $response = $controller->runAction($action, $this->request);
+
+        $this->assertInstanceOf($expectedResponse, $response);
+    }
+
+    public function safeActionsProvider(): array
+    {
+        return [
+            ['get', SuccessResponse::class],
+            ['create', ForbiddenResponse::class],
+            ['replace', ForbiddenResponse::class],
+            ['delete', ForbiddenResponse::class],
+            ['rebuild', ForbiddenResponse::class],
+        ];
+    }
+
+    private function createImageController(): ImageController
+    {
+        $controller = new ImageController($this->security, $this->imageCache);
+
+        return $controller;
+    }
+
+    private function createImageControllerWithStubbedActions(): ImageController
+    {
+        $security = $this->security;
+        $imageCache = $this->imageCache;
+
+        $controller = new class ($security, $imageCache) extends ImageController {
+            public function actionGet(RequestInterface $request): ResponseInterface
+            {
+                return new SuccessResponse();
+            }
+
+            public function actionCreate(RequestInterface $request): ResponseInterface
+            {
+                return new SuccessResponse();
+            }
+
+            public function actionReplace(RequestInterface $request): ResponseInterface
+            {
+                return new SuccessResponse();
+            }
+
+            public function actionDelete(RequestInterface $request): ResponseInterface
+            {
+                return new SuccessResponse();
+            }
+
+            public function actionRebuild(RequestInterface $request): ResponseInterface
+            {
+                return new SuccessResponse();
+            }
+        };
+
+        return $controller;
     }
 }

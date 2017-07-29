@@ -8,8 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Validation;
-
+namespace Strider2038\ImgCache\Imaging\Validation;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -17,5 +16,4 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Validation;
 interface KeyValidatorInterface
 {
     public function isValidPublicFilename(string $filename): bool;
-    public function hasValidImageExtension(string $filename): bool;
 }

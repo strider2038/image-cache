@@ -9,29 +9,33 @@
  * file that was distributed with this source code.
  */
 
+namespace Strider2038\ImgCache\Tests\Unit\Service;
+
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
-use Strider2038\ImgCache\Core\{
-    RequestInterface, Route, SecurityInterface
-};
-use Strider2038\ImgCache\Imaging\{
-    ImageCacheInterface
-};
-use Strider2038\ImgCache\Service\{
-    ImageController, Router
-};
+use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\Route;
+use Strider2038\ImgCache\Core\SecurityInterface;
+use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
+use Strider2038\ImgCache\Service\ImageController;
+use Strider2038\ImgCache\Service\Router;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class RouterTest extends TestCase
 {
+    const REQUEST_URL = '/a.jpg';
     /** @var RequestInterface */
     private $request;
     
     /** @var Application */
     private $app;
-    
+
+    /** @var ImageValidatorInterface */
+    private $imageValidator;
+
     protected function setUp()
     {
         $this->app = new class extends Application {
@@ -44,6 +48,7 @@ class RouterTest extends TestCase
         };
         
         $this->request = \Phake::mock(RequestInterface::class);
+        $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
     }
     
     /**
@@ -53,9 +58,10 @@ class RouterTest extends TestCase
         string $requestMethod,
         string $actionName
     ): void {
-        $router = new Router($this->app);
-        \Phake::when($this->request)->getMethod()->thenReturn($requestMethod);
-        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn('/a.jpg');
+        $router = $this->createRouter();
+        $this->givenRequest_GetMethod_Returns($requestMethod);
+        $this->givenRequest_GetUrl_Returns(self::REQUEST_URL);
+        $this->givenImageValidator_HasValidImageExtension_Returns(true);
 
         $route = $router->getRoute($this->request);
         
@@ -81,46 +87,44 @@ class RouterTest extends TestCase
      */
     public function testGetRoute_RequestMethodIsNotSet_ExceptionThrown(): void
     {
-        $router = new Router($this->app);
+        $router = $this->createRouter();
         
         $router->getRoute($this->request);
     }
-    
-    /**
-     * @dataProvider allowedExtensionsProvider
-     */
-    public function testGetRoute_RequestedFileHasAllowedExtension_ControllerAndActionReturned(string $url): void
-    {
-        $router = new Router($this->app);
-        \Phake::when($this->request)->getMethod()->thenReturn('GET');
-        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn($url);
-        
-        $route = $router->getRoute($this->request);
-        
-        $this->assertInstanceOf(Route::class, $route);
-        $this->assertInstanceOf(ImageController::class, $route->getController());
-        $this->assertEquals('get', $route->getAction());
-    }
-    
-    public function allowedExtensionsProvider(): array
-    {
-        return [
-            ['/a.jpg'],
-            ['/a.jpeg'],
-            ['/a.png'],
-        ];
-    }
-    
+
     /**
      * @expectedException \Strider2038\ImgCache\Exception\RequestException
      * @expectedExceptionMessage Requested file has incorrect extension
      */
     public function testGetRoute_RequestedFileHasNotAllowedExtension_ExceptionThrown(): void 
     {
-        $router = new Router($this->app);
-        \Phake::when($this->request)->getMethod()->thenReturn('GET');
-        \Phake::when($this->request)->getUrl()->thenReturn('/a.php');
+        $router = $this->createRouter();
+        $this->givenRequest_GetMethod_Returns('GET');
+        $this->givenRequest_GetUrl_Returns('/a.php');
+        $this->givenImageValidator_HasValidImageExtension_Returns(false);
         
         $router->getRoute($this->request);
+    }
+
+    private function createRouter(): Router
+    {
+        $router = new Router($this->app, $this->imageValidator);
+
+        return $router;
+    }
+
+    private function givenRequest_GetMethod_Returns(string $requestMethod): void
+    {
+        \Phake::when($this->request)->getMethod()->thenReturn($requestMethod);
+    }
+
+    private function givenRequest_GetUrl_Returns(string $value): void
+    {
+        \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn($value);
+    }
+
+    private function givenImageValidator_HasValidImageExtension_Returns(bool $value): void
+    {
+        \Phake::when($this->imageValidator)->hasValidImageExtension(self::REQUEST_URL)->thenReturn($value);
     }
 }

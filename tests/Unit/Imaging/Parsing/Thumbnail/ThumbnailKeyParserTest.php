@@ -13,7 +13,8 @@ namespace Strider2038\ImgCache\Tests\Imaging\Parsing\Thumbnail;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser;
-use Strider2038\ImgCache\Imaging\Parsing\Validation\KeyValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
 class ThumbnailKeyParserTest extends TestCase
 {
@@ -21,11 +22,15 @@ class ThumbnailKeyParserTest extends TestCase
     const KEY_WITH_INVALID_CONFIG = 'a_.jpg';
 
     /** @var KeyValidatorInterface */
-    private $validator;
+    private $keyValidator;
+
+    /** @var ImageValidatorInterface */
+    private $imageValidator;
 
     protected function setUp()
     {
-        $this->validator = \Phake::mock(KeyValidatorInterface::class);
+        $this->keyValidator = \Phake::mock(KeyValidatorInterface::class);
+        $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
     }
 
     /**
@@ -36,7 +41,7 @@ class ThumbnailKeyParserTest extends TestCase
     public function testParse_GivenInvalidKey_ExceptionThrown(): void
     {
         $parser = $this->createThumbnailKeyParser();
-        $this->givenValidator_IsValidPublicFilename_Returns(self::INVALID_KEY,false);
+        $this->givenKeyValidator_IsValidPublicFilename_Returns(self::INVALID_KEY,false);
 
         $parser->parse(self::INVALID_KEY);
     }
@@ -49,8 +54,8 @@ class ThumbnailKeyParserTest extends TestCase
     public function testParse_GivenKeyHasInvalidExtension_ExceptionThrown(): void
     {
         $parser = $this->createThumbnailKeyParser();
-        $this->givenValidator_IsValidPublicFilename_Returns(self::INVALID_KEY,true);
-        $this->givenValidator_hasValidImageExtension_Returns(self::INVALID_KEY, false);
+        $this->givenKeyValidator_IsValidPublicFilename_Returns(self::INVALID_KEY,true);
+        $this->givenImageValidator_hasValidImageExtension_Returns(self::INVALID_KEY, false);
 
         $parser->parse(self::INVALID_KEY);
     }
@@ -67,8 +72,8 @@ class ThumbnailKeyParserTest extends TestCase
         string $processingConfiguration
     ): void {
         $parser = $this->createThumbnailKeyParser();
-        $this->givenValidator_IsValidPublicFilename_Returns($key,true);
-        $this->givenValidator_hasValidImageExtension_Returns($key, true);
+        $this->givenKeyValidator_IsValidPublicFilename_Returns($key,true);
+        $this->givenImageValidator_hasValidImageExtension_Returns($key, true);
 
         $thumbnailKey = $parser->parse($key);
 
@@ -94,26 +99,26 @@ class ThumbnailKeyParserTest extends TestCase
     public function testParse_GivenKeyHasInvalidProcessingConfig_ExceptionThrown(): void
     {
         $parser = $this->createThumbnailKeyParser();
-        $this->givenValidator_IsValidPublicFilename_Returns(self::KEY_WITH_INVALID_CONFIG,true);
-        $this->givenValidator_hasValidImageExtension_Returns(self::KEY_WITH_INVALID_CONFIG, true);
+        $this->givenKeyValidator_IsValidPublicFilename_Returns(self::KEY_WITH_INVALID_CONFIG,true);
+        $this->givenImageValidator_hasValidImageExtension_Returns(self::KEY_WITH_INVALID_CONFIG, true);
 
         $parser->parse(self::KEY_WITH_INVALID_CONFIG);
     }
 
     private function createThumbnailKeyParser(): ThumbnailKeyParser
     {
-        $parser = new ThumbnailKeyParser($this->validator);
+        $parser = new ThumbnailKeyParser($this->keyValidator, $this->imageValidator);
 
         return $parser;
     }
 
-    private function givenValidator_IsValidPublicFilename_Returns(string $filename, bool $value): void
+    private function givenKeyValidator_IsValidPublicFilename_Returns(string $filename, bool $value): void
     {
-        \Phake::when($this->validator)->isValidPublicFilename($filename)->thenReturn($value);
+        \Phake::when($this->keyValidator)->isValidPublicFilename($filename)->thenReturn($value);
     }
 
-    private function givenValidator_hasValidImageExtension_Returns(string $filename, bool $value): void
+    private function givenImageValidator_hasValidImageExtension_Returns(string $filename, bool $value): void
     {
-        \Phake::when($this->validator)->hasValidImageExtension($filename)->thenReturn($value);
+        \Phake::when($this->imageValidator)->hasValidImageExtension($filename)->thenReturn($value);
     }
 }

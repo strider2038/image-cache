@@ -45,6 +45,20 @@ class ImageCacheTest extends FileTestCase
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
     }
 
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessageRegExp /Directory .* does not exist/
+     */
+    public function testConstruct_CacheDirectoryIsInvalid_ExceptionThrown(): void
+    {
+        new ImageCache(
+            $this->givenFile(self::IMAGE_CAT300),
+            $this->imageFactory,
+            $this->imageExtractor
+        );
+    }
+
     public function testGet_ImageDoesNotExistInSource_NullIsReturned(): void
     {
         $cache = $this->createImageCache();
