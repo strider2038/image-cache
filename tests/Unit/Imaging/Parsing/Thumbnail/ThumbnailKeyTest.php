@@ -18,7 +18,7 @@ class ThumbnailKeyTest extends TestCase
     const PUBLIC_FILENAME = 'a.jpg';
     const PROCESSING_CONFIGURATION = 'q5';
 
-    public function testConstruct_GivenProperties_PropertiesAreSetted(): void
+    public function testConstruct_GivenProperties_PropertiesAreSet(): void
     {
         $key = new ThumbnailKey(self::PUBLIC_FILENAME, self::PROCESSING_CONFIGURATION);
 
