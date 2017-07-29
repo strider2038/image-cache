@@ -8,20 +8,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessor;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
+use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
-class ThumbnailImageFactoryTest extends TestCase
+class ImageProcessorTest extends TestCase
 {
+    use ImageTrait;
+
     /** @var ProcessingEngineInterface */
     private $processingEngine;
 
@@ -30,53 +33,55 @@ class ThumbnailImageFactoryTest extends TestCase
         $this->processingEngine = \Phake::mock(ProcessingEngineInterface::class);
     }
 
-    public function testCreate_NoTransformationsInRequestConfiguration_TransformationsAreNotAppliedToProcessingImage(): void
+    public function testProcess_NoTransformationsInRequestConfiguration_TransformationsAreNotAppliedToProcessingImage(): void
     {
-        $factory = $this->createThumbnailImageFactory();
-        $requestConfiguration = $this->givenThumbnailRequestConfiguration();
-        $extractedImage = $this->givenExtractedImage();
-        $this->givenProcessingImage($extractedImage);
+        $processor = $this->createImageProcessor();
+        $configuration = $this->givenProcessingConfiguration();
+        $sourceImage = $this->givenImage();
+        $processingImage = $this->givenProcessingEngine_Open_ReturnsProcessingImage($sourceImage);
 
-        $thumbnailImage = $factory->create($requestConfiguration, $extractedImage);
+        $processedImage = $processor->process($configuration, $sourceImage);
 
-        $this->assertInstanceOf(ProcessingImageInterface::class, $thumbnailImage);
+        $this->assertInstanceOf(ProcessingImageInterface::class, $processedImage);
+        $this->assertSame($processingImage, $processedImage);
     }
 
-    public function testCreate_RequestConfigurationHasTransformations_TransformationsAppliedToProcessingImage(): void
+    public function testProcess_ConfigurationHasTransformations_TransformationsAppliedToProcessingImage(): void
     {
-        $factory = $this->createThumbnailImageFactory();
+        $processor = $this->createImageProcessor();
         $transformation = $this->givenTransformation();
         $transformations = $this->givenTransformationsCollectionWithTransformation($transformation);
-        $requestConfiguration = $this->givenThumbnailRequestConfiguration($transformations);
-        $extractedImage = $this->givenExtractedImage();
-        $processingImage = $this->givenProcessingImage($extractedImage);
+        $requestConfiguration = $this->givenProcessingConfiguration($transformations);
+        $sourceImage = $this->givenImage();
+        $processingImage = $this->givenProcessingEngine_Open_ReturnsProcessingImage($sourceImage);
 
-        $thumbnailImage = $factory->create($requestConfiguration, $extractedImage);
+        $processedImage = $processor->process($requestConfiguration, $sourceImage);
 
-        $this->assertInstanceOf(ProcessingImageInterface::class, $thumbnailImage);
+        $this->assertInstanceOf(ProcessingImageInterface::class, $processedImage);
+        $this->assertSame($processingImage, $processedImage);
         $this->assertTransformationIsAppliedToProcessingImage($transformation, $processingImage);
     }
 
-    public function testCreate_RequestConfigurationIsGiven_GetSaveOptionsIsCalled(): void
+    public function testProcess_ConfigurationIsGiven_GetSaveOptionsIsCalled(): void
     {
-        $factory = $this->createThumbnailImageFactory();
+        $processor = $this->createImageProcessor();
         $saveOptions = $this->givenSaveOptions();
-        $requestConfiguration = $this->givenThumbnailRequestConfiguration(null, $saveOptions);
-        $extractedImage = $this->givenExtractedImage();
-        $processingImage = $this->givenProcessingImage($extractedImage);
+        $configuration = $this->givenProcessingConfiguration(null, $saveOptions);
+        $sourceImage = $this->givenImage();
+        $processingImage = $this->givenProcessingEngine_Open_ReturnsProcessingImage($sourceImage);
 
-        $thumbnailImage = $factory->create($requestConfiguration, $extractedImage);
+        $processedImage = $processor->process($configuration, $sourceImage);
 
-        $this->assertInstanceOf(SaveOptions::class, $thumbnailImage->getSaveOptions());
-        $this->assertGetSaveOptionsIsCalledOnRequestConfiguration($requestConfiguration);
+        $this->assertInstanceOf(SaveOptions::class, $processedImage->getSaveOptions());
+        $this->assertGetSaveOptionsIsCalledOnRequestConfiguration($configuration);
         $this->assertSaveOptionsIsCalledOnProcessingImage($processingImage, $saveOptions);
     }
 
-    private function createThumbnailImageFactory(): ImageProcessor
+    private function createImageProcessor(): ImageProcessor
     {
-        $factory = new ImageProcessor($this->processingEngine);
+        $processor = new ImageProcessor($this->processingEngine);
 
-        return $factory;
+        return $processor;
     }
 
     private function givenEmptyTransformationsCollection(): TransformationsCollection
@@ -116,17 +121,17 @@ class ThumbnailImageFactoryTest extends TestCase
         return $transformations;
     }
 
-    private function givenThumbnailRequestConfiguration(
+    private function givenProcessingConfiguration(
         TransformationsCollection $transformations = null,
         SaveOptions $saveOptions = null
-    ): ThumbnailRequestConfigurationInterface {
-        $requestConfiguration = \Phake::mock(ThumbnailRequestConfigurationInterface::class);
+    ): ProcessingConfigurationInterface {
+        $configuration = \Phake::mock(ProcessingConfigurationInterface::class);
 
         if ($transformations === null) {
             $transformations = $this->givenEmptyTransformationsCollection();
         }
 
-        \Phake::when($requestConfiguration)
+        \Phake::when($configuration)
             ->getTransformations()
             ->thenReturn($transformations);
 
@@ -134,14 +139,14 @@ class ThumbnailImageFactoryTest extends TestCase
             $saveOptions = \Phake::mock(SaveOptions::class);
         }
 
-        \Phake::when($requestConfiguration)
+        \Phake::when($configuration)
             ->getSaveOptions()
             ->thenReturn($saveOptions);
 
-        return $requestConfiguration;
+        return $configuration;
     }
 
-    private function givenProcessingImage(ImageInterface $extractedImage): ProcessingImageInterface
+    private function givenProcessingEngine_Open_ReturnsProcessingImage(ImageInterface $extractedImage): ProcessingImageInterface
     {
         $processingImage = \Phake::mock(ProcessingImageInterface::class);
 
@@ -150,13 +155,6 @@ class ThumbnailImageFactoryTest extends TestCase
             ->thenReturn($processingImage);
 
         return $processingImage;
-    }
-
-    private function givenExtractedImage(): ImageInterface
-    {
-        $extractedImage = \Phake::mock(ImageInterface::class);
-
-        return $extractedImage;
     }
 
     private function assertTransformationIsAppliedToProcessingImage(
@@ -168,7 +166,7 @@ class ThumbnailImageFactoryTest extends TestCase
     }
 
     private function assertGetSaveOptionsIsCalledOnRequestConfiguration(
-        ThumbnailRequestConfigurationInterface $requestConfiguration
+        ProcessingConfigurationInterface $requestConfiguration
     ): void {
         \Phake::verify($requestConfiguration, \Phake::times(1))->getSaveOptions();
     }

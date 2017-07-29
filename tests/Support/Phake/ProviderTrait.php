@@ -8,13 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Extraction\Request;
+namespace Strider2038\ImgCache\Tests\Support\Phake;
 
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface FileExtractionRequestInterface
+trait ProviderTrait
 {
-    public function getFilename(): string;
+    public function boolValuesProvider(): array
+    {
+        return [
+            [true],
+            [false],
+        ];
+    }
 }

@@ -32,18 +32,18 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     private $processingConfigurationParser;
 
     /** @var ImageProcessorInterface */
-    private $thumbnailImageFactory;
+    private $imageProcessor;
 
     public function __construct(
         ThumbnailKeyParserInterface $keyParser,
         SourceImageExtractor $sourceImageExtractor,
         ProcessingConfigurationParserInterface $processingConfigurationParser,
-        ImageProcessorInterface $thumbnailImageFactory
+        ImageProcessorInterface $imageProcessor
     ) {
         $this->keyParser = $keyParser;
         $this->sourceImageExtractor = $sourceImageExtractor;
         $this->processingConfigurationParser = $processingConfigurationParser;
-        $this->thumbnailImageFactory = $thumbnailImageFactory;
+        $this->imageProcessor = $imageProcessor;
     }
 
     public function extract(string $key): ?ImageInterface
@@ -57,12 +57,12 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         /** @var ThumbnailKeyInterface $thumbnailKey */
         $thumbnailKey = $this->keyParser->parse($key);
 
-        $unparsedConfiguration = $thumbnailKey->getProcessingConfiguration();
+        $configurationString = $thumbnailKey->getProcessingConfiguration();
 
         /** @var ProcessingConfigurationInterface $processingConfiguration */
-        $processingConfiguration = $this->processingConfigurationParser->parse($unparsedConfiguration);
+        $processingConfiguration = $this->processingConfigurationParser->parse($configurationString);
 
-        return $this->thumbnailImageFactory->process($processingConfiguration, $sourceImage);
+        return $this->imageProcessor->process($processingConfiguration, $sourceImage);
     }
 
     public function exists(string $key): bool

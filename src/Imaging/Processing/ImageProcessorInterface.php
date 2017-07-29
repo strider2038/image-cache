@@ -17,5 +17,5 @@ use Strider2038\ImgCache\Imaging\Image\ImageInterface;
  */
 interface ImageProcessorInterface
 {
-    public function process(ProcessingConfigurationInterface $configuration, ImageInterface $image): ProcessingImageInterface;
+    public function process(ProcessingConfigurationInterface $configuration, ImageInterface $image): ImageInterface;
 }

@@ -36,25 +36,25 @@ class SourceImageExtractor implements ImageExtractorInterface
 
     public function extract(string $key): ?ImageInterface
     {
-        $sourceFilename = $this->getSourceFilename($key);
+        $publicFilename = $this->getPublicFilename($key);
 
-        return $this->sourceAccessor->get($sourceFilename);
+        return $this->sourceAccessor->get($publicFilename);
     }
 
     public function exists(string $key): bool
     {
-        $sourceFilename = $this->getSourceFilename($key);
+        $publicFilename = $this->getPublicFilename($key);
 
-        return $this->sourceAccessor->exists($sourceFilename);
+        return $this->sourceAccessor->exists($publicFilename);
     }
 
-    private function getSourceFilename(string $key): string
+    private function getPublicFilename(string $key): string
     {
-        /** @var SourceKeyInterface $thumbnailKey */
-        $thumbnailKey = $this->keyParser->parse($key);
+        /** @var SourceKeyInterface $sourceKey */
+        $sourceKey = $this->keyParser->parse($key);
 
-        $sourceFilename = $thumbnailKey->getSourceFilename();
+        $publicFilename = $sourceKey->getPublicFilename();
 
-        return $sourceFilename;
+        return $publicFilename;
     }
 }

@@ -83,7 +83,7 @@ class ImageFileTest extends FileTestCase
     {
         $filename = $this->givenFile(self::IMAGE_CAT300);
         $image = $this->createImage($filename);
-        $expectedProcessingImage = $this->givenProcessingImage();
+        $expectedProcessingImage = $this->givenProcessingEngine_Open_ReturnsProcessingImage();
         $processingEngine = $this->givenProcessingEngine_OpenFromFile_Returns($filename, $expectedProcessingImage);
 
         $processingImage = $image->open($processingEngine);

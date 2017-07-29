@@ -16,5 +16,5 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Source;
  */
 interface SourceKeyInterface
 {
-    public function getSourceFilename(): string;
+    public function getPublicFilename(): string;
 }

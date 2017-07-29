@@ -28,7 +28,7 @@ class ImageProcessor implements ImageProcessorInterface
         $this->processingEngine = $processingEngine;
     }
 
-    public function process(ProcessingConfigurationInterface $configuration, ImageInterface $image): ProcessingImageInterface
+    public function process(ProcessingConfigurationInterface $configuration, ImageInterface $image): ImageInterface
     {
         /** @var ProcessingImageInterface $processingImage */
         $processingImage = $image->open($this->processingEngine);

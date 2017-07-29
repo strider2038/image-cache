@@ -11,190 +11,105 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequestInterface;
-use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
-use Strider2038\ImgCache\Imaging\Parsing\DeprecatedThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
-use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
+use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ThumbnailImageExtractorTest extends TestCase
 {
-    use ImageTrait;
+    use ImageTrait, ProviderTrait;
 
     const KEY = 'key';
+    const CONFIGURATION_STRING = 's';
 
-    /** @var FilesystemSourceInterface */
-    private $source;
-
-    /** @var DeprecatedThumbnailKeyParserInterface */
+    /** @var ThumbnailKeyParserInterface */
     private $keyParser;
 
+    /** @var SourceImageExtractor */
+    private $sourceImageExtractor;
+
+    /** @var ProcessingConfigurationParserInterface */
+    private $processingConfigurationParser;
+
     /** @var ImageProcessorInterface */
-    private $thumbnailImageFactory;
+    private $imageProcessor;
 
     protected function setUp()
     {
-        $this->markTestSkipped();
-
-        $this->source = \Phake::mock(FilesystemSourceInterface::class);
-        $this->keyParser = \Phake::mock(DeprecatedThumbnailKeyParserInterface::class);
-        $this->thumbnailImageFactory = \Phake::mock(ImageProcessorInterface::class);
+        $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
+        $this->sourceImageExtractor = \Phake::mock(SourceImageExtractor::class);
+        $this->processingConfigurationParser = \Phake::mock(ProcessingConfigurationParserInterface::class);
+        $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
     }
 
-    public function testExtract_SourceImageNotFound_NullIsReturned(): void
+    public function testExtract_ImageDoesNotExistInSource_NullIsReturned(): void
     {
-        $imageExtractor = $this->createThumbnailImageExtractor();
-        $requestConfiguration = $this->givenThumbnailRequestConfiguration();
-        $this->givenKeyParser_GetRequestConfiguration_Returns($requestConfiguration);
-        $extractionRequest = $this->givenFileExtractionRequest();
-        $this->givenRequestConfiguration_GetExtractionRequest_Returns($requestConfiguration, $extractionRequest);
-        $this->givenSource_Get_Returns($extractionRequest, null);
+        $extractor = $this->createThumbnailImageExtractor();
+        $this->givenSourceImageExtractor_Extract_Returns(null);
 
-        $extractedImage = $imageExtractor->extract(self::KEY);
+        $extractedImage = $extractor->extract(self::KEY);
 
         $this->assertNull($extractedImage);
     }
 
-    public function testExtract_SourceImageFoundAndNoTransformationsNeeded_SourceImageIsReturned(): void
+    public function testExtract_ImageExistsInSource_ImageIsProcessedAndReturned(): void
     {
-        $imageExtractor = $this->createThumbnailImageExtractor();
-        $requestConfiguration = $this->givenThumbnailRequestConfiguration();
-        $this->givenKeyParser_GetRequestConfiguration_Returns($requestConfiguration);
-        $extractionRequest = $this->givenFileExtractionRequest();
-        $this->givenRequestConfiguration_GetExtractionRequest_Returns($requestConfiguration, $extractionRequest);
+        $extractor = $this->createThumbnailImageExtractor();
         $sourceImage = $this->givenImage();
-        $this->givenSource_Get_Returns($extractionRequest, $sourceImage);
-        $this->givenRequestConfiguration_HasTransformation_Returns($requestConfiguration, false);
+        $this->givenSourceImageExtractor_Extract_Returns($sourceImage);
+        $thumbnailKey = \Phake::mock(ThumbnailKeyInterface::class);
+        \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($thumbnailKey);
+        \Phake::when($thumbnailKey)
+            ->getProcessingConfiguration()
+            ->thenReturn(self::CONFIGURATION_STRING);
+        $processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
+        \Phake::when($this->processingConfigurationParser)
+            ->parse(self::CONFIGURATION_STRING)
+            ->thenReturn($processingConfiguration);
+        $processedImage = $this->givenImage();
+        \Phake::when($this->imageProcessor)
+            ->process($processingConfiguration, $sourceImage)
+            ->thenReturn($processedImage);
 
-        $extractedImage = $imageExtractor->extract(self::KEY);
+        $extractedImage = $extractor->extract(self::KEY);
 
-        $this->assertInstanceOf(ImageInterface::class, $extractedImage);
-        $this->assertSame($sourceImage, $extractedImage);
+        $this->assertSame($processedImage, $extractedImage);
     }
 
-    public function testExtract_SourceImageFoundAndTransformationsNeeded_ThumbnailImageIsReturned(): void
+    /**
+     * @param bool $expectedExists
+     * @dataProvider boolValuesProvider
+     */
+    public function testExists_SourceImageExtractorExistsReturnsBool_BoolIsReturned(bool $expectedExists): void
     {
-        $imageExtractor = $this->createThumbnailImageExtractor();
-        $requestConfiguration = $this->givenThumbnailRequestConfiguration();
-        $this->givenKeyParser_GetRequestConfiguration_Returns($requestConfiguration);
-        $extractionRequest = $this->givenFileExtractionRequest();
-        $this->givenRequestConfiguration_GetExtractionRequest_Returns($requestConfiguration, $extractionRequest);
-        $sourceImage = $this->givenImage();
-        $this->givenSource_Get_Returns($extractionRequest, $sourceImage);
-        $this->givenRequestConfiguration_HasTransformation_Returns($requestConfiguration, true);
-        $thumbnailImage = $this->givenProcessingImage();
-        $this->givenThumbnailImageFactory_Create_Returns($requestConfiguration, $sourceImage, $thumbnailImage);
+        $extractor = $this->createThumbnailImageExtractor();
+        \Phake::when($this->sourceImageExtractor)->exists(self::KEY)->thenReturn($expectedExists);
 
-        $extractedImage = $imageExtractor->extract(self::KEY);
-
-        $this->assertInstanceOf(ImageInterface::class, $extractedImage);
-    }
-
-    /** @dataProvider getExistsValues */
-    public function testExists_SourceImageExistsCalled_BoolIsReturned(bool $expectedExists): void
-    {
-        $imageExtractor = $this->createThumbnailImageExtractor();
-        $requestConfiguration = $this->givenThumbnailRequestConfiguration();
-        $this->givenKeyParser_GetRequestConfiguration_Returns($requestConfiguration);
-        $extractionRequest = $this->givenFileExtractionRequest();
-        $this->givenRequestConfiguration_GetExtractionRequest_Returns($requestConfiguration, $extractionRequest);
-        $this->givenSource_Exists_Returns($extractionRequest, $expectedExists);
-
-        $actualExists = $imageExtractor->exists(self::KEY);
+        $actualExists = $extractor->exists(self::KEY);
 
         $this->assertEquals($expectedExists, $actualExists);
     }
 
-    public function getExistsValues(): array
-    {
-        return [
-            [true],
-            [false],
-        ];
-    }
-
     private function createThumbnailImageExtractor(): ThumbnailImageExtractor
     {
-        $imageExtractor = new ThumbnailImageExtractor($this->source, $this->keyParser, $this->thumbnailImageFactory);
-
-        return $imageExtractor;
+        $extractor = new ThumbnailImageExtractor(
+            $this->keyParser,
+            $this->sourceImageExtractor,
+            $this->processingConfigurationParser,
+            $this->imageProcessor
+        );
+        return $extractor;
     }
 
-    private function givenThumbnailRequestConfiguration(): ThumbnailRequestConfigurationInterface
+    private function givenSourceImageExtractor_Extract_Returns(?ImageInterface $sourceImage): void
     {
-        $requestConfiguration = \Phake::mock(ThumbnailRequestConfigurationInterface::class);
-
-        return $requestConfiguration;
-    }
-
-    private function givenKeyParser_GetRequestConfiguration_Returns(
-        ThumbnailRequestConfigurationInterface $requestConfiguration
-    ): void {
-        \Phake::when($this->keyParser)
-            ->getRequestConfiguration(self::KEY)
-            ->thenReturn($requestConfiguration);
-    }
-
-    private function givenFileExtractionRequest(): FileExtractionRequestInterface
-    {
-        $extractionRequest = \Phake::mock(FileExtractionRequestInterface::class);
-
-        return $extractionRequest;
-    }
-
-    private function givenRequestConfiguration_GetExtractionRequest_Returns(
-        ThumbnailRequestConfigurationInterface $requestConfiguration,
-        FileExtractionRequestInterface$extractionRequest
-    ): void {
-        \Phake::when($requestConfiguration)
-            ->getExtractionRequest()
-            ->thenReturn($extractionRequest);
-    }
-
-    private function givenSource_Get_Returns(
-        FileExtractionRequestInterface $extractionRequest,
-        ?ImageInterface $sourceImage
-    ): void {
-        \Phake::when($this->source)
-            ->get($extractionRequest)
-            ->thenReturn($sourceImage);
-    }
-
-    private function givenImage(): ImageInterface
-    {
-        $sourceImage = \Phake::mock(ImageInterface::class);
-
-        return $sourceImage;
-    }
-
-    private function givenRequestConfiguration_HasTransformation_Returns(
-        ThumbnailRequestConfigurationInterface $requestConfiguration,
-        bool $value
-    ): void {
-        \Phake::when($requestConfiguration)
-            ->hasTransformations()
-            ->thenReturn($value);
-    }
-
-    private function givenThumbnailImageFactory_Create_Returns(
-        ThumbnailRequestConfigurationInterface $requestConfiguration,
-        ImageInterface $sourceImage,
-        ImageInterface $thumbnailImage
-    ): void {
-        \Phake::when($this->thumbnailImageFactory)
-            ->create($requestConfiguration, $sourceImage)
-            ->thenReturn($thumbnailImage);
-    }
-
-    private function givenSource_Exists_Returns(
-        FileExtractionRequestInterface $extractionRequest,
-        bool $expectedExists
-    ): void {
-        \Phake::when($this->source)
-            ->exists($extractionRequest)
-            ->thenReturn($expectedExists);
+        \Phake::when($this->sourceImageExtractor)->extract(self::KEY)->thenReturn($sourceImage);
     }
 }

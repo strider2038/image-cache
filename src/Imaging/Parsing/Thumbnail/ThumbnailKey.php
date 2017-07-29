@@ -10,10 +10,19 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
 
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ThumbnailKeyParserInterface
+class ThumbnailKey implements ThumbnailKeyInterface
 {
-    public function parse(string $key): ThumbnailKeyInterface;
+    public function getPublicFilename(): string
+    {
+        // TODO: Implement getPublicFilename() method.
+    }
+
+    public function getProcessingConfiguration(): string
+    {
+        // TODO: Implement getProcessingConfiguration() method.
+    }
 }

@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Tests\Support\Phake;
 
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 
 /**
@@ -17,7 +18,14 @@ use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
  */
 trait ImageTrait
 {
-    protected function givenProcessingImage(): ProcessingImageInterface
+    protected function givenImage(): ImageInterface
+    {
+        $image = \Phake::mock(ImageInterface::class);
+
+        return $image;
+    }
+
+    protected function givenProcessingEngine_Open_ReturnsProcessingImage(): ProcessingImageInterface
     {
         $image = \Phake::mock(ProcessingImageInterface::class);
 

@@ -11,9 +11,6 @@
 namespace Strider2038\ImgCache\Imaging\Parsing;
 
 use Strider2038\ImgCache\Exception\InvalidImageException;
-use Strider2038\ImgCache\Imaging\Extraction\Request\FileExtractionRequest;
-use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfiguration;
-use Strider2038\ImgCache\Imaging\Extraction\Request\ThumbnailRequestConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
@@ -22,7 +19,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
  * @author Igor Lazarev <strider2038@rambler.ru>
  * @deprecated
  */
-class DeprecatedThumbnailKeyParser implements DeprecatedThumbnailKeyParserInterface
+class DeprecatedThumbnailKeyParser
 {
     /** @var TransformationsFactoryInterface */
     private $transformationsFactory;
