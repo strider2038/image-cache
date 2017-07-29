@@ -58,7 +58,7 @@ class Router extends Component implements RouterInterface
         $app = $this->getApp();
         
         return new Route(
-            new ImageController($app->security, $app->imgcache),
+            new ImageController($app->security, $app->imageCache),
             $this->methodsToActions[$requestMethod]
         );
     }

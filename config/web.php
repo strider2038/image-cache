@@ -3,25 +3,92 @@
 $configWeb = [
     'id' => 'ImgCache',
     'components' => [
+
+        // service
         'router' => function($app) {
-            return new \Strider2038\ImgCache\Service\Router($app);
+            return new \Strider2038\ImgCache\Service\Router($app, $app->imageValidator);
         },
-        'imgcache' => function($app) {
+
+        // imaging
+        'imageCache' => function($app) {
             return new \Strider2038\ImgCache\Imaging\ImageCache(
                 __DIR__ . '/../web',
-                $app->imageSource,
-                $app->transformationsFactory,
-                $app->processingEngine
+                $app->imageFactory,
+                $app->thumbnailImageExtractor
             );
         },
-        'transformationsFactory' => \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory::class,
-        'processingEngine' => \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine::class,
-        'imageSource' => function(\Strider2038\ImgCache\Application $app) {
-            return new \Strider2038\ImgCache\Imaging\Source\FilesystemSource(
-                $app->temporaryFileManager, 
-                __DIR__ . '/../isource'
+
+        // imaging/image
+        'imageFactory' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Image\ImageFactory(
+                $app->saveOptionsFactory,
+                $app->imageValidator
             );
-        },        
+        },
+
+        // imaging/extraction
+        'thumbnailImageExtractor' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor(
+                $app->thumbnailKeyParser,
+                $app->sourceImageExtractor,
+                $app->thumbnailProcessingConfigurationParser,
+                $app->imageProcessor
+            );
+        },
+        'sourceImageExtractor' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor(
+                $app->thumbnailKeyParser,
+                $app->filesystemSourceAccessor
+            );
+        },
+
+        // imaging/parsing
+        'thumbnailKeyParser' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser(
+                $app->keyValidator,
+                $app->imageValidator
+            );
+        },
+        'thumbnailProcessingConfigurationParser' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser(
+                $app->transformationsFactory,
+                $app->saveOptionsFactory,
+                $app->saveOptionsConfigurator
+            );
+        },
+
+        // imaging/processing
+        'saveOptionsFactory' => \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory::class,
+        'saveOptionsConfigurator' => \Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator::class,
+        'imageProcessor' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Processing\ImageProcessor(
+                $app->imagickEngine
+            );
+        },
+        'imagickEngine' => \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine::class,
+
+        // imaging/transformation
+        'transformationsFactory' => \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory::class,
+
+        // imaging/source
+        'filesystemSourceAccessor' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor(
+                $app->filesystemSource,
+                $app->directKeyMapper
+            );
+        },
+        'filesystemSource' => function($app) {
+            return new \Strider2038\ImgCache\Imaging\Source\FilesystemSource(
+                __DIR__ . '/../tests/assets',
+                $app->imageFactory
+            );
+        },
+        'directKeyMapper' => \Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper::class,
+
+        // imaging/validation
+        'imageValidator' => \Strider2038\ImgCache\Imaging\Validation\ImageValidator::class,
+        'keyValidator' => \Strider2038\ImgCache\Imaging\Validation\KeyValidator::class,
+
     ],
     'params' => [
         'debug' => false,

@@ -17,12 +17,8 @@ namespace Strider2038\ImgCache\Response;
  */
 class ErrorResponse extends MessageResponse
 {
-    /** @var string */
-    private $message;
-    
     public function __construct(int $httpCode = null, string $message = null)
     {
-        parent::__construct($httpCode ?? self::HTTP_CODE_INTERNAL_SERVER_ERROR);
-        $this->message = $message;
+        parent::__construct($httpCode ?? self::HTTP_CODE_INTERNAL_SERVER_ERROR, $message);
     }
 }

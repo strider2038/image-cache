@@ -40,10 +40,10 @@ class RouterTest extends TestCase
     {
         $this->app = new class extends Application {
             public $security;
-            public $imgcache;
+            public $imageCache;
             public function __construct() {
                 $this->security = \Phake::mock(SecurityInterface::class);
-                $this->imgcache = \Phake::mock(ImageCacheInterface::class);
+                $this->imageCache = \Phake::mock(ImageCacheInterface::class);
             }
         };
         
