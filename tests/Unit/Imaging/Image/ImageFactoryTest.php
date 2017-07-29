@@ -39,7 +39,7 @@ class ImageFactoryTest extends FileTestCase
     public function testCreateImageFile_GivenImage_ImageFileIsReturned(): void
     {
         $factory = $this->createImageFactory();
-        $imageFilename = $this->givenFile(self::IMAGE_CAT300);
+        $imageFilename = $this->givenFile(self::IMAGE_BOX_PNG);
         $this->givenImageValidator_HasValidImageExtension_Returns(true);
         $this->givenImageValidator_HasFileValidImageMimeType_Returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_Create_ReturnsSaveOptions();
@@ -80,7 +80,7 @@ class ImageFactoryTest extends FileTestCase
     public function testCreateImageBlob_GivenBlob_ImageBlobIsReturned(): void
     {
         $factory = $this->createImageFactory();
-        $imageFilename = $this->givenFile(self::IMAGE_CAT300);
+        $imageFilename = $this->givenFile(self::IMAGE_BOX_PNG);
         $imageBlob = file_get_contents($imageFilename);
         $this->givenImageValidator_HasBlobValidImageMimeType_Returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_Create_ReturnsSaveOptions();

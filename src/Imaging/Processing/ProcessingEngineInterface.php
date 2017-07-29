@@ -16,6 +16,6 @@ namespace Strider2038\ImgCache\Imaging\Processing;
  */
 interface ProcessingEngineInterface
 {
-    public function openFromFile(string $filename): ProcessingImageInterface;
-    public function openFromBlob(string $data): ProcessingImageInterface;
+    public function openFromFile(string $filename, SaveOptions $saveOptions): ProcessingImageInterface;
+    public function openFromBlob(string $data, SaveOptions $saveOptions): ProcessingImageInterface;
 }

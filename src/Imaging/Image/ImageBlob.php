@@ -36,7 +36,9 @@ class ImageBlob extends AbstractImage implements ImageInterface
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        return $engine->openFromBlob($this->data);
+        $processingImage = $engine->openFromBlob($this->data, $this->saveOptions);
+
+        return $processingImage;
     }
 
     public function render(): void

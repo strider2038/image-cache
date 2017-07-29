@@ -67,7 +67,7 @@ class ImageControllerTest extends FileTestCase
         $image = \Phake::mock(ImageFile::class);
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn(self::IMAGE_FILENAME);
         \Phake::when($this->imageCache)->get(self::IMAGE_FILENAME)->thenReturn($image);
-        \Phake::when($image)->getFilename()->thenReturn($this->givenFile(self::IMAGE_CAT300));
+        \Phake::when($image)->getFilename()->thenReturn($this->givenFile(self::IMAGE_BOX_PNG));
 
         $response = $controller->actionGet($this->request);
 

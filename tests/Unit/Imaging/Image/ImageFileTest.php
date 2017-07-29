@@ -49,7 +49,7 @@ class ImageFileTest extends FileTestCase
 
     public function testConstruct_FileExists_FileNameIsCorrect(): void
     {
-        $filename = $this->givenFile(self::IMAGE_CAT300);
+        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
 
         $image = $this->createImage($filename);
 
@@ -59,7 +59,7 @@ class ImageFileTest extends FileTestCase
 
     public function testSaveTo_FileExists_FileCopiedToDestination(): void
     {
-        $image = $this->createImage($this->givenFile(self::IMAGE_CAT300));
+        $image = $this->createImage($this->givenFile(self::IMAGE_BOX_PNG));
         $this->assertFileNotExists(self::VALID_DESTINATION_FILENAME);
 
         $image->saveTo(self::VALID_DESTINATION_FILENAME);
@@ -69,7 +69,7 @@ class ImageFileTest extends FileTestCase
 
     public function testOpen_FileExists_ProcessingImageInterfaceIsReturned(): void
     {
-        $filename = $this->givenFile(self::IMAGE_CAT300);
+        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
         $image = $this->createImage($filename);
         $expectedProcessingImage = $this->givenProcessingImage();
         $processingEngine = $this->givenProcessingEngine_OpenFromFile_Returns($filename, $expectedProcessingImage);
@@ -106,7 +106,7 @@ class ImageFileTest extends FileTestCase
         $processingEngine = \Phake::mock(ProcessingEngineInterface::class);
 
         \Phake::when($processingEngine)
-            ->openFromFile($filename)
+            ->openFromFile($filename, $this->saveOptions)
             ->thenReturn($processingImage);
 
         return $processingEngine;

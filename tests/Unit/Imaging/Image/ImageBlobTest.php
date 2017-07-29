@@ -32,9 +32,9 @@ class ImageBlobTest extends FileTestCase
         $this->saveOptions = \Phake::mock(SaveOptions::class);
     }
 
-    public function testSaveTo_FileExists_FileCopiedToDestination(): void
+    public function testSaveTo_GivenData_DataSavedToFile(): void
     {
-        $filename = $this->givenFile(self::IMAGE_CAT300);
+        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
         $image = $this->createImage(file_get_contents($filename));
 
         $image->saveTo(self::VALID_DESTINATION_FILENAME);
@@ -42,9 +42,9 @@ class ImageBlobTest extends FileTestCase
         $this->assertFileExists(self::VALID_DESTINATION_FILENAME);
     }
 
-    public function testOpen_FileExists_ProcessingImageInterfaceIsReturned(): void
+    public function testOpen_GivenData_ProcessingImageInterfaceIsReturned(): void
     {
-        $filename = $this->givenFile(self::IMAGE_CAT300);
+        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
         $blob = file_get_contents($filename);
         $image = $this->createImage($blob);
         $expectedProcessingImage = $this->givenProcessingImage();
@@ -83,7 +83,7 @@ class ImageBlobTest extends FileTestCase
         $processingEngine = \Phake::mock(ProcessingEngineInterface::class);
 
         \Phake::when($processingEngine)
-            ->openFromBlob($data)
+            ->openFromBlob($data, $this->saveOptions)
             ->thenReturn($processingImage);
 
         return $processingEngine;

@@ -53,7 +53,7 @@ class ImageCacheTest extends FileTestCase
     public function testConstruct_CacheDirectoryIsInvalid_ExceptionThrown(): void
     {
         new ImageCache(
-            $this->givenFile(self::IMAGE_CAT300),
+            $this->givenFile(self::IMAGE_BOX_PNG),
             $this->imageFactory,
             $this->imageExtractor
         );
@@ -119,7 +119,7 @@ class ImageCacheTest extends FileTestCase
 
     public function testDelete_ImageWriterIsSpecified_DeleteMethodCalled(): void
     {
-        $this->givenFile(self::IMAGE_CAT300, self::DELETE_KEY_DESTINATION_FILENAME);
+        $this->givenFile(self::IMAGE_BOX_PNG, self::DELETE_KEY_DESTINATION_FILENAME);
         $writer = \Phake::mock(ImageWriterInterface::class);
         $cache = $this->createImageCache($writer);
 
@@ -143,7 +143,7 @@ class ImageCacheTest extends FileTestCase
     public function testRebuild_CachedImageExists_ImageRemovedFromCacheAndSavedFromSourceToWebDirectory(): void
     {
         $cache = $this->createImageCacheWithMockedGetMethod();
-        $this->givenFile(self::IMAGE_CAT300, self::REBUILD_DESTINATION_FILENAME);
+        $this->givenFile(self::IMAGE_BOX_PNG, self::REBUILD_DESTINATION_FILENAME);
 
         $cache->rebuild(self::REBUILD_KEY);
 

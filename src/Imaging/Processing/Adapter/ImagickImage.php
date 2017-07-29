@@ -14,6 +14,7 @@ namespace Strider2038\ImgCache\Imaging\Processing\Adapter;
 use Strider2038\ImgCache\Imaging\Image\AbstractImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
  * @todo Add layer support http://php.net/manual/ru/imagick.coalesceimages.php
@@ -24,19 +25,20 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
     /** @var \Imagick */
     private $imagick;
     
-    public function __construct(\Imagick $processor)
+    public function __construct(\Imagick $processor, SaveOptions $saveOptions)
     {
+        parent::__construct($saveOptions);
         $this->imagick = $processor;
     }
     
     public function getHeight(): int
     {
-        $this->imagick->getImageHeight();
+        return $this->imagick->getImageHeight();
     }
 
     public function getWidth(): int
     {
-        $this->imagick->getImageWidth();
+        return $this->imagick->getImageWidth();
     }
 
     public function crop(int $width, int $height, int $x, int $y): void
@@ -56,11 +58,14 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        // TODO: Implement open() method.
+        $blob = $this->imagick->getImageBlob();
+        $image = $engine->openFromBlob($blob, $this->saveOptions);
+
+        return $image;
     }
 
     public function render(): void
     {
-        // TODO: Implement render() method.
+        echo $this->imagick->getImageBlob();
     }
 }

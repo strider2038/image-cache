@@ -48,7 +48,9 @@ class ImageFile extends AbstractImage implements ImageInterface
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        return $engine->openFromFile($this->filename);
+        $processingImage = $engine->openFromFile($this->filename, $this->saveOptions);
+
+        return $processingImage;
     }
 
     public function render(): void

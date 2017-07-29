@@ -30,7 +30,7 @@ class ImageCacheApiTest extends ApiTestCase
     
     public function testGet_ImageExist_Http200Returned(): void
     {
-        [$imageFilename, $imageUrl] = $this->givenPublicImage();
+        [$imageFilename, $imageUrl] = $this->givenPublicImage('', self::IMAGE_CAT300);
         
         /** @var \GuzzleHttp\Psr7\Response */
         $response = $this->client->request('GET', $imageUrl);

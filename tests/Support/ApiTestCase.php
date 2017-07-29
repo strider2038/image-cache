@@ -46,7 +46,7 @@ class ApiTestCase extends FileTestCase
      * @param string $name
      * @return string[] imageFilename, imageUrl
      */
-    public function givenPublicImage(string $urlPrefix = '', string $name = self::IMAGE_CAT300): array
+    public function givenPublicImage(string $urlPrefix = '', string $name = self::IMAGE_BOX_PNG): array
     {
         $filename = static::getTestWebDir() . $urlPrefix . $name;
 
