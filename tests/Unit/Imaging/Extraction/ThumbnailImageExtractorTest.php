@@ -11,7 +11,6 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
@@ -19,6 +18,7 @@ use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
@@ -26,14 +26,15 @@ class ThumbnailImageExtractorTest extends TestCase
 {
     use ImageTrait, ProviderTrait;
 
-    const KEY = 'key';
-    const CONFIGURATION_STRING = 's';
+    const KEY = '/publicFilename_configString.jpg';
+    const PUBLIC_FILENAME = '/publicFilename.jpg';
+    const CONFIGURATION_STRING = 'configString';
 
     /** @var ThumbnailKeyParserInterface */
     private $keyParser;
 
-    /** @var SourceImageExtractor */
-    private $sourceImageExtractor;
+    /** @var SourceAccessorInterface */
+    private $sourceAccessor;
 
     /** @var ProcessingConfigurationParserInterface */
     private $processingConfigurationParser;
@@ -44,7 +45,7 @@ class ThumbnailImageExtractorTest extends TestCase
     protected function setUp()
     {
         $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
-        $this->sourceImageExtractor = \Phake::mock(SourceImageExtractor::class);
+        $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
         $this->processingConfigurationParser = \Phake::mock(ProcessingConfigurationParserInterface::class);
         $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
     }
@@ -52,7 +53,8 @@ class ThumbnailImageExtractorTest extends TestCase
     public function testExtract_ImageDoesNotExistInSource_NullIsReturned(): void
     {
         $extractor = $this->createThumbnailImageExtractor();
-        $this->givenSourceImageExtractor_Extract_Returns(null);
+        $this->givenKeyParser_Parse_Returns_ThumbnailKey();
+        $this->givenSourceAccessor_Get_Returns(null);
 
         $extractedImage = $extractor->extract(self::KEY);
 
@@ -62,21 +64,11 @@ class ThumbnailImageExtractorTest extends TestCase
     public function testExtract_ImageExistsInSource_ImageIsProcessedAndReturned(): void
     {
         $extractor = $this->createThumbnailImageExtractor();
+        $this->givenKeyParser_Parse_Returns_ThumbnailKey();
         $sourceImage = $this->givenImage();
-        $this->givenSourceImageExtractor_Extract_Returns($sourceImage);
-        $thumbnailKey = \Phake::mock(ThumbnailKeyInterface::class);
-        \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($thumbnailKey);
-        \Phake::when($thumbnailKey)
-            ->getProcessingConfiguration()
-            ->thenReturn(self::CONFIGURATION_STRING);
-        $processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
-        \Phake::when($this->processingConfigurationParser)
-            ->parse(self::CONFIGURATION_STRING)
-            ->thenReturn($processingConfiguration);
-        $processedImage = $this->givenImage();
-        \Phake::when($this->imageProcessor)
-            ->process($processingConfiguration, $sourceImage)
-            ->thenReturn($processedImage);
+        $this->givenSourceAccessor_Get_Returns($sourceImage);
+        $processingConfiguration = $this->givenProcessingConfigurationParser_Parse_Returns_ProcessingConfiguration();
+        $processedImage = $this->givenImageProcessor_Process_Returns_ProcessedImage($processingConfiguration, $sourceImage);
 
         $extractedImage = $extractor->extract(self::KEY);
 
@@ -90,7 +82,8 @@ class ThumbnailImageExtractorTest extends TestCase
     public function testExists_SourceImageExtractorExistsReturnsBool_BoolIsReturned(bool $expectedExists): void
     {
         $extractor = $this->createThumbnailImageExtractor();
-        \Phake::when($this->sourceImageExtractor)->exists(self::KEY)->thenReturn($expectedExists);
+        $this->givenKeyParser_Parse_Returns_ThumbnailKey();
+        $this->givenSourceAccessor_Exists_Returns($expectedExists);
 
         $actualExists = $extractor->exists(self::KEY);
 
@@ -101,15 +94,57 @@ class ThumbnailImageExtractorTest extends TestCase
     {
         $extractor = new ThumbnailImageExtractor(
             $this->keyParser,
-            $this->sourceImageExtractor,
+            $this->sourceAccessor,
             $this->processingConfigurationParser,
             $this->imageProcessor
         );
         return $extractor;
     }
 
-    private function givenSourceImageExtractor_Extract_Returns(?ImageInterface $sourceImage): void
+    private function givenSourceAccessor_Get_Returns(?ImageInterface $sourceImage): void
     {
-        \Phake::when($this->sourceImageExtractor)->extract(self::KEY)->thenReturn($sourceImage);
+        \Phake::when($this->sourceAccessor)->get(self::PUBLIC_FILENAME)->thenReturn($sourceImage);
+    }
+
+    private function givenSourceAccessor_Exists_Returns(bool $value): void
+    {
+        \Phake::when($this->sourceAccessor)->exists(self::PUBLIC_FILENAME)->thenReturn($value);
+    }
+
+    private function givenKeyParser_Parse_Returns_ThumbnailKey(): ThumbnailKeyInterface
+    {
+        $thumbnailKey = \Phake::mock(ThumbnailKeyInterface::class);
+
+        \Phake::when($thumbnailKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
+
+        \Phake::when($thumbnailKey)->getProcessingConfiguration()->thenReturn(self::CONFIGURATION_STRING);
+
+        \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($thumbnailKey);
+
+        return $thumbnailKey;
+    }
+
+    private function givenProcessingConfigurationParser_Parse_Returns_ProcessingConfiguration(): ProcessingConfigurationInterface
+    {
+        $processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
+
+        \Phake::when($this->processingConfigurationParser)
+            ->parse(self::CONFIGURATION_STRING)
+            ->thenReturn($processingConfiguration);
+
+        return $processingConfiguration;
+    }
+
+    private function givenImageProcessor_Process_Returns_ProcessedImage(
+        ProcessingConfigurationInterface $processingConfiguration,
+        ImageInterface $sourceImage
+    ): ImageInterface {
+        $processedImage = $this->givenImage();
+
+        \Phake::when($this->imageProcessor)
+            ->process($processingConfiguration, $sourceImage)
+            ->thenReturn($processedImage);
+
+        return $processedImage;
     }
 }

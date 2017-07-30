@@ -27,7 +27,10 @@ class FileResponse extends Response
             throw new FileNotFoundException();
         }
         parent::__construct(self::HTTP_CODE_OK);
+
         $this->filename = $filename;
+
+        $this->setHeader(self::HTTP_HEADER_CONTENT_TYPE, mime_content_type($filename));
     }
     
     protected function sendContent(): void

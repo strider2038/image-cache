@@ -20,17 +20,19 @@ use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class ImageCacheTest extends FileTestCase
 {
-    const GET_KEY = 'a.jpg';
+    const INVALID_KEY = 'a';
+
+    const GET_KEY = '/a.jpg';
     const GET_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/a.jpg';
 
-    const INSERT_KEY = 'a';
+    const INSERT_KEY = '/b.jpg';
     const INSERT_DATA = 'data';
 
-    const DELETE_KEY = 'b.jpg';
-    const DELETE_KEY_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/b.jpg';
+    const DELETE_KEY = '/c.jpg';
+    const DELETE_KEY_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/c.jpg';
 
-    const REBUILD_KEY = 'c.jpg';
-    const REBUILD_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/c.jpg';
+    const REBUILD_KEY = '/d.jpg';
+    const REBUILD_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/d.jpg';
 
     /** @var ImageExtractorInterface */
     private $imageExtractor;
@@ -114,7 +116,7 @@ class ImageCacheTest extends FileTestCase
     {
         $cache = $this->createImageCache();
 
-        $cache->delete('key');
+        $cache->delete(self::DELETE_KEY);
     }
 
     public function testDelete_ImageWriterIsSpecified_DeleteMethodCalled(): void
@@ -149,6 +151,32 @@ class ImageCacheTest extends FileTestCase
 
         $this->assertFileNotExists(self::REBUILD_DESTINATION_FILENAME);
         $this->assertEquals(self::REBUILD_KEY, $cache->testGetKey);
+    }
+
+    /**
+     * @param string $method
+     * @param array $params
+     * @dataProvider invalidKeyProvider
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Key must start with slash
+     */
+    public function testGivenMethod_GivenInvalidKey_ExceptionThrown(string $method, array $params): void
+    {
+        $cache = $this->createImageCache();
+
+        call_user_func_array([$cache, $method], $params);
+    }
+
+    public function invalidKeyProvider(): array
+    {
+        return [
+            ['get', [self::INVALID_KEY]],
+            ['put', [self::INVALID_KEY, '']],
+            ['delete', [self::INVALID_KEY]],
+            ['exists', [self::INVALID_KEY]],
+            ['rebuild', [self::INVALID_KEY]],
+        ];
     }
 
     private function createImageCache(ImageWriterInterface $writer = null): ImageCache

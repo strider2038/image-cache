@@ -35,7 +35,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     rm -rf /var/run/composer && \
     rm /usr/local/bin/composer && \
     rm -rf /services/imgcache/.docker && \
-    rm -rf /tmp/*
+    rm -rf /tmp/* && \
+    chown -R www-data:www-data /services/imgcache
 
 EXPOSE 80
 

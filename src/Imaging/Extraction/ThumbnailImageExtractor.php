@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -25,8 +26,8 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     /** @var ThumbnailKeyParserInterface */
     private $keyParser;
 
-    /** @var SourceImageExtractor */
-    private $sourceImageExtractor;
+    /** @var SourceAccessorInterface */
+    private $sourceAccessor;
 
     /** @var ProcessingConfigurationParserInterface */
     private $processingConfigurationParser;
@@ -36,26 +37,28 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
 
     public function __construct(
         ThumbnailKeyParserInterface $keyParser,
-        SourceImageExtractor $sourceImageExtractor,
+        SourceAccessorInterface $sourceImageExtractor,
         ProcessingConfigurationParserInterface $processingConfigurationParser,
         ImageProcessorInterface $imageProcessor
     ) {
         $this->keyParser = $keyParser;
-        $this->sourceImageExtractor = $sourceImageExtractor;
+        $this->sourceAccessor = $sourceImageExtractor;
         $this->processingConfigurationParser = $processingConfigurationParser;
         $this->imageProcessor = $imageProcessor;
     }
 
     public function extract(string $key): ?ImageInterface
     {
-        $sourceImage = $this->sourceImageExtractor->extract($key);
+        /** @var ThumbnailKeyInterface $thumbnailKey */
+        $thumbnailKey = $this->keyParser->parse($key);
+
+        $publicFilename = $thumbnailKey->getPublicFilename();
+
+        $sourceImage = $this->sourceAccessor->get($publicFilename);
 
         if ($sourceImage === null) {
             return null;
         }
-
-        /** @var ThumbnailKeyInterface $thumbnailKey */
-        $thumbnailKey = $this->keyParser->parse($key);
 
         $configurationString = $thumbnailKey->getProcessingConfiguration();
 
@@ -67,6 +70,11 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
 
     public function exists(string $key): bool
     {
-        return $this->sourceImageExtractor->exists($key);
+        /** @var ThumbnailKeyInterface $thumbnailKey */
+        $thumbnailKey = $this->keyParser->parse($key);
+
+        $publicFilename = $thumbnailKey->getPublicFilename();
+
+        return $this->sourceAccessor->exists($publicFilename);
     }
 }

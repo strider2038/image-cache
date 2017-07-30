@@ -12,6 +12,7 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Exception\InvalidConfigException;
+use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Exception\NotAllowedException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
@@ -53,7 +54,7 @@ class ImageCache implements ImageCacheInterface
         if (!is_dir($cacheDirectory)) {
             throw new InvalidConfigException("Directory '{$cacheDirectory}' does not exist");
         }
-        $this->cacheDirectory = rtrim($cacheDirectory, '/') . '/';
+        $this->cacheDirectory = rtrim($cacheDirectory, '/');
         $this->imageFactory = $imageFactory;
         $this->imageExtractor = $imageExtractor;
         $this->imageWriter = $imageWriter;
@@ -67,6 +68,8 @@ class ImageCache implements ImageCacheInterface
      */
     public function get(string $key): ?ImageInterface
     {
+        $this->validateKey($key);
+
         /** @var ImageInterface $extractedImage */
         $extractedImage = $this->imageExtractor->extract($key);
         if ($extractedImage === null) {
@@ -82,6 +85,8 @@ class ImageCache implements ImageCacheInterface
 
     public function put(string $key, $data): void
     {
+        $this->validateKey($key);
+
         if ($this->imageWriter === null) {
             throw new NotAllowedException(
                 "Operation 'put' is not allowed for this type of cache"
@@ -93,6 +98,8 @@ class ImageCache implements ImageCacheInterface
 
     public function delete(string $key): void
     {
+        $this->validateKey($key);
+
         if ($this->imageWriter === null) {
             throw new NotAllowedException(
                 "Operation 'delete' is not allowed for this type of cache"
@@ -107,11 +114,15 @@ class ImageCache implements ImageCacheInterface
     
     public function exists(string $key): bool
     {
+        $this->validateKey($key);
+
         return $this->imageExtractor->exists($key);
     }
 
     public function rebuild(string $key): void
     {
+        $this->validateKey($key);
+
         // @todo cascade thumbnail rebuild
         $destinationFilename = $this->composeDestinationFilename($key);
         if (file_exists($destinationFilename)) {
@@ -124,5 +135,12 @@ class ImageCache implements ImageCacheInterface
     private function composeDestinationFilename(string $key): string
     {
         return $this->cacheDirectory . $key;
+    }
+
+    private function validateKey(string $key): void
+    {
+        if (substr($key, 0, 1) !== '/') {
+            throw new InvalidValueException('Key must start with slash');
+        }
     }
 }

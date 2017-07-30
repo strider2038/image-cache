@@ -30,15 +30,9 @@ $configWeb = [
         'thumbnailImageExtractor' => function($app) {
             return new \Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor(
                 $app->thumbnailKeyParser,
-                $app->sourceImageExtractor,
+                $app->filesystemSourceAccessor,
                 $app->thumbnailProcessingConfigurationParser,
                 $app->imageProcessor
-            );
-        },
-        'sourceImageExtractor' => function($app) {
-            return new \Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor(
-                $app->thumbnailKeyParser,
-                $app->filesystemSourceAccessor
             );
         },
 
