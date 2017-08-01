@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Service;
 
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\Component;
 use Strider2038\ImgCache\Core\Request;
 use Strider2038\ImgCache\Core\RequestInterface;
@@ -23,7 +22,7 @@ use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Router extends Component implements RouterInterface 
+class Router implements RouterInterface
 {
     /** @var ImageValidatorInterface */
     private $imageValidator;
@@ -36,9 +35,8 @@ class Router extends Component implements RouterInterface
         Request::METHOD_DELETE => 'delete',
     ];
 
-    public function __construct(Application $app, ImageValidatorInterface $imageValidator)
+    public function __construct(ImageValidatorInterface $imageValidator)
     {
-        parent::__construct($app);
         $this->imageValidator = $imageValidator;
     }
 
@@ -54,12 +52,11 @@ class Router extends Component implements RouterInterface
         if (!$this->imageValidator->hasValidImageExtension($url)) {
             throw new RequestException('Requested file has incorrect extension');
         }
-        
-        $app = $this->getApp();
-        
+
         return new Route(
-            new ImageController($app->security, $app->imageCache),
-            $this->methodsToActions[$requestMethod]
+            'imageController',
+            $this->methodsToActions[$requestMethod],
+            $request->getUrl()
         );
     }
 }

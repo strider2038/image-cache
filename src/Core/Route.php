@@ -11,31 +11,38 @@
 namespace Strider2038\ImgCache\Core;
 
 /**
- * Description of Route
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class Route 
 {
-    /** @var Strider2038\ImgCache\Core\ControllerInterface */
-    private $controller;
+    /** @var string */
+    private $controllerId;
 
     /** @var string */
-    private $action;
-    
-    public function __construct(ControllerInterface $controller, string $action) 
+    private $actionId;
+
+    /** @var string */
+    private $location;
+
+    public function __construct(string $controllerId, string $actionId, string $location)
     {
-        $this->controller = $controller;
-        $this->action = $action;
+        $this->controllerId = $controllerId;
+        $this->actionId = $actionId;
+        $this->location = $location;
     }
     
-    public function getController(): ControllerInterface 
+    public function getControllerId(): string
     {
-        return $this->controller;
+        return $this->controllerId;
     }
     
-    public function getAction(): string 
+    public function getActionId(): string
     {
-        return $this->action;
+        return $this->actionId;
+    }
+
+    public function getLocation(): string
+    {
+        return $this->location;
     }
 }

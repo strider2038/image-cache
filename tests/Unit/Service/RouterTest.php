@@ -12,13 +12,9 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
-use Strider2038\ImgCache\Core\SecurityInterface;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
-use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Service\Router;
 
 /**
@@ -27,26 +23,15 @@ use Strider2038\ImgCache\Service\Router;
 class RouterTest extends TestCase
 {
     const REQUEST_URL = '/a.jpg';
+
     /** @var RequestInterface */
     private $request;
-    
-    /** @var Application */
-    private $app;
 
     /** @var ImageValidatorInterface */
     private $imageValidator;
 
     protected function setUp()
     {
-        $this->app = new class extends Application {
-            public $security;
-            public $imageCache;
-            public function __construct() {
-                $this->security = \Phake::mock(SecurityInterface::class);
-                $this->imageCache = \Phake::mock(ImageCacheInterface::class);
-            }
-        };
-        
         $this->request = \Phake::mock(RequestInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
     }
@@ -66,8 +51,9 @@ class RouterTest extends TestCase
         $route = $router->getRoute($this->request);
         
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertInstanceOf(ImageController::class, $route->getController());
-        $this->assertEquals($actionName, $route->getAction());
+        $this->assertEquals('imageController', $route->getControllerId());
+        $this->assertEquals($actionName, $route->getActionId());
+        $this->assertEquals(self::REQUEST_URL, $route->getLocation());
     }
     
     public function requestMethodsProvider(): array
@@ -108,7 +94,7 @@ class RouterTest extends TestCase
 
     private function createRouter(): Router
     {
-        $router = new Router($this->app, $this->imageValidator);
+        $router = new Router($this->imageValidator);
 
         return $router;
     }

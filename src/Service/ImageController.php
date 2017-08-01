@@ -24,13 +24,20 @@ use Strider2038\ImgCache\Response\{
  */
 class ImageController extends Controller 
 {
+    /** @var RequestInterface */
+    private $request;
+
     /** @var ImageCacheInterface */
     private $imageCache;
 
-    public function __construct(SecurityInterface $security, ImageCacheInterface $imageCache)
-    {
+    public function __construct(
+        SecurityInterface $security,
+        ImageCacheInterface $imageCache,
+        RequestInterface $request
+    ) {
         parent::__construct($security);
         $this->imageCache = $imageCache;
+        $this->request = $request;
     }
     
     protected function getSafeActions(): array
@@ -41,15 +48,13 @@ class ImageController extends Controller
     /**
      * Handles GET request for resource. Returns ImageResponse if resource is found and
      * NotFoundResponse when not found.
-     * @param RequestInterface $request
+     * @param string $location
      * @return ResponseInterface
      */
-    public function actionGet(RequestInterface $request): ResponseInterface
+    public function actionGet(string $location): ResponseInterface
     {
-        $filename = $request->getUrl(PHP_URL_PATH);
-
         /** @var ImageFile $image */
-        $image = $this->imageCache->get($filename);
+        $image = $this->imageCache->get($location);
         if ($image === null) {
             return new NotFoundResponse();
         }
@@ -60,81 +65,73 @@ class ImageController extends Controller
     /**
      * Handles POST request for creating resource. If resource already exists then ConflictResponse
      * will be returned, otherwise - CreatedResponse.
-     * @param RequestInterface $request
+     * @param string $location
      * @return ResponseInterface
      */
-    public function actionCreate(RequestInterface $request): ResponseInterface
+    public function actionCreate(string $location): ResponseInterface
     {
-        $filename = $request->getUrl(PHP_URL_PATH);
-
-        if ($this->imageCache->exists($filename)) {
+        if ($this->imageCache->exists($location)) {
             return new ConflictResponse(
-                "File '{$filename}' already exists in cache source. "
+                "File '{$location}' already exists in cache source. "
                 . "Use PUT method to replace file in it."
             );
         }
 
-        $this->imageCache->put($filename, $request->getBody());
+        $this->imageCache->put($location, $this->request->getBody());
 
-        return new CreatedResponse("File '{$filename}' successfully created in cache");
+        return new CreatedResponse("File '{$location}' successfully created in cache");
     }
 
     /**
      * Handles PUT request for creating new resource or replacing old one. If resource is already
      * exists it will be replaced with all thumbnails deleted. CreatedResponse is returned.
-     * @param RequestInterface $request
+     * @param string $location
      * @return ResponseInterface
      */
-    public function actionReplace(RequestInterface $request): ResponseInterface
+    public function actionReplace(string $location): ResponseInterface
     {
-        $filename = $request->getUrl(PHP_URL_PATH);
-
-        if ($this->imageCache->exists($filename)) {
-            $this->imageCache->delete($filename);
+        if ($this->imageCache->exists($location)) {
+            $this->imageCache->delete($location);
         }
 
-        $this->imageCache->put($filename, $request->getBody());
+        $this->imageCache->put($location, $this->request->getBody());
 
-        return new CreatedResponse("File '{$filename}' successfully created in cache");
+        return new CreatedResponse("File '{$location}' successfully created in cache");
     }
 
     /**
      * Handles DELETE request for deleting resource from cache source and all it's cached
      * thumbnails
-     * @param RequestInterface $request
+     * @param string $location
      * @return ResponseInterface
      */
-    public function actionDelete(RequestInterface $request): ResponseInterface
+    public function actionDelete(string $location): ResponseInterface
     {
-        $filename = $request->getUrl(PHP_URL_PATH);
-
-        if (!$this->imageCache->exists($filename)) {
-            return new NotFoundResponse("File {$filename} does not exist");
+        if (!$this->imageCache->exists($location)) {
+            return new NotFoundResponse("File {$location} does not exist");
         }
 
-        $this->imageCache->delete($filename);
+        $this->imageCache->delete($location);
         return new SuccessResponse(
-            "File {$filename} was successfully deleted from"
+            "File {$location} was successfully deleted from"
             . " cache source and from cache with all thumbnails"
         );
     }
 
     /**
      * Handles PATCH request for rebuilding cached resource with all its thumbnails
-     * @param RequestInterface $request
+     * @param string $location
      * @return ResponseInterface
      */
-    public function actionRebuild(RequestInterface $request): ResponseInterface
+    public function actionRebuild(string $location): ResponseInterface
     {
-        $filename = $request->getUrl(PHP_URL_PATH);
-
-        if (!$this->imageCache->exists($filename)) {
-            return new NotFoundResponse("File {$filename} does not exist");
+        if (!$this->imageCache->exists($location)) {
+            return new NotFoundResponse("File {$location} does not exist");
         }
 
-        $this->imageCache->rebuild($filename);
+        $this->imageCache->rebuild($location);
         return new SuccessResponse(
-            "File {$filename} was successfully rebuilt with all its thumbnails"
+            "File {$location} was successfully rebuilt with all its thumbnails"
         );
     }
 }

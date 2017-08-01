@@ -10,18 +10,15 @@
 
 namespace Strider2038\ImgCache\Response;
 
-use Strider2038\ImgCache\Application;
-
 /**
- * Description of ExceptionResponse
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ExceptionResponse extends ErrorResponse {
     
-    public function __construct(Application $app, \Exception $ex) {
+    public function __construct(\Exception $ex, bool $isDebug = false) {
         $message = null;
-        if ($app->isDebugMode()) {
+
+        if ($isDebug) {
             $message = nl2br($ex->getMessage() . PHP_EOL . $ex->getTraceAsString());
         }
         

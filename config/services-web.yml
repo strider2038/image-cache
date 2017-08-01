@@ -1,0 +1,77 @@
+parameters:
+  isDebug: true
+  security.accessToken: 'sample-security-token-must-be-replaced-with-real'
+  imageCache.cacheDirectory: '/services/imgcache/web'
+  filesystemSource.baseDirectory: '/services/imgcache/tests/assets'
+
+services:
+  # core components
+  request:
+    class: \Strider2038\ImgCache\Core\Request
+  security:
+    class: \Strider2038\ImgCache\Core\Security
+    arguments: ['@request', '%security.accessToken%']
+
+  # routing components
+  router:
+    class: \Strider2038\ImgCache\Service\Router
+    arguments: ['@imageValidator']
+
+  # controllers
+  imageController:
+    class: \Strider2038\ImgCache\Service\ImageController
+    arguments: ['@security', '@imageCache', '@request']
+
+  # imaging
+  imageCache:
+    class: \Strider2038\ImgCache\Imaging\ImageCache
+    arguments: ['%imageCache.cacheDirectory%', '@imageFactory', '@thumbnailImageExtractor']
+
+  # imaging/image
+  imageFactory:
+    class: \Strider2038\ImgCache\Imaging\Image\ImageFactory
+    arguments: ['@saveOptionsFactory', '@imageValidator']
+
+  # imaging/extraction
+  thumbnailImageExtractor:
+    class: \Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
+    arguments: ['@thumbnailKeyParser', '@filesystemSourceAccessor', '@thumbnailProcessingConfigurationParser', '@imageProcessor']
+
+  # imaging/parsing
+  thumbnailKeyParser:
+    class: \Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser
+    arguments: ['@keyValidator', '@imageValidator']
+  thumbnailProcessingConfigurationParser:
+    class: \Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser
+    arguments: ['@transformationsFactory', '@saveOptionsFactory', '@saveOptionsConfigurator']
+
+  # imaging/processing
+  saveOptionsFactory:
+    class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+  saveOptionsConfigurator:
+    class: \Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator
+  imageProcessor:
+    class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
+    arguments: ['@imagickEngine']
+  imagickEngine:
+    class: \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine
+
+  # imaging/transformation
+  transformationsFactory:
+    class: \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory
+
+  # imaging/source
+  filesystemSourceAccessor:
+    class: \Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor
+    arguments: ['@filesystemSource', '@directKeyMapper']
+  filesystemSource:
+    class: \Strider2038\ImgCache\Imaging\Source\FilesystemSource
+    arguments: ['%filesystemSource.baseDirectory%', '@imageFactory']
+  directKeyMapper:
+    class: \Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper
+
+  # imaging/validation
+  imageValidator:
+    class: \Strider2038\ImgCache\Imaging\Validation\ImageValidator
+  keyValidator:
+    class: \Strider2038\ImgCache\Imaging\Validation\KeyValidator

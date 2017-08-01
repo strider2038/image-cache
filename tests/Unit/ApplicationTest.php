@@ -4,86 +4,116 @@ namespace Strider2038\ImgCache\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Application;
+use Strider2038\ImgCache\Core\ControllerInterface;
 use Strider2038\ImgCache\Core\RequestInterface;
-use Strider2038\ImgCache\Core\SecurityInterface;
+use Strider2038\ImgCache\Core\ResponseInterface;
+use Strider2038\ImgCache\Core\Route;
+use Strider2038\ImgCache\Core\RouterInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Description of ApplicationTest
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ApplicationTest extends TestCase 
 {
-    
-    /**
-     * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
-     */
-    public function testConstruct_IdIsNotSet_ExceptionThrown(): void
-    {
-        new Application([]);
-    }
-    
-    public function testConstruct_IdIsSet_ReturningAppId(): void 
-    {
-        $app = new Application(['id' => 'test']);
-        $this->assertEquals('test', $app->getId());
-    }
-    
-    public function testConstruct_ComponentsInjected_ComponentsAvailable(): void
-    {
-        $app = new Application([
-            'id' => 'test',
-            'components' => [
-                'request' => function() {
-                    return \Phake::mock(RequestInterface::class);
-                },
-                'security' => function() {
-                    return \Phake::mock(SecurityInterface::class);
-                },
-            ],
-        ]);
+    const CONTROLLER_ID = 'controller';
+    const ACTION_ID = 'action';
+    const LOCATION = '/image.jpeg';
 
-        $this->assertInstanceOf(RequestInterface::class, $app->request);
-        $this->assertInstanceOf(SecurityInterface::class, $app->security);
-    }
-    
-    public function testConstruct_NoComponentsAreSet_CoreComponentsAreAvailable()
+    /** @var ContainerInterface */
+    private $container;
+
+    protected function setUp()
     {
-        $app = new Application([
-            'id' => 'test',
-            'params' => [
-                'securityToken' => '12345678901234567890123456789012',
-            ],
-        ]);
-        $this->assertInstanceOf(RequestInterface::class, $app->request);
-        $this->assertInstanceOf(SecurityInterface::class, $app->security);
+        $this->container = \Phake::mock(ContainerInterface::class);
     }
-    
-    public function testConstruct_ParamIsSet_ParamValueReturned(): void
+
+    public function testRun_ContainerIsEmpty_1IsReturned(): void
     {
-        $app = new Application([
-            'id' => 'test',
-            'params' => [
-                'param' => 'value',
-            ],
-        ]);
-        $this->assertEquals('value', $app->getParam('param'));
+        $this->givenContainer_Get_ThrowsException();
+        $application = $this->createApplication();
+
+        $exitCode = $application->run();
+
+        $this->assertEquals(1, $exitCode);
     }
-    
-    /**
-     * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage is not set
-     */
-    public function testGetParam_ParamIsNotSet_ExceptionThrown(): void
+
+    public function testRun_AllServicesExists_ResponseIsSentAnd0IsReturned(): void
     {
-        $app = new Application([
-            'id' => 'test',
-            'params' => [
-                'a' => 'b',
-            ],
-        ]);
-        $this->assertEquals('b', $app->getParam('a'));
-        $app->getParam('b');
+        $request = $this->givenRequest();
+        $router = $this->givenRouter();
+        $this->givenRouter_GetRoute_ReturnsRoute($router, $request);
+        $controller = $this->givenController();
+        $response = $this->givenController_RunAction_Returns($controller);
+        $application = $this->createApplication();
+
+        $exitCode = $application->run();
+
+        $this->assertEquals(0, $exitCode);
+        $this->assertResponse_Send_IsCalledOnce($response);
+    }
+
+    private function createApplication(): Application
+    {
+        $application = new Application($this->container);
+
+        return $application;
+    }
+
+    private function givenRequest(): RequestInterface
+    {
+        $request = \Phake::mock(RequestInterface::class);
+
+        \Phake::when($this->container)->get('request')->thenReturn($request);
+
+        return $request;
+    }
+
+    private function givenRouter(): RouterInterface
+    {
+        $router = \Phake::mock(RouterInterface::class);
+
+        \Phake::when($this->container)->get('router')->thenReturn($router);
+
+        return $router;
+    }
+
+    private function givenRouter_GetRoute_ReturnsRoute(RouterInterface $router, RequestInterface $request): void
+    {
+        $route = \Phake::mock(Route::class);
+
+        \Phake::when($route)->getControllerId()->thenReturn(self::CONTROLLER_ID);
+        \Phake::when($route)->getActionId()->thenReturn(self::ACTION_ID);
+        \Phake::when($route)->getLocation()->thenReturn(self::LOCATION);
+
+        \Phake::when($router)->getRoute($request)->thenReturn($route);
+    }
+
+    private function givenController(): ControllerInterface
+    {
+        $controller = \Phake::mock(ControllerInterface::class);
+
+        \Phake::when($this->container)->get(self::CONTROLLER_ID)->thenReturn($controller);
+
+        return $controller;
+    }
+
+    private function givenController_RunAction_Returns($controller): ResponseInterface
+    {
+        $response = \Phake::mock(ResponseInterface::class);
+
+        \Phake::when($controller)->runAction(self::ACTION_ID, self::LOCATION)->thenReturn($response);
+
+        return $response;
+    }
+
+    private function assertResponse_Send_IsCalledOnce($response): void
+    {
+        \Phake::verify($response, \Phake::times(1))->send();
+    }
+
+    private function givenContainer_Get_ThrowsException(): void
+    {
+        \Phake::when($this->container)->get(\Phake::anyParameters())->thenThrow(new \Exception());
     }
 }

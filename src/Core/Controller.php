@@ -28,7 +28,7 @@ abstract class Controller implements ControllerInterface
         $this->security = $security;
     }
 
-    public function runAction(string $action, RequestInterface $request): ResponseInterface 
+    public function runAction(string $action, string $location): ResponseInterface
     {
         $actionName = 'action' . ucfirst($action);
         if (!method_exists($this, $actionName)) {
@@ -38,7 +38,7 @@ abstract class Controller implements ControllerInterface
             return new ForbiddenResponse();
         }
         
-        return call_user_func([$this, $actionName], $request);
+        return call_user_func([$this, $actionName], $location);
     }
     
     protected function getSafeActions(): array
@@ -48,12 +48,10 @@ abstract class Controller implements ControllerInterface
     
     private function isActionSafe(string $action): bool
     {
-        if ($this->security === null) {
+        if ($this->security === null || in_array($action, $this->getSafeActions())) {
             return true;
         }
-        if (in_array($action, $this->getSafeActions())) {
-            return true;
-        }
+
         return $this->security->isAuthorized();
     }
 }
