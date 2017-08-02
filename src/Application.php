@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Application
 {
+    const CONFIG_DEBUG = 'app.debug';
+
     /** @var ContainerInterface */
     private $container;
 
@@ -52,11 +54,18 @@ class Application
             
             $response->send();
         } catch (\Exception $ex) {
-            $response = new ExceptionResponse($ex, (bool) $this->container->getParameter('isDebug'));
+            $response = new ExceptionResponse($ex, $this->isDebugMode());
             $response->send();
             return 1;
         }
         return 0;
     }
 
+    public function isDebugMode(): bool
+    {
+        if (!$this->container->hasParameter(self::CONFIG_DEBUG)) {
+            return false;
+        }
+        return (bool) $this->container->getParameter(self::CONFIG_DEBUG);
+    }
 }

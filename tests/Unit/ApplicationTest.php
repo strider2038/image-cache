@@ -9,6 +9,7 @@ use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -16,6 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ApplicationTest extends TestCase 
 {
+    use ProviderTrait;
+
+    const CONFIG_DEBUG = 'app.debug';
     const CONTROLLER_ID = 'controller';
     const ACTION_ID = 'action';
     const LOCATION = '/image.jpeg';
@@ -51,6 +55,20 @@ class ApplicationTest extends TestCase
 
         $this->assertEquals(0, $exitCode);
         $this->assertResponse_Send_IsCalledOnce($response);
+    }
+
+    /**
+     * @param bool $value
+     * @dataProvider boolValuesProvider
+     */
+    public function testIsDebugMode_ContainerHasDebugParameter_BoolIsReturned(bool $value): void
+    {
+        $application = $this->createApplication();
+        $this->givenContainerHasParameterDebug($value);
+
+        $isDebugMode = $application->isDebugMode();
+
+        $this->assertEquals($value, $isDebugMode);
     }
 
     private function createApplication(): Application
@@ -115,5 +133,11 @@ class ApplicationTest extends TestCase
     private function givenContainer_Get_ThrowsException(): void
     {
         \Phake::when($this->container)->get(\Phake::anyParameters())->thenThrow(new \Exception());
+    }
+
+    private function givenContainerHasParameterDebug(bool $value): void
+    {
+        \Phake::when($this->container)->hasParameter(self::CONFIG_DEBUG)->thenReturn(true);
+        \Phake::when($this->container)->getParameter(self::CONFIG_DEBUG)->thenReturn($value);
     }
 }

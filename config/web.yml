@@ -1,8 +1,8 @@
 parameters:
-  isDebug: true
+  app.debug: true
   security.accessToken: 'sample-security-token-must-be-replaced-with-real'
-  imageCache.baseDirectory: '/services/imgcache/web'
-  filesystemSource.baseDirectory: '/services/imgcache/tests/assets/sample'
+  imageCache.baseDirectory: '%app.webDirectory%'
+  filesystemSource.baseDirectory: '%app.webDirectory%/../tests/assets/sample'
 
 services:
   # core components
