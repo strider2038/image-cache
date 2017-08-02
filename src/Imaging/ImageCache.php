@@ -28,7 +28,7 @@ class ImageCache implements ImageCacheInterface
      * Web directory that contains image files
      * @var string
      */
-    private $cacheDirectory;
+    private $baseDirectory;
 
     /**
      * @var ImageExtractorInterface
@@ -46,15 +46,15 @@ class ImageCache implements ImageCacheInterface
     private $imageFactory;
     
     public function __construct(
-        string $cacheDirectory,
+        string $baseDirectory,
         ImageFactoryInterface $imageFactory,
         ImageExtractorInterface $imageExtractor,
         ImageWriterInterface $imageWriter = null
     ) {
-        if (!is_dir($cacheDirectory)) {
-            throw new InvalidConfigException("Directory '{$cacheDirectory}' does not exist");
+        if (!is_dir($baseDirectory)) {
+            throw new InvalidConfigException("Directory '{$baseDirectory}' does not exist");
         }
-        $this->cacheDirectory = rtrim($cacheDirectory, '/');
+        $this->baseDirectory = rtrim($baseDirectory, '/');
         $this->imageFactory = $imageFactory;
         $this->imageExtractor = $imageExtractor;
         $this->imageWriter = $imageWriter;
@@ -108,7 +108,7 @@ class ImageCache implements ImageCacheInterface
 
         $this->imageWriter->delete($key);
 
-        unlink($this->cacheDirectory . $key);
+        unlink($this->baseDirectory . $key);
         // @todo delete all thumbnails
     }
     
@@ -134,7 +134,7 @@ class ImageCache implements ImageCacheInterface
 
     private function composeDestinationFilename(string $key): string
     {
-        return $this->cacheDirectory . $key;
+        return $this->baseDirectory . $key;
     }
 
     private function validateKey(string $key): void

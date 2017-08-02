@@ -20,9 +20,9 @@ class FileTestCase extends ProjectTestCase
 
     const TEST_CACHE_DIR = '/tmp/imgcache-test';
 
-    const IMAGE_CAT300 = 'cat300.jpg';
-    const IMAGE_CAT2000 = 'cat2000.jpg';
-    const IMAGE_RIDER_PNG = 'rider.png';
+    const IMAGE_CAT300 = 'sample/cat300.jpg';
+    const IMAGE_CAT2000 = 'sample/cat2000.jpg';
+    const IMAGE_RIDER_PNG = 'sample/rider.png';
     const IMAGE_BOX_JPG = 'box.jpg';
     const IMAGE_BOX_PNG = 'box.png';
     const FILE_JSON = 'file.json';

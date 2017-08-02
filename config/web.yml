@@ -1,8 +1,8 @@
 parameters:
   isDebug: true
   security.accessToken: 'sample-security-token-must-be-replaced-with-real'
-  imageCache.cacheDirectory: '/services/imgcache/web'
-  filesystemSource.baseDirectory: '/services/imgcache/tests/assets'
+  imageCache.baseDirectory: '/services/imgcache/web'
+  filesystemSource.baseDirectory: '/services/imgcache/tests/assets/sample'
 
 services:
   # core components
@@ -25,7 +25,7 @@ services:
   # imaging
   imageCache:
     class: \Strider2038\ImgCache\Imaging\ImageCache
-    arguments: ['%imageCache.cacheDirectory%', '@imageFactory', '@thumbnailImageExtractor']
+    arguments: ['%imageCache.baseDirectory%', '@imageFactory', '@thumbnailImageExtractor']
 
   # imaging/image
   imageFactory:
