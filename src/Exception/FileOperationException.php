@@ -19,9 +19,8 @@ class FileOperationException extends ApplicationException
 {
     public function __construct(
         $message = "",
-        $code = Response::HTTP_CODE_INTERNAL_SERVER_ERROR,
         \Throwable $previous = null
     ) {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, Response::HTTP_CODE_INTERNAL_SERVER_ERROR, $previous);
     }
 }

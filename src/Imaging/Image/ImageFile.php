@@ -11,8 +11,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Exception\FileOperationException;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -24,14 +24,14 @@ class ImageFile extends AbstractImage implements ImageInterface
 {
     /** @var string */
     private $filename;
-    
-    public function __construct(string $filename, SaveOptions $saveOptions)
+
+    public function __construct(string $filename, FileOperations $fileOperations, SaveOptions $saveOptions)
     {
-        if (!file_exists($filename)) {
+        parent::__construct($fileOperations, $saveOptions);
+        if (!$this->fileOperations->fileExists($filename)) {
             throw new FileNotFoundException("File {$filename} not found");
         }
         $this->filename = $filename;
-        parent::__construct($saveOptions);
     }
     
     public function getFilename(): string
@@ -41,9 +41,7 @@ class ImageFile extends AbstractImage implements ImageInterface
 
     public function saveTo(string $filename): void
     {
-        if (!copy($this->filename, $filename)) {
-            throw new FileOperationException("Cannot copy file '{$this->filename}' to '{$filename}'");
-        }
+        $this->fileOperations->copyFileTo($this->filename, $filename);
     }
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
@@ -53,8 +51,8 @@ class ImageFile extends AbstractImage implements ImageInterface
         return $processingImage;
     }
 
-    public function render(): void
+    public function getBlob(): string
     {
-        echo file_get_contents($this->filename);
+        return $this->fileOperations->getFileContents($this->filename);
     }
 }

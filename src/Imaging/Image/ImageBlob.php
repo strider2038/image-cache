@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -23,15 +24,15 @@ class ImageBlob extends AbstractImage implements ImageInterface
     /** @var string */
     private $data;
 
-    public function __construct(string $data, SaveOptions $saveOptions)
+    public function __construct(string $data, FileOperations $fileOperations, SaveOptions $saveOptions)
     {
+        parent::__construct($fileOperations, $saveOptions);
         $this->data = $data;
-        parent::__construct($saveOptions);
     }
 
     public function saveTo(string $filename): void
     {
-        file_put_contents($filename, $this->data);
+        $this->fileOperations->createFile($filename, $this->data);
     }
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
@@ -41,8 +42,8 @@ class ImageBlob extends AbstractImage implements ImageInterface
         return $processingImage;
     }
 
-    public function render(): void
+    public function getBlob(): string
     {
-        echo $this->data;
+        return $this->data;
     }
 }

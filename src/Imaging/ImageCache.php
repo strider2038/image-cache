@@ -21,6 +21,7 @@ use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @todo File operations service
  */
 class ImageCache implements ImageCacheInterface
 {

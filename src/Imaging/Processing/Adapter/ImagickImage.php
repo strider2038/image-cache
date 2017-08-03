@@ -11,6 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing\Adapter;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Image\AbstractImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -25,9 +26,9 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
     /** @var \Imagick */
     private $imagick;
     
-    public function __construct(\Imagick $processor, SaveOptions $saveOptions)
+    public function __construct(\Imagick $processor, FileOperations $fileOperations, SaveOptions $saveOptions)
     {
-        parent::__construct($saveOptions);
+        parent::__construct($fileOperations, $saveOptions);
         $this->imagick = $processor;
     }
     
@@ -53,6 +54,7 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
 
     public function saveTo(string $filename): void
     {
+        // @todo create directory
         $this->imagick->writeImage($filename);
     }
 
@@ -64,8 +66,8 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
         return $image;
     }
 
-    public function render(): void
+    public function getBlob(): string
     {
-        echo $this->imagick->getImageBlob();
+        return $this->imagick->getImageBlob();
     }
 }

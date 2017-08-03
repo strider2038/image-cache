@@ -10,68 +10,70 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
+use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Image\ImageBlob;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Tests\Support\FileTestCase;
+use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
-class ImageBlobTest extends FileTestCase
+class ImageBlobTest extends TestCase
 {
-    use ImageTrait;
+    use ImageTrait, FileOperationsTrait;
 
-    const VALID_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/valid_destination_file.jpg';
+    const BLOB = 'raw_image';
+    const DESTINATION_FILENAME = '/tmp/file.jpg';
 
     /** @var SaveOptions */
     private $saveOptions;
 
+    /** @var FileOperations */
+    private $fileOperations;
+
     protected function setUp()
     {
-        parent::setUp();
         $this->saveOptions = \Phake::mock(SaveOptions::class);
+        $this->fileOperations = $this->givenFileOperations();
     }
 
-    public function testSaveTo_GivenData_DataSavedToFile(): void
+    public function testSaveTo_GivenBlob_DataSavedToFile(): void
     {
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
-        $image = $this->createImage(file_get_contents($filename));
+        $image = $this->createImage(self::BLOB);
 
-        $image->saveTo(self::VALID_DESTINATION_FILENAME);
+        $image->saveTo(self::DESTINATION_FILENAME);
 
-        $this->assertFileExists(self::VALID_DESTINATION_FILENAME);
+        $this->assertFileOperations_CreateFile_IsCalledOnce(
+            $this->fileOperations,
+            self::DESTINATION_FILENAME,
+            self::BLOB
+        );
     }
 
-    public function testOpen_GivenData_ProcessingImageInterfaceIsReturned(): void
+    public function testOpen_GivenBlob_ProcessingImageInterfaceIsReturned(): void
     {
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
-        $blob = file_get_contents($filename);
-        $image = $this->createImage($blob);
+        $image = $this->createImage(self::BLOB);
         $expectedProcessingImage = $this->givenProcessingImage();
-        $processingEngine = $this->givenProcessingEngine_OpenFromBlob_Returns($blob, $expectedProcessingImage);
+        $processingEngine = $this->givenProcessingEngine_OpenFromBlob_Returns(self::BLOB, $expectedProcessingImage);
 
         $processingImage = $image->open($processingEngine);
 
         $this->assertSame($expectedProcessingImage, $processingImage);
     }
 
-    /**
-     * @runInSeparateProcess
-     * @group separate
-     */
-    public function testRender_GivenFile_ContentsIsEchoed(): void
+    public function testGetBlob_GivenBlob_BlobIsReturned(): void
     {
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
-        $blob = file_get_contents($filename);
-        $image = $this->createImage($blob);
-        $this->expectOutputString($blob);
+        $image = $this->createImage(self::BLOB);
 
-        $image->render();
+        $blob = $image->getBlob();
+
+        $this->assertEquals(self::BLOB, $blob);
     }
 
     private function createImage(string $blob): ImageBlob
     {
-        $image = new ImageBlob($blob, $this->saveOptions);
+        $image = new ImageBlob($blob, $this->fileOperations, $this->saveOptions);
 
         return $image;
     }

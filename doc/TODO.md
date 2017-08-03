@@ -2,8 +2,10 @@
 
 - [x] Migrate to Symfony Dependency Injection component
 - [ ] File operations service
+- [ ] Refactor render methods in images (eliminate side effect in classes)
 - [ ] Refactor controllers and routing to use different image caches
 - [ ] Basic logging
+- [ ] Transformation classes refactoring (changing names and using flyweight pattern)
 - [ ] Image saving with options
 - [ ] Image writing to sources
 - [ ] Cache mechanism for source accessor

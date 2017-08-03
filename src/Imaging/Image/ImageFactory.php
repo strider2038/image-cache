@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
@@ -27,12 +28,17 @@ class ImageFactory implements ImageFactoryInterface
     /** @var ImageValidatorInterface */
     private $imageValidator;
 
+    /** @var FileOperations */
+    private $fileOperations;
+
     public function __construct(
         SaveOptionsFactoryInterface $saveOptionsFactory,
-        ImageValidatorInterface $imageValidator
+        ImageValidatorInterface $imageValidator,
+        FileOperations $fileOperations
     ) {
         $this->saveOptionsFactory = $saveOptionsFactory;
         $this->imageValidator = $imageValidator;
+        $this->fileOperations = $fileOperations;
     }
 
     public function createImageFile(string $filename): ImageFile
@@ -44,7 +50,7 @@ class ImageFactory implements ImageFactoryInterface
             throw new InvalidMediaTypeException("File '{$filename}' has unsupported mime type");
         }
 
-        $image = new ImageFile($filename, $this->createSaveOptions());
+        $image = new ImageFile($filename, $this->fileOperations, $this->createSaveOptions());
 
         return $image;
     }
@@ -55,7 +61,7 @@ class ImageFactory implements ImageFactoryInterface
             throw new InvalidMediaTypeException('Image has unsupported mime type');
         }
 
-        $image = new ImageBlob($blob, $this->createSaveOptions());
+        $image = new ImageBlob($blob, $this->fileOperations, $this->createSaveOptions());
 
         return $image;
     }

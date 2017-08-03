@@ -148,7 +148,7 @@ class ResizeTest extends TestCase
             public function getSaveOptions(): SaveOptions {}
             public function saveTo(string $filename): void {}
             public function open(ProcessingEngineInterface $engine): ProcessingImageInterface {}
-            public function render(): void {}
+            public function getBlob(): string {}
         };
 
         return $image;

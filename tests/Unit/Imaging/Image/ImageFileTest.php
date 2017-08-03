@@ -11,30 +11,37 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
+use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Tests\Support\{
-    FileTestCase, Phake\ImageTrait, TestImages
-};
+use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
+use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageFileTest extends FileTestCase
+class ImageFileTest extends TestCase
 {
-    use ImageTrait;
+    use ImageTrait, FileOperationsTrait;
 
-    const VALID_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/valid_destination_file.jpg';
+    const FILENAME = '/tmp/file.jpg';
+    const BLOB = 'blob';
+    const COPY_FILENAME = '/tmp/file-copy.jpg';
 
     /** @var SaveOptions */
     private $saveOptions;
+
+    /** @var FileOperations */
+    private $fileOperations;
 
     protected function setUp()
     {
         parent::setUp();
         $this->saveOptions = \Phake::mock(SaveOptions::class);
+        $this->fileOperations = $this->givenFileOperations();
     }
 
     /**
@@ -44,57 +51,61 @@ class ImageFileTest extends FileTestCase
      */
     public function testConstruct_FileDoesNotExist_ExceptionThrown(): void
     {
-        $this->createImage(self::TEST_CACHE_DIR . '/not.existing');
+        $this->givenFileOperations_FileExists_Returns($this->fileOperations, self::FILENAME, false);
+
+        $this->createImage();
     }
 
     public function testConstruct_FileExists_FileNameIsCorrect(): void
     {
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
+        $this->givenFileOperations_FileExists_Returns($this->fileOperations, self::FILENAME, true);
 
-        $image = $this->createImage($filename);
+        $image = $this->createImage();
 
         $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertEquals($filename, $image->getFilename());
+        $this->assertEquals(self::FILENAME, $image->getFilename());
     }
 
     public function testSaveTo_FileExists_FileCopiedToDestination(): void
     {
-        $image = $this->createImage($this->givenFile(self::IMAGE_BOX_PNG));
-        $this->assertFileNotExists(self::VALID_DESTINATION_FILENAME);
+        $this->givenFileOperations_FileExists_Returns($this->fileOperations, self::FILENAME, true);
+        $image = $this->createImage();
 
-        $image->saveTo(self::VALID_DESTINATION_FILENAME);
+        $image->saveTo(self::COPY_FILENAME);
 
-        $this->assertFileExists(self::VALID_DESTINATION_FILENAME);
+        $this->assertFileOperations_CopyFileTo_IsCalledOnce(
+            $this->fileOperations,
+            self::FILENAME,
+            self::COPY_FILENAME
+        );
     }
 
-    public function testOpen_FileExists_ProcessingImageInterfaceIsReturned(): void
+    public function testOpen_GivenFile_ProcessingImageInterfaceIsReturned(): void
     {
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
-        $image = $this->createImage($filename);
+        $this->givenFileOperations_FileExists_Returns($this->fileOperations, self::FILENAME, true);
+        $image = $this->createImage();
         $expectedProcessingImage = $this->givenProcessingImage();
-        $processingEngine = $this->givenProcessingEngine_OpenFromFile_Returns($filename, $expectedProcessingImage);
+        $processingEngine = $this->givenProcessingEngine_OpenFromFile_Returns(self::FILENAME, $expectedProcessingImage);
 
         $processingImage = $image->open($processingEngine);
 
         $this->assertSame($expectedProcessingImage, $processingImage);
     }
 
-    /**
-     * @runInSeparateProcess
-     * @group separate
-     */
-    public function testRender_GivenFile_ContentsIsEchoed(): void
+    public function testGetBlob_GivenFile_BlobIsReturned(): void
     {
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
-        $image = $this->createImage($filename);
-        $this->expectOutputString(file_get_contents($filename));
+        $this->givenFileOperations_FileExists_Returns($this->fileOperations, self::FILENAME, true);
+        $image = $this->createImage();
+        $this->givenFileOperations_GetFileContents_Returns($this->fileOperations, self::FILENAME, self::BLOB);
 
-        $image->render();
+        $blob = $image->getBlob();
+
+        $this->assertEquals(self::BLOB, $blob);
     }
 
-    private function createImage(string $filename): ImageFile
+    private function createImage(): ImageFile
     {
-        $image = new ImageFile($filename, $this->saveOptions);
+        $image = new ImageFile(self::FILENAME, $this->fileOperations, $this->saveOptions);
 
         return $image;
     }

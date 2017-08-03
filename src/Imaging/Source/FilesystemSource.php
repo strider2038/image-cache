@@ -18,6 +18,7 @@ use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @todo File operations service
  */
 class FilesystemSource implements FilesystemSourceInterface
 {

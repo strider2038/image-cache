@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
@@ -20,8 +21,12 @@ abstract class AbstractImage implements ImageInterface
     /** @var SaveOptions */
     protected $saveOptions;
 
-    public function __construct(SaveOptions $saveOptions)
+    /** @var FileOperations */
+    protected $fileOperations;
+
+    public function __construct(FileOperations $fileOperations, SaveOptions $saveOptions)
     {
+        $this->fileOperations = $fileOperations;
         $this->saveOptions = $saveOptions;
     }
 

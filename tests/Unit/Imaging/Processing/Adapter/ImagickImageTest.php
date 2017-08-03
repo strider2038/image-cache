@@ -10,14 +10,18 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Adapter;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
+use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 
 class ImagickImageTest extends FileTestCase
 {
+    use FileOperationsTrait;
+
     const TEST_IMAGE_FILE = self::TEST_CACHE_DIR . '/imagick.jpg';
     const TEST_IMAGE_DESTINATION_FILE = self::TEST_CACHE_DIR . '/imagick_result.jpg';
 
@@ -27,11 +31,15 @@ class ImagickImageTest extends FileTestCase
     /** @var SaveOptions */
     private $saveOptions;
 
+    /** @var FileOperations */
+    private $fileOperations;
+
     protected function setUp()
     {
         parent::setUp();
         $this->givenFile(self::IMAGE_CAT300, self::TEST_IMAGE_FILE);
         $this->saveOptions = \Phake::mock(SaveOptions::class);
+        $this->fileOperations = $this->givenFileOperations();
     }
 
     public function testGetHeight_GivenImage_HeightReturned(): void
@@ -95,7 +103,7 @@ class ImagickImageTest extends FileTestCase
     private function createImagickImage(string $filename = self::TEST_IMAGE_FILE): ImagickImage
     {
         $imagick = new \Imagick($filename);
-        $image = new ImagickImage($imagick, $this->saveOptions);
+        $image = new ImagickImage($imagick, $this->fileOperations, $this->saveOptions);
 
         return $image;
     }
