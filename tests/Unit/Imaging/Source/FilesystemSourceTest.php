@@ -11,35 +11,44 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source;
 
+use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSource;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
-use Strider2038\ImgCache\Tests\Support\FileTestCase;
+use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FilesystemSourceTest extends FileTestCase
+class FilesystemSourceTest extends TestCase
 {
+    use FileOperationsTrait;
+
+    const BASE_DIRECTORY = '/base';
     const FILENAME_NOT_EXIST = 'not.exist';
-    const FILENAME_EXISTS_FULL = self::TEST_CACHE_DIR . '/cat.jpg';
+    const FILENAME_EXISTS_FULL = self::BASE_DIRECTORY . '/cat.jpg';
     const FILENAME_EXISTS = 'cat.jpg';
 
     /** @var ImageFactoryInterface */
     private $imageFactory;
+
+    /** @var FileOperations */
+    private $fileOperations;
     
     public function setUp() 
     {
         parent::setUp();
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
+        $this->fileOperations = $this->givenFileOperations();
     }
     
     public function testConstruct_BaseDirectoryExists_BaseDirectoryIsReturned(): void
     {
         $source = $this->createFilesystemSource();
 
-        $this->assertEquals(self::TEST_CACHE_DIR . '/', $source->getBaseDirectory());
+        $this->assertEquals(self::BASE_DIRECTORY . '/', $source->getBaseDirectory());
     }
 
     /**
@@ -49,7 +58,8 @@ class FilesystemSourceTest extends FileTestCase
      */
     public function testConstruct_BaseDirectoryDoesNotExist_ExceptionThrown(): void
     {
-        $this->createFilesystemSource(self::TEST_CACHE_DIR . '/not-exist');
+        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, false);
+        new FilesystemSource(self::BASE_DIRECTORY, $this->fileOperations, $this->imageFactory);
     }
     
     public function testGet_FileDoesNotExist_NullIsReturned(): void
@@ -65,8 +75,8 @@ class FilesystemSourceTest extends FileTestCase
     public function testGet_FileExists_ImageIsReturned(): void
     {
         $source = $this->createFilesystemSource();
-        $this->givenAssetFile(self::IMAGE_BOX_PNG, self::FILENAME_EXISTS_FULL);
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
+        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
         $this->givenImageFactory_CreateImageFile_ReturnsImageFile(self::FILENAME_EXISTS);
 
         $image = $source->get($filenameKey);
@@ -87,7 +97,7 @@ class FilesystemSourceTest extends FileTestCase
     public function testExists_FileExists_TrueIsReturned(): void
     {
         $source = $this->createFilesystemSource();
-        $this->givenAssetFile(self::IMAGE_BOX_PNG, self::FILENAME_EXISTS_FULL);
+        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
 
         $exists = $source->exists($filenameKey);
@@ -95,9 +105,11 @@ class FilesystemSourceTest extends FileTestCase
         $this->assertTrue($exists);
     }
 
-    private function createFilesystemSource(string $baseDirectory = self::TEST_CACHE_DIR): FilesystemSource
+    private function createFilesystemSource(string $baseDirectory = self::BASE_DIRECTORY): FilesystemSource
     {
-        $source = new FilesystemSource($baseDirectory, $this->imageFactory);
+        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, true);
+
+        $source = new FilesystemSource($baseDirectory, $this->fileOperations, $this->imageFactory);
 
         return $source;
     }

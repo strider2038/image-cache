@@ -22,6 +22,8 @@ class ImagickImageTest extends FileTestCase
 {
     use FileOperationsTrait;
 
+    const BLOB = 'blob';
+
     const TEST_IMAGE_FILE = self::TEST_CACHE_DIR . '/imagick.jpg';
     const TEST_IMAGE_DESTINATION_FILE = self::TEST_CACHE_DIR . '/imagick_result.jpg';
 
@@ -98,6 +100,17 @@ class ImagickImageTest extends FileTestCase
         $processingImage = $image->open($engine);
 
         $this->assertInstanceOf(ProcessingImageInterface::class, $processingImage);
+    }
+
+    public function testGetBlob_GivenImagick_GetImageBlobIsReturned(): void
+    {
+        $imageFilename = $this->givenAssetFile(self::IMAGE_BOX_PNG);
+        $imagick = new \Imagick($imageFilename);
+        $image = new ImagickImage($imagick, $this->fileOperations, $this->saveOptions);
+
+        $blob = $image->getBlob();
+
+        $this->assertSame($imagick->getImageBlob(), $blob);
     }
 
     private function createImagickImage(string $filename = self::TEST_IMAGE_FILE): ImagickImage

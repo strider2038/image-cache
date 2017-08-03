@@ -11,6 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Source;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Exception\InvalidConfigException;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
@@ -18,7 +19,6 @@ use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
- * @todo File operations service
  */
 class FilesystemSource implements FilesystemSourceInterface
 {
@@ -27,13 +27,22 @@ class FilesystemSource implements FilesystemSourceInterface
 
     /** @var ImageFactoryInterface */
     private $imageFactory;
-    
-    public function __construct(string $baseDirectory, ImageFactoryInterface $imageFactory) {
-        $this->baseDirectory = rtrim($baseDirectory, '/') . '/';
 
-        if (!is_dir($this->baseDirectory)) {
+    /** @var FileOperations */
+    private $fileOperations;
+    
+    public function __construct(
+        string $baseDirectory,
+        FileOperations $fileOperations,
+        ImageFactoryInterface $imageFactory
+    ) {
+        $this->fileOperations = $fileOperations;
+
+        $this->baseDirectory = rtrim($baseDirectory, '/');
+        if (!$this->fileOperations->isDirectory($this->baseDirectory)) {
             throw new InvalidConfigException("Directory '{$this->baseDirectory}' does not exist");
         }
+        $this->baseDirectory .= '/';
 
         $this->imageFactory = $imageFactory;
     }
@@ -47,7 +56,7 @@ class FilesystemSource implements FilesystemSourceInterface
     {
         $sourceFilename = $this->composeSourceFilename($key);
         
-        if (!file_exists($sourceFilename)) {
+        if (!$this->fileOperations->isFile($sourceFilename)) {
             return null;
         }
 
@@ -58,7 +67,7 @@ class FilesystemSource implements FilesystemSourceInterface
     {
         $sourceFilename = $this->composeSourceFilename($key);
 
-        return file_exists($sourceFilename);
+        return $this->fileOperations->isFile($sourceFilename);
     }
 
     private function composeSourceFilename(FilenameKeyInterface $key): string
