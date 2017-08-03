@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Core\Request;
 use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
+use Strider2038\ImgCache\Exception\InvalidConfigException;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
 use Strider2038\ImgCache\Exception\RequestException;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
@@ -24,10 +25,15 @@ use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
  */
 class Router implements RouterInterface
 {
+    const DEFAULT_CONTROLLER_ID = 'imageController';
+
     /** @var ImageValidatorInterface */
     private $imageValidator;
 
-    protected $methodsToActions = [
+    /** @var string[] */
+    private $urlMaskToControllersMap;
+
+    private $methodsToActionsMap = [
         Request::METHOD_GET    => 'get',
         Request::METHOD_POST   => 'create',
         Request::METHOD_PUT    => 'replace',
@@ -35,16 +41,21 @@ class Router implements RouterInterface
         Request::METHOD_DELETE => 'delete',
     ];
 
-    public function __construct(ImageValidatorInterface $imageValidator)
+    public function __construct(ImageValidatorInterface $imageValidator, array $urlMaskToControllersMap = [])
     {
         $this->imageValidator = $imageValidator;
+        $this->urlMaskToControllersMap = [];
+        foreach ($urlMaskToControllersMap as $prefix => $controllerId) {
+            $this->validateUrlMapRow($prefix, $controllerId);
+            $this->urlMaskToControllersMap[str_replace('/', '\/', $prefix)] = $controllerId;
+        }
     }
 
     public function getRoute(RequestInterface $request): Route 
     {
         $requestMethod = $request->getMethod();
         
-        if (!array_key_exists($requestMethod, $this->methodsToActions)) {
+        if (!array_key_exists($requestMethod, $this->methodsToActionsMap)) {
             throw new InvalidRouteException('Route not found');
         }
         
@@ -53,10 +64,44 @@ class Router implements RouterInterface
             throw new RequestException('Requested file has incorrect extension');
         }
 
-        return new Route(
-            'imageController',
-            $this->methodsToActions[$requestMethod],
-            $request->getUrl()
-        );
+        [$controllerId, $location] = $this->splitUrlToControllerAndLocation($request->getUrl());
+
+        return new Route($controllerId, $this->methodsToActionsMap[$requestMethod], $location);
+    }
+
+    private function splitUrlToControllerAndLocation(string $url): array
+    {
+        if (count($this->urlMaskToControllersMap) <= 0) {
+            return [self::DEFAULT_CONTROLLER_ID, $url];
+        }
+
+        foreach ($this->urlMaskToControllersMap as $prefix => $controllerId) {
+            if (preg_match_all('/^' . $prefix . '\/(?<url>.*)$/i', $url, $matches)) {
+                if (!empty($matches['url'][0])) {
+                    return [$controllerId, '/' . $matches['url'][0]];
+                }
+            }
+        }
+
+        throw new InvalidRouteException('Route not found');
+    }
+
+    private function validateUrlMapRow(string $prefix, string $controllerId): void
+    {
+        if (empty($prefix) || $prefix === '/') {
+            throw new InvalidConfigException(
+                "Url mask to controllers map is invalid: prefix cannot be empty or slash"
+            );
+        }
+        if (!preg_match('/^\/([A-Z0-9_]+(\/){0,1})*[^\/|\s]$/i', $prefix)) {
+            throw new InvalidConfigException(
+                "Url mask to controllers map is invalid: incorrect prefix '{$prefix}'"
+            );
+        }
+        if (!preg_match('/[A-Z]+[A-Z0-9]{0,}/i', $controllerId)) {
+            throw new InvalidConfigException(
+                "Url mask to controllers map is invalid: controller id can contain only latin characters and digits"
+            );
+        }
     }
 }

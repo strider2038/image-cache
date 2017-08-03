@@ -23,6 +23,7 @@ use Strider2038\ImgCache\Service\Router;
 class RouterTest extends TestCase
 {
     const REQUEST_URL = '/a.jpg';
+    const REQUEST_METHOD_GET = 'GET';
 
     /** @var RequestInterface */
     private $request;
@@ -35,7 +36,60 @@ class RouterTest extends TestCase
         $this->request = \Phake::mock(RequestInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
     }
-    
+
+    /**
+     * @param array $map
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Url mask to controllers map is invalid
+     * @dataProvider invalidUrlMaskToControllersMapProvider
+     */
+    public function testConstruct_GivenInvalidUrlMaskToControllersMap_ExceptionThrown(array $map): void
+    {
+        $this->createRouter($map);
+    }
+
+    /**
+     * @param array $map
+     * @dataProvider validUrlMaskToControllersMapProvider
+     */
+    public function testConstruct_GivenValidUrlMaskToControllersMap_ExceptionThrown(array $map): void
+    {
+        $router = $this->createRouter($map);
+
+        $this->assertInstanceOf(Router::class, $router);
+    }
+
+    public function invalidUrlMaskToControllersMapProvider(): array
+    {
+        return [
+            [['' => 'value']],
+            [['/' => 'value']],
+            [['/no_slash_at_end/' => 'value']],
+            [['/кириллица' => 'value']],
+            [['/ ' => 'value']],
+            [['/  ' => 'value']],
+            [['/i ' => 'value']],
+            [['/i j' => 'value']],
+            [['/i//j' => 'value']],
+            [['/i' => '/']],
+            [['/i' => '']],
+            [['/i' => ' ']],
+            [['/i' => 0]],
+        ];
+    }
+
+    public function validUrlMaskToControllersMapProvider(): array
+    {
+        return [
+            [['/i' => 'v']],
+            [['/0' => 'value']],
+            [['/key_1' => 'value']],
+            [['/i/j/k' => 'value']],
+            [['/i' => 'V1']],
+        ];
+    }
+
     /**
      * @dataProvider requestMethodsProvider
      */
@@ -46,7 +100,7 @@ class RouterTest extends TestCase
         $router = $this->createRouter();
         $this->givenRequest_GetMethod_Returns($requestMethod);
         $this->givenRequest_GetUrl_Returns(self::REQUEST_URL);
-        $this->givenImageValidator_HasValidImageExtension_Returns(true);
+        $this->givenImageValidator_HasValidImageExtension_Returns(self::REQUEST_URL,true);
 
         $route = $router->getRoute($this->request);
         
@@ -59,7 +113,7 @@ class RouterTest extends TestCase
     public function requestMethodsProvider(): array
     {
         return [
-            ['GET', 'get'],
+            [self::REQUEST_METHOD_GET, 'get'],
             ['POST', 'create'],
             ['PUT', 'replace'],
             ['PATCH', 'rebuild'],
@@ -69,6 +123,7 @@ class RouterTest extends TestCase
     
     /**
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRouteException
+     * @expectedExceptionCode 404
      * @expectedExceptionMessage Route not found
      */
     public function testGetRoute_RequestMethodIsNotSet_ExceptionThrown(): void
@@ -80,21 +135,88 @@ class RouterTest extends TestCase
 
     /**
      * @expectedException \Strider2038\ImgCache\Exception\RequestException
+     * @expectedExceptionCode 400
      * @expectedExceptionMessage Requested file has incorrect extension
      */
     public function testGetRoute_RequestedFileHasNotAllowedExtension_ExceptionThrown(): void 
     {
         $router = $this->createRouter();
-        $this->givenRequest_GetMethod_Returns('GET');
+        $this->givenRequest_GetMethod_Returns(self::REQUEST_METHOD_GET);
         $this->givenRequest_GetUrl_Returns('/a.php');
-        $this->givenImageValidator_HasValidImageExtension_Returns(false);
+        $this->givenImageValidator_HasValidImageExtension_Returns(self::REQUEST_URL,false);
         
         $router->getRoute($this->request);
     }
 
-    private function createRouter(): Router
+    /**
+     * @param array $map
+     * @param string $requestUrl
+     * @param string $controllerId
+     * @param string $location
+     * @dataProvider validUrlMaskToControllersMapAndUrlAndControllerIdAndLocationProvider
+     */
+    public function testGetRoute_GivenUrlMaskToControllersMap_RouteWithGivenControllerIdAndLocationIsReturned(
+        array $map,
+        string $requestUrl,
+        string $controllerId,
+        string $location
+    ): void {
+        $router = $this->createRouter($map);
+        $this->givenRequest_GetMethod_Returns(self::REQUEST_METHOD_GET);
+        $this->givenRequest_GetUrl_Returns($requestUrl);
+        $this->givenImageValidator_HasValidImageExtension_Returns($requestUrl,true);
+
+        $route = $router->getRoute($this->request);
+
+        $this->assertEquals($controllerId, $route->getControllerId());
+        $this->assertEquals($location, $route->getLocation());
+    }
+
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidRouteException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessage Route not found
+     * @param array $map
+     * @param string $requestUrl
+     * @dataProvider invalidUrlMaskToControllersMapAndUrlAndControllerIdAndLocationProvider
+     */
+    public function testGetRoute_GivenInvalidUrlMaskToControllersMap_ExceptionThrown(
+        array $map,
+        string $requestUrl
+    ): void {
+        $router = $this->createRouter($map);
+        $this->givenRequest_GetMethod_Returns(self::REQUEST_METHOD_GET);
+        $this->givenRequest_GetUrl_Returns($requestUrl);
+        $this->givenImageValidator_HasValidImageExtension_Returns($requestUrl,true);
+
+        $router->getRoute($this->request);
+    }
+
+    public function validUrlMaskToControllersMapAndUrlAndControllerIdAndLocationProvider(): array
     {
-        $router = new Router($this->imageValidator);
+        return [
+            [['/i' => 'controller1'], '/i/file.jpg', 'controller1', '/file.jpg'],
+            [['/i/j' => 'controller2'], '/i/j/k/file.jpg', 'controller2', '/k/file.jpg'],
+            [
+                ['/i' => 'controller1', '/j' => 'controller2'],
+                '/j/image.png',
+                'controller2',
+                '/image.png',
+            ],
+        ];
+    }
+
+    public function invalidUrlMaskToControllersMapAndUrlAndControllerIdAndLocationProvider(): array
+    {
+        return [
+            [['/i' => 'controller1'], '/ij/file.jpg'],
+            [['/i' => 'controller1'], 'file.jpg'],
+        ];
+    }
+
+    private function createRouter(array $urlMaskToControllersMap = []): Router
+    {
+        $router = new Router($this->imageValidator, $urlMaskToControllersMap);
 
         return $router;
     }
@@ -109,8 +231,8 @@ class RouterTest extends TestCase
         \Phake::when($this->request)->getUrl(\Phake::anyParameters())->thenReturn($value);
     }
 
-    private function givenImageValidator_HasValidImageExtension_Returns(bool $value): void
+    private function givenImageValidator_HasValidImageExtension_Returns(string $url, bool $value): void
     {
-        \Phake::when($this->imageValidator)->hasValidImageExtension(self::REQUEST_URL)->thenReturn($value);
+        \Phake::when($this->imageValidator)->hasValidImageExtension($url)->thenReturn($value);
     }
 }

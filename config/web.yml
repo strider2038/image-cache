@@ -1,8 +1,10 @@
 parameters:
   app.debug: true
   security.accessToken: 'sample-security-token-must-be-replaced-with-real'
-  imageCache.baseDirectory: '%app.webDirectory%'
+  imageCache.baseDirectory: '%app.webDirectory%/i'
   filesystemSource.baseDirectory: '%app.webDirectory%/../tests/assets/sample'
+  routes:
+    /i: 'imageController'
 
 services:
   # core components
@@ -17,7 +19,7 @@ services:
   # routing components
   router:
     class: \Strider2038\ImgCache\Service\Router
-    arguments: ['@imageValidator']
+    arguments: ['@imageValidator', '%routes%']
 
   # controllers
   imageController:
