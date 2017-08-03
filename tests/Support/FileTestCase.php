@@ -11,10 +11,12 @@
 
 namespace Strider2038\ImgCache\Tests\Support;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FileTestCase extends ProjectTestCase
+class FileTestCase extends TestCase
 {
     private const FILES_DIR = '/../assets/';
 
@@ -26,6 +28,9 @@ class FileTestCase extends ProjectTestCase
     const IMAGE_BOX_JPG = 'box.jpg';
     const IMAGE_BOX_PNG = 'box.png';
     const FILE_JSON = 'file.json';
+    const DIRECTORY_NAME = 'dirname';
+
+    const FILENAME_NOT_EXIST = self::TEST_CACHE_DIR . '/not.exist';
     
     protected function setUp() 
     {
@@ -40,7 +45,25 @@ class FileTestCase extends ProjectTestCase
         //exec('rm -rf ' . self::TEST_CACHE_DIR);
     }
 
-    public function givenFile(string $name, string $copyFilename = null): string
+    public function givenDirectory(): string
+    {
+        $directory = self::TEST_CACHE_DIR . '/' . self::DIRECTORY_NAME;
+        if (!mkdir($directory)) {
+            throw new \Exception("Cannot create directory '{$directory}'");
+        }
+
+        return $directory;
+    }
+
+    public function givenFile(): string
+    {
+        $filename = self::TEST_CACHE_DIR . '/' . self::FILE_JSON;
+        $this->givenAssetFile(self::FILE_JSON, $filename);
+
+        return $filename;
+    }
+
+    public function givenAssetFile(string $name, string $copyFilename = null): string
     {
         $filename = __DIR__ . self::FILES_DIR . $name;
 

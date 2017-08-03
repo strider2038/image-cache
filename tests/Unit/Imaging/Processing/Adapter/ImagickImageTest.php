@@ -37,7 +37,7 @@ class ImagickImageTest extends FileTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->givenFile(self::IMAGE_CAT300, self::TEST_IMAGE_FILE);
+        $this->givenAssetFile(self::IMAGE_CAT300, self::TEST_IMAGE_FILE);
         $this->saveOptions = \Phake::mock(SaveOptions::class);
         $this->fileOperations = $this->givenFileOperations();
     }
@@ -91,7 +91,7 @@ class ImagickImageTest extends FileTestCase
 
     public function testOpen_GivenImage_ProcessingImageIsReturned(): void
     {
-        $imageFilename = $this->givenFile(self::IMAGE_BOX_PNG);
+        $imageFilename = $this->givenAssetFile(self::IMAGE_BOX_PNG);
         $image = $this->createImagickImage($imageFilename);
         $engine = $this->givenProcessingEngine();
 

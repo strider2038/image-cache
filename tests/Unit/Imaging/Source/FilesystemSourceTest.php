@@ -65,7 +65,7 @@ class FilesystemSourceTest extends FileTestCase
     public function testGet_FileExists_ImageIsReturned(): void
     {
         $source = $this->createFilesystemSource();
-        $this->givenFile(self::IMAGE_BOX_PNG, self::FILENAME_EXISTS_FULL);
+        $this->givenAssetFile(self::IMAGE_BOX_PNG, self::FILENAME_EXISTS_FULL);
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $this->givenImageFactory_CreateImageFile_ReturnsImageFile(self::FILENAME_EXISTS);
 
@@ -87,7 +87,7 @@ class FilesystemSourceTest extends FileTestCase
     public function testExists_FileExists_TrueIsReturned(): void
     {
         $source = $this->createFilesystemSource();
-        $this->givenFile(self::IMAGE_BOX_PNG, self::FILENAME_EXISTS_FULL);
+        $this->givenAssetFile(self::IMAGE_BOX_PNG, self::FILENAME_EXISTS_FULL);
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
 
         $exists = $source->exists($filenameKey);

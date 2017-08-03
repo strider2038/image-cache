@@ -248,7 +248,7 @@ class ImageControllerTest extends FileTestCase
     {
         $image = \Phake::mock(ImageFile::class);
 
-        \Phake::when($image)->getFilename()->thenReturn($this->givenFile(self::IMAGE_BOX_PNG));
+        \Phake::when($image)->getFilename()->thenReturn($this->givenAssetFile(self::IMAGE_BOX_PNG));
 
         return $image;
     }

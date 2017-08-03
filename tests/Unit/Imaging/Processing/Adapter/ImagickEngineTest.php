@@ -40,7 +40,7 @@ class ImagickEngineTest extends FileTestCase
     {
         $engine = $this->createImagick();
         $saveOptions = \Phake::mock(SaveOptions::class);
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
+        $filename = $this->givenAssetFile(self::IMAGE_BOX_PNG);
 
         $image = $engine->openFromFile($filename, $saveOptions);
 
@@ -53,7 +53,7 @@ class ImagickEngineTest extends FileTestCase
     {
         $engine = $this->createImagick();
         $saveOptions = \Phake::mock(SaveOptions::class);
-        $filename = $this->givenFile(self::IMAGE_BOX_PNG);
+        $filename = $this->givenAssetFile(self::IMAGE_BOX_PNG);
         $blob = file_get_contents($filename);
 
         $image = $engine->openFromBlob($blob, $saveOptions);

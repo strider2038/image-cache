@@ -23,12 +23,20 @@ trait FileOperationsTrait
         return \Phake::mock(FileOperations::class);
     }
 
-    public function givenFileOperations_FileExists_Returns(
+    public function givenFileOperations_IsFile_Returns(
         FileOperations $fileOperations,
         string $filename,
         bool $value
     ): void {
-        \Phake::when($fileOperations)->fileExists($filename)->thenReturn($value);
+        \Phake::when($fileOperations)->isFile($filename)->thenReturn($value);
+    }
+
+    public function givenFileOperations_IsDirectory_Returns(
+        FileOperations $fileOperations,
+        string $directory,
+        bool $value
+    ): void {
+        \Phake::when($fileOperations)->isDirectory($directory)->thenReturn($value);
     }
 
     public function givenFileOperations_GetFileContents_Returns(
@@ -53,5 +61,10 @@ trait FileOperationsTrait
         string $data
     ): void {
         \Phake::verify($fileOperations, \Phake::times(1))->createFile($filename, $data);
+    }
+
+    public function assertFileOperations_DeleteFile_IsCalledOnce(FileOperations $fileOperations, string $filename): void
+    {
+        \Phake::verify($fileOperations, \Phake::times(1))->deleteFile($filename);
     }
 }

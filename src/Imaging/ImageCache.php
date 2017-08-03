@@ -11,6 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Exception\InvalidConfigException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Exception\NotAllowedException;
@@ -21,7 +22,6 @@ use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
- * @todo File operations service
  */
 class ImageCache implements ImageCacheInterface
 {
@@ -30,6 +30,9 @@ class ImageCache implements ImageCacheInterface
      * @var string
      */
     private $baseDirectory;
+
+    /** @var FileOperations */
+    private $fileOperations;
 
     /**
      * @var ImageExtractorInterface
@@ -48,11 +51,13 @@ class ImageCache implements ImageCacheInterface
     
     public function __construct(
         string $baseDirectory,
+        FileOperations $fileOperations,
         ImageFactoryInterface $imageFactory,
         ImageExtractorInterface $imageExtractor,
         ImageWriterInterface $imageWriter = null
     ) {
-        if (!is_dir($baseDirectory)) {
+        $this->fileOperations = $fileOperations;
+        if (!$this->fileOperations->isDirectory($baseDirectory)) {
             throw new InvalidConfigException("Directory '{$baseDirectory}' does not exist");
         }
         $this->baseDirectory = rtrim($baseDirectory, '/');
@@ -109,7 +114,7 @@ class ImageCache implements ImageCacheInterface
 
         $this->imageWriter->delete($key);
 
-        unlink($this->baseDirectory . $key);
+        $this->fileOperations->deleteFile($this->baseDirectory . $key);
         // @todo delete all thumbnails
     }
     
@@ -126,8 +131,8 @@ class ImageCache implements ImageCacheInterface
 
         // @todo cascade thumbnail rebuild
         $destinationFilename = $this->composeDestinationFilename($key);
-        if (file_exists($destinationFilename)) {
-            unlink($destinationFilename);
+        if ($this->fileOperations->isFile($destinationFilename)) {
+            $this->fileOperations->deleteFile($destinationFilename);
         }
 
         $this->get($key);

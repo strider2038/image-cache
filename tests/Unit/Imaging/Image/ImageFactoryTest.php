@@ -48,7 +48,7 @@ class ImageFactoryTest extends TestCase
     public function testCreateImageFile_GivenImage_ImageFileIsReturned(): void
     {
         $factory = $this->createImageFactory();
-        $this->givenFileOperations_FileExists_Returns($this->fileOperations, self::FILENAME, true);
+        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME, true);
         $this->givenImageValidator_HasValidImageExtension_Returns(true);
         $this->givenImageValidator_HasFileValidImageMimeType_Returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_Create_ReturnsSaveOptions();

@@ -28,7 +28,7 @@ class ImageFile extends AbstractImage implements ImageInterface
     public function __construct(string $filename, FileOperations $fileOperations, SaveOptions $saveOptions)
     {
         parent::__construct($fileOperations, $saveOptions);
-        if (!$this->fileOperations->fileExists($filename)) {
+        if (!$this->fileOperations->isFile($filename)) {
             throw new FileNotFoundException("File {$filename} not found");
         }
         $this->filename = $filename;

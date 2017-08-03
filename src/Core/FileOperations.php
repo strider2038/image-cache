@@ -7,9 +7,14 @@ use Strider2038\ImgCache\Exception\FileOperationException;
 class FileOperations
 {
 
-    public function fileExists(string $filename): bool
+    public function isFile(string $filename): bool
     {
-        return file_exists($filename);
+        return file_exists($filename) && !is_dir($filename);
+    }
+
+    public function isDirectory(string $directory): bool
+    {
+        return is_dir($directory);
     }
 
     public function copyFileTo(string $source, string $destination): void
@@ -46,6 +51,17 @@ class FileOperations
             }
         } catch (\Exception $exception) {
             throw new FileOperationException("Cannot create file '{$filename}'", $exception);
+        }
+    }
+
+    public function deleteFile(string $filename): void
+    {
+        try {
+            if (!unlink($filename)) {
+                throw new FileOperationException("Cannot delete file '{$filename}'");
+            }
+        } catch (\Exception $exception) {
+            throw new FileOperationException("Cannot delete file '{$filename}'", $exception);
         }
     }
 

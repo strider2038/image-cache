@@ -10,29 +10,39 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging;
 
+use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
-use Strider2038\ImgCache\Tests\Support\FileTestCase;
+use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
+use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
-class ImageCacheTest extends FileTestCase
+class ImageCacheTest extends TestCase
 {
+    use FileOperationsTrait, ImageTrait;
+
+    const BASE_DIRECTORY = '/cache';
+
     const INVALID_KEY = 'a';
 
     const GET_KEY = '/a.jpg';
-    const GET_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/a.jpg';
+    const GET_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/a.jpg';
 
     const INSERT_KEY = '/b.jpg';
     const INSERT_DATA = 'data';
 
     const DELETE_KEY = '/c.jpg';
-    const DELETE_KEY_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/c.jpg';
+    const DELETE_KEY_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/c.jpg';
 
     const REBUILD_KEY = '/d.jpg';
-    const REBUILD_DESTINATION_FILENAME = self::TEST_CACHE_DIR . '/d.jpg';
+    const REBUILD_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/d.jpg';
+
+    /** @var FileOperations */
+    private $fileOperations;
 
     /** @var ImageExtractorInterface */
     private $imageExtractor;
@@ -43,6 +53,7 @@ class ImageCacheTest extends FileTestCase
     protected function setUp()
     {
         parent::setUp();
+        $this->fileOperations = $this->givenFileOperations();
         $this->imageExtractor = \Phake::mock(ImageExtractorInterface::class);
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
     }
@@ -54,8 +65,11 @@ class ImageCacheTest extends FileTestCase
      */
     public function testConstruct_CacheDirectoryIsInvalid_ExceptionThrown(): void
     {
+        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, false);
+
         new ImageCache(
-            $this->givenFile(self::IMAGE_BOX_PNG),
+            self::BASE_DIRECTORY,
+            $this->fileOperations,
             $this->imageFactory,
             $this->imageExtractor
         );
@@ -64,7 +78,7 @@ class ImageCacheTest extends FileTestCase
     public function testGet_ImageDoesNotExistInSource_NullIsReturned(): void
     {
         $cache = $this->createImageCache();
-        $this->givenImageExtractorReturnsNull();
+        $this->givenImageExtractor_Extract_ReturnsNull();
 
         $image = $cache->get(self::GET_KEY);
 
@@ -74,14 +88,14 @@ class ImageCacheTest extends FileTestCase
     public function testGet_ImageExistsInSource_SourceImageSavedToWebDirectoryAndCachedImageIsReturned(): void
     {
         $cache = $this->createImageCache();
-        $extractedImage = $this->givenImageExtractorReturnsImage(self::GET_KEY);
-        $createdImage = $this->givenImageFactoryCreatesImageFile($this->imageFactory, self::GET_DESTINATION_FILENAME);
+        $extractedImage = $this->givenImageExtractor_Extract_ReturnsImage(self::GET_KEY);
+        $createdImage = $this->givenImageFactory_CreateImageFile_ReturnsImage($this->imageFactory, self::GET_DESTINATION_FILENAME);
 
         $image = $cache->get(self::GET_KEY);
 
         $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertImageSavedTo($extractedImage, self::GET_DESTINATION_FILENAME);
-        $this->assertImageFactoryCreateImageFileIsCalled($this->imageFactory, self::GET_DESTINATION_FILENAME);
+        $this->assertImage_SavedTo_IsCalledOnce($extractedImage, self::GET_DESTINATION_FILENAME);
+        $this->assertImageFactory_CreateImageFile_IsCalledOnce($this->imageFactory, self::GET_DESTINATION_FILENAME);
         $this->assertSame($createdImage, $image);
     }
 
@@ -121,14 +135,13 @@ class ImageCacheTest extends FileTestCase
 
     public function testDelete_ImageWriterIsSpecified_DeleteMethodCalled(): void
     {
-        $this->givenFile(self::IMAGE_BOX_PNG, self::DELETE_KEY_DESTINATION_FILENAME);
         $writer = \Phake::mock(ImageWriterInterface::class);
         $cache = $this->createImageCache($writer);
 
         $cache->delete(self::DELETE_KEY);
 
         \Phake::verify($writer, \Phake::times(1))->delete(self::DELETE_KEY);
-        $this->assertFileNotExists(self::DELETE_KEY_DESTINATION_FILENAME);
+        $this->assertFileOperations_DeleteFile_IsCalledOnce($this->fileOperations, self::DELETE_KEY_DESTINATION_FILENAME);
     }
 
     public function testExists_KeyIsSet_ExistsCalledWithKeyAndValueReturned(): void
@@ -145,12 +158,13 @@ class ImageCacheTest extends FileTestCase
     public function testRebuild_CachedImageExists_ImageRemovedFromCacheAndSavedFromSourceToWebDirectory(): void
     {
         $cache = $this->createImageCacheWithMockedGetMethod();
-        $this->givenFile(self::IMAGE_BOX_PNG, self::REBUILD_DESTINATION_FILENAME);
+        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::REBUILD_DESTINATION_FILENAME, true);
 
         $cache->rebuild(self::REBUILD_KEY);
 
         $this->assertFileNotExists(self::REBUILD_DESTINATION_FILENAME);
         $this->assertEquals(self::REBUILD_KEY, $cache->testGetKey);
+        $this->assertFileOperations_DeleteFile_IsCalledOnce($this->fileOperations, self::REBUILD_DESTINATION_FILENAME);
     }
 
     /**
@@ -181,8 +195,11 @@ class ImageCacheTest extends FileTestCase
 
     private function createImageCache(ImageWriterInterface $writer = null): ImageCache
     {
+        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, true);
+
         $cache = new ImageCache(
-            self::TEST_CACHE_DIR,
+            self::BASE_DIRECTORY,
+            $this->fileOperations,
             $this->imageFactory,
             $this->imageExtractor,
             $writer
@@ -193,11 +210,14 @@ class ImageCacheTest extends FileTestCase
 
     private function createImageCacheWithMockedGetMethod()
     {
-        $dir = self::TEST_CACHE_DIR;
+        $dir = self::BASE_DIRECTORY;
+        $fileOperations = $this->fileOperations;
         $imageFactory = $this->imageFactory;
         $imageExtractor = $this->imageExtractor;
 
-        $cache = new class ($dir, $imageFactory, $imageExtractor) extends ImageCache {
+        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, true);
+
+        $cache = new class ($dir, $fileOperations, $imageFactory, $imageExtractor) extends ImageCache {
             public $testGetKey = null;
             public function get(string $key): ?ImageInterface
             {
@@ -209,14 +229,14 @@ class ImageCacheTest extends FileTestCase
         return $cache;
     }
 
-    private function givenImageExtractorReturnsNull(): void
+    private function givenImageExtractor_Extract_ReturnsNull(): void
     {
         \Phake::when($this->imageExtractor)
             ->extract(\Phake::anyParameters())
             ->thenReturn(null);
     }
 
-    private function givenImageExtractorReturnsImage(string $imageKey): ImageInterface
+    private function givenImageExtractor_Extract_ReturnsImage(string $imageKey): ImageInterface
     {
         $image = \Phake::mock(ImageInterface::class);
 

@@ -50,7 +50,7 @@ class ApiTestCase extends FileTestCase
     {
         $filename = static::getTestWebDir() . $urlPrefix . $name;
 
-        copy($this->givenFile($name), $filename);
+        copy($this->givenAssetFile($name), $filename);
 
         return [$filename, '/i/' . $name];
     }
