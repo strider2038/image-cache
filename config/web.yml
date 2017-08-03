@@ -11,6 +11,8 @@ services:
   security:
     class: \Strider2038\ImgCache\Core\Security
     arguments: ['@request', '%security.accessToken%']
+  fileOperations:
+    class: \Strider2038\ImgCache\Core\FileOperations
 
   # routing components
   router:
@@ -25,12 +27,12 @@ services:
   # imaging
   imageCache:
     class: \Strider2038\ImgCache\Imaging\ImageCache
-    arguments: ['%imageCache.baseDirectory%', '@imageFactory', '@thumbnailImageExtractor']
+    arguments: ['%imageCache.baseDirectory%', '@fileOperations', '@imageFactory', '@thumbnailImageExtractor']
 
   # imaging/image
   imageFactory:
     class: \Strider2038\ImgCache\Imaging\Image\ImageFactory
-    arguments: ['@saveOptionsFactory', '@imageValidator']
+    arguments: ['@saveOptionsFactory', '@imageValidator', '@fileOperations']
 
   # imaging/extraction
   thumbnailImageExtractor:
@@ -55,6 +57,7 @@ services:
     arguments: ['@imagickEngine']
   imagickEngine:
     class: \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine
+    arguments: ['@fileOperations']
 
   # imaging/transformation
   transformationsFactory:
@@ -66,7 +69,7 @@ services:
     arguments: ['@filesystemSource', '@directKeyMapper']
   filesystemSource:
     class: \Strider2038\ImgCache\Imaging\Source\FilesystemSource
-    arguments: ['%filesystemSource.baseDirectory%', '@imageFactory']
+    arguments: ['%filesystemSource.baseDirectory%', '@fileOperations', '@imageFactory']
   directKeyMapper:
     class: \Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper
 
