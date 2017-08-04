@@ -18,15 +18,11 @@ Thumbs.db
 # composer vendor dir
 /vendor
 
-# directory with images for dummy source
-/isource
-/tests/isource
-
 # web directories
 /web/*
 !/web/index.php
-/tests/web/*
-!/tests/web/index.php
 
 # test reports
-/tests/report
+/tests/report/
+/tests/app/filesource/
+/tests/app/web/

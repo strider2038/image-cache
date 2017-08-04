@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Functional\Api;
+namespace Strider2038\ImgCache\Tests\Acceptance\Api;
 
 use Strider2038\ImgCache\Core\Response;
 use Strider2038\ImgCache\Tests\Support\ApiTestCase;

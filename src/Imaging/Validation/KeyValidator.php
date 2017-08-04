@@ -22,7 +22,7 @@ class KeyValidator implements KeyValidatorInterface
             return false;
         }
         // incorrect symbols in filename
-        if (!preg_match('/^[A-Za-z0-9_\.\/]+$/', $filename)) {
+        if (!preg_match('/^[A-Za-z0-9_\-\.\/]+$/', $filename)) {
             return false;
         }
         // duplicating slashes

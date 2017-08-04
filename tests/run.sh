@@ -6,6 +6,8 @@ for i in $@; do
         tests_type="./Unit"
     elif [[ "$i" == "--functional" || "$i" == "-f" ]]; then
         tests_type="./Functional"
+    elif [[ "$i" == "--acceptance" || "$i" == "-a" ]]; then
+        tests_type="./Acceptance"
     fi
 done
 

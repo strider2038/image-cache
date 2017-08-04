@@ -56,7 +56,7 @@ class KeyValidatorTest extends TestCase
             /* 21 */ ['/path/image..JPG', false],
             /* 22 */ ['/path/image_sz80x100.jpg', true],
             /* 23 */ ['//path//image_sz80x100.jpg', false],
-            /* 24 */ ['_root/i_q95.jpeg', true],
+            /* 24 */ ['_root/i-2_q95.jpeg', true],
         ];
     }
 
