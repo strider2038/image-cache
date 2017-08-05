@@ -1,11 +1,22 @@
 parameters:
   imageCache.baseDirectory: '%test.webDirectory%'
   filesystemSource.baseDirectory: '%test.filesourceDirectory%'
+  log.directory: '%test.runtimeDirectory%'
 
 services:
+  # external
+  filesystem:
+    class: \Symfony\Component\Filesystem\Filesystem
+
   # core components
+  loggerFactory:
+    class: \Strider2038\ImgCache\Core\LoggerFactory
+    arguments: ['%log.directory%']
+  logger:
+    factory: ['@loggerFactory', 'createLogger']
   fileOperations:
     class: \Strider2038\ImgCache\Core\FileOperations
+    arguments: ['@filesystem', '@logger']
 
   # imaging
   imageCache:

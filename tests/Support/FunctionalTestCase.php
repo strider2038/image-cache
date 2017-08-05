@@ -24,6 +24,7 @@ class FunctionalTestCase extends TestCase
     const APPLICATION_DIRECTORY = __DIR__ . '/../app';
     const FILESOURCE_DIRECTORY = self::APPLICATION_DIRECTORY . '/filesource';
     const WEB_DIRECTORY = self::APPLICATION_DIRECTORY . '/web';
+    const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
 
     private const ASSETS_DIRECTORY = __DIR__ . '/../assets/';
     private const IMAGE_JPEG_FILENAME = self::ASSETS_DIRECTORY . 'sample/cat300.jpg';
@@ -39,6 +40,10 @@ class FunctionalTestCase extends TestCase
         if (!mkdir(self::WEB_DIRECTORY)) {
             throw new \Exception('Cannot create test web directory');
         }
+        exec('rm -rf ' . self::RUNTIME_DIRECTORY);
+        if (!mkdir(self::RUNTIME_DIRECTORY)) {
+            throw new \Exception('Cannot create test runtime directory');
+        }
     }
 
     protected function loadContainer(string $filename): ContainerInterface
@@ -49,6 +54,7 @@ class FunctionalTestCase extends TestCase
         $loader->load('config/' . $filename);
         $container->setParameter('test.webDirectory', self::WEB_DIRECTORY);
         $container->setParameter('test.filesourceDirectory', self::FILESOURCE_DIRECTORY);
+        $container->setParameter('test.runtimeDirectory', self::RUNTIME_DIRECTORY);
 
         return $container;
     }

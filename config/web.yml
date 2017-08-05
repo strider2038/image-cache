@@ -1,20 +1,31 @@
 parameters:
   app.debug: true
   security.accessToken: 'sample-security-token-must-be-replaced-with-real'
+  log.directory: '%app.webDirectory%/../runtime'
   imageCache.baseDirectory: '%app.webDirectory%/i'
   filesystemSource.baseDirectory: '%app.webDirectory%/../tests/assets/sample'
   routes:
     /i: 'imageController'
 
 services:
+  # external
+  filesystem:
+    class: \Symfony\Component\Filesystem\Filesystem
+
   # core components
   request:
     class: \Strider2038\ImgCache\Core\Request
   security:
     class: \Strider2038\ImgCache\Core\Security
     arguments: ['@request', '%security.accessToken%']
+  loggerFactory:
+    class: \Strider2038\ImgCache\Core\LoggerFactory
+    arguments: ['%log.directory%']
+  logger:
+    factory: ['@loggerFactory', 'createLogger']
   fileOperations:
     class: \Strider2038\ImgCache\Core\FileOperations
+    arguments: ['@filesystem', '@logger']
 
   # routing components
   router:

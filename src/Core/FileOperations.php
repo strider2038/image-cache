@@ -2,10 +2,24 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Exception\FileOperationException;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 
 class FileOperations
 {
+    /** @var Filesystem */
+    private $filesystem;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(Filesystem $filesystem, LoggerInterface $logger)
+    {
+        $this->filesystem = $filesystem;
+        $this->logger = $logger;
+    }
 
     public function isFile(string $filename): bool
     {
@@ -20,10 +34,11 @@ class FileOperations
     public function copyFileTo(string $source, string $destination): void
     {
         try {
-            if (!copy($source, $destination)) {
-                throw new FileOperationException("Cannot copy file from '{$source}' to '{$destination}'");
-            }
-        } catch (\Exception $exception) {
+            $this->filesystem->copy($source, $destination);
+            $this->logger->info(
+                "File copied from '{$source}' to '{$destination}'"
+            );
+        } catch (IOException $exception) {
             throw new FileOperationException("Cannot copy file from '{$source}' to '{$destination}'", $exception);
         }
     }
@@ -32,13 +47,15 @@ class FileOperations
     {
         try {
             $contents = file_get_contents($filename);
-
-            if ($contents === false) {
-                throw new FileOperationException("Cannot read file '{$filename}'");
-            }
         } catch (\Exception $exception) {
             throw new FileOperationException("Cannot read file '{$filename}'", $exception);
         }
+
+        if ($contents === false) {
+            throw new FileOperationException("Cannot read file '{$filename}'");
+        }
+
+        $this->logger->info("Contents of file '{$filename}' was read");
 
         return $contents;
     }
@@ -46,57 +63,41 @@ class FileOperations
     public function createFile(string $filename, string $data): void
     {
         try {
-            if (!file_put_contents($filename, $data)) {
-                throw new FileOperationException("Cannot create file '{$filename}'");
-            }
-        } catch (\Exception $exception) {
+            $this->filesystem->dumpFile($filename, $data);
+            $this->logger->info("File '{$filename}' was created");
+        } catch (IOException $exception) {
             throw new FileOperationException("Cannot create file '{$filename}'", $exception);
         }
     }
 
     public function deleteFile(string $filename): void
     {
+        if (!$this->isFile($filename)) {
+            throw new FileOperationException("Cannot delete file '{$filename}': it does not exist");
+        }
         try {
-            if (!unlink($filename)) {
-                throw new FileOperationException("Cannot delete file '{$filename}'");
-            }
-        } catch (\Exception $exception) {
-            throw new FileOperationException("Cannot delete file '{$filename}'", $exception);
+            $this->filesystem->remove($filename);
+            $this->logger->info("File '{$filename}' was deleted");
+        } catch (IOException $exception) {
+            throw new FileOperationException(
+                "Cannot delete file '{$filename}' because of unexpected error",
+                $exception
+            );
         }
     }
 
-    public function createDirectory(
-        string $directory, 
-        int $mode = 0775, 
-        bool $recursive = true
-    ): void {
-        if (is_dir($directory)) {
-            return;
-        }
-
-        $parentDirectory = dirname($directory);
-        if ($recursive && !is_dir($parentDirectory) && $parentDirectory !== $directory) {
-            $this->createDirectory($parentDirectory, $mode, $recursive);
-        }
-
+    public function createDirectory(string $directory, int $mode = 0775): void
+    {
         try {
-            if (!mkdir($directory, $mode)) {
-                throw new FileOperationException("Cannot create directory '{$directory}'");
-            }
-        } catch (\Exception $previous) {
-            if (!is_dir($directory)) {
-                throw new FileOperationException("Cannot create directory '{$directory}'", $previous);
-            }
-        }
-
-        try {
-            if (!chmod($directory, $mode)) {
-                throw new FileOperationException("Cannot change permissions for directory '{$directory}'");
-            }
-        } catch (\Exception $previous) {
-            throw new FileOperationException("Cannot change permissions for directory '{$directory}'", $previous);
+            $this->filesystem->mkdir($directory, $mode);
+            $this->logger->info(sprintf(
+                "Directory '%s' was created recursively with mode %s",
+                $directory,
+                decoct($mode)
+            ));
+        } catch (IOException $exception) {
+            throw new FileOperationException("Cannot create directory '{$directory}'", $exception);
         }
     }
-
 
 }
