@@ -19,12 +19,13 @@ use Strider2038\ImgCache\Exception\FileNotFoundException;
  */
 class FileResponse extends Response
 {
+    /** @var string */
     protected $filename;
     
     public function __construct(string $filename)
     {
         if (!file_exists($filename)) {
-            throw new FileNotFoundException();
+            throw new FileNotFoundException("File '{$filename}' not found");
         }
         parent::__construct(self::HTTP_CODE_OK);
 
@@ -39,10 +40,12 @@ class FileResponse extends Response
         $chunkSize = 8 * 1024 * 1024; // 8MB per chunk
 
         $stream = fopen($this->filename, 'r');
+
         while (!feof($stream)) {
             echo fread($stream, $chunkSize);
             flush();
         }
+
         fclose($stream);
     }
 }

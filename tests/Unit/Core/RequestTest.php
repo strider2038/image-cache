@@ -19,6 +19,8 @@ use Strider2038\ImgCache\Core\Request;
  */
 class RequestTest extends TestCase
 {
+    const REQUEST_URI = 'http://example.org';
+    const REQUEST_URI_SCHEME = 'http';
 
     /**
      * @dataProvider requestMethodsProvider
@@ -26,7 +28,9 @@ class RequestTest extends TestCase
     public function testConstruct_RequestMethodIsSet_RequestMethodReturned($method)
     {
         $_SERVER['REQUEST_METHOD'] = $method;
-        $request = new Request();
+
+        $request = $this->createRequest();
+
         $this->assertEquals($method, $request->getMethod());
     }
     
@@ -44,7 +48,9 @@ class RequestTest extends TestCase
     public function testConstruct_RequestMethodNotSet_NullReturned(): void
     {   
         unset($_SERVER['REQUEST_METHOD']);
-        $request = new Request();
+
+        $request = $this->createRequest();
+
         $this->assertNull($request->getMethod());
     }
     
@@ -54,12 +60,11 @@ class RequestTest extends TestCase
     public function testGetHeader_HeaderIsSet_HeaderReturned($header, $value): void
     {
         $_SERVER[$header] = $value;
-        
-        $request = new Request();
-        $this->assertEquals(
-            $value, 
-            $request->getHeader(Request::HEADER_AUTHORIZATION)
-        );
+        $request = $this->createRequest();
+
+        $actualHeader = $request->getHeader(Request::HEADER_AUTHORIZATION);
+
+        $this->assertEquals($value, $actualHeader);
     }
     
     public function headersProvider(): array
@@ -71,7 +76,37 @@ class RequestTest extends TestCase
     
     public function testGetHeader_HeaderIsNotSet_NullReturned(): void
     {
+        $request = $this->createRequest();
+
+        $header = $request->getHeader('UNKNOWN_HEADER');
+
+        $this->assertNull($header);
+    }
+
+    public function testGetUrl_GivenRequestURIInServer_UrlIsReturned(): void
+    {
+        $_SERVER['REQUEST_URI'] = self::REQUEST_URI;
+        $request = $this->createRequest();
+
+        $url = $request->getUrl();
+
+        $this->assertEquals(self::REQUEST_URI, $url);
+    }
+
+    public function testGetUrl_GivenRequestURIInServerAndComponent_ComponentOfUrlIsReturned(): void
+    {
+        $_SERVER['REQUEST_URI'] = self::REQUEST_URI;
+        $request = $this->createRequest();
+
+        $url = $request->getUrl(PHP_URL_SCHEME);
+
+        $this->assertEquals(self::REQUEST_URI_SCHEME, $url);
+    }
+
+    private function createRequest(): Request
+    {
         $request = new Request();
-        $this->assertNull($request->getHeader('UNKNOWN_HEADER'));
+
+        return $request;
     }
 }

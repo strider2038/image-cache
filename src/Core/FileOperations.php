@@ -57,8 +57,8 @@ class FileOperations
             throw new FileOperationException("Cannot read file '{$filename}'", $exception);
         }
 
-        if ($contents === false) {
-            throw new FileOperationException("Cannot read file '{$filename}'");
+        if (empty($contents)) {
+            throw new FileOperationException("File '{$filename}' is empty");
         }
 
         $this->logger->info("Contents of file '{$filename}' was read");

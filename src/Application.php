@@ -49,6 +49,7 @@ class Application
     public function run(): int 
     {
         try {
+
             $this->logger->debug('Application started');
 
             /** @var RequestInterface $request */
@@ -69,17 +70,11 @@ class Application
             $response->send();
 
             $this->logger->debug(sprintf('Application ended. Response %d is sent', $response->getHttpCode()));
+
         } catch (\Exception $exception) {
-            $this->logger->error(sprintf(
-                "Application exception\nCode: %d\nMessage: %s\nFile: %s\nLine: %d\nStack trace:\n%s\n",
-                $exception->getCode(),
-                $exception->getMessage(),
-                $exception->getFile(),
-                $exception->getLine(),
-                $exception->getTraceAsString()
-            ));
 
             $response = new ExceptionResponse($exception, $this->isDebugMode());
+            $this->logger->error($response->getMessage());
             $response->send();
 
             return 1;

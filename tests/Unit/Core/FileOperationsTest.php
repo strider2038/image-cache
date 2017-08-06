@@ -26,6 +26,7 @@ class FileOperationsTest extends FileTestCase
     const CREATE_FILENAME = self::TEST_CACHE_DIR . '/fs_create.dat';
     const CREATE_FILENAME_CONTENTS = 'create_filename';
     const CREATE_DIRECTORY_NAME = '/tmp/test';
+    const EMPTY_FILENAME = self::TEST_CACHE_DIR . '/empty.dat';
 
     /** @var Filesystem */
     private $filesystem;
@@ -145,6 +146,19 @@ class FileOperationsTest extends FileTestCase
         $fileOperations = $this->createFileOperations();
 
         $fileOperations->getFileContents('/not.exist');
+    }
+
+    /**
+     * @expectedException \Strider2038\ImgCache\Exception\FileOperationException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessageRegExp  /File .* is empty/
+     */
+    public function testGetFileContents_GivenFileIsEmpty_ExceptionThrown(): void
+    {
+        file_put_contents(self::EMPTY_FILENAME, '');
+        $fileOperations = $this->createFileOperations();
+
+        $fileOperations->getFileContents(self::EMPTY_FILENAME);
     }
 
     public function testCreateFile_GivenFilenameAndContents_FilesystemDumpFileIsCalled(): void

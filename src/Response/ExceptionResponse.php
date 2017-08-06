@@ -14,18 +14,27 @@ namespace Strider2038\ImgCache\Response;
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ExceptionResponse extends ErrorResponse {
-    
-    public function __construct(\Exception $ex, bool $isDebug = false) {
-        $message = null;
 
+    /** @var string */
+    private $message = '';
+
+    public function __construct(\Exception $exception, bool $isDebug = false) {
         if ($isDebug) {
-            $message = nl2br($ex->getMessage() . PHP_EOL . $ex->getTraceAsString());
+            $this->message = sprintf(
+                "Application exception #%d '%s' in file: %s (%d)\n\nStack trace:\n%s\n",
+                $exception->getCode(),
+                $exception->getMessage(),
+                $exception->getFile(),
+                $exception->getLine(),
+                $exception->getTraceAsString()
+            );
         }
-        
-        parent::__construct(
-            self::HTTP_CODE_INTERNAL_SERVER_ERROR,
-            $message
-        );
+
+        parent::__construct(self::HTTP_CODE_INTERNAL_SERVER_ERROR, nl2br($this->message));
     }
-    
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
 }

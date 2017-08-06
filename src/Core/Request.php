@@ -32,7 +32,8 @@ class Request implements RequestInterface
     public function __construct() 
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? '');
-        if (in_array($method, static::getAvailableMethods())) {
+
+        if (in_array($method, $this->getAvailableMethods())) {
             $this->method = $method;
         }
     }
@@ -44,20 +45,23 @@ class Request implements RequestInterface
     
     public function getHeader(string $key): ?string 
     {
-        if (!in_array($key, self::getAvailableHeaders())) {
+        if (!in_array($key, $this->getAvailableHeaders())) {
             return null;
         }
+
         return $_SERVER[$key] ?? null;
     }
     
-    public function getUrl(int $component = null): string
+    public function getUrl(int $component = -1): string
     {
         if ($this->requestUri === null) {
             $this->requestUri = $_SERVER['REQUEST_URI'];
         }
-        if ($component === null || $component <= 0) {
+
+        if ($component < 0) {
             return $this->requestUri;
         }
+
         return parse_url($this->requestUri, $component);
     }
 
@@ -69,7 +73,7 @@ class Request implements RequestInterface
     /**
      * @return string[]
      */
-    public static function getAvailableMethods(): array
+    public function getAvailableMethods(): array
     {
         return [
             self::METHOD_GET,
@@ -83,7 +87,7 @@ class Request implements RequestInterface
     /**
      * @return string[]
      */
-    public static function getAvailableHeaders(): array
+    public function getAvailableHeaders(): array
     {
         return [
             self::HEADER_AUTHORIZATION,
