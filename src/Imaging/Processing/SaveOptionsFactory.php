@@ -15,8 +15,25 @@ namespace Strider2038\ImgCache\Imaging\Processing;
  */
 class SaveOptionsFactory implements SaveOptionsFactoryInterface
 {
+    /** @var int */
+    private $quality = SaveOptions::QUALITY_VALUE_DEFAULT;
+
+    public function getQuality(): int
+    {
+        return $this->quality;
+    }
+
+    public function setQuality(int $quality): void
+    {
+        $this->quality = $quality;
+    }
+
     public function create(): SaveOptions
     {
-        return new SaveOptions();
+        $saveOptions = new SaveOptions();
+
+        $saveOptions->setQuality($this->quality);
+
+        return $saveOptions;
     }
 }

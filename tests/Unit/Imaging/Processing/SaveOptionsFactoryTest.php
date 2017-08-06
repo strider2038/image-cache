@@ -16,12 +16,33 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory;
 
 class SaveOptionsFactoryTest extends TestCase
 {
-    public function testCreate_Nop_SaveOptionsIsReturned(): void
+    const QUALITY = 51;
+
+    public function testCreate_GivenQuality_SaveOptionsWithInjectedPropertiesIsReturned(): void
     {
-        $saveOptionsFactory = new SaveOptionsFactory();
+        $saveOptionsFactory = $this->createSaveOptionsFactory();
+        $saveOptionsFactory->setQuality(self::QUALITY);
 
         $saveOptions = $saveOptionsFactory->create();
 
         $this->assertInstanceOf(SaveOptions::class, $saveOptions);
+        $this->assertEquals(self::QUALITY, $saveOptions->getQuality());
+    }
+
+    public function testGetQuality_GivenQuality_QualityValueIsReturned(): void
+    {
+        $saveOptionsFactory = $this->createSaveOptionsFactory();
+        $saveOptionsFactory->setQuality(self::QUALITY);
+
+        $quality = $saveOptionsFactory->getQuality();
+
+        $this->assertEquals(self::QUALITY, $quality);
+    }
+
+    private function createSaveOptionsFactory(): SaveOptionsFactory
+    {
+        $saveOptionsFactory = new SaveOptionsFactory();
+
+        return $saveOptionsFactory;
     }
 }

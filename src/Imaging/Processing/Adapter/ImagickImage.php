@@ -11,6 +11,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing\Adapter;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Imaging\Image\AbstractImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
@@ -25,13 +27,22 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
 {
     /** @var \Imagick */
     private $imagick;
+
+    /** @var LoggerInterface */
+    private $logger;
     
     public function __construct(\Imagick $processor, FileOperations $fileOperations, SaveOptions $saveOptions)
     {
         parent::__construct($fileOperations, $saveOptions);
         $this->imagick = $processor;
+        $this->logger = new NullLogger();
     }
-    
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function getHeight(): int
     {
         return $this->imagick->getImageHeight();
@@ -54,8 +65,22 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
 
     public function saveTo(string $filename): void
     {
-        // @todo create directory
+        $directory = dirname($filename);
+
+        if (!$this->fileOperations->isDirectory($directory)) {
+            $this->fileOperations->createDirectory($directory);
+        }
+
+        $quality = $this->saveOptions->getQuality();
+
+        $this->imagick->setImageCompressionQuality($quality);
         $this->imagick->writeImage($filename);
+
+        $this->logger->info(sprintf(
+            'Processed image was saved to file "%" with compression quality %d',
+            $filename,
+            $quality
+        ));
     }
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface

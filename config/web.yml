@@ -4,8 +4,9 @@ parameters:
   log.directory: '%app.webDirectory%/../runtime'
   log.name: 'app.log'
   log.level: 100
+  saveOptions.quality: 20
   imageCache.baseDirectory: '%app.webDirectory%/i'
-  filesystemSource.baseDirectory: '%app.webDirectory%/../tests/assets/sample'
+  filesystemSource.baseDirectory: '%app.webDirectory%/../tests/assets'
   routes:
     /i: 'imageController'
 
@@ -70,6 +71,8 @@ services:
   # imaging/processing
   saveOptionsFactory:
     class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+    calls:
+      - [setQuality, ['%saveOptions.quality%']]
   saveOptionsConfigurator:
     class: \Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator
   imageProcessor:
@@ -78,6 +81,8 @@ services:
   imagickEngine:
     class: \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine
     arguments: ['@fileOperations']
+    calls:
+      - [setLogger, ['@logger']]
 
   # imaging/transformation
   transformationsCreator:

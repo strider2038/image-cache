@@ -6,7 +6,7 @@
 - [x] Refactor controllers and routing to use different image caches
 - [x] Basic logging
 - [x] Transformation classes refactoring (changing names and using flyweight pattern)
-- [ ] Image saving with options
+- [x] Image saving with options
 - [ ] Functional testing
 - [ ] Acceptance testing
 - [ ] Image writing to sources
@@ -15,3 +15,4 @@
 - [ ] Yandex.Disk source
 - [ ] Support for phpDocumentor
 - [ ] Support for building docker containers in Travis
+- [ ] JPEG optimization by https://github.com/tjko/jpegoptim

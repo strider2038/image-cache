@@ -64,6 +64,10 @@ class FunctionalTestCase extends TestCase
         if (file_exists($filename)) {
             throw new \Exception("File '{$filename}' already exists");
         }
+        $dirname = dirname($filename);
+        if (!is_dir($dirname)) {
+            mkdir($dirname, 0777, true);
+        }
         if (!copy(self::IMAGE_JPEG_FILENAME, $filename)) {
             throw new \Exception(
                 sprintf("Cannot copy '%s' to '%s'", self::IMAGE_JPEG_FILENAME, $filename)

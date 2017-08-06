@@ -88,6 +88,7 @@ class ThumbnailKeyParserTest extends TestCase
             ['a.jpg', 'a.jpg', ''],
             ['/a_q1.jpg', '/a.jpg', 'q1'],
             ['/b_a1_b2.png', '/b.png', 'a1_b2'],
+            ['/a/b/c/d_q5.jpg', '/a/b/c/d.jpg', 'q5'],
         ];
     }
 

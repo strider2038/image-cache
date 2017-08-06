@@ -47,7 +47,7 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         }
 
         $filename = explode('_', $path['filename']);
-        $dir = $path['dirname'] !== '.' ? $path['dirname'] : '';
+        $dir = $path['dirname'] === '.' ? '' : (rtrim($path['dirname'], '/') . '/');
         $sourceFilename = sprintf('%s%s.%s', $dir, array_shift($filename), $path['extension']);
         $processingConfiguration = implode('_', $filename);
 

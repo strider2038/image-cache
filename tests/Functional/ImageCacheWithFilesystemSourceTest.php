@@ -18,12 +18,15 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
 {
     const FILE_NOT_EXIST = '/not-exist.jpg';
     const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
+    const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
     const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
     const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
-    const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY;
+    const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
+    const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
+    const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
 
     /** @var ImageCache */
     private $cache;
@@ -64,5 +67,15 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
         $this->assertEquals(self::IMAGE_JPEG_THUMBNAIL_WIDTH, $width);
         $this->assertEquals(self::IMAGE_JPEG_THUMBNAIL_HEIGHT, $height);
         $this->assertEquals(IMAGETYPE_JPEG, $type);
+    }
+
+    public function testGet_GivenImageInSubdirectoryRequested_ImageIsReturned(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
+
+        $image = $this->cache->get(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
+
+        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
     }
 }
