@@ -33,7 +33,7 @@ class LoggerFactory
 
     public function __construct(string $logDirectory = self::LOG_DIRECTORY_DEFAULT, bool $dryRun = false)
     {
-        $this->logDirectory = $logDirectory;
+        $this->logDirectory = rtrim($logDirectory, '/') . '/';
         $this->dryRun = $dryRun;
     }
 
@@ -42,7 +42,7 @@ class LoggerFactory
         if ($this->dryRun) {
             $handler = new NullHandler(Logger::EMERGENCY);
         } else {
-            $handler = new StreamHandler($this->logDirectory, $logLevel);
+            $handler = new StreamHandler($this->logDirectory . $logName, $logLevel);
         }
 
         $lineFormatter = new LineFormatter("[%datetime%] %level_name%: %message%\n");

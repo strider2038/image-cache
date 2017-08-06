@@ -3,12 +3,14 @@
 namespace Strider2038\ImgCache\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\ControllerInterface;
 use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -17,12 +19,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ApplicationTest extends TestCase 
 {
-    use ProviderTrait;
+    use ProviderTrait, LoggerTrait;
 
+    const LOGGER_ID = 'logger';
+    const ROUTER_ID = 'router';
+    const REQUEST_ID = 'request';
     const CONFIG_DEBUG = 'app.debug';
     const CONTROLLER_ID = 'controller';
     const ACTION_ID = 'action';
     const LOCATION = '/image.jpeg';
+    const EXCEPTION_MESSAGE = 'application exception message';
 
     /** @var ContainerInterface */
     private $container;
@@ -35,17 +41,19 @@ class ApplicationTest extends TestCase
     public function testRun_ContainerIsEmpty_1IsReturned(): void
     {
         $this->givenContainer_Get_ThrowsException();
+        $logger = $this->givenContainer_Get_ReturnsLogger();
         $application = $this->createApplication();
 
         $exitCode = $application->run();
 
         $this->assertEquals(1, $exitCode);
+        $this->assertLogger_Error_IsCalledOnce($logger);
     }
 
     public function testRun_AllServicesExists_ResponseIsSentAnd0IsReturned(): void
     {
-        $request = $this->givenRequest();
-        $router = $this->givenRouter();
+        $request = $this->givenContainer_Get_ReturnsRequest();
+        $router = $this->givenContainer_Get_ReturnsRouter();
         $this->givenRouter_GetRoute_ReturnsRoute($router, $request);
         $controller = $this->givenController();
         $response = $this->givenController_RunAction_Returns($controller);
@@ -78,22 +86,32 @@ class ApplicationTest extends TestCase
         return $application;
     }
 
-    private function givenRequest(): RequestInterface
+    private function givenContainer_Get_ReturnsRequest(): RequestInterface
     {
         $request = \Phake::mock(RequestInterface::class);
 
-        \Phake::when($this->container)->get('request')->thenReturn($request);
+        \Phake::when($this->container)->get(self::REQUEST_ID)->thenReturn($request);
 
         return $request;
     }
 
-    private function givenRouter(): RouterInterface
+    private function givenContainer_Get_ReturnsRouter(): RouterInterface
     {
         $router = \Phake::mock(RouterInterface::class);
 
-        \Phake::when($this->container)->get('router')->thenReturn($router);
+        \Phake::when($this->container)->get(self::ROUTER_ID)->thenReturn($router);
 
         return $router;
+    }
+
+    private function givenContainer_Get_ReturnsLogger(): LoggerInterface
+    {
+        $logger = $this->givenLogger();
+
+        \Phake::when($this->container)->has(self::LOGGER_ID)->thenReturn(true);
+        \Phake::when($this->container)->get(self::LOGGER_ID)->thenReturn($logger);
+
+        return $logger;
     }
 
     private function givenRouter_GetRoute_ReturnsRoute(RouterInterface $router, RequestInterface $request): void
@@ -132,7 +150,9 @@ class ApplicationTest extends TestCase
 
     private function givenContainer_Get_ThrowsException(): void
     {
-        \Phake::when($this->container)->get(\Phake::anyParameters())->thenThrow(new \Exception());
+        \Phake::when($this->container)
+            ->get(\Phake::anyParameters())
+            ->thenThrow(new \Exception(self::EXCEPTION_MESSAGE));
     }
 
     private function givenContainerHasParameterDebug(bool $value): void

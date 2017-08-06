@@ -20,9 +20,11 @@ class LoggerFactoryTest extends TestCase
 {
     const LOG_NAME_DEFAULT = 'runtime.log';
     const LOG_DIRECTORY_DEFAULT = '/var/log/imgcache/';
+    const LOG_FILENAME_DEFAULT = self::LOG_DIRECTORY_DEFAULT . self::LOG_NAME_DEFAULT;
     const LOG_LEVEL_DEFAULT = Logger::INFO;
     const LOG_NAME_CUSTOM = 'custom.log';
     const LOG_DIRECTORY_CUSTOM = '/tmp/';
+    const LOG_FILENAME_CUSTOM = self::LOG_DIRECTORY_CUSTOM . self::LOG_NAME_CUSTOM;
     const LOG_LEVEL_CUSTOM = Logger::DEBUG;
 
     public function testCreateLogger_GivenDefaultLogNameAndDirectoryAndLevel_LogNameAndDirectoryAreSet(): void
@@ -32,7 +34,7 @@ class LoggerFactoryTest extends TestCase
         /** @var Logger $logger */
         $logger = $loggerFactory->createLogger();
 
-        $this->verifyLogger($logger,self::LOG_NAME_DEFAULT, self::LOG_LEVEL_DEFAULT, self::LOG_DIRECTORY_DEFAULT);
+        $this->verifyLogger($logger,self::LOG_NAME_DEFAULT, self::LOG_LEVEL_DEFAULT, self::LOG_FILENAME_DEFAULT);
     }
 
     public function testCreateLogger_GivenCustomLogNameAndDirectoryAndLevel_LogNameAndDirectoryAreSet(): void
@@ -42,7 +44,7 @@ class LoggerFactoryTest extends TestCase
         /** @var Logger $logger */
         $logger = $loggerFactory->createLogger(self::LOG_NAME_CUSTOM, self::LOG_LEVEL_CUSTOM);
 
-        $this->verifyLogger($logger,self::LOG_NAME_CUSTOM, self::LOG_LEVEL_CUSTOM, self::LOG_DIRECTORY_CUSTOM);
+        $this->verifyLogger($logger,self::LOG_NAME_CUSTOM, self::LOG_LEVEL_CUSTOM, self::LOG_FILENAME_CUSTOM);
     }
 
     public function testCreateLogger_GivenDefaultParametersAndDryRunIsOn_LoggerHasNullHandler(): void
@@ -57,7 +59,7 @@ class LoggerFactoryTest extends TestCase
         $this->assertInstanceOf(NullHandler::class, $handlers[0]);
     }
 
-    private function verifyLogger(Logger $logger, string $name, int $level, string $directory): void
+    private function verifyLogger(Logger $logger, string $name, int $level, string $filename): void
     {
         $this->assertEquals($name, $logger->getName());
         $handlers = $logger->getHandlers();
@@ -65,6 +67,6 @@ class LoggerFactoryTest extends TestCase
         /** @var StreamHandler $handler */
         $handler = $handlers[0];
         $this->assertEquals($level, $handler->getLevel());
-        $this->assertEquals($directory, $handler->getUrl());
+        $this->assertEquals($filename, $handler->getUrl());
     }
 }

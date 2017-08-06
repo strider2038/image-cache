@@ -12,16 +12,20 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Service\Router;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class RouterTest extends TestCase
 {
+    use LoggerTrait;
+
     const REQUEST_URL = '/a.jpg';
     const REQUEST_METHOD_GET = 'GET';
 
@@ -31,10 +35,14 @@ class RouterTest extends TestCase
     /** @var ImageValidatorInterface */
     private $imageValidator;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     protected function setUp()
     {
         $this->request = \Phake::mock(RequestInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
+        $this->logger = $this->givenLogger();
     }
 
     /**
@@ -108,6 +116,7 @@ class RouterTest extends TestCase
         $this->assertEquals('imageController', $route->getControllerId());
         $this->assertEquals($actionName, $route->getActionId());
         $this->assertEquals(self::REQUEST_URL, $route->getLocation());
+        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
     }
     
     public function requestMethodsProvider(): array
@@ -170,6 +179,7 @@ class RouterTest extends TestCase
 
         $this->assertEquals($controllerId, $route->getControllerId());
         $this->assertEquals($location, $route->getLocation());
+        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
     }
 
     /**
@@ -217,6 +227,8 @@ class RouterTest extends TestCase
     private function createRouter(array $urlMaskToControllersMap = []): Router
     {
         $router = new Router($this->imageValidator, $urlMaskToControllersMap);
+
+        $router->setLogger($this->logger);
 
         return $router;
     }

@@ -26,12 +26,17 @@ trait LoggerTrait
     public function assertLogger_Info_IsCalledOnce(LoggerInterface $logger, string $message = null): void
     {
         $params = $message ?? \Phake::anyParameters();
-        \Phake::verify($logger)->info($params);
+        \Phake::verify($logger, \Phake::times(1))->info($params);
+    }
+
+    public function assertLogger_Info_IsCalledTimes(LoggerInterface $logger, int $times): void
+    {
+        \Phake::verify($logger, \Phake::times($times))->info(\Phake::anyParameters());
     }
 
     public function assertLogger_Error_IsCalledOnce(LoggerInterface $logger, string $message = null): void
     {
         $params = $message ?? \Phake::anyParameters();
-        \Phake::verify($logger)->error($params);
+        \Phake::verify($logger, \Phake::times(1))->error($params);
     }
 }

@@ -22,7 +22,10 @@ Thumbs.db
 /web/*
 !/web/index.php
 
-# test reports
+# runtime directory
+/runtime
+
+# test directories
 /tests/report/
 /tests/app/filesource/
 /tests/app/web/

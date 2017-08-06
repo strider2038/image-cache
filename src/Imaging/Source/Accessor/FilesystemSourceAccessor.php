@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
@@ -26,31 +28,58 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     /** @var FilenameKeyMapperInterface */
     private $keyMapper;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         FilesystemSourceInterface $source,
         FilenameKeyMapperInterface $keyMapper
     ) {
         $this->source = $source;
         $this->keyMapper = $keyMapper;
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     public function get(string $key): ?ImageInterface
     {
         $filenameKey = $this->composeFilenameKey($key);
 
-        return $this->source->get($filenameKey);
+        $image = $this->source->get($filenameKey);
+
+        $this->logger->info(sprintf(
+            'Image %s in filesystem source for key "%s"',
+            $image === null ? 'not found' : 'is found',
+            $key
+        ));
+
+        return $image;
     }
 
     public function exists(string $key): bool
     {
         $filenameKey = $this->composeFilenameKey($key);
 
-        return $this->source->exists($filenameKey);
+        $exists = $this->source->exists($filenameKey);
+
+        $this->logger->info(sprintf(
+            'Image with key "%s" %s in filesystem source',
+            $key,
+            $exists ? 'exists' : 'does not exist'
+        ));
+
+        return $exists;
     }
 
     private function composeFilenameKey(string $key): FilenameKeyInterface
     {
         $filenameKey = $this->keyMapper->getKey($key);
+
+        $this->logger->info(sprintf('Key "%s" is mapped to "%s"', $key, $filenameKey->getValue()));
 
         return $filenameKey;
     }

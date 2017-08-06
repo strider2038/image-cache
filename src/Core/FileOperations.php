@@ -3,6 +3,7 @@
 namespace Strider2038\ImgCache\Core;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Exception\FileOperationException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -15,9 +16,14 @@ class FileOperations
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(Filesystem $filesystem, LoggerInterface $logger)
+    public function __construct(Filesystem $filesystem)
     {
         $this->filesystem = $filesystem;
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 

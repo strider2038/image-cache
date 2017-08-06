@@ -10,7 +10,8 @@
 
 namespace Strider2038\ImgCache;
 
-use Strider2038\ImgCache\Core\ComponentsContainer;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\ControllerInterface;
 use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
@@ -24,24 +25,37 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Application
 {
-    const CONFIG_DEBUG = 'app.debug';
+    private const CONFIG_DEBUG = 'app.debug';
+    private const LOGGER_ID = 'logger';
+    private const REQUEST_ID = 'request';
+    private const ROUTER_ID = 'router';
 
     /** @var ContainerInterface */
     private $container;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        if (!$this->container->has(self::LOGGER_ID)) {
+            $this->logger = new NullLogger();
+        } else {
+            $this->logger = $this->container->get(self::LOGGER_ID);
+        }
     }
     
     public function run(): int 
     {
         try {
+            $this->logger->debug('Application started');
+
             /** @var RequestInterface $request */
-            $request = $this->container->get('request');
+            $request = $this->container->get(self::REQUEST_ID);
 
             /** @var RouterInterface $router */
-            $router = $this->container->get('router');
+            $router = $this->container->get(self::ROUTER_ID);
 
             /** @var Route $route */
             $route = $router->getRoute($request);
@@ -53,11 +67,22 @@ class Application
             $response = $controller->runAction($route->getActionId(), $route->getLocation());
             
             $response->send();
-        } catch (\Exception $ex) {
-            $response = new ExceptionResponse($ex, $this->isDebugMode());
+
+            $this->logger->debug(sprintf('Application ended. Response %d is sent', $response->getHttpCode()));
+        } catch (\Exception $exception) {
+            $this->logger->error(sprintf(
+                'Application exception %d: %s\n\n%s\n',
+                $exception->getCode(),
+                $exception->getMessage(),
+                $exception->getTraceAsString()
+            ));
+
+            $response = new ExceptionResponse($exception, $this->isDebugMode());
             $response->send();
+
             return 1;
         }
+
         return 0;
     }
 

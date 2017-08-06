@@ -4,12 +4,13 @@
 - [x] File operations service
 - [x] Refactor render methods in images (eliminate side effect in classes)
 - [x] Refactor controllers and routing to use different image caches
-- [ ] Basic logging
+- [x] Basic logging
 - [ ] Transformation classes refactoring (changing names and using flyweight pattern)
 - [ ] Image saving with options
 - [ ] Functional testing
 - [ ] Acceptance testing
 - [ ] Image writing to sources
+- [ ] Performance optimization (lazy services)
 - [ ] Cache mechanism for source accessor
 - [ ] Yandex.Disk source
 - [ ] Support for phpDocumentor

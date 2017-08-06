@@ -233,7 +233,8 @@ class FileOperationsTest extends FileTestCase
 
     private function createFileOperations(): FileOperations
     {
-        $fileOperations = new FileOperations($this->filesystem, $this->logger);
+        $fileOperations = new FileOperations($this->filesystem);
+        $fileOperations->setLogger($this->logger);
 
         return $fileOperations;
     }

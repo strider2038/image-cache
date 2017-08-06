@@ -87,12 +87,7 @@ class ControllerTest extends TestCase
             public function actionTest()
             {
                 $this->success = true;
-                return new class implements ResponseInterface
-                {
-                    public function send(): void
-                    {
-                    }
-                };
+                return \Phake::mock(ResponseInterface::class);
             }
         };
 
@@ -112,12 +107,7 @@ class ControllerTest extends TestCase
             public function actionTest()
             {
                 $this->success = true;
-                return new class implements ResponseInterface
-                {
-                    public function send(): void
-                    {
-                    }
-                };
+                return \Phake::mock(ResponseInterface::class);
             }
         };
 

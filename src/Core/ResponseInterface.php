@@ -16,5 +16,6 @@ namespace Strider2038\ImgCache\Core;
  */
 interface ResponseInterface 
 {
+    public function getHttpCode(): int;
     public function send(): void;
 }

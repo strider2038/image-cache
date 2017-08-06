@@ -10,7 +10,8 @@
 
 namespace Strider2038\ImgCache\Service;
 
-use Strider2038\ImgCache\Core\Component;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\Request;
 use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
@@ -33,6 +34,9 @@ class Router implements RouterInterface
     /** @var string[] */
     private $urlMaskToControllersMap;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     private $methodsToActionsMap = [
         Request::METHOD_GET    => 'get',
         Request::METHOD_POST   => 'create',
@@ -49,24 +53,40 @@ class Router implements RouterInterface
             $this->validateUrlMapRow($prefix, $controllerId);
             $this->urlMaskToControllersMap[str_replace('/', '\/', $prefix)] = $controllerId;
         }
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     public function getRoute(RequestInterface $request): Route 
     {
         $requestMethod = $request->getMethod();
-        
+        $url = $request->getUrl(PHP_URL_PATH);
+
+        $this->logger->info("Processing route for request {$requestMethod} {$url}");
+
         if (!array_key_exists($requestMethod, $this->methodsToActionsMap)) {
             throw new InvalidRouteException('Route not found');
         }
-        
-        $url = $request->getUrl(PHP_URL_PATH);
+
         if (!$this->imageValidator->hasValidImageExtension($url)) {
             throw new RequestException('Requested file has incorrect extension');
         }
 
         [$controllerId, $location] = $this->splitUrlToControllerAndLocation($request->getUrl());
+        $route = new Route($controllerId, $this->methodsToActionsMap[$requestMethod], $location);
 
-        return new Route($controllerId, $this->methodsToActionsMap[$requestMethod], $location);
+        $this->logger->info(sprintf(
+            'Route is detected: controller id = %s, action id = %s, location = %s',
+            $route->getControllerId(),
+            $route->getActionId(),
+            $route->getLocation()
+        ));
+
+        return $route;
     }
 
     private function splitUrlToControllerAndLocation(string $url): array

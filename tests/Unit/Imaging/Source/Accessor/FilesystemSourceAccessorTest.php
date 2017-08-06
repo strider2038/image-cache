@@ -11,17 +11,19 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Accessor;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Imaging\Source\Mapping\FilenameKeyMapperInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class FilesystemSourceAccessorTest extends TestCase
 {
-    use ImageTrait, ProviderTrait;
+    use ImageTrait, ProviderTrait, LoggerTrait;
 
     const KEY = 'test';
 
@@ -31,10 +33,14 @@ class FilesystemSourceAccessorTest extends TestCase
     /** @var FilenameKeyMapperInterface */
     private $keyMapper;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     protected function setUp()
     {
         $this->source = \Phake::mock(FilesystemSourceInterface::class);
         $this->keyMapper = \Phake::mock(FilenameKeyMapperInterface::class);
+        $this->logger = $this->givenLogger();
     }
 
     public function testGet_GivenKeyAndSourceFileDoesNotExist_NullIsReturned(): void
@@ -46,6 +52,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $image = $accessor->get(self::KEY);
 
         $this->assertNull($image);
+        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
     }
 
     public function testGet_GivenKeyAndSourceFileExists_ImageIsReturned(): void
@@ -59,13 +66,14 @@ class FilesystemSourceAccessorTest extends TestCase
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertSame($sourceImage, $image);
+        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
     }
 
     /**
      * @param bool $expectedExists
      * @dataProvider boolValuesProvider
      */
-    public function testGet_GivenKeyAndSourceFileExistStatus_BoolIsReturned(bool $expectedExists): void
+    public function testExists_GivenKeyAndSourceFileExistStatus_BoolIsReturned(bool $expectedExists): void
     {
         $accessor = $this->createFilesystemSourceAccessor();
         $filenameKey = $this->givenKeyMapper_GetKey_ReturnsFilenameKey(self::KEY);
@@ -74,11 +82,13 @@ class FilesystemSourceAccessorTest extends TestCase
         $actualExists = $accessor->exists(self::KEY);
 
         $this->assertEquals($expectedExists, $actualExists);
+        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
     }
 
     private function createFilesystemSourceAccessor(): FilesystemSourceAccessor
     {
         $accessor = new FilesystemSourceAccessor($this->source, $this->keyMapper);
+        $accessor->setLogger($this->logger);
 
         return $accessor;
     }
