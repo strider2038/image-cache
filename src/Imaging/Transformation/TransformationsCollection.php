@@ -23,10 +23,7 @@ class TransformationsCollection implements \IteratorAggregate, \Countable
     {
         $this->collection[] = $transformation;
     }
-    
-    /**
-     * @return \Traversable
-     */
+
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->collection);

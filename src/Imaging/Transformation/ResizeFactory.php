@@ -16,13 +16,13 @@ use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeBuilder implements TransformationBuilderInterface
+class ResizeFactory implements TransformationFactoryInterface
 {
-    public function build(string $config): TransformationInterface
+    public function create(string $configuration): TransformationInterface
     {
         $isValid = preg_match(
             '/^(\d+)(x(\d+)){0,1}([fswh]{1}){0,1}$/', 
-            strtolower($config), 
+            strtolower($configuration),
             $matches
         );
 
@@ -31,7 +31,7 @@ class ResizeBuilder implements TransformationBuilderInterface
         }
 
         $width = $matches[1] ?? 0;
-        $heigth = !empty($matches[3]) ? (int) $matches[3] : null;
+        $height = !empty($matches[3]) ? (int) $matches[3] : null;
         $mode = Resize::MODE_STRETCH;
         $modeCode = $matches[4] ?? null;
 
@@ -42,6 +42,6 @@ class ResizeBuilder implements TransformationBuilderInterface
             case 'h': $mode = Resize::MODE_PRESERVE_HEIGHT; break;
         }
 
-        return new Resize($width, $heigth, $mode);
+        return new Resize($width, $height, $mode);
     }
 }

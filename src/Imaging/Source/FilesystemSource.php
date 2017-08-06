@@ -12,7 +12,7 @@
 namespace Strider2038\ImgCache\Imaging\Source;
 
 use Strider2038\ImgCache\Core\FileOperations;
-use Strider2038\ImgCache\Exception\InvalidConfigException;
+use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
@@ -40,7 +40,7 @@ class FilesystemSource implements FilesystemSourceInterface
 
         $this->baseDirectory = rtrim($baseDirectory, '/');
         if (!$this->fileOperations->isDirectory($this->baseDirectory)) {
-            throw new InvalidConfigException("Directory '{$this->baseDirectory}' does not exist");
+            throw new InvalidConfigurationException("Directory '{$this->baseDirectory}' does not exist");
         }
         $this->baseDirectory .= '/';
 

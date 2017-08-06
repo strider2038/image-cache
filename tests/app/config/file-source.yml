@@ -33,7 +33,7 @@ services:
     arguments: ['@keyValidator', '@imageValidator']
   thumbnailProcessingConfigurationParser:
     class: \Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser
-    arguments: ['@transformationsFactory', '@saveOptionsFactory', '@saveOptionsConfigurator']
+    arguments: ['@transformationsCreator', '@saveOptionsFactory', '@saveOptionsConfigurator']
 
   # imaging/processing
   saveOptionsFactory:
@@ -48,8 +48,11 @@ services:
     arguments: ['@fileOperations']
 
   # imaging/transformation
-  transformationsFactory:
-    class: \Strider2038\ImgCache\Imaging\Transformation\TransformationsFactory
+  transformationsCreator:
+    class: \Strider2038\ImgCache\Imaging\Transformation\TransformationsCreator
+    arguments: ['@transformationFactoryFlyweight']
+  transformationFactoryFlyweight:
+    class: \Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight
 
   # imaging/source
   filesystemSourceAccessor:

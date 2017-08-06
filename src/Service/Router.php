@@ -16,7 +16,7 @@ use Strider2038\ImgCache\Core\Request;
 use Strider2038\ImgCache\Core\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
-use Strider2038\ImgCache\Exception\InvalidConfigException;
+use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
 use Strider2038\ImgCache\Exception\RequestException;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
@@ -109,17 +109,17 @@ class Router implements RouterInterface
     private function validateUrlMapRow(string $prefix, string $controllerId): void
     {
         if (empty($prefix) || $prefix === '/') {
-            throw new InvalidConfigException(
+            throw new InvalidConfigurationException(
                 "Url mask to controllers map is invalid: prefix cannot be empty or slash"
             );
         }
         if (!preg_match('/^\/([A-Z0-9_]+(\/){0,1})*[^\/|\s]$/i', $prefix)) {
-            throw new InvalidConfigException(
+            throw new InvalidConfigurationException(
                 "Url mask to controllers map is invalid: incorrect prefix '{$prefix}'"
             );
         }
         if (!preg_match('/[A-Z]+[A-Z0-9]{0,}/i', $controllerId)) {
-            throw new InvalidConfigException(
+            throw new InvalidConfigurationException(
                 "Url mask to controllers map is invalid: controller id can contain only latin characters and digits"
             );
         }

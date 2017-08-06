@@ -47,7 +47,7 @@ class RouterTest extends TestCase
 
     /**
      * @param array $map
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Url mask to controllers map is invalid
      * @dataProvider invalidUrlMaskToControllersMapProvider

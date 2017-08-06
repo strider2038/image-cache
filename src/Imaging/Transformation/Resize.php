@@ -38,10 +38,10 @@ class Resize implements TransformationInterface
     /** @var string */
     private $mode;
     
-    public function __construct(int $width, ?int $heigth = null, string $mode = self::MODE_STRETCH)
+    public function __construct(int $width, ?int $height = null, string $mode = self::MODE_STRETCH)
     {
-        if ($heigth === null) {
-            $heigth = $width;
+        if ($height === null) {
+            $height = $width;
         }
 
         if ($width < static::MIN_WIDTH || $width > static::MAX_WIDTH) {
@@ -51,7 +51,7 @@ class Resize implements TransformationInterface
             );
         }
 
-        if ($heigth < static::MIN_HEIGHT || $heigth > static::MAX_HEIGHT) {
+        if ($height < static::MIN_HEIGHT || $height > static::MAX_HEIGHT) {
             throw new InvalidImageException(
                 "Height of the image must be between " . static::MIN_HEIGHT 
                     . " and " . static::MAX_HEIGHT
@@ -63,7 +63,7 @@ class Resize implements TransformationInterface
         }
 
         $this->width = $width;
-        $this->heigth = $heigth;
+        $this->heigth = $height;
         $this->mode = $mode;
     }
     
@@ -72,7 +72,7 @@ class Resize implements TransformationInterface
         return $this->width;
     }
 
-    public function getHeigth(): int
+    public function getHeight(): int
     {
         return $this->heigth;
     }

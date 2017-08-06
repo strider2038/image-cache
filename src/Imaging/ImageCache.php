@@ -12,7 +12,7 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Core\FileOperations;
-use Strider2038\ImgCache\Exception\InvalidConfigException;
+use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Exception\NotAllowedException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
@@ -58,7 +58,7 @@ class ImageCache implements ImageCacheInterface
     ) {
         $this->fileOperations = $fileOperations;
         if (!$this->fileOperations->isDirectory($baseDirectory)) {
-            throw new InvalidConfigException("Directory '{$baseDirectory}' does not exist");
+            throw new InvalidConfigurationException("Directory '{$baseDirectory}' does not exist");
         }
         $this->baseDirectory = rtrim($baseDirectory, '/');
         $this->imageFactory = $imageFactory;

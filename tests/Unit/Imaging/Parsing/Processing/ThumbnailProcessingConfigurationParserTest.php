@@ -19,12 +19,12 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationsCreatorInterface;
 
 class ThumbnailProcessingConfigurationParserTest extends TestCase
 {
-    /** @var TransformationsFactoryInterface */
-    private $transformationsFactory;
+    /** @var TransformationsCreatorInterface */
+    private $transformationsCreator;
 
     /** @var SaveOptionsFactoryInterface */
     private $saveOptionsFactory;
@@ -34,7 +34,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
     protected function setUp()
     {
-        $this->transformationsFactory = \Phake::mock(TransformationsFactoryInterface::class);
+        $this->transformationsCreator = \Phake::mock(TransformationsCreatorInterface::class);
         $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
         $this->saveOptionsConfigurator = \Phake::mock(SaveOptionsConfiguratorInterface::class);
     }
@@ -89,7 +89,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     private function createThumbnailProcessingConfigurationParser(): ThumbnailProcessingConfigurationParser
     {
         $parser = new ThumbnailProcessingConfigurationParser(
-            $this->transformationsFactory,
+            $this->transformationsCreator,
             $this->saveOptionsFactory,
             $this->saveOptionsConfigurator
         );
@@ -101,7 +101,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     {
         $transformation = \Phake::mock(TransformationInterface::class);
 
-        \Phake::when($this->transformationsFactory)
+        \Phake::when($this->transformationsCreator)
             ->create(\Phake::anyParameters())
             ->thenReturn($transformation);
     }
@@ -124,7 +124,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
     private function assertTransformationsFactory_Create_IsCalled(int $times): void
     {
-        \Phake::verify($this->transformationsFactory, \Phake::times($times))
+        \Phake::verify($this->transformationsCreator, \Phake::times($times))
             ->create(\Phake::anyParameters());
     }
 
@@ -136,7 +136,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
     private function givenTransformationsFactory_Create_Returns_Null(): void
     {
-        \Phake::when($this->transformationsFactory)
+        \Phake::when($this->transformationsCreator)
             ->create(\Phake::anyParameters())
             ->thenReturn(null);
     }

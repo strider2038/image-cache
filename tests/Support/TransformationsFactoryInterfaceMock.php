@@ -13,16 +13,16 @@ namespace Strider2038\ImgCache\Tests\Support;
 
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Transformation\{
-    TransformationBuilderInterface,
+    TransformationFactoryInterface,
     TransformationInterface
 };
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TransformationsBuilderInterfaceMock implements TransformationBuilderInterface
+class TransformationsFactoryInterfaceMock implements TransformationFactoryInterface
 {
-    public function build(string $config): TransformationInterface
+    public function create(string $configuration): TransformationInterface
     {
         return new class implements TransformationInterface {
             public function apply(ProcessingImageInterface $image): void {}

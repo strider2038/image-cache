@@ -71,9 +71,11 @@ class Application
             $this->logger->debug(sprintf('Application ended. Response %d is sent', $response->getHttpCode()));
         } catch (\Exception $exception) {
             $this->logger->error(sprintf(
-                'Application exception %d: %s\n\n%s\n',
+                "Application exception\nCode: %d\nMessage: %s\nFile: %s\nLine: %d\nStack trace:\n%s\n",
                 $exception->getCode(),
                 $exception->getMessage(),
+                $exception->getFile(),
+                $exception->getLine(),
                 $exception->getTraceAsString()
             ));
 

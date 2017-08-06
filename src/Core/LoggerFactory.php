@@ -45,7 +45,11 @@ class LoggerFactory
             $handler = new StreamHandler($this->logDirectory . $logName, $logLevel);
         }
 
-        $lineFormatter = new LineFormatter("[%datetime%] %level_name%: %message%\n");
+        $lineFormatter = new LineFormatter(
+            "[%datetime%] %level_name%: %message%\n",
+            null,
+            true
+        );
         $handler->setFormatter($lineFormatter);
 
         return new Logger($logName, [$handler]);

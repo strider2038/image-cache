@@ -13,24 +13,35 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Transformation\Resize;
-use Strider2038\ImgCache\Imaging\Transformation\ResizeBuilder;
+use Strider2038\ImgCache\Imaging\Transformation\ResizeFactory;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeBuilderTest extends TestCase
+class ResizeFactoryTest extends TestCase
 {
 
     /**
+     * @param string $configuration
+     * @param int $width
+     * @param int $height
+     * @param string $mode
      * @dataProvider resizeConfigProvider
      */
-    public function testBuild_ValidConfig_ClassIsConstructed($config, $width, $height, $mode): void
-    {
-        $builder = new ResizeBuilder();
-        $resize = $builder->build($config);
+    public function testCreate_ValidConfig_ClassIsConstructed(
+        string $configuration,
+        int $width,
+        int $height,
+        string $mode
+    ): void {
+        $factory = new ResizeFactory();
+
+        /** @var Resize $resize */
+        $resize = $factory->create($configuration);
+
         $this->assertInstanceOf(Resize::class, $resize);
         $this->assertEquals($width, $resize->getWidth());
-        $this->assertEquals($height, $resize->getHeigth());
+        $this->assertEquals($height, $resize->getHeight());
         $this->assertEquals($mode, $resize->getMode());
     }
 
@@ -49,15 +60,17 @@ class ResizeBuilderTest extends TestCase
     }
 
     /**
+     * @param string $configuration
      * @dataProvider resizeInvalidConfigProvider
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid config for resize transformation
      */
-    public function testBuild_InvalidConfig_ExceptionThrown($config): void
+    public function testBuild_InvalidConfig_ExceptionThrown(string $configuration): void
     {
-        $builder = new ResizeBuilder();
-        $builder->build($config);
+        $factory = new ResizeFactory();
+
+        $factory->create($configuration);
     }
 
     public function resizeInvalidConfigProvider(): array

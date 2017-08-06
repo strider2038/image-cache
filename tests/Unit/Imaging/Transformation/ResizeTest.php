@@ -48,7 +48,7 @@ class ResizeTest extends TestCase
         $resize = new Resize(100, 200);
 
         $this->assertEquals(100, $resize->getWidth());
-        $this->assertEquals(200, $resize->getHeigth());
+        $this->assertEquals(200, $resize->getHeight());
         $this->assertEquals(Resize::MODE_STRETCH, $resize->getMode());
     }
 
@@ -57,7 +57,7 @@ class ResizeTest extends TestCase
         $resize = new Resize(100);
 
         $this->assertEquals(100, $resize->getWidth());
-        $this->assertEquals(100, $resize->getHeigth());
+        $this->assertEquals(100, $resize->getHeight());
         $this->assertEquals(Resize::MODE_STRETCH, $resize->getMode());
     }
 

@@ -5,7 +5,7 @@
 - [x] Refactor render methods in images (eliminate side effect in classes)
 - [x] Refactor controllers and routing to use different image caches
 - [x] Basic logging
-- [ ] Transformation classes refactoring (changing names and using flyweight pattern)
+- [x] Transformation classes refactoring (changing names and using flyweight pattern)
 - [ ] Image saving with options
 - [ ] Functional testing
 - [ ] Acceptance testing

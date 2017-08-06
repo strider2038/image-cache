@@ -59,7 +59,7 @@ class ImageCacheTest extends TestCase
     }
 
     /**
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigException
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessageRegExp /Directory .* does not exist/
      */

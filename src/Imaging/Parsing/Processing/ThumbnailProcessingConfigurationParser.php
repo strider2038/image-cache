@@ -15,15 +15,15 @@ use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsFactoryInterface;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationsCreatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationParserInterface
 {
-    /** @var TransformationsFactoryInterface */
-    private $transformationsFactory;
+    /** @var TransformationsCreatorInterface */
+    private $transformationsCreator;
 
     /** @var SaveOptionsFactoryInterface */
     private $saveOptionsFactory;
@@ -32,11 +32,11 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
     private $saveOptionsConfigurator;
 
     public function __construct(
-        TransformationsFactoryInterface $transformationsFactory,
+        TransformationsCreatorInterface $transformationsCreator,
         SaveOptionsFactoryInterface $saveOptionsFactory,
         SaveOptionsConfiguratorInterface $saveOptionsConfigurator
     ) {
-        $this->transformationsFactory = $transformationsFactory;
+        $this->transformationsCreator = $transformationsCreator;
         $this->saveOptionsFactory = $saveOptionsFactory;
         $this->saveOptionsConfigurator = $saveOptionsConfigurator;
     }
@@ -51,7 +51,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
 
             foreach ($configurationValues as $value) {
 
-                $transformation = $this->transformationsFactory->create($value);
+                $transformation = $this->transformationsCreator->create($value);
                 if ($transformation !== null) {
                     $transformations->add($transformation);
                     continue;
