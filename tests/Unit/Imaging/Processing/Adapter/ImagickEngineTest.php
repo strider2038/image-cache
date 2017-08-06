@@ -11,19 +11,30 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Adapter;
 
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine;
 use Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImagickEngineTest extends FileTestCase
 {
-    use FileOperationsTrait;
+    use FileOperationsTrait, LoggerTrait;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->logger = $this->givenLogger();
+    }
 
     /**
      * @expectedException \Exception
@@ -66,6 +77,8 @@ class ImagickEngineTest extends FileTestCase
     private function createImagick(): ImagickEngine
     {
         $engine = new ImagickEngine($this->givenFileOperations());
+
+        $engine->setLogger($this->logger);
 
         return $engine;
     }
