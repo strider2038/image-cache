@@ -12,6 +12,7 @@
 - [ ] Image writing to sources
 - [ ] Performance optimization (lazy services)
 - [ ] Cache mechanism for source accessor
+- [ ] Google map source
 - [ ] Yandex.Disk source
 - [ ] Support for phpDocumentor
 - [ ] Support for building docker containers in Travis

@@ -1,0 +1,14 @@
+language: php
+
+php:
+  - '7.1'
+
+sudo: enabled
+
+dist: xenial
+
+install:
+  - ./.travis/install.sh
+
+script:
+  - ./vendor/bin/phpunit

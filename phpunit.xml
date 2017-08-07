@@ -10,9 +10,19 @@
     timeoutForMediumTests="10"
     timeoutForLargeTests="60"
     verbose="true">
+
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./../src</directory>
+            <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
+
+    <testsuite name="ImgCache unit tests">
+        <directory suffix=".php">./tests/Unit</directory>
+    </testsuite>
+
+    <testsuite name="ImgCache functional tests">
+        <directory suffix=".php">./tests/Functional</directory>
+    </testsuite>
+
 </phpunit>
