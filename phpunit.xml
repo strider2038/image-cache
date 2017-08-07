@@ -17,12 +17,20 @@
         </whitelist>
     </filter>
 
-    <testsuite name="ImgCache unit tests">
+    <php>
+        <env name="ACCEPTANCE_HOST" value="http://localhost"/>
+    </php>
+
+    <testsuite name="unit">
         <directory suffix=".php">./tests/Unit</directory>
     </testsuite>
 
-    <testsuite name="ImgCache functional tests">
+    <testsuite name="functional">
         <directory suffix=".php">./tests/Functional</directory>
+    </testsuite>
+
+    <testsuite name="acceptance">
+        <directory suffix=".php">./tests/Acceptance</directory>
     </testsuite>
 
 </phpunit>

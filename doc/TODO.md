@@ -15,5 +15,6 @@
 - [ ] Google map source
 - [ ] Yandex.Disk source
 - [ ] Support for phpDocumentor
+- [ ] Migrate from supervisor to systemd daemons
 - [ ] Support for building docker containers in Travis
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim

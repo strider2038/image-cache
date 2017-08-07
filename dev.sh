@@ -16,13 +16,6 @@ if [ $build_prod -eq 1 ]; then
     ./build.sh
 fi
 
-echo "Building testing image..."
-echo "========================================================================="
-docker build \
-    --file Dockerfile.test \
-    --tag strider2038:imgcache-service-test \
-    .
-
 echo "Building development image..."
 echo "========================================================================="
 
@@ -39,5 +32,5 @@ docker run \
     --detach \
     --name imgcache \
     --stop-signal SIGKILL \
-    --volume $PWD:/services/imgcache \
+    --volume $PWD:/imgcache \
     strider2038:imgcache-service-dev

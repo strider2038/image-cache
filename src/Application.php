@@ -88,6 +88,7 @@ class Application
         if (!$this->container->hasParameter(self::CONFIG_DEBUG)) {
             return false;
         }
+
         return (bool) $this->container->getParameter(self::CONFIG_DEBUG);
     }
 }

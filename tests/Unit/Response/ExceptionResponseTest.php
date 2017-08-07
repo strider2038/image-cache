@@ -11,11 +11,22 @@
 namespace Strider2038\ImgCache\Tests\Unit\Response;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Exception\ApplicationException;
 use Strider2038\ImgCache\Response\ExceptionResponse;
 
 class ExceptionResponseTest extends TestCase
 {
     const EXCEPTION_MESSAGE = 'message';
+    const EXCEPTION_CODE = 404;
+
+    public function testConstruct_GivenApplicationExceptionWithHttpCode_AppropriateHttpCodeIsReturned(): void
+    {
+        $exception = new ApplicationException(self::EXCEPTION_MESSAGE, self::EXCEPTION_CODE);
+
+        $response = new ExceptionResponse($exception);
+
+        $this->assertEquals(self::EXCEPTION_CODE, $response->getHttpCode());
+    }
 
     public function testGetMessage_GivenExceptionAndIsDebugFalse_MessageIsEmptyComposed(): void
     {

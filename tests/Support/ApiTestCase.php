@@ -12,46 +12,30 @@
 namespace Strider2038\ImgCache\Tests\Support;
 
 use GuzzleHttp\Client;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ApiTestCase extends FileTestCase
+class ApiTestCase extends TestCase
 {
     /** @var \GuzzleHttp\Client */
     protected $client;
+
+    /** @var string */
+    protected $host;
     
     protected function setUp()
     {
         parent::setUp();
 
+        $this->host = getenv('ACCEPTANCE_HOST');
+
         $this->client = new Client([
-            'base_uri' => 'http://localhost:8080/',
+            'base_uri' => $this->host,
             'timeout' => 5,
             'allow_redirects' => false,
             'http_errors' => false,
         ]);
-        
-        exec('rm -rf ' . static::getTestWebDir());
-        mkdir(static::getTestWebDir());
-    }
-
-    public static function getTestWebDir(): string
-    {
-        return __DIR__ . '/../../web/i/';
-    }
-    
-    /**
-     * @param string $urlPrefix
-     * @param string $name
-     * @return string[] imageFilename, imageUrl
-     */
-    public function givenPublicImage(string $urlPrefix = '', string $name = self::IMAGE_BOX_PNG): array
-    {
-        $filename = static::getTestWebDir() . $urlPrefix . $name;
-
-        copy($this->givenAssetFile($name), $filename);
-
-        return [$filename, '/i/' . $name];
     }
 }

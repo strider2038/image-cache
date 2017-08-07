@@ -30,7 +30,7 @@ class ExceptionResponse extends ErrorResponse {
             );
         }
 
-        parent::__construct(self::HTTP_CODE_INTERNAL_SERVER_ERROR, nl2br($this->message));
+        parent::__construct($exception->getCode(), nl2br($this->message));
     }
 
     public function getMessage(): string

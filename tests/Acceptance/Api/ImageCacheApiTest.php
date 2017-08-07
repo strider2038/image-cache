@@ -19,29 +19,22 @@ use Strider2038\ImgCache\Tests\Support\ApiTestCase;
  */
 class ImageCacheApiTest extends ApiTestCase
 {
+    const URL_NOT_EXIST = '/i/not-exist.jpg';
+    const URL_INCORRECT_EXTENSION = '/index.php';
 
-//    public function testGet_ImageDoesNotExist_Http404Returned(): void
-//    {
-//        /** @var \GuzzleHttp\Psr7\Response */
-//        $response = $this->client->request('GET', '/i/' . self::IMAGE_CAT300);
-//
-//        $this->assertEquals(Response::HTTP_CODE_NOT_FOUND, $response->getStatusCode());
-//    }
-    
-    public function testGet_ImageExist_Http200Returned(): void
+    public function testGet_GivenUrlWithIncorrectExtension_400BadRequestIsReturned(): void
     {
-        $this->markTestIncomplete();
-        [$imageFilename, $imageUrl] = $this->givenPublicImage('', self::IMAGE_CAT300);
-
         /** @var \GuzzleHttp\Psr7\Response */
-        $response = $this->client->request('GET', $imageUrl);
+        $response = $this->client->request('GET', self::URL_INCORRECT_EXTENSION);
 
-        $this->assertFileExists($imageFilename);
-        $this->assertEquals(Response::HTTP_CODE_OK, $response->getStatusCode());
-        $this->assertEquals(
-            Response::CONTENT_TYPE_IMAGE_JPEG,
-            $response->getHeader(Response::HTTP_HEADER_CONTENT_TYPE)[0]
-        );
+        $this->assertEquals(Response::HTTP_CODE_BAD_REQUEST, $response->getStatusCode());
     }
-    
+
+    public function testGet_ImageDoesNotExist_404NotFoundIsReturned(): void
+    {
+        /** @var \GuzzleHttp\Psr7\Response */
+        $response = $this->client->request('GET', self::URL_NOT_EXIST);
+
+        $this->assertEquals(Response::HTTP_CODE_NOT_FOUND, $response->getStatusCode());
+    }
 }

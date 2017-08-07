@@ -1,12 +1,12 @@
 parameters:
   app.debug: true
   security.accessToken: 'sample-security-token-must-be-replaced-with-real'
-  log.directory: '%app.webDirectory%/../runtime'
+  log.directory: '%app.directory%/runtime'
   log.name: 'app.log'
   log.level: 100
-  saveOptions.quality: 20
-  imageCache.baseDirectory: '%app.webDirectory%/i'
-  filesystemSource.baseDirectory: '%app.webDirectory%/../tests/assets'
+  saveOptions.quality: 90
+  imageCache.baseDirectory: '%app.directory%/web/i'
+  filesystemSource.baseDirectory: '%app.directory%/tests/assets'
   routes:
     /i: 'imageController'
 

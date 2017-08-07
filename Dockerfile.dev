@@ -1,5 +1,7 @@
-FROM strider2038:imgcache-service-test
+FROM strider2038:imgcache-service
 MAINTAINER Igor Lazarev <strider2038@rambler.ru>
+
+COPY ./.docker/composer/auth.json /var/run/composer/auth.json
 
 RUN apk add --update \
     openssh \
@@ -7,7 +9,9 @@ RUN apk add --update \
     iputils && \
     pecl install xdebug && \
     docker-php-ext-enable xdebug && \
-    mkdir -p /var/log/xdebug
+    mkdir -p /var/log/xdebug && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer install
 
 COPY ./.docker/supervisor/sshd.conf /etc/supervisord/sshd.conf
 COPY ./.docker/composer/auth.json /var/run/composer/auth.json
@@ -16,5 +20,3 @@ COPY ./.docker/sshd/* /etc/ssh/
 COPY ./.docker/env/dev.sh /etc/profile.d/dev.sh
 
 EXPOSE 22 80 9001
-
-VOLUME /services/imgcache
