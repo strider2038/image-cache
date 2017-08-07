@@ -23,7 +23,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^6.2",
-        "phake/phake": "3.*"
+        "phake/phake": "3.*",
+        "satooshi/php-coveralls": "1.*"
     },
     "autoload": {
         "psr-4": {
