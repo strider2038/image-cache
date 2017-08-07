@@ -9,7 +9,7 @@ dist: xenial
 
 before_install:
   - sudo apt update
-  - sudo apt-add-repository ppa:ondrej/php
+  - sudo apt-add-repository -y ppa:ondrej/php
 
 install:
   - sudo apt install -y php-imagick
