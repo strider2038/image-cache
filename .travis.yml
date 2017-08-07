@@ -8,7 +8,8 @@ sudo: enabled
 dist: xenial
 
 install:
-  - ./.travis/install.sh
+  - apt install install -y php-imagick
+  - composer install
 
 script:
   - ./vendor/bin/phpunit
