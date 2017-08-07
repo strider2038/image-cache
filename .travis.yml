@@ -8,7 +8,7 @@ sudo: enabled
 dist: xenial
 
 install:
-  - apt install install -y php-imagick
+  - apt install -y php-imagick
   - composer install
 
 script:
