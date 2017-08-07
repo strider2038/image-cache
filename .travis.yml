@@ -7,10 +7,8 @@ sudo: enabled
 
 dist: xenial
 
-before_script:
-  - sudo pecl install imagick
-
 install:
+  - pecl install imagick
   - composer install
 
 script:
