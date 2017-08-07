@@ -7,8 +7,11 @@ sudo: enabled
 
 dist: xenial
 
-install:
+before_install:
   - sudo apt update
+  - sudo apt-add-repository ppa:ondrej/php
+
+install:
   - sudo apt install -y php-imagick
   - composer install
 
