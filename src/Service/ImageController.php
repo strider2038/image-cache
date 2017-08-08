@@ -49,7 +49,7 @@ class ImageController extends Controller
      * Handles GET request for resource. Returns ImageResponse if resource is found and
      * NotFoundResponse when not found.
      * @param string $location
-     * @return ResponseInterface
+     * @return \Strider2038\ImgCache\Core\ResponseInterface
      */
     public function actionGet(string $location): ResponseInterface
     {
@@ -66,7 +66,7 @@ class ImageController extends Controller
      * Handles POST request for creating resource. If resource already exists then ConflictResponse
      * will be returned, otherwise - CreatedResponse.
      * @param string $location
-     * @return ResponseInterface
+     * @return \Strider2038\ImgCache\Core\ResponseInterface
      */
     public function actionCreate(string $location): ResponseInterface
     {
@@ -86,7 +86,7 @@ class ImageController extends Controller
      * Handles PUT request for creating new resource or replacing old one. If resource is already
      * exists it will be replaced with all thumbnails deleted. CreatedResponse is returned.
      * @param string $location
-     * @return ResponseInterface
+     * @return \Strider2038\ImgCache\Core\ResponseInterface
      */
     public function actionReplace(string $location): ResponseInterface
     {
@@ -103,7 +103,7 @@ class ImageController extends Controller
      * Handles DELETE request for deleting resource from cache source and all it's cached
      * thumbnails
      * @param string $location
-     * @return ResponseInterface
+     * @return \Strider2038\ImgCache\Core\ResponseInterface
      */
     public function actionDelete(string $location): ResponseInterface
     {
@@ -121,7 +121,7 @@ class ImageController extends Controller
     /**
      * Handles PATCH request for rebuilding cached resource with all its thumbnails
      * @param string $location
-     * @return ResponseInterface
+     * @return \Strider2038\ImgCache\Core\ResponseInterface
      */
     public function actionRebuild(string $location): ResponseInterface
     {
