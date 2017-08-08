@@ -1,0 +1,11 @@
+build:
+  environment:
+    php:
+      version: 7.1.0
+  tests:
+    override:
+      -
+        command: ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
+        coverage:
+          file: ./build/logs/clover.xml
+          format: php-clover
