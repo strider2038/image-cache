@@ -4,6 +4,7 @@ build:
       version: 7.1.0
   dependencies:
     before:
+      - sudo apt-get install -y libmagickwand-dev libmagickcore-dev
       - pecl install imagick
   tests:
     override:
