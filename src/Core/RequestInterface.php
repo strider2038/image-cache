@@ -16,8 +16,8 @@ namespace Strider2038\ImgCache\Core;
  */
 interface RequestInterface 
 {
-    public function getMethod(): ?string;
-    public function getHeader(string $key): ?string;
+    public function getMethod(): ? string;
+    public function getHeader(string $key): ? string;
     public function getUrl(int $component = -1): string;
     public function getBody();
 }

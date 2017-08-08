@@ -18,6 +18,6 @@ use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
  */
 interface FilesystemSourceInterface
 {
-    public function get(FilenameKeyInterface $key): ?ImageInterface;
+    public function get(FilenameKeyInterface $key): ? ImageInterface;
     public function exists(FilenameKeyInterface $key): bool;
 }

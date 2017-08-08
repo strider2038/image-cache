@@ -38,12 +38,12 @@ class Request implements RequestInterface
         }
     }
     
-    public function getMethod(): ?string 
+    public function getMethod(): ? string 
     {
         return $this->method;
     }
     
-    public function getHeader(string $key): ?string 
+    public function getHeader(string $key): ? string 
     {
         if (!in_array($key, $this->getAvailableHeaders())) {
             return null;

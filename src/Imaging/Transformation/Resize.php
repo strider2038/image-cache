@@ -38,7 +38,7 @@ class Resize implements TransformationInterface
     /** @var string */
     private $mode;
     
-    public function __construct(int $width, ?int $height = null, string $mode = self::MODE_STRETCH)
+    public function __construct(int $width, ? int $height = null, string $mode = self::MODE_STRETCH)
     {
         if ($height === null) {
             $height = $width;

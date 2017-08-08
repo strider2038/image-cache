@@ -24,7 +24,7 @@ class TransformationsCreator implements TransformationsCreatorInterface
         $this->factoryFlyweight = $factoryFlyweight;
     }
 
-    public function create(string $configuration): ?TransformationInterface
+    public function create(string $configuration): ? TransformationInterface
     {
         $factory = $this->factoryFlyweight->findFactory(substr($configuration, 0, 2));
         if ($factory !== null) {

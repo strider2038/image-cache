@@ -52,7 +52,7 @@ class FilesystemSource implements FilesystemSourceInterface
         return $this->baseDirectory;
     }
     
-    public function get(FilenameKeyInterface $key): ?ImageInterface
+    public function get(FilenameKeyInterface $key): ? ImageInterface
     {
         $sourceFilename = $this->composeSourceFilename($key);
         

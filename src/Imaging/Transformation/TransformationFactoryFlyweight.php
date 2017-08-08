@@ -55,7 +55,7 @@ class TransformationFactoryFlyweight implements TransformationFactoryFlyweightIn
         ];
     }
 
-    public function findFactory(string $index): ?TransformationFactoryInterface
+    public function findFactory(string $index): ? TransformationFactoryInterface
     {
         if (!isset($this->factoriesMap[$index])) {
             return null;

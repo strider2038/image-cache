@@ -30,6 +30,6 @@ class SaveOptionsConfigurator implements SaveOptionsConfiguratorInterface
             throw new InvalidRequestValueException('Invalid config for quality transformation');
         }
 
-        $saveOptions->setQuality((int)$config);
+        $saveOptions->setQuality((int) $config);
     }
 }

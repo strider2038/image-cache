@@ -16,5 +16,5 @@ namespace Strider2038\ImgCache\Imaging\Transformation;
  */
 interface TransformationFactoryFlyweightInterface
 {
-    public function findFactory(string $index): ?TransformationFactoryInterface;
+    public function findFactory(string $index): ? TransformationFactoryInterface;
 }

@@ -7,9 +7,9 @@
 - [x] Basic logging
 - [x] Transformation classes refactoring (changing names and using flyweight pattern)
 - [x] Image saving with options
+- [ ] Image writing to sources
 - [ ] Functional testing
 - [ ] Acceptance testing
-- [ ] Image writing to sources
 - [ ] Performance optimization (lazy services)
 - [ ] Cache mechanism for source accessor
 - [ ] Google map source
@@ -18,3 +18,6 @@
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] Support for building docker containers in Travis
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
+- [ ] Shift transformation
+- [ ] Rotate transformation
+- [ ] Flip transformation

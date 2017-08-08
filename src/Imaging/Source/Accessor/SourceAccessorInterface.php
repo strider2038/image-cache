@@ -17,6 +17,6 @@ use Strider2038\ImgCache\Imaging\Image\ImageInterface;
  */
 interface SourceAccessorInterface
 {
-    public function get(string $key): ?ImageInterface;
+    public function get(string $key): ? ImageInterface;
     public function exists(string $key): bool;
 }

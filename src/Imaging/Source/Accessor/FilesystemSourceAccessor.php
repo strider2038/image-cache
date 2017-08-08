@@ -45,7 +45,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
         $this->logger = $logger;
     }
 
-    public function get(string $key): ?ImageInterface
+    public function get(string $key): ? ImageInterface
     {
         $filenameKey = $this->composeFilenameKey($key);
 

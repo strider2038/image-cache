@@ -72,7 +72,7 @@ class ImageCache implements ImageCacheInterface
      * @param string $key
      * @return null|ImageInterface
      */
-    public function get(string $key): ?ImageInterface
+    public function get(string $key): ? ImageInterface
     {
         $this->validateKey($key);
 
