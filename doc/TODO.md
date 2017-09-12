@@ -21,3 +21,4 @@
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
+- [ ] Migrate to PSR-7 request and response interfaces
