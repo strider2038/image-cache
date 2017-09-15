@@ -19,4 +19,6 @@ COPY ./.docker/php/* /usr/local/etc/php/conf.d/
 COPY ./.docker/sshd/* /etc/ssh/
 COPY ./.docker/env/dev.sh /etc/profile.d/dev.sh
 
+RUN chmod 600 /etc/ssh/ssh_host_*
+
 EXPOSE 22 80 9001
