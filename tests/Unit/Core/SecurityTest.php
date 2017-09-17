@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\{
-    RequestInterface, Security
+    DeprecatedRequestInterface, Security
 };
 
 /**
@@ -25,12 +25,12 @@ class SecurityTest extends TestCase
     const INVALID_TOKEN = '123';
     const HEADER_AUTH = 'HTTP_AUTHORIZATION';
     
-    /** @var RequestInterface */
+    /** @var DeprecatedRequestInterface */
     private $request;
 
     public function setUp() 
     {
-        $this->request = \Phake::mock(RequestInterface::class);
+        $this->request = \Phake::mock(DeprecatedRequestInterface::class);
     }
     
     /**

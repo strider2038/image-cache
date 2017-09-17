@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Service\Router;
@@ -29,7 +29,7 @@ class RouterTest extends TestCase
     const REQUEST_URL = '/a.jpg';
     const REQUEST_METHOD_GET = 'GET';
 
-    /** @var RequestInterface */
+    /** @var DeprecatedRequestInterface */
     private $request;
 
     /** @var ImageValidatorInterface */
@@ -40,7 +40,7 @@ class RouterTest extends TestCase
 
     protected function setUp()
     {
-        $this->request = \Phake::mock(RequestInterface::class);
+        $this->request = \Phake::mock(DeprecatedRequestInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->logger = $this->givenLogger();
     }

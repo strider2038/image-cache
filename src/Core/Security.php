@@ -17,13 +17,13 @@ use Strider2038\ImgCache\Exception\ApplicationException;
  */
 class Security implements SecurityInterface
 {
-    /** @var RequestInterface */
+    /** @var DeprecatedRequestInterface */
     private $request;
     
     /** @var string */
     private $accessToken;
     
-    public function __construct(RequestInterface $request, string $token)
+    public function __construct(DeprecatedRequestInterface $request, string $token)
     {
         if (strlen($token) < 32) {
             throw new ApplicationException('Access token is insecure');
@@ -34,7 +34,7 @@ class Security implements SecurityInterface
 
     public function isTokenValid(): bool 
     {
-        $auth = $this->request->getHeader(Request::HEADER_AUTHORIZATION);
+        $auth = $this->request->getHeader(DeprecatedRequest::HEADER_AUTHORIZATION);
         if ($auth !== null && preg_match('/^Bearer\s+(.*?)$/', $auth, $matches)) {
             return $matches[1] === $this->accessToken;
         }

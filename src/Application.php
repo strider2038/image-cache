@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\ControllerInterface;
-use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
@@ -52,7 +52,7 @@ class Application
 
             $this->logger->debug('Application started');
 
-            /** @var RequestInterface $request */
+            /** @var DeprecatedRequestInterface $request */
             $request = $this->container->get(self::REQUEST_ID);
 
             /** @var RouterInterface $router */

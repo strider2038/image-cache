@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\ControllerInterface;
-use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
@@ -86,9 +86,9 @@ class ApplicationTest extends TestCase
         return $application;
     }
 
-    private function givenContainer_Get_ReturnsRequest(): RequestInterface
+    private function givenContainer_Get_ReturnsRequest(): DeprecatedRequestInterface
     {
-        $request = \Phake::mock(RequestInterface::class);
+        $request = \Phake::mock(DeprecatedRequestInterface::class);
 
         \Phake::when($this->container)->get(self::REQUEST_ID)->thenReturn($request);
 
@@ -114,7 +114,7 @@ class ApplicationTest extends TestCase
         return $logger;
     }
 
-    private function givenRouter_GetRoute_ReturnsRoute(RouterInterface $router, RequestInterface $request): void
+    private function givenRouter_GetRoute_ReturnsRoute(RouterInterface $router, DeprecatedRequestInterface $request): void
     {
         $route = \Phake::mock(Route::class);
 

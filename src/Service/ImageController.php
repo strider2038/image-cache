@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Service;
 
 use Strider2038\ImgCache\Core\{
-    Controller, RequestInterface, ResponseInterface, SecurityInterface
+    Controller, DeprecatedRequestInterface, ResponseInterface, SecurityInterface
 };
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
@@ -24,7 +24,7 @@ use Strider2038\ImgCache\Response\{
  */
 class ImageController extends Controller 
 {
-    /** @var RequestInterface */
+    /** @var DeprecatedRequestInterface */
     private $request;
 
     /** @var ImageCacheInterface */
@@ -33,7 +33,7 @@ class ImageController extends Controller
     public function __construct(
         SecurityInterface $security,
         ImageCacheInterface $imageCache,
-        RequestInterface $request
+        DeprecatedRequestInterface $request
     ) {
         parent::__construct($security);
         $this->imageCache = $imageCache;

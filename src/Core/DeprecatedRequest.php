@@ -11,9 +11,10 @@
 namespace Strider2038\ImgCache\Core;
 
 /**
+ * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Request implements RequestInterface 
+class DeprecatedRequest implements DeprecatedRequestInterface
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';

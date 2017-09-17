@@ -11,10 +11,10 @@
 namespace Strider2038\ImgCache\Core;
 
 /**
- *
+ * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface RequestInterface 
+interface DeprecatedRequestInterface
 {
     public function getMethod(): ? string;
     public function getHeader(string $key): ? string;

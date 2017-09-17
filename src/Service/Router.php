@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Service;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\Request;
-use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\DeprecatedRequest;
+use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
@@ -38,11 +38,11 @@ class Router implements RouterInterface
     private $logger;
 
     private $methodsToActionsMap = [
-        Request::METHOD_GET    => 'get',
-        Request::METHOD_POST   => 'create',
-        Request::METHOD_PUT    => 'replace',
-        Request::METHOD_PATCH  => 'rebuild',
-        Request::METHOD_DELETE => 'delete',
+        DeprecatedRequest::METHOD_GET    => 'get',
+        DeprecatedRequest::METHOD_POST   => 'create',
+        DeprecatedRequest::METHOD_PUT    => 'replace',
+        DeprecatedRequest::METHOD_PATCH  => 'rebuild',
+        DeprecatedRequest::METHOD_DELETE => 'delete',
     ];
 
     public function __construct(ImageValidatorInterface $imageValidator, array $urlMaskToControllersMap = [])
@@ -61,7 +61,7 @@ class Router implements RouterInterface
         $this->logger = $logger;
     }
 
-    public function getRoute(RequestInterface $request): Route 
+    public function getRoute(DeprecatedRequestInterface $request): Route
     {
         $requestMethod = $request->getMethod();
         $url = $request->getUrl(PHP_URL_PATH);

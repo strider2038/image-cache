@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Service;
 
-use Strider2038\ImgCache\Core\RequestInterface;
+use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
@@ -37,7 +37,7 @@ class ImageControllerTest extends FileTestCase
     /** @var SecurityInterface */
     private $security;
     
-    /** @var RequestInterface */
+    /** @var DeprecatedRequestInterface */
     private $request;
     
     /** @var ImageCacheInterface */
@@ -48,7 +48,7 @@ class ImageControllerTest extends FileTestCase
         parent::setUp();
         $this->imageCache = \Phake::mock(ImageCacheInterface::class);
         $this->security = \Phake::mock(SecurityInterface::class);
-        $this->request = \Phake::mock(RequestInterface::class);
+        $this->request = \Phake::mock(DeprecatedRequestInterface::class);
     }
 
     public function testActionGet_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void

@@ -12,7 +12,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\Request;
+use Strider2038\ImgCache\Core\DeprecatedRequest;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -62,7 +62,7 @@ class RequestTest extends TestCase
         $_SERVER[$header] = $value;
         $request = $this->createRequest();
 
-        $actualHeader = $request->getHeader(Request::HEADER_AUTHORIZATION);
+        $actualHeader = $request->getHeader(DeprecatedRequest::HEADER_AUTHORIZATION);
 
         $this->assertEquals($value, $actualHeader);
     }
@@ -103,9 +103,9 @@ class RequestTest extends TestCase
         $this->assertEquals(self::REQUEST_URI_SCHEME, $url);
     }
 
-    private function createRequest(): Request
+    private function createRequest(): DeprecatedRequest
     {
-        $request = new Request();
+        $request = new DeprecatedRequest();
 
         return $request;
     }
