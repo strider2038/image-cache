@@ -17,7 +17,7 @@ use Strider2038\ImgCache\Core\DeprecatedRequest;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class RequestTest extends TestCase
+class DeprecatedRequestTest extends TestCase
 {
     const REQUEST_URI = 'http://example.org';
     const REQUEST_URI_SCHEME = 'http';

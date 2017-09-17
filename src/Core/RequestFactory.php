@@ -14,18 +14,10 @@ namespace Strider2038\ImgCache\Core;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HeaderValueCollection extends IterableCollection
+class RequestFactory implements RequestFactoryInterface
 {
-    /** @param string[] $elements */
-    public function __construct(array $elements = [])
+    public function createRequest(): RequestInterface
     {
-        foreach ($elements as $value) {
-            $this->add($value);
-        }
-    }
-
-    public function add(string $value): void
-    {
-        $this->elements[] = $value;
+        // TODO: Implement createRequest() method.
     }
 }

@@ -10,13 +10,29 @@
 
 namespace Strider2038\ImgCache\Core;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Strider2038\ImgCache\Enum\HttpHeader;
 
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HeaderCollection extends ArrayCollection
+class HeaderCollection extends IterableCollection
 {
+    /** @param HeaderValueCollection[] $elements */
+    public function __construct(array $elements = [])
+    {
+        foreach ($elements as $key => $value) {
+            $this->set(new HttpHeader($key), $value);
+        }
+    }
 
+    public function set(HttpHeader $name, HeaderValueCollection $values): void
+    {
+        $this->elements[$name->getValue()] = $values;
+    }
+
+    public function get(HttpHeader $name): ? HeaderValueCollection
+    {
+        return $this->elements[$name->getValue()] ?? null;
+    }
 }

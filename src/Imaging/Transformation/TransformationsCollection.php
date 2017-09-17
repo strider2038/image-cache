@@ -11,26 +11,15 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
+use Strider2038\ImgCache\Core\IterableCollection;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TransformationsCollection implements \IteratorAggregate, \Countable
+class TransformationsCollection extends IterableCollection
 {
-    /** @var TransformationInterface[] */
-    private $collection = [];
-    
     public function add(TransformationInterface $transformation): void
     {
-        $this->collection[] = $transformation;
-    }
-
-    public function getIterator(): \Traversable
-    {
-        return new \ArrayIterator($this->collection);
-    }
-    
-    public function count(): int
-    {
-        return count($this->collection);
+        $this->elements[] = $transformation;
     }
 }

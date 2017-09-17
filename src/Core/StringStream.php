@@ -14,18 +14,23 @@ namespace Strider2038\ImgCache\Core;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HeaderValueCollection extends IterableCollection
+class StringStream implements StreamInterface
 {
-    /** @param string[] $elements */
-    public function __construct(array $elements = [])
+    /** @var string */
+    private $contents;
+
+    public function __construct(string $contents)
     {
-        foreach ($elements as $value) {
-            $this->add($value);
-        }
+        $this->contents = $contents;
     }
 
-    public function add(string $value): void
+    public function __toString()
     {
-        $this->elements[] = $value;
+        return $this->getContents();
+    }
+
+    public function getContents(): string
+    {
+        return $this->contents;
     }
 }

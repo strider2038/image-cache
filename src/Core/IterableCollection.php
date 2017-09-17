@@ -14,18 +14,18 @@ namespace Strider2038\ImgCache\Core;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HeaderValueCollection extends IterableCollection
+abstract class IterableCollection implements \IteratorAggregate, \Countable
 {
-    /** @param string[] $elements */
-    public function __construct(array $elements = [])
+    /** @var array */
+    protected $elements = [];
+
+    public function getIterator(): \Traversable
     {
-        foreach ($elements as $value) {
-            $this->add($value);
-        }
+        return new \ArrayIterator($this->elements);
     }
 
-    public function add(string $value): void
+    public function count(): int
     {
-        $this->elements[] = $value;
+        return count($this->elements);
     }
 }

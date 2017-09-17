@@ -16,7 +16,8 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 
 class TransformationsCollectionTest extends TestCase
 {
-    public function testAdd_NoTransformationsInCollection_OneTransformationInCollection(): void
+    /** @test */
+    public function add_noTransformationsInCollection_oneTransformationInCollection(): void
     {
         $collection = new TransformationsCollection();
         $transformation = \Phake::mock(TransformationInterface::class);
@@ -24,19 +25,5 @@ class TransformationsCollectionTest extends TestCase
         $collection->add($transformation);
 
         $this->assertCount(1, $collection);
-    }
-
-    public function testIterate_OneTransformationInCollection_IterationsCountIsOne(): void
-    {
-        $collection = new TransformationsCollection();
-        $transformation = \Phake::mock(TransformationInterface::class);
-        $collection->add($transformation);
-        $iterationsCount = 0;
-
-        foreach ($collection as $item) {
-            $iterationsCount++;
-        }
-
-        $this->assertEquals(1, $iterationsCount);
     }
 }
