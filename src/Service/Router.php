@@ -17,8 +17,8 @@ use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
+use Strider2038\ImgCache\Exception\InvalidRequestException;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
-use Strider2038\ImgCache\Exception\RequestException;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 /**
@@ -73,7 +73,7 @@ class Router implements RouterInterface
         }
 
         if (!$this->imageValidator->hasValidImageExtension($url)) {
-            throw new RequestException('Requested file has incorrect extension');
+            throw new InvalidRequestException('Requested file has incorrect extension');
         }
 
         [$controllerId, $location] = $this->splitUrlToControllerAndLocation($request->getUrl());

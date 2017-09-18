@@ -16,5 +16,5 @@ namespace Strider2038\ImgCache\Core\Http;
  */
 interface RequestFactoryInterface
 {
-    public function createRequest(): RequestInterface;
+    public function createRequest(array $serverConfiguration): RequestInterface;
 }

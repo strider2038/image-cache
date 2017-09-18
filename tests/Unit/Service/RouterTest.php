@@ -143,7 +143,7 @@ class RouterTest extends TestCase
     }
 
     /**
-     * @expectedException \Strider2038\ImgCache\Exception\RequestException
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Requested file has incorrect extension
      */

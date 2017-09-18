@@ -10,14 +10,39 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
+use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
+use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Exception\InvalidRequestException;
+
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class RequestFactory implements RequestFactoryInterface
 {
-    public function createRequest(): RequestInterface
+    /** @var string */
+    private $streamSource;
+
+    public function __construct(string $streamSource = 'php://input')
     {
-        // TODO: Implement createRequest() method.
+        $this->streamSource = $streamSource;
+    }
+
+    public function createRequest(array $serverConfiguration): RequestInterface
+    {
+        $requestMethodName = strtoupper($serverConfiguration['REQUEST_METHOD'] ?? '');
+        if (!HttpMethod::isValid($requestMethodName)) {
+            throw new InvalidRequestException(sprintf("Unsupported http method '%s'", $requestMethodName));
+        }
+
+        $method = new HttpMethod($requestMethodName);
+        $uri = new Uri($serverConfiguration['REQUEST_URI'] ?? '');
+
+        $request = new Request($method, $uri);
+
+        $bodyStream = new ReadOnlyResourceStream($this->streamSource);
+        $request->setBody($bodyStream);
+
+        return $request;
     }
 }

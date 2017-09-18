@@ -24,23 +24,20 @@ class Request extends Message implements RequestInterface
     /** @var UriInterface */
     private $uri;
 
+    public function __construct(HttpMethod $method, UriInterface $uri)
+    {
+        parent::__construct();
+        $this->method = $method;
+        $this->uri = $uri;
+    }
+
     public function getMethod(): HttpMethod
     {
         return $this->method;
     }
 
-    public function setMethod(HttpMethod $method): void
-    {
-        $this->method = $method;
-    }
-
     public function getUri(): UriInterface
     {
         return $this->uri;
-    }
-
-    public function setUri(UriInterface $uri): void
-    {
-        $this->uri = $uri;
     }
 }
