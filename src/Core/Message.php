@@ -57,17 +57,19 @@ class Message implements MessageInterface
 
     public function hasHeader(HttpHeader $name): bool
     {
-        // TODO: Implement hasHeader() method.
+        return $this->headers->containsKey($name);
     }
 
     public function getHeader(HttpHeader $name): HeaderValueCollection
     {
-        // TODO: Implement getHeader() method.
+        return $this->headers->get($name);
     }
 
     public function getHeaderLine(HttpHeader $name): string
     {
-        // TODO: Implement getHeaderLine() method.
+        $values = $this->headers->get($name);
+
+        return implode(',', $values->toArray());
     }
 
     public function getBody(): StreamInterface

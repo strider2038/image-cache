@@ -35,4 +35,9 @@ class HeaderCollection extends IterableCollection
     {
         return $this->elements[$name->getValue()] ?? null;
     }
+
+    public function containsKey(HttpHeader $name): bool
+    {
+        return array_key_exists($name->getValue(), $this->elements);
+    }
 }

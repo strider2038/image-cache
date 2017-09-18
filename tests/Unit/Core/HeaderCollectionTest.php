@@ -20,15 +20,33 @@ class HeaderCollectionTest extends TestCase
     /** @test */
     public function construct_givenArrayWithHeader_headerWithValuesIsSet(): void
     {
+        $elements = $this->givenElements();
+
+        $collection = new HeaderCollection($elements);
+
+        $values = $collection->get(new HttpHeader(HttpHeader::AUTHORIZATION));
+        $this->assertInstanceOf(HeaderValueCollection::class, $values);
+    }
+
+    /** @test */
+    public function containsKey_givenArrayWithHeader_returnsTrue(): void
+    {
+        $elements = $this->givenElements();
+        $collection = new HeaderCollection($elements);
+
+        $result = $collection->containsKey(new HttpHeader(HttpHeader::AUTHORIZATION));
+
+        $this->assertTrue($result);
+    }
+
+    private function givenElements(): array
+    {
         $elements = [
             HttpHeader::AUTHORIZATION => new HeaderValueCollection([
                 'AuthorizationValue'
             ])
         ];
 
-        $collection = new HeaderCollection($elements);
-
-        $values = $collection->get(new HttpHeader(HttpHeader::AUTHORIZATION));
-        $this->assertInstanceOf(HeaderValueCollection::class, $values);
+        return $elements;
     }
 }

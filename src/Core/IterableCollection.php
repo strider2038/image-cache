@@ -28,4 +28,9 @@ abstract class IterableCollection implements \IteratorAggregate, \Countable
     {
         return count($this->elements);
     }
+
+    public function toArray(): array
+    {
+        return $this->elements;
+    }
 }
