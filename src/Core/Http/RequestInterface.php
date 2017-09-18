@@ -8,13 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Core\Http;
+
+use Strider2038\ImgCache\Enum\HttpMethod;
 
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface RequestFactoryInterface
+interface RequestInterface extends MessageInterface
 {
-    public function createRequest(): RequestInterface;
+    public function getMethod(): HttpMethod;
+    public function getUri(): UriInterface;
 }

@@ -8,8 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Core\Http;
 
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeader;
 use Strider2038\ImgCache\Enum\HttpProtocolVersion;
 

@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Core;
+namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\HeaderCollection;
-use Strider2038\ImgCache\Core\HeaderValueCollection;
-use Strider2038\ImgCache\Core\Message;
+use Strider2038\ImgCache\Core\Http\HeaderCollection;
+use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
+use Strider2038\ImgCache\Core\Http\Message;
 use Strider2038\ImgCache\Core\NullStream;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeader;

@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Core;
+namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\HeaderValueCollection;
+use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 
 class HeaderValueCollectionTest extends TestCase
 {

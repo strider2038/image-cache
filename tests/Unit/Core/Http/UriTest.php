@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Core;
+namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\Uri;
+use Strider2038\ImgCache\Core\Http\Uri;
 
 class UriTest extends TestCase
 {
-    const URI_VALUE = 'http://username:password@hostname:9090/path?arg=value#anchor';
+    private const URI_VALUE = 'http://username:password@hostname:9090/path?arg=value#anchor';
 
     /**
      * @test
