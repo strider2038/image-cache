@@ -25,24 +25,24 @@ class MessageTest extends TestCase
     private const HEADER_VALUES_LINE = 'value1,value2';
 
     /** @test */
-    public function construct_nothingIsGiven_HeadersAreEmptyAndBodyIsNullStreamAndProtocolVersionIs1(): void
+    public function construct_nothingIsGiven_HeadersAreEmptyAndBodyIsNullStreamAndProtocolVersionIs11(): void
     {
         $message = new Message();
 
-        $this->assertEquals('1.0', $message->getProtocolVersion());
+        $this->assertEquals('1.1', $message->getProtocolVersion());
         $this->assertCount(0, $message->getHeaders());
         $this->assertInstanceOf(NullStream::class, $message->getBody());
     }
 
     /** @test */
-    public function setProtocolVersion_versionIs11_versionIsReturned(): void
+    public function setProtocolVersion_versionIs10_versionIsReturned(): void
     {
         $message = new Message();
-        $protocolVersion = new HttpProtocolVersion(HttpProtocolVersion::V1_1);
+        $protocolVersion = new HttpProtocolVersion(HttpProtocolVersion::V1_0);
 
         $message->setProtocolVersion($protocolVersion);
 
-        $this->assertEquals('1.1', $message->getProtocolVersion());
+        $this->assertEquals('1.0', $message->getProtocolVersion());
     }
 
     /** @test */

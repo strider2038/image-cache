@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
 use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Enum\HttpProtocolVersion;
 use Strider2038\ImgCache\Exception\InvalidRequestException;
 
 
@@ -42,6 +43,13 @@ class RequestFactory implements RequestFactoryInterface
 
         $bodyStream = new ReadOnlyResourceStream($this->streamSource);
         $request->setBody($bodyStream);
+
+        $requestProtocol = $serverConfiguration['SERVER_PROTOCOL'] ?? '';
+        if ($requestProtocol === 'HTTP/1.0') {
+            $request->setProtocolVersion(new HttpProtocolVersion(HttpProtocolVersion::V1_0));
+        } else {
+            $request->setProtocolVersion(new HttpProtocolVersion(HttpProtocolVersion::V1_1));
+        }
 
         return $request;
     }

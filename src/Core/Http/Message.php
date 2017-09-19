@@ -32,7 +32,7 @@ class Message implements MessageInterface
 
     public function __construct()
     {
-        $this->protocolVersion = new HttpProtocolVersion(HttpProtocolVersion::V1_0);
+        $this->protocolVersion = new HttpProtocolVersion(HttpProtocolVersion::V1_1);
         $this->headers = new HeaderCollection();
         $this->body = new NullStream();
     }

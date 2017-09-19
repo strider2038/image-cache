@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestFactory;
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
 use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Enum\HttpProtocolVersion;
 
 class RequestFactoryTest extends TestCase
 {
@@ -35,6 +36,38 @@ class RequestFactoryTest extends TestCase
         $this->assertEquals(HttpMethod::GET, $request->getMethod());
         $this->assertEquals(self::REQUEST_URI_VALUE, $request->getUri());
         $this->assertInstanceOf(ReadOnlyResourceStream::class, $request->getBody());
+        $this->assertEquals(HttpProtocolVersion::V1_1, $request->getProtocolVersion()->getValue());
+    }
+
+    /**
+     * @test
+     * @param null|string $givenServerProtocol
+     * @param string $expectedServerProtocol
+     * @dataProvider serverProtocolProvider
+     */
+    public function createRequest_givenServerConfigurationWithServerProtocol_requestWithValidServerProtocolIsReturned(
+        ?string $givenServerProtocol,
+        string $expectedServerProtocol
+    ): void {
+        $serverConfiguration = [
+            'REQUEST_METHOD' => HttpMethod::GET,
+            'REQUEST_URI' => self::REQUEST_URI_VALUE,
+            'SERVER_PROTOCOL' => $givenServerProtocol
+        ];
+        $factory = new RequestFactory();
+
+        $request = $factory->createRequest($serverConfiguration);
+
+        $this->assertEquals($expectedServerProtocol, $request->getProtocolVersion()->getValue());
+    }
+
+    public function serverProtocolProvider(): array
+    {
+        return [
+            [null, '1.1'],
+            ['HTTP/1.0', '1.0'],
+            ['HTTP/1.1', '1.1'],
+        ];
     }
 
     /**
