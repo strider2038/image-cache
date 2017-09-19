@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
@@ -25,21 +26,16 @@ class ImageCacheTest extends TestCase
 {
     use FileOperationsTrait, ImageTrait;
 
-    const BASE_DIRECTORY = '/cache';
-
-    const INVALID_KEY = 'a';
-
-    const GET_KEY = '/a.jpg';
-    const GET_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/a.jpg';
-
-    const INSERT_KEY = '/b.jpg';
-    const INSERT_DATA = 'data';
-
-    const DELETE_KEY = '/c.jpg';
-    const DELETE_KEY_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/c.jpg';
-
-    const REBUILD_KEY = '/d.jpg';
-    const REBUILD_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/d.jpg';
+    private const BASE_DIRECTORY = '/cache';
+    private const INVALID_KEY = 'a';
+    private const GET_KEY = '/a.jpg';
+    private const GET_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/a.jpg';
+    private const INSERT_KEY = '/b.jpg';
+    private const INSERT_DATA = 'data';
+    private const DELETE_KEY = '/c.jpg';
+    private const DELETE_KEY_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/c.jpg';
+    private const REBUILD_KEY = '/d.jpg';
+    private const REBUILD_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/d.jpg';
 
     /** @var FileOperations */
     private $fileOperations;
@@ -59,11 +55,12 @@ class ImageCacheTest extends TestCase
     }
 
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessageRegExp /Directory .* does not exist/
      */
-    public function testConstruct_CacheDirectoryIsInvalid_ExceptionThrown(): void
+    public function construct_cacheDirectoryIsInvalid_exceptionThrown(): void
     {
         $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, false);
 
@@ -75,7 +72,8 @@ class ImageCacheTest extends TestCase
         );
     }
 
-    public function testGet_ImageDoesNotExistInSource_NullIsReturned(): void
+    /** @test */
+    public function get_imageDoesNotExistInSource_nullIsReturned(): void
     {
         $cache = $this->createImageCache();
         $this->givenImageExtractor_Extract_ReturnsNull();
@@ -85,7 +83,8 @@ class ImageCacheTest extends TestCase
         $this->assertNull($image);
     }
 
-    public function testGet_ImageExistsInSource_SourceImageSavedToWebDirectoryAndCachedImageIsReturned(): void
+    /** @test */
+    public function get_imageExistsInSource_sourceImageSavedToWebDirectoryAndCachedImageIsReturned(): void
     {
         $cache = $this->createImageCache();
         $extractedImage = $this->givenImageExtractor_Extract_ReturnsImage(self::GET_KEY);
@@ -100,40 +99,46 @@ class ImageCacheTest extends TestCase
     }
 
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\NotAllowedException
      * @expectedExceptionCode 405
      * @expectedExceptionMessage Operation 'put' is not allowed
      */
-    public function testPut_ImageWriterIsNotSpecified_NotAllowedExceptionThrown(): void
+    public function put_imageWriterIsNotSpecified_notAllowedExceptionThrown(): void
     {
         $cache = $this->createImageCache();
+        $stream = $this->givenStream();
 
-        $cache->put(self::INSERT_KEY, self::INSERT_DATA);
+        $cache->put(self::INSERT_KEY, $stream);
     }
 
-    public function testPut_ImageWriterIsSpecified_InsertMethodCalled(): void
+    /** @test */
+    public function put_imageWriterIsSpecified_insertMethodCalled(): void
     {
         $writer = \Phake::mock(ImageWriterInterface::class);
         $cache = $this->createImageCache($writer);
+        $stream = $this->givenStream();
 
-        $cache->put(self::INSERT_KEY, self::INSERT_DATA);
+        $cache->put(self::INSERT_KEY, $stream);
 
-        \Phake::verify($writer, \Phake::times(1))->insert(self::INSERT_KEY, self::INSERT_DATA);
+        \Phake::verify($writer, \Phake::times(1))->insert(self::INSERT_KEY, $stream);
     }
 
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\NotAllowedException
      * @expectedExceptionCode 405
      * @expectedExceptionMessage Operation 'delete' is not allowed
      */
-    public function testDelete_ImageWriterIsNotSpecified_NotAllowedExceptionThrown(): void
+    public function delete_imageWriterIsNotSpecified_notAllowedExceptionThrown(): void
     {
         $cache = $this->createImageCache();
 
         $cache->delete(self::DELETE_KEY);
     }
 
-    public function testDelete_ImageWriterIsSpecified_DeleteMethodCalled(): void
+    /** @test */
+    public function delete_imageWriterIsSpecified_deleteMethodCalled(): void
     {
         $writer = \Phake::mock(ImageWriterInterface::class);
         $cache = $this->createImageCache($writer);
@@ -144,7 +149,8 @@ class ImageCacheTest extends TestCase
         $this->assertFileOperations_DeleteFile_IsCalledOnce($this->fileOperations, self::DELETE_KEY_DESTINATION_FILENAME);
     }
 
-    public function testExists_KeyIsSet_ExistsCalledWithKeyAndValueReturned(): void
+    /** @test */
+    public function exists_keyIsSet_existsCalledWithKeyAndValueReturned(): void
     {
         $cache = $this->createImageCache();
         \Phake::when($this->imageExtractor)->exists(self::GET_KEY)->thenReturn(true);
@@ -155,7 +161,8 @@ class ImageCacheTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testRebuild_CachedImageExists_ImageRemovedFromCacheAndSavedFromSourceToWebDirectory(): void
+    /** @test */
+    public function rebuild_cachedImageExists_imageRemovedFromCacheAndSavedFromSourceToWebDirectory(): void
     {
         $cache = $this->createImageCacheWithMockedGetMethod();
         $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::REBUILD_DESTINATION_FILENAME, true);
@@ -168,6 +175,7 @@ class ImageCacheTest extends TestCase
     }
 
     /**
+     * @test
      * @param string $method
      * @param array $params
      * @dataProvider invalidKeyProvider
@@ -175,7 +183,7 @@ class ImageCacheTest extends TestCase
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Key must start with slash
      */
-    public function testGivenMethod_GivenInvalidKey_ExceptionThrown(string $method, array $params): void
+    public function givenMethod_givenInvalidKey_exceptionThrown(string $method, array $params): void
     {
         $cache = $this->createImageCache();
 
@@ -186,7 +194,7 @@ class ImageCacheTest extends TestCase
     {
         return [
             ['get', [self::INVALID_KEY]],
-            ['put', [self::INVALID_KEY, '']],
+            ['put', [self::INVALID_KEY, $this->givenStream()]],
             ['delete', [self::INVALID_KEY]],
             ['exists', [self::INVALID_KEY]],
             ['rebuild', [self::INVALID_KEY]],
@@ -245,6 +253,12 @@ class ImageCacheTest extends TestCase
             ->thenReturn($image);
 
         return $image;
+    }
+
+    private function givenStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        return $stream;
     }
 
 }

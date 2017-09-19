@@ -10,21 +10,24 @@
 
 namespace Strider2038\ImgCache\Service;
 
-use Strider2038\ImgCache\Core\{
-    Controller, DeprecatedRequestInterface, ResponseInterface, SecurityInterface
-};
+use Strider2038\ImgCache\Core\Controller;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\ResponseInterface;
+use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
-use Strider2038\ImgCache\Response\{
-    ConflictResponse, CreatedResponse, ImageResponse, NotFoundResponse, SuccessResponse
-};
+use Strider2038\ImgCache\Response\ConflictResponse;
+use Strider2038\ImgCache\Response\CreatedResponse;
+use Strider2038\ImgCache\Response\ImageResponse;
+use Strider2038\ImgCache\Response\NotFoundResponse;
+use Strider2038\ImgCache\Response\SuccessResponse;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageController extends Controller 
 {
-    /** @var DeprecatedRequestInterface */
+    /** @var RequestInterface */
     private $request;
 
     /** @var ImageCacheInterface */
@@ -33,7 +36,7 @@ class ImageController extends Controller
     public function __construct(
         SecurityInterface $security,
         ImageCacheInterface $imageCache,
-        DeprecatedRequestInterface $request
+        RequestInterface $request
     ) {
         parent::__construct($security);
         $this->imageCache = $imageCache;

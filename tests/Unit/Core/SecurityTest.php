@@ -12,65 +12,71 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\{
-    DeprecatedRequestInterface, Security
-};
+use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\Security;
+use Strider2038\ImgCache\Enum\HttpHeader;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class SecurityTest extends TestCase 
 {
-    const VALID_TOKEN = '12345678901234567890123456789012';
-    const INVALID_TOKEN = '123';
-    const HEADER_AUTH = 'HTTP_AUTHORIZATION';
-    
-    /** @var DeprecatedRequestInterface */
+    private const VALID_TOKEN = '12345678901234567890123456789012';
+    private const INVALID_TOKEN = '123';
+
+    /** @var RequestInterface */
     private $request;
 
     public function setUp() 
     {
-        $this->request = \Phake::mock(DeprecatedRequestInterface::class);
+        $this->request = \Phake::mock(RequestInterface::class);
     }
     
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Access token is insecure
      */
-    public function testConstruct_TokenIsShort_ExceptionThrown(): void
+    public function construct_tokenIsShort_exceptionThrown(): void
     {
         new Security($this->request, self::INVALID_TOKEN);
     }
-    
-    public function testIsTokenValid_HeaderIsNotSet_FalseReturned() 
+
+    /** @test */
+    public function isTokenValid_headerIsNotSet_falseReturned()
     {
         $security = new Security($this->request, self::VALID_TOKEN);
             
         $this->assertFalse($security->isTokenValid());
     }
-    
-    public function testIsTokenValid_ValidTokenInHeader_TrueReturned()
+
+    /** @test */
+    public function isTokenValid_validTokenInHeader_trueReturned()
     {
-        \Phake::when($this->request)
-            ->getHeader(self::HEADER_AUTH)
-            ->thenReturn('Bearer ' . self::VALID_TOKEN);
-        
+        $this->givenRequest_getHeaderLine_Returns('Bearer ' . self::VALID_TOKEN);
+
         $security = new Security($this->request, self::VALID_TOKEN);
         
         $this->assertTrue($security->isTokenValid());
         $this->assertTrue($security->isAuthorized());
     }
-    
-    public function testIsTokenValid_InvalidTokenInHeader_FalseReturned()
+
+    /** @test */
+    public function isTokenValid_invalidTokenInHeader_falseReturned()
     {
-        \Phake::when($this->request)
-            ->getHeader(self::HEADER_AUTH)
-            ->thenReturn('Bearer 123');
+        $this->givenRequest_getHeaderLine_Returns('Bearer 123');
         
         $security = new Security($this->request, self::VALID_TOKEN);
             
         $this->assertFalse($security->isTokenValid());
         $this->assertFalse($security->isAuthorized());
+    }
+
+    private function givenRequest_getHeaderLine_Returns(string $value): void
+    {
+        \Phake::when($this->request)
+            ->getHeaderLine(new HttpHeader(HttpHeader::AUTHORIZATION))
+            ->thenReturn($value);
     }
 }

@@ -11,9 +11,10 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Service;
 
-use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
@@ -31,13 +32,12 @@ use Strider2038\ImgCache\Tests\Support\FileTestCase;
  */
 class ImageControllerTest extends FileTestCase
 {
-    const LOCATION = 'a.jpg';
-    const IMAGE_BODY = '0';
+    private const LOCATION = 'a.jpg';
 
     /** @var SecurityInterface */
     private $security;
     
-    /** @var DeprecatedRequestInterface */
+    /** @var RequestInterface */
     private $request;
     
     /** @var ImageCacheInterface */
@@ -48,10 +48,11 @@ class ImageControllerTest extends FileTestCase
         parent::setUp();
         $this->imageCache = \Phake::mock(ImageCacheInterface::class);
         $this->security = \Phake::mock(SecurityInterface::class);
-        $this->request = \Phake::mock(DeprecatedRequestInterface::class);
+        $this->request = \Phake::mock(RequestInterface::class);
     }
 
-    public function testActionGet_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
+    /** @test */
+    public function actionGet_fileDoesNotExistInCache_notFoundResponseIsReturned(): void
     {
         $controller = $this->createImageController();
         $this->givenImageCache_Get_Returns(null);
@@ -61,7 +62,8 @@ class ImageControllerTest extends FileTestCase
         $this->assertInstanceOf(NotFoundResponse::class, $response);
     }
 
-    public function testActionGet_FileExistsInCache_ImageResponseIsReturned(): void
+    /** @test */
+    public function actionGet_fileExistsInCache_imageResponseIsReturned(): void
     {
         $controller = $this->createImageController();
         $image = $this->givenImage();
@@ -72,7 +74,8 @@ class ImageControllerTest extends FileTestCase
         $this->assertInstanceOf(ImageResponse::class, $response);
     }
 
-    public function testActionCreate_FileAlreadyExistsInCache_ConflictResponseIsReturned(): void
+    /** @test */
+    public function actionCreate_fileAlreadyExistsInCache_conflictResponseIsReturned(): void
     {
         $controller = $this->createImageController();
         $this->givenImageCache_Exists_Returns(true);
@@ -82,45 +85,49 @@ class ImageControllerTest extends FileTestCase
         $this->assertInstanceOf(ConflictResponse::class, $response);
     }
 
-    public function testActionCreate_FileDoesNotExistInCache_CreatedResponseIsReturned(): void
+    /** @test */
+    public function actionCreate_fileDoesNotExistInCache_createdResponseIsReturned(): void
     {
         $controller = $this->createImageController();
-        $this->givenRequest_GetBody_ReturnsString();
+        $stream = $this->givenRequest_GetBody_ReturnsStream();
         $this->givenImageCache_Exists_Returns(false);
 
         $response = $controller->actionCreate(self::LOCATION);
 
-        $this->assertImageCache_Put_IsCalledOnce();
+        $this->assertImageCache_Put_IsCalledOnce($stream);
         $this->assertInstanceOf(CreatedResponse::class, $response);
     }
 
-    public function testActionReplace_FileDoesNotExistInCache_DeleteNotCalledAndCreatedResponseIsReturned(): void
+    /** @test */
+    public function actionReplace_fileDoesNotExistInCache_deleteNotCalledAndCreatedResponseIsReturned(): void
     {
         $controller = $this->createImageController();
-        $this->givenRequest_GetBody_ReturnsString();
+        $stream = $this->givenRequest_GetBody_ReturnsStream();
         $this->givenImageCache_Exists_Returns(false);
 
         $response = $controller->actionReplace(self::LOCATION);
 
         $this->assertImageCache_Delete_IsNeverCalled();
-        $this->assertImageCache_Put_IsCalledOnce();
+        $this->assertImageCache_Put_IsCalledOnce($stream);
         $this->assertInstanceOf(CreatedResponse::class, $response);
     }
 
-    public function testActionReplace_FileExistsInCache_DeleteIsCalledAndCreatedResponseIsReturned(): void
+    /** @test */
+    public function actionReplace_fileExistsInCache_deleteIsCalledAndCreatedResponseIsReturned(): void
     {
         $controller = $this->createImageController();
-        $this->givenRequest_GetBody_ReturnsString();
+        $stream = $this->givenRequest_GetBody_ReturnsStream();
         $this->givenImageCache_Exists_Returns(true);
 
         $response = $controller->actionReplace(self::LOCATION);
 
         $this->assertImageCache_Delete_IsCalledOnce();
-        $this->assertImageCache_Put_IsCalledOnce();
+        $this->assertImageCache_Put_IsCalledOnce($stream);
         $this->assertInstanceOf(CreatedResponse::class, $response);
     }
 
-    public function testDelete_FileExistsInCache_DeleteIsCalledAndOkResponseIsReturned(): void
+    /** @test */
+    public function delete_fileExistsInCache_deleteIsCalledAndOkResponseIsReturned(): void
     {
         $controller = $this->createImageController();
         $this->givenImageCache_Exists_Returns(true);
@@ -131,7 +138,8 @@ class ImageControllerTest extends FileTestCase
         $this->assertInstanceOf(SuccessResponse::class, $response);
     }
 
-    public function testDelete_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
+    /** @test */
+    public function delete_fileDoesNotExistInCache_notFoundResponseIsReturned(): void
     {
         $controller = $this->createImageController();
         $this->givenImageCache_Exists_Returns(false);
@@ -142,7 +150,8 @@ class ImageControllerTest extends FileTestCase
         $this->assertInstanceOf(NotFoundResponse::class, $response);
     }
 
-    public function testRebuild_FileExistsInCache_RebuildIsCalledAndOkResponseIsReturned(): void
+    /** @test */
+    public function rebuild_fileExistsInCache_rebuildIsCalledAndOkResponseIsReturned(): void
     {
         $controller = $this->createImageController();
         $this->givenImageCache_Exists_Returns(true);
@@ -153,7 +162,8 @@ class ImageControllerTest extends FileTestCase
         $this->assertInstanceOf(SuccessResponse::class, $response);
     }
 
-    public function testRebuild_FileDoesNotExistInCache_NotFoundResponseIsReturned(): void
+    /** @test */
+    public function rebuild_fileDoesNotExistInCache_notFoundResponseIsReturned(): void
     {
         $controller = $this->createImageController();
         $this->givenImageCache_Exists_Returns(false);
@@ -165,11 +175,12 @@ class ImageControllerTest extends FileTestCase
     }
 
     /**
+     * @test
      * @param string $action
      * @param string $expectedResponse
      * @dataProvider safeActionsProvider
      */
-    public function testRunAction_GivenActionAndSecurityReturnsFalse_ResponseIsReturned(
+    public function runAction_givenActionAndSecurityReturnsFalse_responseIsReturned(
         string $action,
         string $expectedResponse
     ): void {
@@ -258,14 +269,17 @@ class ImageControllerTest extends FileTestCase
         \Phake::when($this->imageCache)->exists(self::LOCATION)->thenReturn($value);
     }
 
-    private function givenRequest_GetBody_ReturnsString(): void
+    private function givenRequest_GetBody_ReturnsStream(): StreamInterface
     {
-        \Phake::when($this->request)->getBody()->thenReturn(self::IMAGE_BODY);
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->request)->getBody()->thenReturn($stream);
+
+        return $stream;
     }
 
-    private function assertImageCache_Put_IsCalledOnce(): void
+    private function assertImageCache_Put_IsCalledOnce(StreamInterface $stream): void
     {
-        \Phake::verify($this->imageCache, \Phake::times(1))->put(self::LOCATION, self::IMAGE_BODY);
+        \Phake::verify($this->imageCache, \Phake::times(1))->put(self::LOCATION, $stream);
     }
 
     private function assertImageCache_Delete_IsNeverCalled(): void

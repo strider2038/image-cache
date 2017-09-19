@@ -10,6 +10,8 @@
  */
 
 namespace Strider2038\ImgCache\Imaging;
+
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
@@ -18,7 +20,7 @@ use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 interface ImageCacheInterface
 {
     public function get(string $key): ? ImageInterface;
-    public function put(string $key, $data): void;
+    public function put(string $key, StreamInterface $data): void;
     public function delete(string $key): void;
     public function rebuild(string $key): void;
     public function exists(string $key): bool;

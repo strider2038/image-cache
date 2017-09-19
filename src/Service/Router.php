@@ -12,10 +12,10 @@ namespace Strider2038\ImgCache\Service;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\DeprecatedRequest;
-use Strider2038\ImgCache\Core\DeprecatedRequestInterface;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
+use Strider2038\ImgCache\Enum\HttpMethod;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidRequestException;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
@@ -26,7 +26,7 @@ use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
  */
 class Router implements RouterInterface
 {
-    const DEFAULT_CONTROLLER_ID = 'imageController';
+    private const DEFAULT_CONTROLLER_ID = 'imageController';
 
     /** @var ImageValidatorInterface */
     private $imageValidator;
@@ -38,11 +38,11 @@ class Router implements RouterInterface
     private $logger;
 
     private $methodsToActionsMap = [
-        DeprecatedRequest::METHOD_GET    => 'get',
-        DeprecatedRequest::METHOD_POST   => 'create',
-        DeprecatedRequest::METHOD_PUT    => 'replace',
-        DeprecatedRequest::METHOD_PATCH  => 'rebuild',
-        DeprecatedRequest::METHOD_DELETE => 'delete',
+        HttpMethod::GET    => 'get',
+        HttpMethod::POST   => 'create',
+        HttpMethod::PUT    => 'replace',
+        HttpMethod::PATCH  => 'rebuild',
+        HttpMethod::DELETE => 'delete',
     ];
 
     public function __construct(ImageValidatorInterface $imageValidator, array $urlMaskToControllersMap = [])
@@ -61,10 +61,10 @@ class Router implements RouterInterface
         $this->logger = $logger;
     }
 
-    public function getRoute(DeprecatedRequestInterface $request): Route
+    public function getRoute(RequestInterface $request): Route
     {
-        $requestMethod = $request->getMethod();
-        $url = $request->getUrl(PHP_URL_PATH);
+        $requestMethod = $request->getMethod()->getValue();
+        $url = $request->getUri()->getPath();
 
         $this->logger->info("Processing route for request {$requestMethod} {$url}");
 
@@ -76,7 +76,7 @@ class Router implements RouterInterface
             throw new InvalidRequestException('Requested file has incorrect extension');
         }
 
-        [$controllerId, $location] = $this->splitUrlToControllerAndLocation($request->getUrl());
+        [$controllerId, $location] = $this->splitUrlToControllerAndLocation($url);
         $route = new Route($controllerId, $this->methodsToActionsMap[$requestMethod], $location);
 
         $this->logger->info(sprintf(

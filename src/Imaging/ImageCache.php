@@ -12,6 +12,7 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Exception\NotAllowedException;
@@ -89,7 +90,7 @@ class ImageCache implements ImageCacheInterface
         return $this->imageFactory->createImageFile($destinationFilename);
     }
 
-    public function put(string $key, $data): void
+    public function put(string $key, StreamInterface $data): void
     {
         $this->validateKey($key);
 

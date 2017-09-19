@@ -10,12 +10,14 @@
 
 namespace Strider2038\ImgCache\Imaging\Insertion;
 
+use Strider2038\ImgCache\Core\StreamInterface;
+
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageWriterInterface
 {
-    public function insert(string $key, $data): void;
+    public function insert(string $key, StreamInterface $data): void;
     public function delete(string $key): void;
 }
