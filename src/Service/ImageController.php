@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Service;
 
 use Strider2038\ImgCache\Core\Controller;
+use Strider2038\ImgCache\Core\DeprecatedResponseInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
@@ -52,9 +52,9 @@ class ImageController extends Controller
      * Handles GET request for resource. Returns ImageResponse if resource is found and
      * NotFoundResponse when not found.
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\ResponseInterface
+     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
      */
-    public function actionGet(string $location): ResponseInterface
+    public function actionGet(string $location): DeprecatedResponseInterface
     {
         /** @var ImageFile $image */
         $image = $this->imageCache->get($location);
@@ -69,9 +69,9 @@ class ImageController extends Controller
      * Handles POST request for creating resource. If resource already exists then ConflictResponse
      * will be returned, otherwise - CreatedResponse.
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\ResponseInterface
+     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
      */
-    public function actionCreate(string $location): ResponseInterface
+    public function actionCreate(string $location): DeprecatedResponseInterface
     {
         if ($this->imageCache->exists($location)) {
             return new ConflictResponse(
@@ -89,9 +89,9 @@ class ImageController extends Controller
      * Handles PUT request for creating new resource or replacing old one. If resource is already
      * exists it will be replaced with all thumbnails deleted. CreatedResponse is returned.
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\ResponseInterface
+     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
      */
-    public function actionReplace(string $location): ResponseInterface
+    public function actionReplace(string $location): DeprecatedResponseInterface
     {
         if ($this->imageCache->exists($location)) {
             $this->imageCache->delete($location);
@@ -106,9 +106,9 @@ class ImageController extends Controller
      * Handles DELETE request for deleting resource from cache source and all it's cached
      * thumbnails
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\ResponseInterface
+     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
      */
-    public function actionDelete(string $location): ResponseInterface
+    public function actionDelete(string $location): DeprecatedResponseInterface
     {
         if (!$this->imageCache->exists($location)) {
             return new NotFoundResponse("File {$location} does not exist");
@@ -124,9 +124,9 @@ class ImageController extends Controller
     /**
      * Handles PATCH request for rebuilding cached resource with all its thumbnails
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\ResponseInterface
+     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
      */
-    public function actionRebuild(string $location): ResponseInterface
+    public function actionRebuild(string $location): DeprecatedResponseInterface
     {
         if (!$this->imageCache->exists($location)) {
             return new NotFoundResponse("File {$location} does not exist");

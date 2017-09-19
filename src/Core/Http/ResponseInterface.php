@@ -8,12 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Core\Http;
+
+use Strider2038\ImgCache\Enum\HttpStatusCode;
+
 
 /**
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ControllerInterface {
-    public function runAction(string $action, string $location): DeprecatedResponseInterface;
+interface ResponseInterface extends MessageInterface
+{
+    public function getStatusCode(): HttpStatusCode;
+    public function getReasonPhrase(): string;
 }

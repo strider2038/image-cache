@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Core\DeprecatedResponse;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -19,7 +19,7 @@ class InvalidValueException extends ApplicationException
 {
     public function __construct(
         $message = "",
-        $code = Response::HTTP_CODE_INTERNAL_SERVER_ERROR,
+        $code = DeprecatedResponse::HTTP_CODE_INTERNAL_SERVER_ERROR,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

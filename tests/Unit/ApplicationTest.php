@@ -6,8 +6,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\ControllerInterface;
+use Strider2038\ImgCache\Core\DeprecatedResponseInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
@@ -136,9 +136,9 @@ class ApplicationTest extends TestCase
         return $controller;
     }
 
-    private function givenController_RunAction_Returns($controller): ResponseInterface
+    private function givenController_RunAction_Returns($controller): DeprecatedResponseInterface
     {
-        $response = \Phake::mock(ResponseInterface::class);
+        $response = \Phake::mock(DeprecatedResponseInterface::class);
 
         \Phake::when($controller)->runAction(self::ACTION_ID, self::LOCATION)->thenReturn($response);
 

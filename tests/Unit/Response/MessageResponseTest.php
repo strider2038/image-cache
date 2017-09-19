@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Response;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Core\DeprecatedResponse;
 use Strider2038\ImgCache\Response\MessageResponse;
 
 class MessageResponseTest extends TestCase
@@ -24,7 +24,7 @@ class MessageResponseTest extends TestCase
      */
     public function testSend_MessageIsSet_MessageIsEchoed(): void
     {
-        $response = new MessageResponse(Response::HTTP_CODE_OK, self::MESSAGE);
+        $response = new MessageResponse(DeprecatedResponse::HTTP_CODE_OK, self::MESSAGE);
         $this->expectOutputString(self::MESSAGE);
 
         $response->send();

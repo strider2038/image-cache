@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\{
-    Controller, ResponseInterface, SecurityInterface
+    Controller, DeprecatedResponseInterface, SecurityInterface
 };
 use Strider2038\ImgCache\Response\ForbiddenResponse;
 
@@ -42,7 +42,7 @@ class ControllerTest extends TestCase
         $this->assertFalse($controller->success);
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertInstanceOf(DeprecatedResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 
@@ -68,7 +68,7 @@ class ControllerTest extends TestCase
         $this->assertFalse($controller->success);
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertInstanceOf(DeprecatedResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 
@@ -87,14 +87,14 @@ class ControllerTest extends TestCase
             public function actionTest()
             {
                 $this->success = true;
-                return \Phake::mock(ResponseInterface::class);
+                return \Phake::mock(DeprecatedResponseInterface::class);
             }
         };
 
         $this->assertFalse($controller->success);
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertInstanceOf(DeprecatedResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 
@@ -107,7 +107,7 @@ class ControllerTest extends TestCase
             public function actionTest()
             {
                 $this->success = true;
-                return \Phake::mock(ResponseInterface::class);
+                return \Phake::mock(DeprecatedResponseInterface::class);
             }
         };
 

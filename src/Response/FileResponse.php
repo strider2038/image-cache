@@ -11,13 +11,13 @@
 
 namespace Strider2038\ImgCache\Response;
 
-use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Core\DeprecatedResponse;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FileResponse extends Response
+class FileResponse extends DeprecatedResponse
 {
     /** @var string */
     protected $filename;

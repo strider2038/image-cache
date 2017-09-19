@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\ControllerInterface;
+use Strider2038\ImgCache\Core\DeprecatedResponseInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
 use Strider2038\ImgCache\Response\ExceptionResponse;
@@ -64,7 +64,7 @@ class Application
             /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
      
-            /** @var ResponseInterface $response */
+            /** @var DeprecatedResponseInterface $response */
             $response = $controller->runAction($route->getActionId(), $route->getLocation());
             
             $response->send();

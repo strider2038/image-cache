@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Core\DeprecatedResponse;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -19,7 +19,7 @@ class NotAllowedException extends ApplicationException
 {
     public function __construct(
         $message = "",
-        $code = Response::HTTP_CODE_METHOD_NOT_ALLOWED,
+        $code = DeprecatedResponse::HTTP_CODE_METHOD_NOT_ALLOWED,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

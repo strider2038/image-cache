@@ -12,7 +12,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Core\DeprecatedResponse;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -102,9 +102,9 @@ class ResponseTest extends TestCase
         $this->assertContains(self::HEADER_TEST . ': ' . self::HEADER_VALUE, $headers);
     }
 
-    private function buildResponse(int $httpCode = 200): Response
+    private function buildResponse(int $httpCode = 200): DeprecatedResponse
     {
-        $response = new class($httpCode) extends Response
+        $response = new class($httpCode) extends DeprecatedResponse
         {
             public $testSendCount = 0;
 

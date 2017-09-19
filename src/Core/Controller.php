@@ -28,7 +28,7 @@ abstract class Controller implements ControllerInterface
         $this->security = $security;
     }
 
-    public function runAction(string $action, string $location): ResponseInterface
+    public function runAction(string $action, string $location): DeprecatedResponseInterface
     {
         $actionName = 'action' . ucfirst($action);
         if (!method_exists($this, $actionName)) {

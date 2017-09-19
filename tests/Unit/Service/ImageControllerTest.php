@@ -11,8 +11,8 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Service;
 
+use Strider2038\ImgCache\Core\DeprecatedResponseInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
@@ -221,27 +221,27 @@ class ImageControllerTest extends FileTestCase
         $request = $this->request;
 
         $controller = new class ($security, $imageCache, $request) extends ImageController {
-            public function actionGet(string $location): ResponseInterface
+            public function actionGet(string $location): DeprecatedResponseInterface
             {
                 return new SuccessResponse();
             }
 
-            public function actionCreate(string $location): ResponseInterface
+            public function actionCreate(string $location): DeprecatedResponseInterface
             {
                 return new SuccessResponse();
             }
 
-            public function actionReplace(string $location): ResponseInterface
+            public function actionReplace(string $location): DeprecatedResponseInterface
             {
                 return new SuccessResponse();
             }
 
-            public function actionDelete(string $location): ResponseInterface
+            public function actionDelete(string $location): DeprecatedResponseInterface
             {
                 return new SuccessResponse();
             }
 
-            public function actionRebuild(string $location): ResponseInterface
+            public function actionRebuild(string $location): DeprecatedResponseInterface
             {
                 return new SuccessResponse();
             }

@@ -11,10 +11,10 @@
 namespace Strider2038\ImgCache\Core;
 
 /**
- *
+ * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ResponseInterface 
+interface DeprecatedResponseInterface
 {
     public function getHttpCode(): int;
     public function send(): void;

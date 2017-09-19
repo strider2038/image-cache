@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Response;
 
-use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Core\DeprecatedResponse;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class MessageResponse extends Response
+class MessageResponse extends DeprecatedResponse
 {
     /** @var string */
     private $message;

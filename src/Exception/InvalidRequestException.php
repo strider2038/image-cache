@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Core\Response;
+use Strider2038\ImgCache\Core\DeprecatedResponse;
 
 /**
  * Description of RequestException
@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Core\Response;
 class InvalidRequestException extends ApplicationException {
     public function __construct(
         string $message = "", 
-        int $code = Response::HTTP_CODE_BAD_REQUEST, 
+        int $code = DeprecatedResponse::HTTP_CODE_BAD_REQUEST,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

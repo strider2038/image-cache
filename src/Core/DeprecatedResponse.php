@@ -12,8 +12,9 @@ namespace Strider2038\ImgCache\Core;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
-abstract class Response implements ResponseInterface 
+abstract class DeprecatedResponse implements DeprecatedResponseInterface
 {
     
     const HTTP_CODE_OK                     = 200;
@@ -106,7 +107,7 @@ abstract class Response implements ResponseInterface
         return $this->httpVersion;
     }
         
-    public function setHeader(string $name, string $value): Response
+    public function setHeader(string $name, string $value): DeprecatedResponse
     {
         $this->headers[$name] = $value;
         return $this;
