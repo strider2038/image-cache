@@ -19,18 +19,16 @@ use PHPUnit\Framework\TestCase;
 class FileTestCase extends TestCase
 {
     private const FILES_DIR = '/../assets/';
-
-    const TEST_CACHE_DIR = '/tmp/imgcache-test';
-
-    const IMAGE_CAT300 = 'sample/cat300.jpg';
-    const IMAGE_CAT2000 = 'sample/cat2000.jpg';
-    const IMAGE_RIDER_PNG = 'sample/rider.png';
-    const IMAGE_BOX_JPG = 'box.jpg';
-    const IMAGE_BOX_PNG = 'box.png';
-    const FILE_JSON = 'file.json';
-    const DIRECTORY_NAME = 'dirname';
-
-    const FILENAME_NOT_EXIST = self::TEST_CACHE_DIR . '/not.exist';
+    protected const TEST_CACHE_DIR = '/tmp/imgcache-test';
+    protected const IMAGE_CAT300 = 'sample/cat300.jpg';
+    protected const IMAGE_CAT2000 = 'sample/cat2000.jpg';
+    protected const IMAGE_RIDER_PNG = 'sample/rider.png';
+    protected const IMAGE_BOX_JPG = 'box.jpg';
+    protected const IMAGE_BOX_PNG = 'box.png';
+    protected const FILE_JSON = 'file.json';
+    protected const FILE_JSON_CONTENTS = '{"isJson": true}';
+    protected const DIRECTORY_NAME = 'dirname';
+    protected const FILENAME_NOT_EXIST = self::TEST_CACHE_DIR . '/not.exist';
     
     protected function setUp() 
     {
