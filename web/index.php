@@ -13,6 +13,7 @@ $container = new ContainerBuilder();
 $loader = new YamlFileLoader($container, new FileLocator($applicationDirectory));
 $loader->load('config/web.yml');
 $container->setParameter('app.directory', $applicationDirectory);
+$container->setParameter('serverConfiguration', $_SERVER);
 
 $app = new \Strider2038\ImgCache\Application($container);
 $app->run();

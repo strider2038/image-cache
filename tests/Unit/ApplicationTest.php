@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\ControllerInterface;
-use Strider2038\ImgCache\Core\Http\RequestFactoryInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\ResponseInterface;
 use Strider2038\ImgCache\Core\Route;
@@ -22,14 +21,14 @@ class ApplicationTest extends TestCase
 {
     use ProviderTrait, LoggerTrait;
 
-    const LOGGER_ID = 'logger';
-    const ROUTER_ID = 'router';
-    const REQUEST_FACTORY_ID = 'requestFactory';
-    const CONFIG_DEBUG = 'app.debug';
-    const CONTROLLER_ID = 'controller';
-    const ACTION_ID = 'action';
-    const LOCATION = '/image.jpeg';
-    const EXCEPTION_MESSAGE = 'application exception message';
+    private const LOGGER_ID = 'logger';
+    private const ROUTER_ID = 'router';
+    private const REQUEST_ID = 'request';
+    private const CONFIG_DEBUG = 'app.debug';
+    private const CONTROLLER_ID = 'controller';
+    private const ACTION_ID = 'action';
+    private const LOCATION = '/image.jpeg';
+    private const EXCEPTION_MESSAGE = 'application exception message';
 
     /** @var ContainerInterface */
     private $container;
@@ -55,8 +54,7 @@ class ApplicationTest extends TestCase
     /** @test */
     public function run_allServicesExists_responseIsSentAnd0IsReturned(): void
     {
-        $requestFactory = $this->givenContainer_Get_ReturnsRequestFactory();
-        $request = $this->givenRequestFactory_CreateRequest_ReturnsRequest($requestFactory);
+        $request = $this->givenContainer_Get_ReturnsRequest();
         $router = $this->givenContainer_Get_ReturnsRouter();
         $this->givenRouter_GetRoute_ReturnsRoute($router, $request);
         $controller = $this->givenController();
@@ -91,13 +89,12 @@ class ApplicationTest extends TestCase
         return $application;
     }
 
-    private function givenContainer_Get_ReturnsRequestFactory(): RequestFactoryInterface
+    private function givenContainer_Get_ReturnsRequest(): RequestInterface
     {
-        $factory = \Phake::mock(RequestFactoryInterface::class);
+        $request = \Phake::mock(RequestInterface::class);
+        \Phake::when($this->container)->get(self::REQUEST_ID)->thenReturn($request);
 
-        \Phake::when($this->container)->get(self::REQUEST_FACTORY_ID)->thenReturn($factory);
-
-        return $factory;
+        return $request;
     }
 
     private function givenContainer_Get_ReturnsRouter(): RouterInterface
@@ -164,13 +161,5 @@ class ApplicationTest extends TestCase
     {
         \Phake::when($this->container)->hasParameter(self::CONFIG_DEBUG)->thenReturn(true);
         \Phake::when($this->container)->getParameter(self::CONFIG_DEBUG)->thenReturn($value);
-    }
-
-    private function givenRequestFactory_CreateRequest_ReturnsRequest($requestFactory): RequestInterface
-    {
-        $request = \Phake::mock(RequestInterface::class);
-        \Phake::when($requestFactory)->createRequest(\Phake::anyParameters())->thenReturn($request);
-
-        return $request;
     }
 }

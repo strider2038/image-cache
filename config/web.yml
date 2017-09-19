@@ -16,8 +16,11 @@ services:
     class: \Symfony\Component\Filesystem\Filesystem
 
   # core components
+  requestFactory:
+    class: \Strider2038\ImgCache\Core\Http\RequestFactory
   request:
-    class: \Strider2038\ImgCache\Core\Request
+    factory: ['@requestFactory', 'createRequest']
+    arguments: ['%serverConfiguration%']
   security:
     class: \Strider2038\ImgCache\Core\Security
     arguments: ['@request', '%security.accessToken%']
