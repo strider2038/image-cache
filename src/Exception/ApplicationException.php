@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Core\DeprecatedResponse;
+use Strider2038\ImgCache\Enum\HttpStatusCode;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Core\DeprecatedResponse;
 class ApplicationException extends \Exception {
     public function __construct(
         string $message = "", 
-        int $code = DeprecatedResponse::HTTP_CODE_INTERNAL_SERVER_ERROR,
+        int $code = HttpStatusCode::INTERNAL_SERVER_ERROR,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

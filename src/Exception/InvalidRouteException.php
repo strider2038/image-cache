@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Core\DeprecatedResponse;
+use Strider2038\ImgCache\Enum\HttpStatusCode;
 
 /**
  * Description of InvalidRouteException
@@ -22,7 +22,7 @@ class InvalidRouteException extends ApplicationException
 {
     public function __construct(
         string $message = "", 
-        int $code = DeprecatedResponse::HTTP_CODE_NOT_FOUND,
+        int $code = HttpStatusCode::NOT_FOUND,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
