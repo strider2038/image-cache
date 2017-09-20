@@ -52,7 +52,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $image = $accessor->get(self::KEY);
 
         $this->assertNull($image);
-        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
+        $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
     public function testGet_GivenKeyAndSourceFileExists_ImageIsReturned(): void
@@ -66,7 +66,7 @@ class FilesystemSourceAccessorTest extends TestCase
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertSame($sourceImage, $image);
-        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
+        $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
     /**
@@ -82,7 +82,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $actualExists = $accessor->exists(self::KEY);
 
         $this->assertEquals($expectedExists, $actualExists);
-        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
+        $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
     private function createFilesystemSourceAccessor(): FilesystemSourceAccessor

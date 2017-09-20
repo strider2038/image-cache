@@ -107,7 +107,7 @@ class FileOperationsTest extends FileTestCase
 
         \Phake::verify($this->filesystem, \Phake::times(1))
             ->copy(self::COPY_FILENAME_SOURCE, self::COPY_FILENAME_DESTINATION);
-        $this->assertLogger_Info_IsCalledOnce($this->logger);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     /**
@@ -133,7 +133,7 @@ class FileOperationsTest extends FileTestCase
         $contents = $fileOperations->getFileContents($filename);
 
         $this->assertEquals(file_get_contents($filename), $contents);
-        $this->assertLogger_Info_IsCalledOnce($this->logger);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     /**
@@ -169,7 +169,7 @@ class FileOperationsTest extends FileTestCase
 
         \Phake::verify($this->filesystem, \Phake::times(1))
             ->dumpFile(self::CREATE_FILENAME, self::CREATE_FILENAME_CONTENTS);
-        $this->assertLogger_Info_IsCalledOnce($this->logger);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     /**
@@ -193,7 +193,7 @@ class FileOperationsTest extends FileTestCase
         $fileOperations->deleteFile($filename);
 
         \Phake::verify($this->filesystem, \Phake::times(1))->remove($filename);
-        $this->assertLogger_Info_IsCalledOnce($this->logger);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     /**
@@ -229,7 +229,7 @@ class FileOperationsTest extends FileTestCase
         $fileOperations->createDirectory(self::CREATE_DIRECTORY_NAME);
 
         \Phake::verify($this->filesystem, \Phake::times(1))->mkdir(self::CREATE_DIRECTORY_NAME, 0775);
-        $this->assertLogger_Info_IsCalledOnce($this->logger);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     /**

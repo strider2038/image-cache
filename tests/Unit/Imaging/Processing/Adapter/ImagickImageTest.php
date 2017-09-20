@@ -100,7 +100,7 @@ class ImagickImageTest extends FileTestCase
 
         $this->assertFileExists(self::TEST_IMAGE_DESTINATION_FILE);
         $this->assertFileOperations_CreateDirectory_IsCalledOnce();
-        $this->assertLogger_Info_IsCalledOnce($this->logger);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     public function testOpen_GivenImage_ProcessingImageIsReturned(): void

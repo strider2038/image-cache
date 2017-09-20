@@ -13,11 +13,12 @@ namespace Strider2038\ImgCache;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\ControllerInterface;
-use Strider2038\ImgCache\Core\DeprecatedResponseInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
+use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
-use Strider2038\ImgCache\Response\ExceptionResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,6 +30,8 @@ class Application
     private const LOGGER_ID = 'logger';
     private const REQUEST_ID = 'request';
     private const ROUTER_ID = 'router';
+    private const RESPONSE_FACTORY_ID = 'responseFactory';
+    private const RESPONSE_SENDER_ID = 'responseSender';
 
     /** @var ContainerInterface */
     private $container;
@@ -39,6 +42,7 @@ class Application
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+
         if (!$this->container->has(self::LOGGER_ID)) {
             $this->logger = new NullLogger();
         } else {
@@ -52,6 +56,20 @@ class Application
 
             $this->logger->debug('Application started');
 
+            /** @var ResponseSenderInterface $responseSender */
+            $responseSender = $this->container->get(self::RESPONSE_SENDER_ID);
+
+            /** @var ResponseFactoryInterface $responseFactory */
+            $responseFactory = $this->container->get(self::RESPONSE_FACTORY_ID);
+
+        } catch (\Exception $exception) {
+            $this->logger->critical($exception);
+
+            return 1;
+        }
+
+        try {
+
             /** @var RequestInterface $request */
             $request = $this->container->get(self::REQUEST_ID);
 
@@ -64,20 +82,24 @@ class Application
             /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
      
-            /** @var DeprecatedResponseInterface $response */
+            /** @var ResponseInterface $response */
             $response = $controller->runAction($route->getActionId(), $route->getLocation());
-            
-            $response->send();
-
-            $this->logger->debug(sprintf('Application ended. Response %d is sent', $response->getHttpCode()));
 
         } catch (\Exception $exception) {
 
-            $response = new ExceptionResponse($exception, $this->isDebugMode());
-            $this->logger->error($response->getMessage());
-            $response->send();
+            $this->logger->error($exception);
 
-            return 1;
+            $response = $responseFactory->createExceptionResponse($exception);
+
+        } finally {
+
+            $responseSender->send($response);
+
+            $this->logger->debug(sprintf(
+                'Application ended. Response %d is sent',
+                $response->getStatusCode()->getValue()
+            ));
+
         }
 
         return 0;

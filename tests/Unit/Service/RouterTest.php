@@ -123,7 +123,7 @@ class RouterTest extends TestCase
         $this->assertEquals('imageController', $route->getControllerId());
         $this->assertEquals($actionName, $route->getActionId());
         $this->assertEquals(self::REQUEST_URL, $route->getLocation());
-        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
+        $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
     
     public function requestMethodsProvider(): array
@@ -190,7 +190,7 @@ class RouterTest extends TestCase
 
         $this->assertEquals($controllerId, $route->getControllerId());
         $this->assertEquals($location, $route->getLocation());
-        $this->assertLogger_Info_IsCalledTimes($this->logger, 2);
+        $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
     /**
