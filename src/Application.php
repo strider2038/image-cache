@@ -26,7 +26,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Application
 {
-    private const CONFIG_DEBUG = 'app.debug';
     private const LOGGER_ID = 'logger';
     private const REQUEST_ID = 'request';
     private const ROUTER_ID = 'router';
@@ -105,12 +104,4 @@ class Application
         return 0;
     }
 
-    public function isDebugMode(): bool
-    {
-        if (!$this->container->hasParameter(self::CONFIG_DEBUG)) {
-            return false;
-        }
-
-        return (bool) $this->container->getParameter(self::CONFIG_DEBUG);
-    }
 }

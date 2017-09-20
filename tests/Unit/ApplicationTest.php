@@ -91,21 +91,6 @@ class ApplicationTest extends TestCase
         $this->assertResponseSender_send_isCalledOnce($responseSender, $response);
     }
 
-    /**
-     * @test
-     * @param bool $value
-     * @dataProvider boolValuesProvider
-     */
-    public function isDebugMode_containerHasDebugParameter_boolIsReturned(bool $value): void
-    {
-        $application = $this->createApplication();
-        $this->givenContainerHasParameterDebug($value);
-
-        $isDebugMode = $application->isDebugMode();
-
-        $this->assertEquals($value, $isDebugMode);
-    }
-
     private function createApplication(): Application
     {
         $application = new Application($this->container);
@@ -192,12 +177,6 @@ class ApplicationTest extends TestCase
         \Phake::when($this->container)
             ->get(\Phake::anyParameters())
             ->thenThrow(new \Exception(self::EXCEPTION_MESSAGE));
-    }
-
-    private function givenContainerHasParameterDebug(bool $value): void
-    {
-        \Phake::when($this->container)->hasParameter(self::CONFIG_DEBUG)->thenReturn(true);
-        \Phake::when($this->container)->getParameter(self::CONFIG_DEBUG)->thenReturn($value);
     }
 
     private function assertResponseSender_send_isCalledOnce(

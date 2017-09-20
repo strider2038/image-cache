@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Enum\HttpStatusCode;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
