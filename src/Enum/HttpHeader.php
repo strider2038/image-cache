@@ -19,4 +19,5 @@ use MyCLabs\Enum\Enum;
 class HttpHeader extends Enum
 {
     public const AUTHORIZATION = 'Authorization';
+    public const CONTENT_TYPE = 'Content-Type';
 }

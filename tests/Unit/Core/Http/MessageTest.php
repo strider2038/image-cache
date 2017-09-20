@@ -86,6 +86,17 @@ class MessageTest extends TestCase
     }
 
     /** @test */
+    public function getHeaderLine_givenEmptyHeaderCollection_emptyHeaderValueIsReturned(): void
+    {
+        $message = new Message();
+        $message->setHeaders(new HeaderCollection());
+
+        $headerLine = $message->getHeaderLine(new HttpHeader(HttpHeader::AUTHORIZATION));
+
+        $this->assertEquals('', $headerLine);
+    }
+
+    /** @test */
     public function getBody_givenStream_streamIsReturned(): void
     {
         $message = new Message();

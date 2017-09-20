@@ -32,9 +32,9 @@ class HeaderCollection extends IterableCollection
         $this->elements[$name->getValue()] = $values;
     }
 
-    public function get(HttpHeader $name): ? HeaderValueCollection
+    public function get(HttpHeader $name): HeaderValueCollection
     {
-        return $this->elements[$name->getValue()] ?? null;
+        return $this->elements[$name->getValue()] ?? new HeaderValueCollection();
     }
 
     public function containsKey(HttpHeader $name): bool

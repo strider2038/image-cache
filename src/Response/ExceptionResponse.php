@@ -18,7 +18,7 @@ class ExceptionResponse extends ErrorResponse {
     /** @var string */
     private $message = '';
 
-    public function __construct(\Exception $exception, bool $isDebug = false) {
+    public function __construct(\Throwable $exception, bool $isDebug = false) {
         if ($isDebug) {
             $this->message = sprintf(
                 "Application exception #%d '%s' in file: %s (%d)\n\nStack trace:\n%s\n",
