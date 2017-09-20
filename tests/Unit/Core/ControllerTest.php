@@ -13,69 +13,83 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\{
-    Controller, DeprecatedResponseInterface, SecurityInterface
+    Controller, Http\ResponseFactoryInterface, Http\ResponseInterface, SecurityInterface
 };
-use Strider2038\ImgCache\Response\ForbiddenResponse;
+use Strider2038\ImgCache\Enum\HttpStatusCode;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ControllerTest extends TestCase 
 {
-    const LOCATION = '/a.jpg';
-    
+    private const LOCATION = '/a.jpg';
+
+    /** @var ResponseFactoryInterface */
+    private $responseFactory;
+
+    /** @var SecurityInterface */
+    private $security;
+
+    protected function setUp()
+    {
+        $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
+        $this->security = \Phake::mock(SecurityInterface::class);
+    }
+
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\ApplicationException
+     * @expectedExceptionCode 500
      * @expectedExceptionMessage does not exists
      */
-    public function testRunAction_ActionDoesNotExists_ExceptionThrown(): void
+    public function runAction_actionDoesNotExists_ExceptionThrown(): void
     {
-        $controller = new class extends Controller {};
+        $controller = new class ($this->responseFactory) extends Controller {};
         
         $controller->runAction('test', self::LOCATION);
     }
-    
-    public function testRunAction_ActionExistsNoSecurityControl_MethodExecuted(): void
+
+    /** @test */
+    public function runAction_actionExistsNoSecurityControl_methodExecuted(): void
     {
-        $controller = $this->buildController();
+        $controller = $this->createController();
         
-        $this->assertFalse($controller->success);
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertInstanceOf(DeprecatedResponseInterface::class, $result);
+        $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 
-    public function testRunAction_ActionIsNotSafeAndNotAuthorized_ForbiddenResponseReturned(): void
+    /** @test */
+    public function runAction_actionIsNotSafeAndNotAuthorized_forbiddenResponseReturned(): void
     {
-        $security = \Phake::mock(SecurityInterface::class);
-        \Phake::when($security)->isAuthorized()->thenReturn(false);
-        $controller = $this->buildController($security);
+        $controller = $this->createController($this->security);
+        $this->givenSecurity_isAuthorized_returns(false);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithForbiddenCode();
 
-        $this->assertFalse($controller->success);
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertInstanceOf(ForbiddenResponse::class, $result);
+        $this->assertEquals(HttpStatusCode::FORBIDDEN, $result->getStatusCode()->getValue());
         $this->assertFalse($controller->success);
+        $this->assertResponseFactory_createMessageResponse_calledWithForbiddenCode();
     }
-    
-    public function testRunAction_ActionIsNotSafeAndIsAuthorized_MethodExecuted(): void
+
+    /** @test */
+    public function runAction_actionIsNotSafeAndIsAuthorized_methodExecuted(): void
     {
-        $security = \Phake::mock(SecurityInterface::class);
-        \Phake::when($security)->isAuthorized()->thenReturn(true);
-        $controller = $this->buildController($security);
+        $this->givenSecurity_isAuthorized_returns(true);
+        $controller = $this->createController($this->security);
         
-        $this->assertFalse($controller->success);
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertInstanceOf(DeprecatedResponseInterface::class, $result);
+        $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 
-    public function testRunAction_ActionIsSafeAndSecurityIsDefined_MethodExecuted(): void
+    /** @test */
+    public function runAction_actionIsSafeAndSecurityIsDefined_methodExecuted(): void
     {
-        $security = \Phake::mock(SecurityInterface::class);
-        $controller = new class($security) extends Controller
+        $controller = new class($this->responseFactory, $this->security) extends Controller
         {
             public $success = false;
 
@@ -87,30 +101,56 @@ class ControllerTest extends TestCase
             public function actionTest()
             {
                 $this->success = true;
-                return \Phake::mock(DeprecatedResponseInterface::class);
+                return \Phake::mock(ResponseInterface::class);
             }
         };
 
         $this->assertFalse($controller->success);
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertInstanceOf(DeprecatedResponseInterface::class, $result);
+        $this->assertInstanceOf(ResponseInterface::class, $result);
         $this->assertTrue($controller->success);
     }
 
-    private function buildController(SecurityInterface $security = null): Controller
+    private function createController(SecurityInterface $security = null): Controller
     {
-        $controller = new class($security) extends Controller
+        $controller = new class($this->responseFactory, $security) extends Controller
         {
             public $success = false;
 
             public function actionTest()
             {
                 $this->success = true;
-                return \Phake::mock(DeprecatedResponseInterface::class);
+                return \Phake::mock(ResponseInterface::class);
             }
         };
 
         return $controller;
+    }
+
+    private function givenSecurity_isAuthorized_returns(bool $value): void
+    {
+        \Phake::when($this->security)->isAuthorized()->thenReturn($value);
+    }
+
+    private function givenResponseFactory_createMessageResponse_returnsResponseWithForbiddenCode(): void
+    {
+        $response = \Phake::mock(ResponseInterface::class);
+
+        \Phake::when($response)
+            ->getStatusCode()
+            ->thenReturn(new HttpStatusCode(HttpStatusCode::FORBIDDEN));
+
+        \Phake::when($this->responseFactory)
+            ->createMessageResponse(\Phake::anyParameters())
+            ->thenReturn($response);
+    }
+
+    private function assertResponseFactory_createMessageResponse_calledWithForbiddenCode(): void
+    {
+        \Phake::verify($this->responseFactory, \Phake::times(1))
+            ->createMessageResponse(\Phake::capture($httpStatusCode));
+
+        $this->assertEquals(HttpStatusCode::FORBIDDEN, $httpStatusCode->getValue());
     }
 }

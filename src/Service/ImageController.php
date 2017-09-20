@@ -11,16 +11,13 @@
 namespace Strider2038\ImgCache\Service;
 
 use Strider2038\ImgCache\Core\Controller;
-use Strider2038\ImgCache\Core\DeprecatedResponseInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
+use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
+use Strider2038\ImgCache\Enum\HttpStatusCode;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
-use Strider2038\ImgCache\Response\ConflictResponse;
-use Strider2038\ImgCache\Response\CreatedResponse;
-use Strider2038\ImgCache\Response\ImageResponse;
-use Strider2038\ImgCache\Response\NotFoundResponse;
-use Strider2038\ImgCache\Response\SuccessResponse;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -34,11 +31,12 @@ class ImageController extends Controller
     private $imageCache;
 
     public function __construct(
+        ResponseFactoryInterface $responseFactory,
         SecurityInterface $security,
         ImageCacheInterface $imageCache,
         RequestInterface $request
     ) {
-        parent::__construct($security);
+        parent::__construct($responseFactory, $security);
         $this->imageCache = $imageCache;
         $this->request = $request;
     }
@@ -49,49 +47,66 @@ class ImageController extends Controller
     }
 
     /**
-     * Handles GET request for resource. Returns ImageResponse if resource is found and
-     * NotFoundResponse when not found.
+     * Handles GET request for resource. Returns response with status code 201 and image body
+     * if resource is found and response with status code 404 when not found.
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
+     * @return ResponseInterface
      */
-    public function actionGet(string $location): DeprecatedResponseInterface
+    public function actionGet(string $location): ResponseInterface
     {
         /** @var ImageFile $image */
         $image = $this->imageCache->get($location);
-        if ($image === null) {
-            return new NotFoundResponse();
-        }
-        
-        return new ImageResponse($image->getFilename());
-    }
 
-    /**
-     * Handles POST request for creating resource. If resource already exists then ConflictResponse
-     * will be returned, otherwise - CreatedResponse.
-     * @param string $location
-     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
-     */
-    public function actionCreate(string $location): DeprecatedResponseInterface
-    {
-        if ($this->imageCache->exists($location)) {
-            return new ConflictResponse(
-                "File '{$location}' already exists in cache source. "
-                . "Use PUT method to replace file in it."
+        if ($image === null) {
+            $response = $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::NOT_FOUND)
+            );
+        } else {
+            $response = $this->responseFactory->createFileResponse(
+                new HttpStatusCode(HttpStatusCode::CREATED),
+                $image->getFilename()
             );
         }
 
-        $this->imageCache->put($location, $this->request->getBody());
+        return $response;
+    }
 
-        return new CreatedResponse("File '{$location}' successfully created in cache");
+    /**
+     * Handles POST request for creating resource. If resource already exists then response with
+     * status code 409 (conflict) will be returned, otherwise with 201 (created) code.
+     * @param string $location
+     * @return ResponseInterface
+     */
+    public function actionCreate(string $location): ResponseInterface
+    {
+        if ($this->imageCache->exists($location)) {
+            $response = $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::CONFLICT),
+                sprintf(
+                    "File '%s' already exists in cache source. Use PUT method to replace file there.",
+                    $location
+                )
+            );
+        } else {
+            $this->imageCache->put($location, $this->request->getBody());
+
+            $response = $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::CREATED),
+                sprintf("File '%s' successfully created in cache", $location)
+            );
+        }
+
+        return $response;
     }
 
     /**
      * Handles PUT request for creating new resource or replacing old one. If resource is already
-     * exists it will be replaced with all thumbnails deleted. CreatedResponse is returned.
+     * exists it will be replaced with all thumbnails deleted. Response with 201 (created)
+     * code is returned.
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
+     * @return ResponseInterface
      */
-    public function actionReplace(string $location): DeprecatedResponseInterface
+    public function actionReplace(string $location): ResponseInterface
     {
         if ($this->imageCache->exists($location)) {
             $this->imageCache->delete($location);
@@ -99,42 +114,66 @@ class ImageController extends Controller
 
         $this->imageCache->put($location, $this->request->getBody());
 
-        return new CreatedResponse("File '{$location}' successfully created in cache");
+        return $this->responseFactory->createMessageResponse(
+            new HttpStatusCode(HttpStatusCode::CREATED),
+            sprintf("File '%s' successfully created in cache", $location)
+        );
     }
 
     /**
      * Handles DELETE request for deleting resource from cache source and all it's cached
-     * thumbnails
+     * thumbnails. If resource does not exist response with 404 code will be returned, otherwise
+     * response with 200 code.
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
+     * @return ResponseInterface
      */
-    public function actionDelete(string $location): DeprecatedResponseInterface
+    public function actionDelete(string $location): ResponseInterface
     {
         if (!$this->imageCache->exists($location)) {
-            return new NotFoundResponse("File {$location} does not exist");
+            $response = $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::NOT_FOUND),
+                sprintf("File '%s' does not exist", $location)
+            );
+        } else {
+            $this->imageCache->delete($location);
+
+            $response = $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::OK),
+                sprintf(
+                    "File '%s' was successfully deleted from"
+                    . " cache source and from cache with all thumbnails",
+                    $location
+                )
+            );
         }
 
-        $this->imageCache->delete($location);
-        return new SuccessResponse(
-            "File {$location} was successfully deleted from"
-            . " cache source and from cache with all thumbnails"
-        );
+        return $response;
     }
 
     /**
      * Handles PATCH request for rebuilding cached resource with all its thumbnails
      * @param string $location
-     * @return \Strider2038\ImgCache\Core\DeprecatedResponseInterface
+     * @return ResponseInterface
      */
-    public function actionRebuild(string $location): DeprecatedResponseInterface
+    public function actionRebuild(string $location): ResponseInterface
     {
         if (!$this->imageCache->exists($location)) {
-            return new NotFoundResponse("File {$location} does not exist");
+            $response = $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::NOT_FOUND),
+                sprintf("File '%s' does not exist", $location)
+            );
+        } else {
+            $this->imageCache->rebuild($location);
+
+            $response = $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::OK),
+                sprintf(
+                    "File '%s' was successfully rebuilt with all its thumbnails",
+                    $location
+                )
+            );
         }
 
-        $this->imageCache->rebuild($location);
-        return new SuccessResponse(
-            "File {$location} was successfully rebuilt with all its thumbnails"
-        );
+        return $response;
     }
 }

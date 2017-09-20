@@ -10,8 +10,10 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
+use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Enum\HttpStatusCode;
 use Strider2038\ImgCache\Exception\ApplicationException;
-use Strider2038\ImgCache\Response\ForbiddenResponse;
 
 /**
  * Description of Controller
@@ -20,22 +22,28 @@ use Strider2038\ImgCache\Response\ForbiddenResponse;
  */
 abstract class Controller implements ControllerInterface
 {
+    /** @var ResponseFactoryInterface */
+    protected $responseFactory;
+
     /** @var SecurityInterface */
     protected $security;
 
-    public function __construct(SecurityInterface $security = null)
+    public function __construct(ResponseFactoryInterface $responseFactory, SecurityInterface $security = null)
     {
+        $this->responseFactory = $responseFactory;
         $this->security = $security;
     }
 
-    public function runAction(string $action, string $location): DeprecatedResponseInterface
+    public function runAction(string $action, string $location): ResponseInterface
     {
         $actionName = 'action' . ucfirst($action);
         if (!method_exists($this, $actionName)) {
             throw new ApplicationException("Action '{$actionName}' does not exists");
         }
         if (!$this->isActionSafe($action)) {
-            return new ForbiddenResponse();
+            return $this->responseFactory->createMessageResponse(
+                new HttpStatusCode(HttpStatusCode::FORBIDDEN)
+            );
         }
         
         return call_user_func([$this, $actionName], $location);
