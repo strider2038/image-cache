@@ -41,17 +41,19 @@ class ApplicationTest extends TestCase
         $this->container = \Phake::mock(ContainerInterface::class);
     }
 
-    /** @test */
-    public function run_containerIsEmpty_fatalIsReturned(): void
+    /**
+     * @test
+     * @runInSeparateProcess
+     * @group separate
+     */
+    public function construct_containerIsEmpty_serverErrorIsReturned(): void
     {
         $this->givenContainer_get_throwsException();
-        $logger = $this->givenContainer_get_returnsLogger();
+
         $application = $this->createApplication();
 
-        $exitCode = $application->run();
-
-        $this->assertEquals(1, $exitCode);
-        $this->assertLogger_critical_isCalledOnce($logger);
+        $this->assertEquals(500, http_response_code());
+        $this->assertEquals(1, $application->run());
     }
 
     /** @test */
@@ -85,9 +87,20 @@ class ApplicationTest extends TestCase
 
         $exitCode = $application->run();
 
-        $this->assertEquals(0, $exitCode);
+        $this->assertEquals(1, $exitCode);
         $this->assertLogger_error_isCalledOnce($logger);
         $this->assertResponseSender_send_isCalledOnce($responseSender, $response);
+    }
+
+    /** @test */
+    public function onShutdown_givenLoggerAndError_loggerCriticalIsCalled(): void
+    {
+        $logger = \Phake::mock(LoggerInterface::class);
+        $error = ['message' => 'error'];
+
+        Application::onShutdown($logger, $error);
+
+        \Phake::verify($logger, \Phake::times(1))->critical('Message: error');
     }
 
     private function createApplication(): Application

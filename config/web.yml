@@ -21,6 +21,11 @@ services:
   request:
     factory: ['@requestFactory', 'createRequest']
     arguments: ['%serverConfiguration%']
+  responseSender:
+    class: \Strider2038\ImgCache\Core\Http\ResponseSender
+  responseFactory:
+    class: \Strider2038\ImgCache\Core\Http\ResponseFactory
+    arguments: ['@request', '%app.debug%']
   security:
     class: \Strider2038\ImgCache\Core\Security
     arguments: ['@request', '%security.accessToken%']
@@ -46,7 +51,7 @@ services:
   # controllers
   imageController:
     class: \Strider2038\ImgCache\Service\ImageController
-    arguments: ['@security', '@imageCache', '@request']
+    arguments: ['@responseFactory', '@security', '@imageCache', '@request']
 
   # imaging
   imageCache:
