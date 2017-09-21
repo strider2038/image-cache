@@ -7,6 +7,7 @@
 - [x] Basic logging
 - [x] Transformation classes refactoring (changing names and using flyweight pattern)
 - [x] Image saving with options
+- [x] Migrate to PSR-7 request and response interfaces (PSR like realisation)
 - [ ] Image writing to sources
 - [ ] Functional testing
 - [ ] Acceptance testing
@@ -21,4 +22,3 @@
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
-- [ ] Migrate to PSR-7 request and response interfaces
