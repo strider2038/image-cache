@@ -28,7 +28,6 @@ class ApplicationTest extends TestCase
     private const REQUEST_ID = 'request';
     private const RESPONSE_FACTORY_ID = 'responseFactory';
     private const RESPONSE_SENDER_ID = 'responseSender';
-    private const CONFIG_DEBUG = 'app.debug';
     private const CONTROLLER_ID = 'controller';
     private const ACTION_ID = 'action';
     private const LOCATION = '/image.jpeg';

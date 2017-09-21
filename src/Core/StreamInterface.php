@@ -18,4 +18,11 @@ interface StreamInterface
 {
     public function __toString();
     public function getContents(): string;
+    public function close(): void;
+    public function getSize(): ? int;
+    public function eof(): bool;
+    public function isWritable(): bool;
+    public function write(string $string): int;
+    public function isReadable(): bool;
+    public function read(int $length): string;
 }

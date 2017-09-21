@@ -10,14 +10,53 @@
 
 namespace Strider2038\ImgCache\Core;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class NullStream extends StringStream
+class NullStream implements StreamInterface
 {
-    public function __construct()
+    public function __toString()
     {
-        parent::__construct('');
+        return '';
     }
+
+    public function getContents(): string
+    {
+        return '';
+    }
+
+    public function close(): void
+    {
+    }
+
+    public function getSize(): ? int
+    {
+        return null;
+    }
+
+    public function eof(): bool
+    {
+        return true;
+    }
+
+    public function isWritable(): bool
+    {
+        return false;
+    }
+
+    public function write(string $string): int
+    {
+        throw new \RuntimeException('Not implemented');
+    }
+
+    public function isReadable(): bool
+    {
+        return false;
+    }
+
+    public function read(int $length): string
+    {
+        throw new \RuntimeException('Not implemented');
+    }
+
 }
