@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Tests\Acceptance\Api;
 
-use Strider2038\ImgCache\Core\DeprecatedResponse;
+use Strider2038\ImgCache\Enum\HttpStatusCode;
 use Strider2038\ImgCache\Tests\Support\ApiTestCase;
 
 /**
@@ -27,7 +27,7 @@ class ImageCacheApiTest extends ApiTestCase
         /** @var \GuzzleHttp\Psr7\Response */
         $response = $this->client->request('GET', self::URL_INCORRECT_EXTENSION);
 
-        $this->assertEquals(DeprecatedResponse::HTTP_CODE_BAD_REQUEST, $response->getStatusCode());
+        $this->assertEquals(HttpStatusCode::BAD_REQUEST, $response->getStatusCode());
     }
 
     public function testGet_ImageDoesNotExist_404NotFoundIsReturned(): void
@@ -35,6 +35,6 @@ class ImageCacheApiTest extends ApiTestCase
         /** @var \GuzzleHttp\Psr7\Response */
         $response = $this->client->request('GET', self::URL_NOT_EXIST);
 
-        $this->assertEquals(DeprecatedResponse::HTTP_CODE_NOT_FOUND, $response->getStatusCode());
+        $this->assertEquals(HttpStatusCode::NOT_FOUND, $response->getStatusCode());
     }
 }
