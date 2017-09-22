@@ -16,7 +16,7 @@ use MyCLabs\Enum\Enum;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HttpMethod extends Enum
+class HttpMethodEnum extends Enum
 {
     public const GET = 'GET';
     public const POST = 'POST';

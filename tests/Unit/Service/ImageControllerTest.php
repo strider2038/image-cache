@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
@@ -58,12 +58,12 @@ class ImageControllerTest extends TestCase
     {
         $controller = $this->createImageController();
         $this->givenImageCache_get_returns(null);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::NOT_FOUND);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::NOT_FOUND);
 
         $response = $controller->actionGet(self::LOCATION);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::NOT_FOUND);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
     }
 
     /** @test */
@@ -78,7 +78,7 @@ class ImageControllerTest extends TestCase
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertResponseFactory_createFileResponse_isCalledOnceWith(
-            HttpStatusCode::CREATED,
+            HttpStatusCodeEnum::CREATED,
             self::IMAGE_FILENAME
         );
     }
@@ -88,12 +88,12 @@ class ImageControllerTest extends TestCase
     {
         $controller = $this->createImageController();
         $this->givenImageCache_exists_returns(true);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::CONFLICT);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CONFLICT);
 
         $response = $controller->actionCreate(self::LOCATION);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::CONFLICT);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CONFLICT);
     }
 
     /** @test */
@@ -102,13 +102,13 @@ class ImageControllerTest extends TestCase
         $controller = $this->createImageController();
         $stream = $this->givenRequest_getBody_returnsStream();
         $this->givenImageCache_exists_returns(false);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::CREATED);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
         $response = $controller->actionCreate(self::LOCATION);
 
         $this->assertImageCache_put_isCalledOnce($stream);
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::CREATED);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
     }
 
     /** @test */
@@ -117,14 +117,14 @@ class ImageControllerTest extends TestCase
         $controller = $this->createImageController();
         $stream = $this->givenRequest_getBody_returnsStream();
         $this->givenImageCache_exists_returns(false);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::CREATED);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
         $response = $controller->actionReplace(self::LOCATION);
 
         $this->assertImageCache_delete_isNeverCalled();
         $this->assertImageCache_put_isCalledOnce($stream);
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::CREATED);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
     }
 
     /** @test */
@@ -133,14 +133,14 @@ class ImageControllerTest extends TestCase
         $controller = $this->createImageController();
         $stream = $this->givenRequest_getBody_returnsStream();
         $this->givenImageCache_exists_returns(true);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::CREATED);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
         $response = $controller->actionReplace(self::LOCATION);
 
         $this->assertImageCache_delete_isCalledOnce();
         $this->assertImageCache_put_isCalledOnce($stream);
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::CREATED);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
     }
 
     /** @test */
@@ -148,13 +148,13 @@ class ImageControllerTest extends TestCase
     {
         $controller = $this->createImageController();
         $this->givenImageCache_exists_returns(true);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::OK);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::OK);
 
         $response = $controller->actionDelete(self::LOCATION);
 
         $this->assertImageCache_delete_isCalledOnce();
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::OK);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::OK);
     }
 
     /** @test */
@@ -162,13 +162,13 @@ class ImageControllerTest extends TestCase
     {
         $controller = $this->createImageController();
         $this->givenImageCache_exists_returns(false);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::NOT_FOUND);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::NOT_FOUND);
 
         $response = $controller->actionDelete(self::LOCATION);
 
         $this->assertImageCache_delete_isNeverCalled();
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::NOT_FOUND);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
     }
 
     /** @test */
@@ -176,13 +176,13 @@ class ImageControllerTest extends TestCase
     {
         $controller = $this->createImageController();
         $this->givenImageCache_exists_returns(true);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::OK);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::OK);
 
         $response = $controller->actionRebuild(self::LOCATION);
 
         $this->assertImageCache_rebuild_isCalledOnce();
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::OK);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::OK);
     }
 
     /** @test */
@@ -190,13 +190,13 @@ class ImageControllerTest extends TestCase
     {
         $controller = $this->createImageController();
         $this->givenImageCache_exists_returns(false);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::NOT_FOUND);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::NOT_FOUND);
 
         $response = $controller->actionRebuild(self::LOCATION);
 
         $this->assertImageCache_rebuild_isNeverCalled();
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCode::NOT_FOUND);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
     }
 
     /**
@@ -211,7 +211,7 @@ class ImageControllerTest extends TestCase
     ): void {
         $controller = $this->createImageControllerWithStubbedActions();
         \Phake::when($this->security)->isAuthorized()->thenReturn(false);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCode::FORBIDDEN);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::FORBIDDEN);
 
         $response = $controller->runAction($action, self::LOCATION);
 
@@ -221,11 +221,11 @@ class ImageControllerTest extends TestCase
     public function safeActionsProvider(): array
     {
         return [
-            ['get', HttpStatusCode::OK],
-            ['create', HttpStatusCode::FORBIDDEN],
-            ['replace', HttpStatusCode::FORBIDDEN],
-            ['delete', HttpStatusCode::FORBIDDEN],
-            ['rebuild', HttpStatusCode::FORBIDDEN],
+            ['get', HttpStatusCodeEnum::OK],
+            ['create', HttpStatusCodeEnum::FORBIDDEN],
+            ['replace', HttpStatusCodeEnum::FORBIDDEN],
+            ['delete', HttpStatusCodeEnum::FORBIDDEN],
+            ['rebuild', HttpStatusCodeEnum::FORBIDDEN],
         ];
     }
 
@@ -251,27 +251,27 @@ class ImageControllerTest extends TestCase
         $controller = new class ($responseFactory, $security, $imageCache, $request) extends ImageController {
             public function actionGet(string $location): ResponseInterface
             {
-                return new Response(new HttpStatusCode(HttpStatusCode::OK));
+                return new Response(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
             }
 
             public function actionCreate(string $location): ResponseInterface
             {
-                return new Response(new HttpStatusCode(HttpStatusCode::OK));
+                return new Response(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
             }
 
             public function actionReplace(string $location): ResponseInterface
             {
-                return new Response(new HttpStatusCode(HttpStatusCode::OK));
+                return new Response(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
             }
 
             public function actionDelete(string $location): ResponseInterface
             {
-                return new Response(new HttpStatusCode(HttpStatusCode::OK));
+                return new Response(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
             }
 
             public function actionRebuild(string $location): ResponseInterface
             {
-                return new Response(new HttpStatusCode(HttpStatusCode::OK));
+                return new Response(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
             }
         };
 
@@ -336,7 +336,7 @@ class ImageControllerTest extends TestCase
 
         \Phake::when($response)
             ->getStatusCode()
-            ->thenReturn(new HttpStatusCode($code));
+            ->thenReturn(new HttpStatusCodeEnum($code));
 
         \Phake::when($this->responseFactory)
             ->createMessageResponse(\Phake::anyParameters())
@@ -348,7 +348,7 @@ class ImageControllerTest extends TestCase
         \Phake::verify($this->responseFactory, \Phake::times(1))
             ->createMessageResponse(\Phake::capture($httpStatusCode), \Phake::capture($message));
 
-        /** @var HttpStatusCode $httpStatusCode */
+        /** @var HttpStatusCodeEnum $httpStatusCode */
         $this->assertEquals($code, $httpStatusCode->getValue());
     }
 
@@ -358,7 +358,7 @@ class ImageControllerTest extends TestCase
 
         \Phake::when($response)
             ->getStatusCode()
-            ->thenReturn(new HttpStatusCode(HttpStatusCode::OK));
+            ->thenReturn(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
 
         \Phake::when($this->responseFactory)
             ->createFileResponse(\Phake::anyParameters())
@@ -372,7 +372,7 @@ class ImageControllerTest extends TestCase
         \Phake::verify($this->responseFactory, \Phake::times(1))
             ->createFileResponse(\Phake::capture($httpStatusCode), \Phake::capture($filename));
 
-        /** @var HttpStatusCode $httpStatusCode */
+        /** @var HttpStatusCodeEnum $httpStatusCode */
         $this->assertEquals($expectedCode, $httpStatusCode->getValue());
         $this->assertEquals($expectedFilename, $filename);
     }

@@ -10,23 +10,23 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class Response extends Message implements ResponseInterface
 {
-    /** @var HttpStatusCode */
+    /** @var HttpStatusCodeEnum */
     private $statusCode;
 
-    public function __construct(HttpStatusCode $statusCode)
+    public function __construct(HttpStatusCodeEnum $statusCode)
     {
         $this->statusCode = $statusCode;
         parent::__construct();
     }
 
-    public function getStatusCode(): HttpStatusCode
+    public function getStatusCode(): HttpStatusCodeEnum
     {
         return $this->statusCode;
     }
@@ -39,20 +39,20 @@ class Response extends Message implements ResponseInterface
     public function getReasonPhrasesMap(): array
     {
         return [
-            HttpStatusCode::OK                     => 'OK',
-            HttpStatusCode::CREATED                => 'Created',
-            HttpStatusCode::ACCEPTED               => 'Accepted',
-            HttpStatusCode::RESET_CONTENT          => 'Reset Content',
-            HttpStatusCode::MOVED_PERMANENTLY      => 'Moved Permanently',
-            HttpStatusCode::FOUND                  => 'Found',
-            HttpStatusCode::NOT_MODIFIED           => 'Not Modified',
-            HttpStatusCode::BAD_REQUEST            => 'Bad Request',
-            HttpStatusCode::UNAUTHORIZED           => 'Unauthorized',
-            HttpStatusCode::FORBIDDEN              => 'Forbidden',
-            HttpStatusCode::NOT_FOUND              => 'Not Found',
-            HttpStatusCode::METHOD_NOT_ALLOWED     => 'Method Not Allowed',
-            HttpStatusCode::UNSUPPORTED_MEDIA_TYPE => 'Unsupported Media Type',
-            HttpStatusCode::INTERNAL_SERVER_ERROR  => 'Internal Server Error',
+            HttpStatusCodeEnum::OK                     => 'OK',
+            HttpStatusCodeEnum::CREATED                => 'Created',
+            HttpStatusCodeEnum::ACCEPTED               => 'Accepted',
+            HttpStatusCodeEnum::RESET_CONTENT          => 'Reset Content',
+            HttpStatusCodeEnum::MOVED_PERMANENTLY      => 'Moved Permanently',
+            HttpStatusCodeEnum::FOUND                  => 'Found',
+            HttpStatusCodeEnum::NOT_MODIFIED           => 'Not Modified',
+            HttpStatusCodeEnum::BAD_REQUEST            => 'Bad Request',
+            HttpStatusCodeEnum::UNAUTHORIZED           => 'Unauthorized',
+            HttpStatusCodeEnum::FORBIDDEN              => 'Forbidden',
+            HttpStatusCodeEnum::NOT_FOUND              => 'Not Found',
+            HttpStatusCodeEnum::METHOD_NOT_ALLOWED     => 'Method Not Allowed',
+            HttpStatusCodeEnum::UNSUPPORTED_MEDIA_TYPE => 'Unsupported Media Type',
+            HttpStatusCodeEnum::INTERNAL_SERVER_ERROR  => 'Internal Server Error',
         ];
     }
 }

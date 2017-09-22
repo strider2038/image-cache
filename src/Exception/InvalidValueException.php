@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -19,7 +19,7 @@ class InvalidValueException extends ApplicationException
 {
     public function __construct(
         $message = "",
-        $code = HttpStatusCode::INTERNAL_SERVER_ERROR,
+        $code = HttpStatusCodeEnum::INTERNAL_SERVER_ERROR,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

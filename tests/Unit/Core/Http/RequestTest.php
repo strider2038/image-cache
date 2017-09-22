@@ -13,14 +13,14 @@ namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\UriInterface;
-use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
 
 class RequestTest extends TestCase
 {
     /** @test */
     public function construct_givenMethodAndUri_methodAndUriIsSet(): void
     {
-        $method = \Phake::mock(HttpMethod::class);
+        $method = \Phake::mock(HttpMethodEnum::class);
         $uri = \Phake::mock(UriInterface::class);
 
         $request = new Request($method, $uri);

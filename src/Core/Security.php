@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Enum\HttpHeader;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
@@ -36,7 +36,7 @@ class Security implements SecurityInterface
 
     public function isTokenValid(): bool 
     {
-        $headerName = new HttpHeader(HttpHeader::AUTHORIZATION);
+        $headerName = new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION);
         $authenticationData = $this->request->getHeaderLine($headerName);
         if (preg_match('/^Bearer\s+(.*?)$/', $authenticationData, $matches)) {
             return $matches[1] === $this->accessToken;

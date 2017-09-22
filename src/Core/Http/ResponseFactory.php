@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
 use Strider2038\ImgCache\Core\StringStream;
-use Strider2038\ImgCache\Enum\HttpHeader;
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 
 /**
@@ -33,7 +33,7 @@ class ResponseFactory implements ResponseFactoryInterface
         $this->isDebugged = $isDebugged;
     }
 
-    public function createMessageResponse(HttpStatusCode $code, string $message = ''): ResponseInterface
+    public function createMessageResponse(HttpStatusCodeEnum $code, string $message = ''): ResponseInterface
     {
         $response = new Response($code);
         $response->setBody(new StringStream($message));
@@ -45,10 +45,10 @@ class ResponseFactory implements ResponseFactoryInterface
     public function createExceptionResponse(\Throwable $exception): ResponseInterface
     {
         $code = $exception->getCode();
-        if (HttpStatusCode::isValid($code) && $code >= 400 && $code < 600) {
-            $httpStatusCode = new HttpStatusCode($code);
+        if (HttpStatusCodeEnum::isValid($code) && $code >= 400 && $code < 600) {
+            $httpStatusCode = new HttpStatusCodeEnum($code);
         } else {
-            $httpStatusCode = new HttpStatusCode(HttpStatusCode::INTERNAL_SERVER_ERROR);
+            $httpStatusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::INTERNAL_SERVER_ERROR);
         }
 
         if (!$this->isDebugged) {
@@ -67,7 +67,7 @@ class ResponseFactory implements ResponseFactoryInterface
         return $this->createMessageResponse($httpStatusCode, $message);
     }
 
-    public function createFileResponse(HttpStatusCode $code, string $filename): ResponseInterface
+    public function createFileResponse(HttpStatusCodeEnum $code, string $filename): ResponseInterface
     {
         if (!file_exists($filename)) {
             throw new FileNotFoundException(sprintf("File '%s' not found", $filename));
@@ -78,7 +78,7 @@ class ResponseFactory implements ResponseFactoryInterface
         $response->setProtocolVersion($this->request->getProtocolVersion());
 
         $headers = new HeaderCollection();
-        $headers->set(new HttpHeader(HttpHeader::CONTENT_TYPE), new HeaderValueCollection([
+        $headers->set(new HttpHeaderEnum(HttpHeaderEnum::CONTENT_TYPE), new HeaderValueCollection([
             mime_content_type($filename)
         ]));
 

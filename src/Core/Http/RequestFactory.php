@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
-use Strider2038\ImgCache\Enum\HttpMethod;
-use Strider2038\ImgCache\Enum\HttpProtocolVersion;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
+use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestException;
 
 
@@ -32,11 +32,11 @@ class RequestFactory implements RequestFactoryInterface
     public function createRequest(array $serverConfiguration): RequestInterface
     {
         $requestMethodName = strtoupper($serverConfiguration['REQUEST_METHOD'] ?? '');
-        if (!HttpMethod::isValid($requestMethodName)) {
+        if (!HttpMethodEnum::isValid($requestMethodName)) {
             throw new InvalidRequestException(sprintf("Unsupported http method '%s'", $requestMethodName));
         }
 
-        $method = new HttpMethod($requestMethodName);
+        $method = new HttpMethodEnum($requestMethodName);
         $uri = new Uri($serverConfiguration['REQUEST_URI'] ?? '');
 
         $request = new Request($method, $uri);
@@ -46,9 +46,9 @@ class RequestFactory implements RequestFactoryInterface
 
         $requestProtocol = $serverConfiguration['SERVER_PROTOCOL'] ?? '';
         if ($requestProtocol === 'HTTP/1.0') {
-            $request->setProtocolVersion(new HttpProtocolVersion(HttpProtocolVersion::V1_0));
+            $request->setProtocolVersion(new HttpProtocolVersionEnum(HttpProtocolVersionEnum::V1_0));
         } else {
-            $request->setProtocolVersion(new HttpProtocolVersion(HttpProtocolVersion::V1_1));
+            $request->setProtocolVersion(new HttpProtocolVersionEnum(HttpProtocolVersionEnum::V1_1));
         }
 
         return $request;

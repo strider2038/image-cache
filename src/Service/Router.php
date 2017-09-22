@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
-use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidRequestException;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
@@ -38,11 +38,11 @@ class Router implements RouterInterface
     private $logger;
 
     private $methodsToActionsMap = [
-        HttpMethod::GET    => 'get',
-        HttpMethod::POST   => 'create',
-        HttpMethod::PUT    => 'replace',
-        HttpMethod::PATCH  => 'rebuild',
-        HttpMethod::DELETE => 'delete',
+        HttpMethodEnum::GET    => 'get',
+        HttpMethodEnum::POST   => 'create',
+        HttpMethodEnum::PUT    => 'replace',
+        HttpMethodEnum::PATCH  => 'rebuild',
+        HttpMethodEnum::DELETE => 'delete',
     ];
 
     public function __construct(ImageValidatorInterface $imageValidator, array $urlMaskToControllersMap = [])

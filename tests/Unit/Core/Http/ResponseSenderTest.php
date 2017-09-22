@@ -17,8 +17,8 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSender;
 use Strider2038\ImgCache\Core\NullStream;
 use Strider2038\ImgCache\Core\StringStream;
-use Strider2038\ImgCache\Enum\HttpHeader;
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 class ResponseSenderTest extends TestCase
 {
@@ -32,9 +32,9 @@ class ResponseSenderTest extends TestCase
     public function send_givenEmptyResponseWithHeaders_headerIsSent(): void {
         $sender = new ResponseSender();
         $response = \Phake::mock(ResponseInterface::class);
-        \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCode(HttpStatusCode::OK));
+        \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
         $headers = new HeaderCollection([
-            HttpHeader::CONTENT_TYPE => new HeaderValueCollection([
+            HttpHeaderEnum::CONTENT_TYPE => new HeaderValueCollection([
                 'text/plain'
             ]),
         ]);
@@ -43,7 +43,7 @@ class ResponseSenderTest extends TestCase
 
         $sender->send($response);
 
-        $this->assertEquals(HttpStatusCode::OK, http_response_code());
+        $this->assertEquals(HttpStatusCodeEnum::OK, http_response_code());
         $actualHeaders = xdebug_get_headers();
         $this->assertContains('Content-type: text/plain;charset=UTF-8', $actualHeaders);
     }
@@ -56,7 +56,7 @@ class ResponseSenderTest extends TestCase
     public function send_givenStringStream_contentIsSent(): void {
         $sender = new ResponseSender();
         $response = \Phake::mock(ResponseInterface::class);
-        \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCode(HttpStatusCode::OK));
+        \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
         $headers = new HeaderCollection();
         \Phake::when($response)->getHeaders()->thenReturn($headers);
         $body = new StringStream(self::CONTENTS);

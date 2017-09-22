@@ -16,7 +16,7 @@ use MyCLabs\Enum\Enum;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HttpStatusCode extends Enum
+class HttpStatusCodeEnum extends Enum
 {
     public const OK                     = 200;
     public const CREATED                = 201;

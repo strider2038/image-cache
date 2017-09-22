@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -19,7 +19,7 @@ class InvalidMediaTypeException extends ApplicationException
 {
     public function __construct(
         string $message = "",
-        int $code = HttpStatusCode::UNSUPPORTED_MEDIA_TYPE,
+        int $code = HttpStatusCodeEnum::UNSUPPORTED_MEDIA_TYPE,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

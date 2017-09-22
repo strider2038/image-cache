@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
 use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
-use Strider2038\ImgCache\Enum\HttpHeader;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 
 class HeaderCollectionTest extends TestCase
 {
@@ -24,7 +24,7 @@ class HeaderCollectionTest extends TestCase
 
         $collection = new HeaderCollection($elements);
 
-        $values = $collection->get(new HttpHeader(HttpHeader::AUTHORIZATION));
+        $values = $collection->get(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
         $this->assertInstanceOf(HeaderValueCollection::class, $values);
     }
 
@@ -34,7 +34,7 @@ class HeaderCollectionTest extends TestCase
         $elements = $this->givenElements();
         $collection = new HeaderCollection($elements);
 
-        $result = $collection->containsKey(new HttpHeader(HttpHeader::AUTHORIZATION));
+        $result = $collection->containsKey(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
 
         $this->assertTrue($result);
     }
@@ -42,7 +42,7 @@ class HeaderCollectionTest extends TestCase
     private function givenElements(): array
     {
         $elements = [
-            HttpHeader::AUTHORIZATION => new HeaderValueCollection([
+            HttpHeaderEnum::AUTHORIZATION => new HeaderValueCollection([
                 'AuthorizationValue'
             ])
         ];

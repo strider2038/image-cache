@@ -16,8 +16,8 @@ use MyCLabs\Enum\Enum;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HttpHeader extends Enum
+class HttpProtocolVersionEnum extends Enum
 {
-    public const AUTHORIZATION = 'Authorization';
-    public const CONTENT_TYPE = 'Content-Type';
+    public const V1_0 = '1.0';
+    public const V1_1 = '1.1';
 }

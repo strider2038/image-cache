@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Core\NullStream;
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Enum\HttpHeader;
-use Strider2038\ImgCache\Enum\HttpProtocolVersion;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
+use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 
 
 /**
@@ -21,7 +21,7 @@ use Strider2038\ImgCache\Enum\HttpProtocolVersion;
  */
 class Message implements MessageInterface
 {
-    /** @var HttpProtocolVersion */
+    /** @var HttpProtocolVersionEnum */
     protected $protocolVersion;
 
     /** @var HeaderCollection */
@@ -32,17 +32,17 @@ class Message implements MessageInterface
 
     public function __construct()
     {
-        $this->protocolVersion = new HttpProtocolVersion(HttpProtocolVersion::V1_1);
+        $this->protocolVersion = new HttpProtocolVersionEnum(HttpProtocolVersionEnum::V1_1);
         $this->headers = new HeaderCollection();
         $this->body = new NullStream();
     }
 
-    public function getProtocolVersion(): HttpProtocolVersion
+    public function getProtocolVersion(): HttpProtocolVersionEnum
     {
         return $this->protocolVersion;
     }
 
-    public function setProtocolVersion(HttpProtocolVersion $protocolVersion)
+    public function setProtocolVersion(HttpProtocolVersionEnum $protocolVersion)
     {
         $this->protocolVersion = $protocolVersion;
     }
@@ -57,17 +57,17 @@ class Message implements MessageInterface
         $this->headers = $headers;
     }
 
-    public function hasHeader(HttpHeader $name): bool
+    public function hasHeader(HttpHeaderEnum $name): bool
     {
         return $this->headers->containsKey($name);
     }
 
-    public function getHeader(HttpHeader $name): HeaderValueCollection
+    public function getHeader(HttpHeaderEnum $name): HeaderValueCollection
     {
         return $this->headers->get($name);
     }
 
-    public function getHeaderLine(HttpHeader $name): string
+    public function getHeaderLine(HttpHeaderEnum $name): string
     {
         $values = $this->headers->get($name);
 

@@ -16,8 +16,8 @@ use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 use Strider2038\ImgCache\Core\Http\Message;
 use Strider2038\ImgCache\Core\NullStream;
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Enum\HttpHeader;
-use Strider2038\ImgCache\Enum\HttpProtocolVersion;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
+use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 
 class MessageTest extends TestCase
 {
@@ -38,7 +38,7 @@ class MessageTest extends TestCase
     public function setProtocolVersion_versionIs10_versionIsReturned(): void
     {
         $message = new Message();
-        $protocolVersion = new HttpProtocolVersion(HttpProtocolVersion::V1_0);
+        $protocolVersion = new HttpProtocolVersionEnum(HttpProtocolVersionEnum::V1_0);
 
         $message->setProtocolVersion($protocolVersion);
 
@@ -53,7 +53,7 @@ class MessageTest extends TestCase
         \Phake::when($headers)->containsKey(\Phake::anyParameters())->thenReturn(true);
         $message->setHeaders($headers);
 
-        $result = $message->hasHeader(new HttpHeader(HttpHeader::AUTHORIZATION));
+        $result = $message->hasHeader(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
 
         $this->assertTrue($result);
     }
@@ -67,7 +67,7 @@ class MessageTest extends TestCase
         \Phake::when($headers)->get(\Phake::anyParameters())->thenReturn($headerValues);
         $message->setHeaders($headers);
 
-        $actualHeaderValues = $message->getHeader(new HttpHeader(HttpHeader::AUTHORIZATION));
+        $actualHeaderValues = $message->getHeader(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
 
         $this->assertSame($headerValues, $actualHeaderValues);
     }
@@ -77,10 +77,10 @@ class MessageTest extends TestCase
     {
         $message = new Message();
         $headerValues = new HeaderValueCollection(self::HEADER_VALUES);
-        $headers = new HeaderCollection([HttpHeader::AUTHORIZATION => $headerValues]);
+        $headers = new HeaderCollection([HttpHeaderEnum::AUTHORIZATION => $headerValues]);
         $message->setHeaders($headers);
 
-        $headerLine = $message->getHeaderLine(new HttpHeader(HttpHeader::AUTHORIZATION));
+        $headerLine = $message->getHeaderLine(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
 
         $this->assertEquals(self::HEADER_VALUES_LINE, $headerLine);
     }
@@ -91,7 +91,7 @@ class MessageTest extends TestCase
         $message = new Message();
         $message->setHeaders(new HeaderCollection());
 
-        $headerLine = $message->getHeaderLine(new HttpHeader(HttpHeader::AUTHORIZATION));
+        $headerLine = $message->getHeaderLine(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
 
         $this->assertEquals('', $headerLine);
     }

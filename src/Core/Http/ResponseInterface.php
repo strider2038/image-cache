@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 
 /**
@@ -18,6 +18,6 @@ use Strider2038\ImgCache\Enum\HttpStatusCode;
  */
 interface ResponseInterface extends MessageInterface
 {
-    public function getStatusCode(): HttpStatusCode;
+    public function getStatusCode(): HttpStatusCodeEnum;
     public function getReasonPhrase(): string;
 }

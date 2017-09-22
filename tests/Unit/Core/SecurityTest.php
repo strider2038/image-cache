@@ -14,7 +14,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Security;
-use Strider2038\ImgCache\Enum\HttpHeader;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -76,7 +76,7 @@ class SecurityTest extends TestCase
     private function givenRequest_getHeaderLine_Returns(string $value): void
     {
         \Phake::when($this->request)
-            ->getHeaderLine(new HttpHeader(HttpHeader::AUTHORIZATION))
+            ->getHeaderLine(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION))
             ->thenReturn($value);
     }
 }

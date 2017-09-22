@@ -14,9 +14,9 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\Response;
 use Strider2038\ImgCache\Core\Http\ResponseFactory;
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
-use Strider2038\ImgCache\Enum\HttpHeader;
-use Strider2038\ImgCache\Enum\HttpProtocolVersion;
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
+use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class ResponseFactoryTest extends FileTestCase
@@ -37,15 +37,15 @@ class ResponseFactoryTest extends FileTestCase
     public function createMessageResponse_givenHttpStatusCodeAndMessage_responseIsCreated(): void
     {
         $factory = $this->createResponseFactory();
-        $statusCode = new HttpStatusCode(HttpStatusCode::OK);
+        $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::OK);
         $this->givenRequest_getProtocolVersion_returns();
 
         $response = $factory->createMessageResponse($statusCode, self::MESSAGE);
 
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(HttpStatusCode::OK, $response->getStatusCode()->getValue());
+        $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
         $this->assertEquals(self::MESSAGE, $response->getBody()->getContents());
-        $this->assertEquals(HttpProtocolVersion::V1_0, $response->getProtocolVersion()->getValue());
+        $this->assertEquals(HttpProtocolVersionEnum::V1_0, $response->getProtocolVersion()->getValue());
     }
 
     /**
@@ -71,21 +71,21 @@ class ResponseFactoryTest extends FileTestCase
     public function exceptionAndHttpCodesProvider(): array
     {
         return [
-            [0, HttpStatusCode::INTERNAL_SERVER_ERROR],
-            [500, HttpStatusCode::INTERNAL_SERVER_ERROR],
-            [400, HttpStatusCode::BAD_REQUEST],
+            [0, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR],
+            [500, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR],
+            [400, HttpStatusCodeEnum::BAD_REQUEST],
         ];
     }
 
     /** @test */
     public function createExceptionResponse_givenExceptionAndIsDebugged_responseIsCreated(): void {
         $factory = $this->createResponseFactory(true);
-        $exception = new \Exception(self::MESSAGE, HttpStatusCode::INTERNAL_SERVER_ERROR);
+        $exception = new \Exception(self::MESSAGE, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR);
 
         $response = $factory->createExceptionResponse($exception);
 
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(HttpStatusCode::INTERNAL_SERVER_ERROR, $response->getStatusCode()->getValue());
+        $this->assertEquals(HttpStatusCodeEnum::INTERNAL_SERVER_ERROR, $response->getStatusCode()->getValue());
         $this->assertRegExp('/Application exception #500 .*/', $response->getBody()->getContents());
     }
 
@@ -93,18 +93,18 @@ class ResponseFactoryTest extends FileTestCase
     public function createFileResponse_givenImage_responseWithContentHeaderIsCreated(): void
     {
         $factory = $this->createResponseFactory();
-        $statusCode = new HttpStatusCode(HttpStatusCode::CREATED);
+        $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED);
         $filename = $this->givenAssetFile(self::IMAGE_BOX_JPG);
 
         $response = $factory->createFileResponse($statusCode, $filename);
 
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(HttpStatusCode::CREATED, $response->getStatusCode()->getValue());
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertInstanceOf(ReadOnlyResourceStream::class, $response->getBody());
         $this->assertEquals(file_get_contents($filename), $response->getBody()->getContents());
         $this->assertEquals(
             self::CONTENT_TYPE_IMAGE_JPEG,
-            $response->getHeaderLine(new HttpHeader(HttpHeader::CONTENT_TYPE))
+            $response->getHeaderLine(new HttpHeaderEnum(HttpHeaderEnum::CONTENT_TYPE))
         );
     }
 
@@ -117,7 +117,7 @@ class ResponseFactoryTest extends FileTestCase
     public function createFileResponse_fileNotExist_exceptionThrown(): void
     {
         $factory = $this->createResponseFactory();
-        $statusCode = new HttpStatusCode(HttpStatusCode::OK);
+        $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::OK);
 
         $factory->createFileResponse($statusCode, self::FILENAME_NOT_EXIST);
     }
@@ -133,6 +133,6 @@ class ResponseFactoryTest extends FileTestCase
     {
         \Phake::when($this->request)
             ->getProtocolVersion()
-            ->thenReturn(new HttpProtocolVersion(HttpProtocolVersion::V1_0));
+            ->thenReturn(new HttpProtocolVersionEnum(HttpProtocolVersionEnum::V1_0));
     }
 }

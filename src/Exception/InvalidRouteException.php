@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * Description of InvalidRouteException
@@ -22,7 +22,7 @@ class InvalidRouteException extends ApplicationException
 {
     public function __construct(
         string $message = "", 
-        int $code = HttpStatusCode::NOT_FOUND,
+        int $code = HttpStatusCodeEnum::NOT_FOUND,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

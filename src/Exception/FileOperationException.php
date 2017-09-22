@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -21,6 +21,6 @@ class FileOperationException extends ApplicationException
         $message = "",
         \Throwable $previous = null
     ) {
-        parent::__construct($message, HttpStatusCode::INTERNAL_SERVER_ERROR, $previous);
+        parent::__construct($message, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR, $previous);
     }
 }

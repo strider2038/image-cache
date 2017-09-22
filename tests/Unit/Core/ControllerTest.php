@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\{
     Controller, Http\ResponseFactoryInterface, Http\ResponseInterface, SecurityInterface
 };
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -69,7 +69,7 @@ class ControllerTest extends TestCase
 
         $result = $controller->runAction('test', self::LOCATION);
 
-        $this->assertEquals(HttpStatusCode::FORBIDDEN, $result->getStatusCode()->getValue());
+        $this->assertEquals(HttpStatusCodeEnum::FORBIDDEN, $result->getStatusCode()->getValue());
         $this->assertFalse($controller->success);
         $this->assertResponseFactory_createMessageResponse_calledWithForbiddenCode();
     }
@@ -139,7 +139,7 @@ class ControllerTest extends TestCase
 
         \Phake::when($response)
             ->getStatusCode()
-            ->thenReturn(new HttpStatusCode(HttpStatusCode::FORBIDDEN));
+            ->thenReturn(new HttpStatusCodeEnum(HttpStatusCodeEnum::FORBIDDEN));
 
         \Phake::when($this->responseFactory)
             ->createMessageResponse(\Phake::anyParameters())
@@ -151,6 +151,6 @@ class ControllerTest extends TestCase
         \Phake::verify($this->responseFactory, \Phake::times(1))
             ->createMessageResponse(\Phake::capture($httpStatusCode));
 
-        $this->assertEquals(HttpStatusCode::FORBIDDEN, $httpStatusCode->getValue());
+        $this->assertEquals(HttpStatusCodeEnum::FORBIDDEN, $httpStatusCode->getValue());
     }
 }

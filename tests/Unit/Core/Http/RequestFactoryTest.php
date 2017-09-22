@@ -14,8 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestFactory;
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
-use Strider2038\ImgCache\Enum\HttpMethod;
-use Strider2038\ImgCache\Enum\HttpProtocolVersion;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
+use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 
 class RequestFactoryTest extends TestCase
 {
@@ -25,7 +25,7 @@ class RequestFactoryTest extends TestCase
     public function createRequest_givenServerConfiguration_requestIsCreatedAndReturned(): void
     {
         $serverConfiguration = [
-            'REQUEST_METHOD' => HttpMethod::GET,
+            'REQUEST_METHOD' => HttpMethodEnum::GET,
             'REQUEST_URI' => self::REQUEST_URI_VALUE,
         ];
         $factory = new RequestFactory();
@@ -33,10 +33,10 @@ class RequestFactoryTest extends TestCase
         $request = $factory->createRequest($serverConfiguration);
 
         $this->assertInstanceOf(Request::class, $request);
-        $this->assertEquals(HttpMethod::GET, $request->getMethod());
+        $this->assertEquals(HttpMethodEnum::GET, $request->getMethod());
         $this->assertEquals(self::REQUEST_URI_VALUE, $request->getUri());
         $this->assertInstanceOf(ReadOnlyResourceStream::class, $request->getBody());
-        $this->assertEquals(HttpProtocolVersion::V1_1, $request->getProtocolVersion()->getValue());
+        $this->assertEquals(HttpProtocolVersionEnum::V1_1, $request->getProtocolVersion()->getValue());
     }
 
     /**
@@ -50,7 +50,7 @@ class RequestFactoryTest extends TestCase
         string $expectedServerProtocol
     ): void {
         $serverConfiguration = [
-            'REQUEST_METHOD' => HttpMethod::GET,
+            'REQUEST_METHOD' => HttpMethodEnum::GET,
             'REQUEST_URI' => self::REQUEST_URI_VALUE,
             'SERVER_PROTOCOL' => $givenServerProtocol
         ];

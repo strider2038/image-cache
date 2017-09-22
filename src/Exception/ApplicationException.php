@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCode;
 class ApplicationException extends \Exception {
     public function __construct(
         string $message = "", 
-        int $code = HttpStatusCode::INTERNAL_SERVER_ERROR,
+        int $code = HttpStatusCodeEnum::INTERNAL_SERVER_ERROR,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

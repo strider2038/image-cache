@@ -12,18 +12,18 @@ namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\Response;
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 class ResponseTest extends TestCase
 {
     /** @test */
     public function construct_givenStatusCode_statusCodeIsSetAndValidReasonPhraseIsReturned(): void
     {
-        $statusCode = new HttpStatusCode(HttpStatusCode::OK);
+        $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::OK);
 
         $response = new Response($statusCode);
 
-        $this->assertEquals(HttpStatusCode::OK, $response->getStatusCode()->getValue());
+        $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
         $this->assertEquals('OK', $response->getReasonPhrase());
     }
 }

@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 
@@ -59,11 +59,11 @@ class ImageController extends Controller
 
         if ($image === null) {
             $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::NOT_FOUND)
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND)
             );
         } else {
             $response = $this->responseFactory->createFileResponse(
-                new HttpStatusCode(HttpStatusCode::CREATED),
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
                 $image->getFilename()
             );
         }
@@ -81,7 +81,7 @@ class ImageController extends Controller
     {
         if ($this->imageCache->exists($location)) {
             $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::CONFLICT),
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::CONFLICT),
                 sprintf(
                     "File '%s' already exists in cache source. Use PUT method to replace file there.",
                     $location
@@ -91,7 +91,7 @@ class ImageController extends Controller
             $this->imageCache->put($location, $this->request->getBody());
 
             $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::CREATED),
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
                 sprintf("File '%s' successfully created in cache", $location)
             );
         }
@@ -115,7 +115,7 @@ class ImageController extends Controller
         $this->imageCache->put($location, $this->request->getBody());
 
         return $this->responseFactory->createMessageResponse(
-            new HttpStatusCode(HttpStatusCode::CREATED),
+            new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
             sprintf("File '%s' successfully created in cache", $location)
         );
     }
@@ -131,14 +131,14 @@ class ImageController extends Controller
     {
         if (!$this->imageCache->exists($location)) {
             $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::NOT_FOUND),
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND),
                 sprintf("File '%s' does not exist", $location)
             );
         } else {
             $this->imageCache->delete($location);
 
             $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::OK),
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::OK),
                 sprintf(
                     "File '%s' was successfully deleted from"
                     . " cache source and from cache with all thumbnails",
@@ -159,14 +159,14 @@ class ImageController extends Controller
     {
         if (!$this->imageCache->exists($location)) {
             $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::NOT_FOUND),
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND),
                 sprintf("File '%s' does not exist", $location)
             );
         } else {
             $this->imageCache->rebuild($location);
 
             $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::OK),
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::OK),
                 sprintf(
                     "File '%s' was successfully rebuilt with all its thumbnails",
                     $location

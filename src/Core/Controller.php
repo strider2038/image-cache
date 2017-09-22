@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
@@ -42,7 +42,7 @@ abstract class Controller implements ControllerInterface
         }
         if (!$this->isActionSafe($action)) {
             return $this->responseFactory->createMessageResponse(
-                new HttpStatusCode(HttpStatusCode::FORBIDDEN)
+                new HttpStatusCodeEnum(HttpStatusCodeEnum::FORBIDDEN)
             );
         }
         

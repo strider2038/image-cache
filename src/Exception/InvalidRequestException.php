@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Exception;
 
-use Strider2038\ImgCache\Enum\HttpStatusCode;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * Description of RequestException
@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCode;
 class InvalidRequestException extends ApplicationException {
     public function __construct(
         string $message = "", 
-        int $code = HttpStatusCode::BAD_REQUEST,
+        int $code = HttpStatusCodeEnum::BAD_REQUEST,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
-use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
 
 
 /**
@@ -18,6 +18,6 @@ use Strider2038\ImgCache\Enum\HttpMethod;
  */
 interface RequestInterface extends MessageInterface
 {
-    public function getMethod(): HttpMethod;
+    public function getMethod(): HttpMethodEnum;
     public function getUri(): UriInterface;
 }

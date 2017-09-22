@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Core\Route;
-use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Service\Router;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
@@ -249,7 +249,7 @@ class RouterTest extends TestCase
     {
         \Phake::when($this->request)
             ->getMethod()
-            ->thenReturn(new HttpMethod($requestMethod));
+            ->thenReturn(new HttpMethodEnum($requestMethod));
     }
 
     private function givenRequest_GetUri_GetPath_Returns(string $value): void

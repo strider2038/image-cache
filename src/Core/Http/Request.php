@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
-use Strider2038\ImgCache\Enum\HttpMethod;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
 
 
 /**
@@ -18,20 +18,20 @@ use Strider2038\ImgCache\Enum\HttpMethod;
  */
 class Request extends Message implements RequestInterface
 {
-    /** @var HttpMethod */
+    /** @var HttpMethodEnum */
     private $method;
 
     /** @var UriInterface */
     private $uri;
 
-    public function __construct(HttpMethod $method, UriInterface $uri)
+    public function __construct(HttpMethodEnum $method, UriInterface $uri)
     {
         parent::__construct();
         $this->method = $method;
         $this->uri = $uri;
     }
 
-    public function getMethod(): HttpMethod
+    public function getMethod(): HttpMethodEnum
     {
         return $this->method;
     }
