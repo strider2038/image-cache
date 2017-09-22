@@ -19,8 +19,9 @@ use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
 class SourceImageWriterTest extends TestCase
 {
-    const KEY = 'key';
+    private const KEY = 'key';
     private const PUBLIC_FILENAME = 'public_filename';
+
     /** @var SourceKeyParserInterface */
     private $keyParser;
 

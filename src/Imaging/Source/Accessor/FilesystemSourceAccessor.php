@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
@@ -73,6 +74,28 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
         ));
 
         return $exists;
+    }
+
+    public function put(string $key, StreamInterface $stream): void
+    {
+        $filenameKey = $this->composeFilenameKey($key);
+        $this->source->put($filenameKey, $stream);
+
+        $this->logger->info(sprintf(
+            "Image is successfully putted to source under key '%s'",
+            $key
+        ));
+    }
+
+    public function delete(string $key): void
+    {
+        $filenameKey = $this->composeFilenameKey($key);
+        $this->source->delete($filenameKey);
+
+        $this->logger->info(sprintf(
+            "Image with key '%s' is successfully deleted from source",
+            $key
+        ));
     }
 
     private function composeFilenameKey(string $key): FilenameKeyInterface
