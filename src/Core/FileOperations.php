@@ -108,6 +108,20 @@ class FileOperations implements FileOperationsInterface
 
     public function openFile(string $filename, string $mode): StreamInterface
     {
-        // TODO: Implement openFile() method.
+        try {
+            $stream = new ResourceStream($filename, $mode);
+            $this->logger->info(sprintf(
+                "File '%s' is succesfully opened in mode '%s'",
+                $filename,
+                $mode
+            ));
+
+            return $stream;
+        } catch (\Exception $exception) {
+            throw new FileOperationException(
+                sprintf("Cannot open file '%s' in mode '%s'", $filename, $mode),
+                $exception
+            );
+        }
     }
 }
