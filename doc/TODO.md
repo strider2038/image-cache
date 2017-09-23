@@ -9,6 +9,7 @@
 - [x] Image saving with options
 - [x] Migrate to PSR-7 request and response interfaces (PSR like realisation)
 - [ ] Image writing to sources
+- [ ] Merge extraction and insertion classes
 - [ ] Functional testing
 - [ ] Acceptance testing
 - [ ] Performance optimization (lazy services)

@@ -63,6 +63,7 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         $configurationString = $thumbnailKey->getProcessingConfiguration();
 
         /** @var ProcessingConfigurationInterface $processingConfiguration */
+        // @todo move method and object to ThumbnailKeyParser
         $processingConfiguration = $this->processingConfigurationParser->parse($configurationString);
 
         return $this->imageProcessor->process($processingConfiguration, $sourceImage);

@@ -18,4 +18,5 @@ use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 interface ThumbnailKeyInterface extends SourceKeyInterface
 {
     public function getProcessingConfiguration(): string;
+    public function hasProcessingConfiguration(): bool;
 }
