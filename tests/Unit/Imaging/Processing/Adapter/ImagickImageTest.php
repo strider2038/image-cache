@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Adapter;
 
 use Psr\Log\LoggerInterface;
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -37,7 +37,7 @@ class ImagickImageTest extends FileTestCase
     /** @var SaveOptions */
     private $saveOptions;
 
-    /** @var FileOperations */
+    /** @var FileOperationsInterface */
     private $fileOperations;
 
     /** @var LoggerInterface */

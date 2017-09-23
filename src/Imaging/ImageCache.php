@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
@@ -32,7 +32,7 @@ class ImageCache implements ImageCacheInterface
      */
     private $baseDirectory;
 
-    /** @var FileOperations */
+    /** @var FileOperationsInterface */
     private $fileOperations;
 
     /**
@@ -52,7 +52,7 @@ class ImageCache implements ImageCacheInterface
     
     public function __construct(
         string $baseDirectory,
-        FileOperations $fileOperations,
+        FileOperationsInterface $fileOperations,
         ImageFactoryInterface $imageFactory,
         ImageExtractorInterface $imageExtractor,
         ImageWriterInterface $imageWriter = null

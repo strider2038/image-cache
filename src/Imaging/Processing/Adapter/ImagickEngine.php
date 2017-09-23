@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Processing\Adapter;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -23,13 +23,13 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
  */
 class ImagickEngine implements ProcessingEngineInterface
 {
-    /** @var FileOperations */
+    /** @var FileOperationsInterface */
     private $fileOperations;
 
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(FileOperations $fileOperations)
+    public function __construct(FileOperationsInterface $fileOperations)
     {
         $this->fileOperations = $fileOperations;
         $this->logger = new NullLogger();

@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -25,7 +25,7 @@ class ImageFile extends AbstractImage implements ImageInterface
     /** @var string */
     private $filename;
 
-    public function __construct(string $filename, FileOperations $fileOperations, SaveOptions $saveOptions)
+    public function __construct(string $filename, FileOperationsInterface $fileOperations, SaveOptions $saveOptions)
     {
         parent::__construct($fileOperations, $saveOptions);
         if (!$this->fileOperations->isFile($filename)) {

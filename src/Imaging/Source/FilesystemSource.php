@@ -11,7 +11,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Source;
 
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
@@ -28,12 +29,12 @@ class FilesystemSource implements FilesystemSourceInterface
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
-    /** @var FileOperations */
+    /** @var FileOperationsInterface */
     private $fileOperations;
     
     public function __construct(
         string $baseDirectory,
-        FileOperations $fileOperations,
+        FileOperationsInterface $fileOperations,
         ImageFactoryInterface $imageFactory
     ) {
         $this->fileOperations = $fileOperations;
@@ -68,6 +69,16 @@ class FilesystemSource implements FilesystemSourceInterface
         $sourceFilename = $this->composeSourceFilename($key);
 
         return $this->fileOperations->isFile($sourceFilename);
+    }
+
+    public function put(FilenameKeyInterface $key, StreamInterface $stream): void
+    {
+        // TODO: Implement put() method.
+    }
+
+    public function delete(FilenameKeyInterface $key): void
+    {
+        // TODO: Implement delete() method.
     }
 
     private function composeSourceFilename(FilenameKeyInterface $key): string

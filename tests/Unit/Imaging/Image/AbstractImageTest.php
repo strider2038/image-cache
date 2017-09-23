@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Image\AbstractImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -48,7 +48,7 @@ class AbstractImageTest extends TestCase
 
     private function createImage($saveOptions)
     {
-        $fileOperations = \Phake::mock(FileOperations::class);
+        $fileOperations = \Phake::mock(FileOperationsInterface::class);
 
         $image = new class ($fileOperations, $saveOptions) extends AbstractImage
         {

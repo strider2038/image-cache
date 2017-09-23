@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
@@ -24,7 +24,7 @@ class ImageBlob extends AbstractImage implements ImageInterface
     /** @var string */
     private $data;
 
-    public function __construct(string $data, FileOperations $fileOperations, SaveOptions $saveOptions)
+    public function __construct(string $data, FileOperationsInterface $fileOperations, SaveOptions $saveOptions)
     {
         parent::__construct($fileOperations, $saveOptions);
         $this->data = $data;

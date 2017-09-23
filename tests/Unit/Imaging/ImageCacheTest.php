@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
@@ -37,7 +37,7 @@ class ImageCacheTest extends TestCase
     private const REBUILD_KEY = '/d.jpg';
     private const REBUILD_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/d.jpg';
 
-    /** @var FileOperations */
+    /** @var FileOperationsInterface */
     private $fileOperations;
 
     /** @var ImageExtractorInterface */

@@ -8,7 +8,7 @@ use Strider2038\ImgCache\Exception\FileOperationException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
-class FileOperations
+class FileOperations implements FileOperationsInterface
 {
     /** @var Filesystem */
     private $filesystem;

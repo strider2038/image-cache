@@ -10,21 +10,20 @@
 
 namespace Strider2038\ImgCache\Tests\Support\Phake;
 
-use Strider2038\ImgCache\Core\FileOperations;
-
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 trait FileOperationsTrait
 {
-    public function givenFileOperations(): FileOperations
+    public function givenFileOperations(): FileOperationsInterface
     {
-        return \Phake::mock(FileOperations::class);
+        return \Phake::mock(FileOperationsInterface::class);
     }
 
     public function givenFileOperations_IsFile_Returns(
-        FileOperations $fileOperations,
+        FileOperationsInterface $fileOperations,
         string $filename,
         bool $value
     ): void {
@@ -32,7 +31,7 @@ trait FileOperationsTrait
     }
 
     public function givenFileOperations_IsDirectory_Returns(
-        FileOperations $fileOperations,
+        FileOperationsInterface $fileOperations,
         string $directory,
         bool $value
     ): void {
@@ -40,7 +39,7 @@ trait FileOperationsTrait
     }
 
     public function givenFileOperations_GetFileContents_Returns(
-        FileOperations $fileOperations,
+        FileOperationsInterface $fileOperations,
         string $filename,
         string $blob
     ): void {
@@ -48,7 +47,7 @@ trait FileOperationsTrait
     }
 
     public function assertFileOperations_CopyFileTo_IsCalledOnce(
-        FileOperations $fileOperations,
+        FileOperationsInterface $fileOperations,
         string $source,
         string $destination
     ): void {
@@ -56,15 +55,17 @@ trait FileOperationsTrait
     }
 
     public function assertFileOperations_CreateFile_IsCalledOnce(
-        FileOperations $fileOperations,
+        FileOperationsInterface $fileOperations,
         string $filename,
         string $data
     ): void {
         \Phake::verify($fileOperations, \Phake::times(1))->createFile($filename, $data);
     }
 
-    public function assertFileOperations_DeleteFile_IsCalledOnce(FileOperations $fileOperations, string $filename): void
-    {
+    public function assertFileOperations_DeleteFile_IsCalledOnce(
+        FileOperationsInterface $fileOperations,
+        string $filename
+    ): void {
         \Phake::verify($fileOperations, \Phake::times(1))->deleteFile($filename);
     }
 }

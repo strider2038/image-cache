@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Processing\Adapter;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Image\AbstractImage;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -31,7 +31,7 @@ class ImagickImage extends AbstractImage implements ProcessingImageInterface
     /** @var LoggerInterface */
     private $logger;
     
-    public function __construct(\Imagick $processor, FileOperations $fileOperations, SaveOptions $saveOptions)
+    public function __construct(\Imagick $processor, FileOperationsInterface $fileOperations, SaveOptions $saveOptions)
     {
         parent::__construct($fileOperations, $saveOptions);
         $this->imagick = $processor;

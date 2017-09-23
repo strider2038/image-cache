@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
@@ -28,13 +28,13 @@ class ImageFactory implements ImageFactoryInterface
     /** @var ImageValidatorInterface */
     private $imageValidator;
 
-    /** @var FileOperations */
+    /** @var FileOperationsInterface */
     private $fileOperations;
 
     public function __construct(
         SaveOptionsFactoryInterface $saveOptionsFactory,
         ImageValidatorInterface $imageValidator,
-        FileOperations $fileOperations
+        FileOperationsInterface $fileOperations
     ) {
         $this->saveOptionsFactory = $saveOptionsFactory;
         $this->imageValidator = $imageValidator;

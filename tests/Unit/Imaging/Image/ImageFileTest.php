@@ -12,7 +12,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\FileOperations;
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -34,7 +34,7 @@ class ImageFileTest extends TestCase
     /** @var SaveOptions */
     private $saveOptions;
 
-    /** @var FileOperations */
+    /** @var FileOperationsInterface */
     private $fileOperations;
 
     protected function setUp()
