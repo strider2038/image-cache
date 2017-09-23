@@ -51,14 +51,14 @@ class ImageFileTest extends TestCase
      */
     public function testConstruct_FileDoesNotExist_ExceptionThrown(): void
     {
-        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME, false);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, false);
 
         $this->createImage();
     }
 
     public function testConstruct_FileExists_FileNameIsCorrect(): void
     {
-        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME, true);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
 
         $image = $this->createImage();
 
@@ -68,12 +68,12 @@ class ImageFileTest extends TestCase
 
     public function testSaveTo_FileExists_FileCopiedToDestination(): void
     {
-        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME, true);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
         $image = $this->createImage();
 
         $image->saveTo(self::COPY_FILENAME);
 
-        $this->assertFileOperations_CopyFileTo_IsCalledOnce(
+        $this->assertFileOperations_copyFileTo_isCalledOnce(
             $this->fileOperations,
             self::FILENAME,
             self::COPY_FILENAME
@@ -82,7 +82,7 @@ class ImageFileTest extends TestCase
 
     public function testOpen_GivenFile_ProcessingImageInterfaceIsReturned(): void
     {
-        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME, true);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
         $image = $this->createImage();
         $expectedProcessingImage = $this->givenProcessingImage();
         $processingEngine = $this->givenProcessingEngine_OpenFromFile_Returns(self::FILENAME, $expectedProcessingImage);
@@ -94,9 +94,9 @@ class ImageFileTest extends TestCase
 
     public function testGetBlob_GivenFile_BlobIsReturned(): void
     {
-        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::FILENAME, true);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
         $image = $this->createImage();
-        $this->givenFileOperations_GetFileContents_Returns($this->fileOperations, self::FILENAME, self::BLOB);
+        $this->givenFileOperations_getFileContents_returns($this->fileOperations, self::FILENAME, self::BLOB);
 
         $blob = $image->getBlob();
 

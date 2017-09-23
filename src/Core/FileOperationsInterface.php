@@ -22,4 +22,5 @@ interface FileOperationsInterface
     public function createFile(string $filename, string $data): void;
     public function deleteFile(string $filename): void;
     public function createDirectory(string $directory, int $mode = 0775): void;
+    public function openFile(string $filename, string $mode): StreamInterface;
 }

@@ -23,6 +23,8 @@ use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
  */
 class FilesystemSource implements FilesystemSourceInterface
 {
+    private const CHUNK_SIZE = 8 * 1024 * 1024;
+
     /** @var string */
     private $baseDirectory;
 
@@ -73,12 +75,19 @@ class FilesystemSource implements FilesystemSourceInterface
 
     public function put(FilenameKeyInterface $key, StreamInterface $stream): void
     {
-        // TODO: Implement put() method.
+        $sourceFilename = $this->composeSourceFilename($key);
+        $this->fileOperations->createDirectory(dirname($sourceFilename));
+
+        $outputStream = $this->fileOperations->openFile($sourceFilename, 'w+');
+        while (!$stream->eof()) {
+            $outputStream->write($stream->read(self::CHUNK_SIZE));
+        }
     }
 
     public function delete(FilenameKeyInterface $key): void
     {
-        // TODO: Implement delete() method.
+        $sourceFilename = $this->composeSourceFilename($key);
+        $this->fileOperations->deleteFile($sourceFilename);
     }
 
     private function composeSourceFilename(FilenameKeyInterface $key): string

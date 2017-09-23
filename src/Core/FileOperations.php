@@ -106,4 +106,8 @@ class FileOperations implements FileOperationsInterface
         }
     }
 
+    public function openFile(string $filename, string $mode): StreamInterface
+    {
+        // TODO: Implement openFile() method.
+    }
 }

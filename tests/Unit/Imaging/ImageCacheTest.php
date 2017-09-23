@@ -62,7 +62,7 @@ class ImageCacheTest extends TestCase
      */
     public function construct_cacheDirectoryIsInvalid_exceptionThrown(): void
     {
-        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, false);
+        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, false);
 
         new ImageCache(
             self::BASE_DIRECTORY,
@@ -146,7 +146,7 @@ class ImageCacheTest extends TestCase
         $cache->delete(self::DELETE_KEY);
 
         \Phake::verify($writer, \Phake::times(1))->delete(self::DELETE_KEY);
-        $this->assertFileOperations_DeleteFile_IsCalledOnce($this->fileOperations, self::DELETE_KEY_DESTINATION_FILENAME);
+        $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::DELETE_KEY_DESTINATION_FILENAME);
     }
 
     /** @test */
@@ -165,13 +165,13 @@ class ImageCacheTest extends TestCase
     public function rebuild_cachedImageExists_imageRemovedFromCacheAndSavedFromSourceToWebDirectory(): void
     {
         $cache = $this->createImageCacheWithMockedGetMethod();
-        $this->givenFileOperations_IsFile_Returns($this->fileOperations, self::REBUILD_DESTINATION_FILENAME, true);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::REBUILD_DESTINATION_FILENAME, true);
 
         $cache->rebuild(self::REBUILD_KEY);
 
         $this->assertFileNotExists(self::REBUILD_DESTINATION_FILENAME);
         $this->assertEquals(self::REBUILD_KEY, $cache->testGetKey);
-        $this->assertFileOperations_DeleteFile_IsCalledOnce($this->fileOperations, self::REBUILD_DESTINATION_FILENAME);
+        $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::REBUILD_DESTINATION_FILENAME);
     }
 
     /**
@@ -203,7 +203,7 @@ class ImageCacheTest extends TestCase
 
     private function createImageCache(ImageWriterInterface $writer = null): ImageCache
     {
-        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, true);
+        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
 
         $cache = new ImageCache(
             self::BASE_DIRECTORY,
@@ -223,7 +223,7 @@ class ImageCacheTest extends TestCase
         $imageFactory = $this->imageFactory;
         $imageExtractor = $this->imageExtractor;
 
-        $this->givenFileOperations_IsDirectory_Returns($this->fileOperations, self::BASE_DIRECTORY, true);
+        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
 
         $cache = new class ($dir, $fileOperations, $imageFactory, $imageExtractor) extends ImageCache {
             public $testGetKey = null;

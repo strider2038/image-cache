@@ -44,7 +44,7 @@ class ImageBlobTest extends TestCase
 
         $image->saveTo(self::DESTINATION_FILENAME);
 
-        $this->assertFileOperations_CreateFile_IsCalledOnce(
+        $this->assertFileOperations_createFile_isCalledOnce(
             $this->fileOperations,
             self::DESTINATION_FILENAME,
             self::BLOB
