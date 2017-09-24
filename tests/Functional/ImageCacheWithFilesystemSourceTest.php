@@ -10,23 +10,25 @@
 
 namespace Strider2038\ImgCache\Tests\Functional;
 
+use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
 {
-    const FILE_NOT_EXIST = '/not-exist.jpg';
-    const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
-    const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
-    const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
-    const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
-    const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY;
-    const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
-    const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
-    const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
+    private const FILE_NOT_EXIST = '/not-exist.jpg';
+    private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
+    private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_RUNTIME_FILENAME = self::RUNTIME_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
+    private const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
+    private const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
+    private const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY;
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
 
     /** @var ImageCache */
     private $cache;
@@ -38,14 +40,16 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
         $this->cache = $container->get('imageCache');
     }
 
-    public function testGet_GivenImageNotExistInSource_NullIsReturned(): void
+    /** @test */
+    public function get_givenImageNotExistInSource_nullIsReturned(): void
     {
         $image = $this->cache->get(self::FILE_NOT_EXIST);
 
         $this->assertNull($image);
     }
 
-    public function testGet_GivenImageInRootOfSource_ImageIsReturned(): void
+    /** @test */
+    public function get_givenImageInRootOfSource_imageIsReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
 
@@ -55,7 +59,8 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
         $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
     }
 
-    public function testGet_GivenImageInRootOfSourceAndThumbnailRequested_ThumbnailCreatedAndImageIsReturned(): void
+    /** @test */
+    public function get_givenImageInRootOfSourceAndThumbnailRequested_thumbnailCreatedAndImageIsReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
 
@@ -69,7 +74,8 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
         $this->assertEquals(IMAGETYPE_JPEG, $type);
     }
 
-    public function testGet_GivenImageInSubdirectoryRequested_ImageIsReturned(): void
+    /** @test */
+    public function get_givenImageInSubdirectoryRequested_imageIsReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
 
@@ -77,5 +83,37 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
 
         $this->assertInstanceOf(ImageFile::class, $image);
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
+    }
+
+    /** @test */
+    public function put_givenStream_imageIsCreated(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+
+        $this->cache->put(self::IMAGE_JPEG_CACHE_KEY, $stream);
+
+        $this->assertFileExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+    }
+
+    /** @test */
+    public function put_givenStream_imageIsCreatedInSubdirectory(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+
+        $this->cache->put(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY, $stream);
+
+        $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
+    }
+
+    /** @test */
+    public function delete_imageExistsInCache_imageIsDeleted(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+
+        $this->cache->delete(self::IMAGE_JPEG_CACHE_KEY);
+
+        $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
     }
 }

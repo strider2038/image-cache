@@ -21,10 +21,10 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 class FunctionalTestCase extends TestCase
 {
-    const APPLICATION_DIRECTORY = __DIR__ . '/../app';
-    const FILESOURCE_DIRECTORY = self::APPLICATION_DIRECTORY . '/filesource';
-    const WEB_DIRECTORY = self::APPLICATION_DIRECTORY . '/web';
-    const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
+    protected const APPLICATION_DIRECTORY = __DIR__ . '/../app';
+    protected const FILESOURCE_DIRECTORY = self::APPLICATION_DIRECTORY . '/filesource';
+    protected const WEB_DIRECTORY = self::APPLICATION_DIRECTORY . '/web';
+    protected const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
 
     private const ASSETS_DIRECTORY = __DIR__ . '/../assets/';
     private const IMAGE_JPEG_FILENAME = self::ASSETS_DIRECTORY . 'sample/cat300.jpg';

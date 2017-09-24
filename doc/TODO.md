@@ -8,9 +8,12 @@
 - [x] Transformation classes refactoring (changing names and using flyweight pattern)
 - [x] Image saving with options
 - [x] Migrate to PSR-7 request and response interfaces (PSR like realisation)
-- [ ] Image writing to sources
+- [x] Image writing to sources
 - [ ] Merge extraction and insertion classes
+- [ ] Move processing configuration parsing into key parser
 - [ ] Functional testing
+    * split tests across all types of sources
+    * thumbnail test checks invalid key
 - [ ] Acceptance testing
 - [ ] Performance optimization (lazy services)
 - [ ] Cache mechanism for source accessor

@@ -142,6 +142,11 @@ class ImageCacheTest extends TestCase
     {
         $writer = \Phake::mock(ImageWriterInterface::class);
         $cache = $this->createImageCache($writer);
+        $this->givenFileOperations_isFile_returns(
+            $this->fileOperations,
+            self::DELETE_KEY_DESTINATION_FILENAME,
+            true
+        );
 
         $cache->delete(self::DELETE_KEY);
 

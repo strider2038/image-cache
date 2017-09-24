@@ -15,14 +15,40 @@ use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 
 class ThumbnailKeyTest extends TestCase
 {
-    const PUBLIC_FILENAME = 'a.jpg';
-    const PROCESSING_CONFIGURATION = 'q5';
+    private const PUBLIC_FILENAME = 'a.jpg';
+    private const PROCESSING_CONFIGURATION = 'q5';
 
-    public function testConstruct_GivenProperties_PropertiesAreSet(): void
+    /** @test */
+    public function construct_givenProperties_propertiesAreSet(): void
     {
         $key = new ThumbnailKey(self::PUBLIC_FILENAME, self::PROCESSING_CONFIGURATION);
 
         $this->assertEquals(self::PUBLIC_FILENAME, $key->getPublicFilename());
         $this->assertEquals(self::PROCESSING_CONFIGURATION, $key->getProcessingConfiguration());
+    }
+
+    /**
+     * @test
+     * @param string $processingConfiguration
+     * @param bool $expectedResult
+     * @dataProvider processingConfigurationProvider
+     */
+    public function hasProcessingConfiguration_givenProcessingConfiguration_boolIsReturned(
+        string $processingConfiguration,
+        bool $expectedResult
+    ): void {
+        $key = new ThumbnailKey(self::PUBLIC_FILENAME, $processingConfiguration);
+
+        $result = $key->hasProcessingConfiguration();
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function processingConfigurationProvider(): array
+    {
+        return [
+            ['', false],
+            ['a', true],
+        ];
     }
 }

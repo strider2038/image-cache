@@ -15,17 +15,34 @@ services:
   # imaging
   imageCache:
     class: \Strider2038\ImgCache\Imaging\ImageCache
-    arguments: ['%imageCache.baseDirectory%', '@fileOperations', '@imageFactory', '@thumbnailImageExtractor']
+    arguments:
+      - '%imageCache.baseDirectory%'
+      - '@fileOperations'
+      - '@imageFactory'
+      - '@thumbnailImageExtractor'
+      - '@thumbnailImageWriter'
 
   # imaging/image
   imageFactory:
     class: \Strider2038\ImgCache\Imaging\Image\ImageFactory
-    arguments: ['@saveOptionsFactory', '@imageValidator', '@fileOperations']
+    arguments:
+      - '@saveOptionsFactory'
+      - '@imageValidator'
+      - '@fileOperations'
 
   # imaging/extraction
   thumbnailImageExtractor:
     class: \Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
-    arguments: ['@thumbnailKeyParser', '@filesystemSourceAccessor', '@thumbnailProcessingConfigurationParser', '@imageProcessor']
+    arguments:
+      - '@thumbnailKeyParser'
+      - '@filesystemSourceAccessor'
+      - '@thumbnailProcessingConfigurationParser'
+      - '@imageProcessor'
+
+  # imaging/insertion
+  thumbnailImageWriter:
+    class: \Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
+    arguments: ['@thumbnailKeyParser', '@filesystemSourceAccessor']
 
   # imaging/parsing
   thumbnailKeyParser:

@@ -115,7 +115,10 @@ class ImageCache implements ImageCacheInterface
 
         $this->imageWriter->delete($key);
 
-        $this->fileOperations->deleteFile($this->baseDirectory . $key);
+        $filename = $this->baseDirectory . $key;
+        if ($this->fileOperations->isFile($filename)) {
+            $this->fileOperations->deleteFile($filename);
+        }
         // @todo delete all thumbnails
     }
     

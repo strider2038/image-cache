@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -36,5 +35,10 @@ class ThumbnailKey implements ThumbnailKeyInterface
     public function getProcessingConfiguration(): string
     {
         return $this->processingConfiguration;
+    }
+
+    public function hasProcessingConfiguration(): bool
+    {
+        return !empty($this->processingConfiguration);
     }
 }
