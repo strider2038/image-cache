@@ -33,6 +33,12 @@ class ThumbnailImageWriter implements ImageWriterInterface
         $this->sourceAccessor = $sourceAccessor;
     }
 
+    public function exists(string $key): bool
+    {
+        $thumbnailKey = $this->keyParser->parse($key);
+        return $this->sourceAccessor->exists($thumbnailKey->getPublicFilename());
+    }
+
     public function insert(string $key, StreamInterface $data): void
     {
         $parsedKey = $this->keyParser->parse($key);

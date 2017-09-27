@@ -69,13 +69,5 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         return $this->imageProcessor->process($processingConfiguration, $sourceImage);
     }
 
-    public function exists(string $key): bool
-    {
-        /** @var ThumbnailKeyInterface $thumbnailKey */
-        $thumbnailKey = $this->keyParser->parse($key);
 
-        $publicFilename = $thumbnailKey->getPublicFilename();
-
-        return $this->sourceAccessor->exists($publicFilename);
-    }
 }

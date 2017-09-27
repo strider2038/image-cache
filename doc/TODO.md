@@ -9,7 +9,6 @@
 - [x] Image saving with options
 - [x] Migrate to PSR-7 request and response interfaces (PSR like realisation)
 - [x] Image writing to sources
-- [ ] Merge extraction and insertion classes
 - [ ] Move processing configuration parsing into key parser
 - [ ] Functional testing
     * split tests across all types of sources

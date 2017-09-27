@@ -20,15 +20,14 @@ use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
-use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ThumbnailImageExtractorTest extends TestCase
 {
-    use ImageTrait, ProviderTrait;
+    use ImageTrait;
 
-    const KEY = '/publicFilename_configString.jpg';
-    const PUBLIC_FILENAME = '/publicFilename.jpg';
-    const CONFIGURATION_STRING = 'configString';
+    private const KEY = '/publicFilename_configString.jpg';
+    private const PUBLIC_FILENAME = '/publicFilename.jpg';
+    private const CONFIGURATION_STRING = 'configString';
 
     /** @var ThumbnailKeyParserInterface */
     private $keyParser;
@@ -50,44 +49,31 @@ class ThumbnailImageExtractorTest extends TestCase
         $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
     }
 
-    public function testExtract_ImageDoesNotExistInSource_NullIsReturned(): void
+    /** @test */
+    public function extract_imageDoesNotExistInSource_nullIsReturned(): void
     {
         $extractor = $this->createThumbnailImageExtractor();
-        $this->givenKeyParser_Parse_Returns_ThumbnailKey();
-        $this->givenSourceAccessor_Get_Returns(null);
+        $this->givenKeyParser_parse_returnsThumbnailKey();
+        $this->givenSourceAccessor_get_returns(null);
 
         $extractedImage = $extractor->extract(self::KEY);
 
         $this->assertNull($extractedImage);
     }
 
-    public function testExtract_ImageExistsInSource_ImageIsProcessedAndReturned(): void
+    /** @test */
+    public function extract_imageExistsInSource_imageIsProcessedAndReturned(): void
     {
         $extractor = $this->createThumbnailImageExtractor();
-        $this->givenKeyParser_Parse_Returns_ThumbnailKey();
+        $this->givenKeyParser_parse_returnsThumbnailKey();
         $sourceImage = $this->givenImage();
-        $this->givenSourceAccessor_Get_Returns($sourceImage);
-        $processingConfiguration = $this->givenProcessingConfigurationParser_Parse_Returns_ProcessingConfiguration();
-        $processedImage = $this->givenImageProcessor_Process_Returns_ProcessedImage($processingConfiguration, $sourceImage);
+        $this->givenSourceAccessor_get_returns($sourceImage);
+        $processingConfiguration = $this->givenProcessingConfigurationParser_parse_returnsProcessingConfiguration();
+        $processedImage = $this->givenImageProcessor_process_returnsProcessedImage($processingConfiguration, $sourceImage);
 
         $extractedImage = $extractor->extract(self::KEY);
 
         $this->assertSame($processedImage, $extractedImage);
-    }
-
-    /**
-     * @param bool $expectedExists
-     * @dataProvider boolValuesProvider
-     */
-    public function testExists_SourceImageExtractorExistsReturnsBool_BoolIsReturned(bool $expectedExists): void
-    {
-        $extractor = $this->createThumbnailImageExtractor();
-        $this->givenKeyParser_Parse_Returns_ThumbnailKey();
-        $this->givenSourceAccessor_Exists_Returns($expectedExists);
-
-        $actualExists = $extractor->exists(self::KEY);
-
-        $this->assertEquals($expectedExists, $actualExists);
     }
 
     private function createThumbnailImageExtractor(): ThumbnailImageExtractor
@@ -101,30 +87,22 @@ class ThumbnailImageExtractorTest extends TestCase
         return $extractor;
     }
 
-    private function givenSourceAccessor_Get_Returns(?ImageInterface $sourceImage): void
+    private function givenSourceAccessor_get_returns(?ImageInterface $sourceImage): void
     {
         \Phake::when($this->sourceAccessor)->get(self::PUBLIC_FILENAME)->thenReturn($sourceImage);
     }
 
-    private function givenSourceAccessor_Exists_Returns(bool $value): void
-    {
-        \Phake::when($this->sourceAccessor)->exists(self::PUBLIC_FILENAME)->thenReturn($value);
-    }
-
-    private function givenKeyParser_Parse_Returns_ThumbnailKey(): ThumbnailKeyInterface
+    private function givenKeyParser_parse_returnsThumbnailKey(): ThumbnailKeyInterface
     {
         $thumbnailKey = \Phake::mock(ThumbnailKeyInterface::class);
-
         \Phake::when($thumbnailKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
-
         \Phake::when($thumbnailKey)->getProcessingConfiguration()->thenReturn(self::CONFIGURATION_STRING);
-
         \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($thumbnailKey);
 
         return $thumbnailKey;
     }
 
-    private function givenProcessingConfigurationParser_Parse_Returns_ProcessingConfiguration(): ProcessingConfigurationInterface
+    private function givenProcessingConfigurationParser_parse_returnsProcessingConfiguration(): ProcessingConfigurationInterface
     {
         $processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
 
@@ -135,7 +113,7 @@ class ThumbnailImageExtractorTest extends TestCase
         return $processingConfiguration;
     }
 
-    private function givenImageProcessor_Process_Returns_ProcessedImage(
+    private function givenImageProcessor_process_returnsProcessedImage(
         ProcessingConfigurationInterface $processingConfiguration,
         ImageInterface $sourceImage
     ): ImageInterface {

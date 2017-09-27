@@ -11,7 +11,6 @@
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
@@ -36,25 +35,7 @@ class SourceImageExtractor implements ImageExtractorInterface
 
     public function extract(string $key): ? ImageInterface
     {
-        $publicFilename = $this->getPublicFilename($key);
-
-        return $this->sourceAccessor->get($publicFilename);
-    }
-
-    public function exists(string $key): bool
-    {
-        $publicFilename = $this->getPublicFilename($key);
-
-        return $this->sourceAccessor->exists($publicFilename);
-    }
-
-    private function getPublicFilename(string $key): string
-    {
-        /** @var SourceKeyInterface $sourceKey */
         $sourceKey = $this->keyParser->parse($key);
-
-        $publicFilename = $sourceKey->getPublicFilename();
-
-        return $publicFilename;
+        return $this->sourceAccessor->get($sourceKey->getPublicFilename());
     }
 }

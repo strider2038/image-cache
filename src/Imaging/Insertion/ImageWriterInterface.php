@@ -18,6 +18,7 @@ use Strider2038\ImgCache\Core\StreamInterface;
  */
 interface ImageWriterInterface
 {
+    public function exists(string $key): bool;
     public function insert(string $key, StreamInterface $data): void;
     public function delete(string $key): void;
 }

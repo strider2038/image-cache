@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image\Insertion;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Insertion;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\StreamInterface;
@@ -16,9 +16,12 @@ use Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class SourceImageWriterTest extends TestCase
 {
+    use ProviderTrait;
+
     private const KEY = 'key';
     private const PUBLIC_FILENAME = 'public_filename';
 
@@ -32,6 +35,23 @@ class SourceImageWriterTest extends TestCase
     {
         $this->keyParser = \Phake::mock(SourceKeyParserInterface::class);
         $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
+    }
+
+    /**
+     * @test
+     * @param bool $expectedExists
+     * @dataProvider boolValuesProvider
+     */
+    public function exists_sourceAccessorExistsReturnBool_boolIsReturned(bool $expectedExists): void
+    {
+        $writer = $this->createSourceImageWriter();
+        $publicFilename = self::PUBLIC_FILENAME;
+        $this->givenKeyParser_parse_returnsSourceKey();
+        $this->givenSourceAccessor_exists_returns($publicFilename, $expectedExists);
+
+        $actualExists = $writer->exists(self::KEY);
+
+        $this->assertEquals($expectedExists, $actualExists);
     }
 
     /** @test */
@@ -68,6 +88,11 @@ class SourceImageWriterTest extends TestCase
         return $parsedKey;
     }
 
+    private function givenSourceAccessor_exists_returns(string $publicFilename, bool $value): void
+    {
+        \Phake::when($this->sourceAccessor)->exists($publicFilename)->thenReturn($value);
+    }
+
     private function assertKeyParser_parse_isCalledOnce(): void
     {
         \Phake::verify($this->keyParser, \Phake::times(1))->parse(self::KEY);
@@ -87,8 +112,6 @@ class SourceImageWriterTest extends TestCase
 
     private function createSourceImageWriter(): SourceImageWriter
     {
-        $writer = new SourceImageWriter($this->keyParser, $this->sourceAccessor);
-
-        return $writer;
+        return new SourceImageWriter($this->keyParser, $this->sourceAccessor);
     }
 }

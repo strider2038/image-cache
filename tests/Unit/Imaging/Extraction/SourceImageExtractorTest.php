@@ -17,14 +17,13 @@ use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
-use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class SourceImageExtractorTest extends TestCase
 {
-    use ImageTrait, ProviderTrait;
+    use ImageTrait;
 
-    const KEY = 'a';
-    const PUBLIC_FILENAME = 'b';
+    private const KEY = 'a';
+    private const PUBLIC_FILENAME = 'b';
 
     /** @var SourceKeyParserInterface */
     private $keyParser;
@@ -38,25 +37,27 @@ class SourceImageExtractorTest extends TestCase
         $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
     }
 
-    public function testExtract_ImageDoesNotExistInSource_NullIsReturned(): void
+    /** @test */
+    public function extract_imageDoesNotExistInSource_nullIsReturned(): void
     {
         $extractor = $this->createSourceImageExtractor();
         $publicFilename = self::PUBLIC_FILENAME;
-        $this->givenPublicFilenameFoundByKey(self::KEY, $publicFilename);
-        $this->givenSourceAccessor_Get_Returns($publicFilename, null);
+        $this->givenKeyParser_parse_returnsSourceKey();
+        $this->givenSourceAccessor_get_returns($publicFilename, null);
 
         $extractedImage = $extractor->extract(self::KEY);
 
         $this->assertNull($extractedImage);
     }
 
-    public function testExtract_ImageExistsInSource_ImageIsReturned(): void
+    /** @test */
+    public function extract_imageExistsInSource_imageIsReturned(): void
     {
         $extractor = $this->createSourceImageExtractor();
         $publicFilename = self::PUBLIC_FILENAME;
-        $this->givenPublicFilenameFoundByKey(self::KEY, $publicFilename);
+        $this->givenKeyParser_parse_returnsSourceKey();
         $image = $this->givenImage();
-        $this->givenSourceAccessor_Get_Returns($publicFilename, $image);
+        $this->givenSourceAccessor_get_returns($publicFilename, $image);
 
         $extractedImage = $extractor->extract(self::KEY);
 
@@ -64,43 +65,24 @@ class SourceImageExtractorTest extends TestCase
         $this->assertSame($image, $extractedImage);
     }
 
-    /**
-     * @param bool $expectedExists
-     * @dataProvider boolValuesProvider
-     */
-    public function testExtract_SourceAccessorExistsReturnBool_BoolIsReturned(bool $expectedExists): void
-    {
-        $extractor = $this->createSourceImageExtractor();
-        $publicFilename = self::PUBLIC_FILENAME;
-        $this->givenPublicFilenameFoundByKey(self::KEY, $publicFilename);
-        $this->givenSourceAccessor_Exists_Returns($publicFilename, $expectedExists);
 
-        $actualExists = $extractor->exists(self::KEY);
-
-        $this->assertEquals($expectedExists, $actualExists);
-    }
 
     private function createSourceImageExtractor(): SourceImageExtractor
     {
-        $extractor = new SourceImageExtractor($this->keyParser, $this->sourceAccessor);
-
-        return $extractor;
+        return new SourceImageExtractor($this->keyParser, $this->sourceAccessor);
     }
 
-    private function givenPublicFilenameFoundByKey(string $key, string $publicFilename): void
+    private function givenKeyParser_parse_returnsSourceKey(): SourceKeyInterface
     {
         $sourceKey = \Phake::mock(SourceKeyInterface::class);
-        \Phake::when($this->keyParser)->parse($key)->thenReturn($sourceKey);
-        \Phake::when($sourceKey)->getPublicFilename()->thenReturn($publicFilename);
+        \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($sourceKey);
+        \Phake::when($sourceKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
+
+        return $sourceKey;
     }
 
-    private function givenSourceAccessor_Get_Returns(string $publicFilename, ?ImageInterface $image): void
+    private function givenSourceAccessor_get_returns(string $publicFilename, ?ImageInterface $image): void
     {
         \Phake::when($this->sourceAccessor)->get($publicFilename)->thenReturn($image);
-    }
-
-    private function givenSourceAccessor_Exists_Returns(string $publicFilename, bool $value): void
-    {
-        \Phake::when($this->sourceAccessor)->exists($publicFilename)->thenReturn($value);
     }
 }
