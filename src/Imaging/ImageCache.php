@@ -15,11 +15,11 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
-use Strider2038\ImgCache\Exception\NotAllowedException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
+use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -35,19 +35,13 @@ class ImageCache implements ImageCacheInterface
     /** @var FileOperationsInterface */
     private $fileOperations;
 
-    /**
-     * @var ImageExtractorInterface
-     */
+    /** @var ImageExtractorInterface */
     private $imageExtractor;
 
-    /**
-     * @var ImageWriterInterface
-     */
+    /** @var ImageWriterInterface */
     private $imageWriter;
 
-    /**
-     * @var ImageFactoryInterface
-     */
+    /** @var ImageFactoryInterface */
     private $imageFactory;
     
     public function __construct(
@@ -64,7 +58,7 @@ class ImageCache implements ImageCacheInterface
         $this->baseDirectory = rtrim($baseDirectory, '/');
         $this->imageFactory = $imageFactory;
         $this->imageExtractor = $imageExtractor;
-        $this->imageWriter = $imageWriter;
+        $this->imageWriter = $imageWriter ?? new NullWriter();
     }
 
     /**
@@ -84,7 +78,6 @@ class ImageCache implements ImageCacheInterface
         }
 
         $destinationFilename = $this->composeDestinationFilename($key);
-
         $extractedImage->saveTo($destinationFilename);
 
         return $this->imageFactory->createImageFile($destinationFilename);
@@ -93,26 +86,12 @@ class ImageCache implements ImageCacheInterface
     public function put(string $key, StreamInterface $data): void
     {
         $this->validateKey($key);
-
-        if ($this->imageWriter === null) {
-            throw new NotAllowedException(
-                "Operation 'put' is not allowed for this type of cache"
-            );
-        }
-
         $this->imageWriter->insert($key, $data);
     }
 
     public function delete(string $key): void
     {
         $this->validateKey($key);
-
-        if ($this->imageWriter === null) {
-            throw new NotAllowedException(
-                "Operation 'delete' is not allowed for this type of cache"
-            );
-        }
-
         $this->imageWriter->delete($key);
 
         $filename = $this->baseDirectory . $key;
@@ -126,7 +105,7 @@ class ImageCache implements ImageCacheInterface
     {
         $this->validateKey($key);
 
-        return $this->imageExtractor->exists($key);
+        return $this->imageWriter->exists($key);
     }
 
     public function rebuild(string $key): void
@@ -149,7 +128,7 @@ class ImageCache implements ImageCacheInterface
 
     private function validateKey(string $key): void
     {
-        if (substr($key, 0, 1) !== '/') {
+        if (@$key[0] !== '/') {
             throw new InvalidValueException('Key must start with slash');
         }
     }

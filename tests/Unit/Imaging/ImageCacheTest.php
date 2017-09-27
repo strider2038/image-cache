@@ -76,7 +76,7 @@ class ImageCacheTest extends TestCase
     public function get_imageDoesNotExistInSource_nullIsReturned(): void
     {
         $cache = $this->createImageCache();
-        $this->givenImageExtractor_Extract_ReturnsNull();
+        $this->givenImageExtractor_extract_returnsNull();
 
         $image = $cache->get(self::GET_KEY);
 
@@ -87,7 +87,7 @@ class ImageCacheTest extends TestCase
     public function get_imageExistsInSource_sourceImageSavedToWebDirectoryAndCachedImageIsReturned(): void
     {
         $cache = $this->createImageCache();
-        $extractedImage = $this->givenImageExtractor_Extract_ReturnsImage(self::GET_KEY);
+        $extractedImage = $this->givenImageExtractor_extract_returnsImage(self::GET_KEY);
         $createdImage = $this->givenImageFactory_CreateImageFile_ReturnsImage($this->imageFactory, self::GET_DESTINATION_FILENAME);
 
         $image = $cache->get(self::GET_KEY);
@@ -96,20 +96,6 @@ class ImageCacheTest extends TestCase
         $this->assertImage_SavedTo_IsCalledOnce($extractedImage, self::GET_DESTINATION_FILENAME);
         $this->assertImageFactory_CreateImageFile_IsCalledOnce($this->imageFactory, self::GET_DESTINATION_FILENAME);
         $this->assertSame($createdImage, $image);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\NotAllowedException
-     * @expectedExceptionCode 405
-     * @expectedExceptionMessage Operation 'put' is not allowed
-     */
-    public function put_imageWriterIsNotSpecified_notAllowedExceptionThrown(): void
-    {
-        $cache = $this->createImageCache();
-        $stream = $this->givenStream();
-
-        $cache->put(self::INSERT_KEY, $stream);
     }
 
     /** @test */
@@ -122,19 +108,6 @@ class ImageCacheTest extends TestCase
         $cache->put(self::INSERT_KEY, $stream);
 
         \Phake::verify($writer, \Phake::times(1))->insert(self::INSERT_KEY, $stream);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\NotAllowedException
-     * @expectedExceptionCode 405
-     * @expectedExceptionMessage Operation 'delete' is not allowed
-     */
-    public function delete_imageWriterIsNotSpecified_notAllowedExceptionThrown(): void
-    {
-        $cache = $this->createImageCache();
-
-        $cache->delete(self::DELETE_KEY);
     }
 
     /** @test */
@@ -157,12 +130,13 @@ class ImageCacheTest extends TestCase
     /** @test */
     public function exists_keyIsSet_existsCalledWithKeyAndValueReturned(): void
     {
-        $cache = $this->createImageCache();
-        \Phake::when($this->imageExtractor)->exists(self::GET_KEY)->thenReturn(true);
+        $writer = \Phake::mock(ImageWriterInterface::class);
+        $cache = $this->createImageCache($writer);
+        \Phake::when($writer)->exists(self::GET_KEY)->thenReturn(true);
 
         $result = $cache->exists(self::GET_KEY);
 
-        \Phake::verify($this->imageExtractor, \Phake::times(1))->exists(self::GET_KEY);
+        \Phake::verify($writer, \Phake::times(1))->exists(self::GET_KEY);
         $this->assertTrue($result);
     }
 
@@ -198,6 +172,7 @@ class ImageCacheTest extends TestCase
     public function invalidKeyProvider(): array
     {
         return [
+            ['get', ['']],
             ['get', [self::INVALID_KEY]],
             ['put', [self::INVALID_KEY, $this->givenStream()]],
             ['delete', [self::INVALID_KEY]],
@@ -242,14 +217,14 @@ class ImageCacheTest extends TestCase
         return $cache;
     }
 
-    private function givenImageExtractor_Extract_ReturnsNull(): void
+    private function givenImageExtractor_extract_returnsNull(): void
     {
         \Phake::when($this->imageExtractor)
             ->extract(\Phake::anyParameters())
             ->thenReturn(null);
     }
 
-    private function givenImageExtractor_Extract_ReturnsImage(string $imageKey): ImageInterface
+    private function givenImageExtractor_extract_returnsImage(string $imageKey): ImageInterface
     {
         $image = \Phake::mock(ImageInterface::class);
 
@@ -262,8 +237,7 @@ class ImageCacheTest extends TestCase
 
     private function givenStream(): StreamInterface
     {
-        $stream = \Phake::mock(StreamInterface::class);
-        return $stream;
+        return \Phake::mock(StreamInterface::class);
     }
 
 }
