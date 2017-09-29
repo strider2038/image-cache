@@ -13,15 +13,17 @@
 - [ ] Functional testing
     * split tests across all types of sources
     * thumbnail test checks invalid key
-- [ ] Acceptance testing
-- [ ] Performance optimization (lazy services)
-- [ ] Cache mechanism for source accessor
 - [ ] Google map source
 - [ ] Yandex.Disk source
-- [ ] Support for phpDocumentor
-- [ ] Migrate from supervisor to systemd daemons
-- [ ] Support for building docker containers in Travis
-- [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
+- [ ] Support for building docker containers in Travis
+- [ ] Acceptance testing
+- [ ] Move all todos to github issues
+- [ ] Cache mechanism for source accessor
+- [ ] Performance optimization (lazy services)
+- [ ] Support for phpDocumentor
+- [ ] Migrate from supervisor to systemd daemons
+- [ ] JPEG optimization by https://github.com/tjko/jpegoptim
+
