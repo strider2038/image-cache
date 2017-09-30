@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
+use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
@@ -25,10 +26,17 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
     /** @var ImageValidatorInterface */
     private $imageValidator;
 
-    public function __construct(KeyValidatorInterface $keyValidator, ImageValidatorInterface $imageValidator)
-    {
+    /** @var ProcessingConfigurationParserInterface */
+    private $processingConfigurationParser;
+
+    public function __construct(
+        KeyValidatorInterface $keyValidator,
+        ImageValidatorInterface $imageValidator,
+        ProcessingConfigurationParserInterface $configurationParser
+    ) {
         $this->keyValidator = $keyValidator;
         $this->imageValidator = $imageValidator;
+        $this->processingConfigurationParser = $configurationParser;
     }
 
     public function parse(string $key): ThumbnailKeyInterface
@@ -47,9 +55,11 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         }
 
         $filename = explode('_', $path['filename']);
-        $dir = $path['dirname'] === '.' ? '' : (rtrim($path['dirname'], '/') . '/');
-        $sourceFilename = sprintf('%s%s.%s', $dir, array_shift($filename), $path['extension']);
-        $processingConfiguration = implode('_', $filename);
+        $directory = $path['dirname'] === '.' ? '' : (rtrim($path['dirname'], '/') . '/');
+        $sourceFilename = sprintf('%s%s.%s', $directory, array_shift($filename), $path['extension']);
+        $processingConfigurationString = implode('_', $filename);
+
+        $processingConfiguration = $this->processingConfigurationParser->parse($processingConfigurationString);
 
         return new ThumbnailKey($sourceFilename, $processingConfiguration);
     }

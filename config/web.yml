@@ -1,14 +1,14 @@
 parameters:
   app.debug: true
-  security.accessToken: 'sample-security-token-must-be-replaced-with-real'
+  security.access_token: 'sample-security-token-must-be-replaced-with-real'
   log.directory: '%app.directory%/runtime'
   log.name: 'app.log'
   log.level: 100
-  saveOptions.quality: 90
-  imageCache.baseDirectory: '%app.directory%/web/i'
-  filesystemSource.baseDirectory: '%app.directory%/tests/assets'
+  save_options.quality: 90
+  image_cache.base_directory: '%app.directory%/web/i'
+  filesystem_source.base_directory: '%app.directory%/tests/assets'
   routes:
-    /i: 'imageController'
+    /i: 'image_controller'
 
 services:
   # external
@@ -16,26 +16,26 @@ services:
     class: \Symfony\Component\Filesystem\Filesystem
 
   # core components
-  requestFactory:
+  request_factory:
     class: \Strider2038\ImgCache\Core\Http\RequestFactory
   request:
-    factory: ['@requestFactory', 'createRequest']
-    arguments: ['%serverConfiguration%']
-  responseSender:
+    factory: ['@request_factory', 'createRequest']
+    arguments: ['%server_configuration%']
+  response_sender:
     class: \Strider2038\ImgCache\Core\Http\ResponseSender
-  responseFactory:
+  response_factory:
     class: \Strider2038\ImgCache\Core\Http\ResponseFactory
     arguments: ['@request', '%app.debug%']
   security:
     class: \Strider2038\ImgCache\Core\Security
-    arguments: ['@request', '%security.accessToken%']
-  loggerFactory:
+    arguments: ['@request', '%security.access_token%']
+  logger_factory:
     class: \Strider2038\ImgCache\Core\LoggerFactory
     arguments: ['%log.directory%']
   logger:
-    factory: ['@loggerFactory', 'createLogger']
+    factory: ['@logger_factory', 'createLogger']
     arguments: ['%log.name%', '%log.level%']
-  fileOperations:
+  file_operations:
     class: \Strider2038\ImgCache\Core\FileOperations
     arguments: ['@filesystem']
     calls:
@@ -44,75 +44,100 @@ services:
   # routing components
   router:
     class: \Strider2038\ImgCache\Service\Router
-    arguments: ['@imageValidator', '%routes%']
+    arguments: ['@image_validator', '%routes%']
     calls:
       - [setLogger, ['@logger']]
 
   # controllers
-  imageController:
+  image_controller:
     class: \Strider2038\ImgCache\Service\ImageController
-    arguments: ['@responseFactory', '@security', '@imageCache', '@request']
+    arguments:
+      - '@response_factory'
+      - '@security'
+      - '@image_cache'
+      - '@request'
 
   # imaging
-  imageCache:
+  image_cache:
     class: \Strider2038\ImgCache\Imaging\ImageCache
-    arguments: ['%imageCache.baseDirectory%', '@fileOperations', '@imageFactory', '@thumbnailImageExtractor']
+    arguments:
+      - '%image_cache.base_directory%'
+      - '@file_operations'
+      - '@image_factory'
+      - '@thumbnail_image_extractor'
 
   # imaging/image
-  imageFactory:
+  image_factory:
     class: \Strider2038\ImgCache\Imaging\Image\ImageFactory
-    arguments: ['@saveOptionsFactory', '@imageValidator', '@fileOperations']
+    arguments:
+      - '@save_options_factory'
+      - '@image_validator'
+      - '@file_operations'
 
   # imaging/extraction
-  thumbnailImageExtractor:
+  thumbnail_image_extractor:
     class: \Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
-    arguments: ['@thumbnailKeyParser', '@filesystemSourceAccessor', '@thumbnailProcessingConfigurationParser', '@imageProcessor']
+    arguments:
+      - '@thumbnail_key_parser'
+      - '@filesystem_source_accessor'
+      - '@image_processor'
 
   # imaging/parsing
-  thumbnailKeyParser:
+  thumbnail_key_parser:
     class: \Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser
-    arguments: ['@keyValidator', '@imageValidator']
-  thumbnailProcessingConfigurationParser:
+    arguments:
+      - '@key_validator'
+      - '@image_validator'
+      - '@thumbnail_processing_configuration_parser'
+  thumbnail_processing_configuration_parser:
     class: \Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser
-    arguments: ['@transformationsCreator', '@saveOptionsFactory', '@saveOptionsConfigurator']
+    arguments:
+      - '@transformations_creator'
+      - '@save_options_factory'
+      - '@save_options_configurator'
 
   # imaging/processing
-  saveOptionsFactory:
+  save_options_factory:
     class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
     calls:
-      - [setQuality, ['%saveOptions.quality%']]
-  saveOptionsConfigurator:
+      - [setQuality, ['%save_options.quality%']]
+  save_options_configurator:
     class: \Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator
-  imageProcessor:
+  image_processor:
     class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
-    arguments: ['@imagickEngine']
-  imagickEngine:
+    arguments: ['@imagick_engine']
+  imagick_engine:
     class: \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine
-    arguments: ['@fileOperations']
+    arguments: ['@file_operations']
     calls:
       - [setLogger, ['@logger']]
 
   # imaging/transformation
-  transformationsCreator:
+  transformations_creator:
     class: \Strider2038\ImgCache\Imaging\Transformation\TransformationsCreator
-    arguments: ['@transformationFactoryFlyweight']
-  transformationFactoryFlyweight:
+    arguments: ['@transformation_factory_flyweight']
+  transformation_factory_flyweight:
     class: \Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight
 
   # imaging/source
-  filesystemSourceAccessor:
+  filesystem_source_accessor:
     class: \Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor
-    arguments: ['@filesystemSource', '@directKeyMapper']
+    arguments:
+      - '@filesystem_source'
+      - '@direct_key_mapper'
     calls:
       - [setLogger, ['@logger']]
-  filesystemSource:
+  filesystem_source:
     class: \Strider2038\ImgCache\Imaging\Source\FilesystemSource
-    arguments: ['%filesystemSource.baseDirectory%', '@fileOperations', '@imageFactory']
-  directKeyMapper:
+    arguments:
+      - '%filesystem_source.base_directory%'
+      - '@file_operations'
+      - '@image_factory'
+  direct_key_mapper:
     class: \Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper
 
   # imaging/validation
-  imageValidator:
+  image_validator:
     class: \Strider2038\ImgCache\Imaging\Validation\ImageValidator
-  keyValidator:
+  key_validator:
     class: \Strider2038\ImgCache\Imaging\Validation\KeyValidator

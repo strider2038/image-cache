@@ -1,6 +1,6 @@
 parameters:
-  imageCache.baseDirectory: '%test.webDirectory%'
-  filesystemSource.baseDirectory: '%test.filesourceDirectory%'
+  image_cache.base_directory: '%test.web_directory%'
+  filesystem_source.base_directory: '%test.filesource_directory%'
 
 services:
   # external
@@ -8,81 +8,93 @@ services:
     class: \Symfony\Component\Filesystem\Filesystem
 
   # core components
-  fileOperations:
+  file_operations:
     class: \Strider2038\ImgCache\Core\FileOperations
     arguments: ['@filesystem']
 
   # imaging
-  imageCache:
+  image_cache:
     class: \Strider2038\ImgCache\Imaging\ImageCache
     arguments:
-      - '%imageCache.baseDirectory%'
-      - '@fileOperations'
-      - '@imageFactory'
-      - '@thumbnailImageExtractor'
-      - '@thumbnailImageWriter'
+      - '%image_cache.base_directory%'
+      - '@file_operations'
+      - '@image_factory'
+      - '@thumbnail_image_extractor'
+      - '@thumbnail_image_writer'
 
   # imaging/image
-  imageFactory:
+  image_factory:
     class: \Strider2038\ImgCache\Imaging\Image\ImageFactory
     arguments:
-      - '@saveOptionsFactory'
-      - '@imageValidator'
-      - '@fileOperations'
+      - '@save_options_factory'
+      - '@image_validator'
+      - '@file_operations'
 
   # imaging/extraction
-  thumbnailImageExtractor:
+  thumbnail_image_extractor:
     class: \Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
     arguments:
-      - '@thumbnailKeyParser'
-      - '@filesystemSourceAccessor'
-      - '@thumbnailProcessingConfigurationParser'
-      - '@imageProcessor'
+      - '@thumbnail_key_parser'
+      - '@filesystem_source_accessor'
+      - '@image_processor'
 
   # imaging/insertion
-  thumbnailImageWriter:
+  thumbnail_image_writer:
     class: \Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
-    arguments: ['@thumbnailKeyParser', '@filesystemSourceAccessor']
+    arguments:
+      - '@thumbnail_key_parser'
+      - '@filesystem_source_accessor'
 
   # imaging/parsing
-  thumbnailKeyParser:
+  thumbnail_key_parser:
     class: \Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser
-    arguments: ['@keyValidator', '@imageValidator']
-  thumbnailProcessingConfigurationParser:
+    arguments:
+      - '@key_validator'
+      - '@image_validator'
+      - '@thumbnail_processing_configuration_parser'
+  thumbnail_processing_configuration_parser:
     class: \Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser
-    arguments: ['@transformationsCreator', '@saveOptionsFactory', '@saveOptionsConfigurator']
+    arguments:
+      - '@transformations_creator'
+      - '@save_options_factory'
+      - '@save_options_configurator'
 
   # imaging/processing
-  saveOptionsFactory:
+  save_options_factory:
     class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
-  saveOptionsConfigurator:
+  save_options_configurator:
     class: \Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator
-  imageProcessor:
+  image_processor:
     class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
-    arguments: ['@imagickEngine']
-  imagickEngine:
+    arguments: ['@imagick_engine']
+  imagick_engine:
     class: \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine
-    arguments: ['@fileOperations']
+    arguments: ['@file_operations']
 
   # imaging/transformation
-  transformationsCreator:
+  transformations_creator:
     class: \Strider2038\ImgCache\Imaging\Transformation\TransformationsCreator
-    arguments: ['@transformationFactoryFlyweight']
-  transformationFactoryFlyweight:
+    arguments: ['@transformation_factory_flyweight']
+  transformation_factory_flyweight:
     class: \Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight
 
   # imaging/source
-  filesystemSourceAccessor:
+  filesystem_source_accessor:
     class: \Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor
-    arguments: ['@filesystemSource', '@directKeyMapper']
-  filesystemSource:
+    arguments:
+      - '@filesystem_source'
+      - '@direct_key_mapper'
+  filesystem_source:
     class: \Strider2038\ImgCache\Imaging\Source\FilesystemSource
-    arguments: ['%filesystemSource.baseDirectory%', '@fileOperations', '@imageFactory']
-  directKeyMapper:
+    arguments:
+      - '%filesystem_source.base_directory%'
+      - '@file_operations'
+      - '@image_factory'
+  direct_key_mapper:
     class: \Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper
 
   # imaging/validation
-  imageValidator:
+  image_validator:
     class: \Strider2038\ImgCache\Imaging\Validation\ImageValidator
-  keyValidator:
+  key_validator:
     class: \Strider2038\ImgCache\Imaging\Validation\KeyValidator

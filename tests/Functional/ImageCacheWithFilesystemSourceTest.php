@@ -37,7 +37,7 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
     {
         parent::setUp();
         $container = $this->loadContainer('file-source.yml');
-        $this->cache = $container->get('imageCache');
+        $this->cache = $container->get('image_cache');
     }
 
     /** @test */

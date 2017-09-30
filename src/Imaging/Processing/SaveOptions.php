@@ -17,9 +17,9 @@ use Strider2038\ImgCache\Exception\InvalidValueException;
  */
 class SaveOptions
 {
-    const QUALITY_VALUE_MIN = 15;
-    const QUALITY_VALUE_MAX = 100;
-    const QUALITY_VALUE_DEFAULT = 85;
+    public const QUALITY_VALUE_MIN = 15;
+    public const QUALITY_VALUE_MAX = 100;
+    public const QUALITY_VALUE_DEFAULT = 85;
 
     /** @var int */
     private $quality = self::QUALITY_VALUE_DEFAULT;
@@ -30,14 +30,14 @@ class SaveOptions
     }
 
     /**
-     * @param int|null $quality
+     * @param int $quality
      * @throws InvalidValueException
      */
     public function setQuality(int $quality): void
     {
         if ($quality < self::QUALITY_VALUE_MIN || $quality > self::QUALITY_VALUE_MAX) {
             throw new InvalidValueException(sprintf(
-                "Quality value must be between %d and %d",
+                'Quality value must be between %d and %d',
                 self::QUALITY_VALUE_MIN,
                 self::QUALITY_VALUE_MAX
             ));

@@ -23,12 +23,17 @@ class ProcessingConfiguration implements ProcessingConfigurationInterface
     /** @var SaveOptions */
     private $saveOptions;
 
+    /** @var bool */
+    private $isDefault;
+
     public function __construct(
         TransformationsCollection $transformations,
-        SaveOptions $saveOptions
+        SaveOptions $saveOptions,
+        bool $isDefault
     ) {
         $this->transformations = $transformations;
         $this->saveOptions = $saveOptions;
+        $this->isDefault = $isDefault;
     }
 
     public function getTransformations(): TransformationsCollection
@@ -39,5 +44,10 @@ class ProcessingConfiguration implements ProcessingConfigurationInterface
     public function getSaveOptions(): SaveOptions
     {
         return $this->saveOptions;
+    }
+
+    public function isDefault(): bool
+    {
+        return $this->isDefault;
     }
 }

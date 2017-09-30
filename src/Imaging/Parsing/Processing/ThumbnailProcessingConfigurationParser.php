@@ -45,9 +45,11 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
     {
         $transformations = new TransformationsCollection();
         $saveOptions = $this->saveOptionsFactory->create();
+        $isDefault = true;
 
         if (!empty($configuration)) {
             $configurationValues = explode('_', $configuration);
+            $isDefault = false;
 
             foreach ($configurationValues as $value) {
 
@@ -62,6 +64,6 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
             }
         }
 
-        return new ProcessingConfiguration($transformations, $saveOptions);
+        return new ProcessingConfiguration($transformations, $saveOptions, $isDefault);
     }
 }

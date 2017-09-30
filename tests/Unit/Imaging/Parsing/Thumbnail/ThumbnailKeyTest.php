@@ -12,43 +12,45 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Thumbnail;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ThumbnailKeyTest extends TestCase
 {
+    use ProviderTrait;
+
     private const PUBLIC_FILENAME = 'a.jpg';
-    private const PROCESSING_CONFIGURATION = 'q5';
+
+    /** @var ProcessingConfigurationInterface */
+    private $processingConfiguration;
+
+    protected function setUp()
+    {
+        $this->processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
+    }
 
     /** @test */
     public function construct_givenProperties_propertiesAreSet(): void
     {
-        $key = new ThumbnailKey(self::PUBLIC_FILENAME, self::PROCESSING_CONFIGURATION);
+        $key = new ThumbnailKey(self::PUBLIC_FILENAME, $this->processingConfiguration);
 
         $this->assertEquals(self::PUBLIC_FILENAME, $key->getPublicFilename());
-        $this->assertEquals(self::PROCESSING_CONFIGURATION, $key->getProcessingConfiguration());
+        $this->assertSame($this->processingConfiguration, $key->getProcessingConfiguration());
     }
 
     /**
      * @test
-     * @param string $processingConfiguration
-     * @param bool $expectedResult
-     * @dataProvider processingConfigurationProvider
+     * @param bool $isDefault
+     * @dataProvider boolValuesProvider
      */
     public function hasProcessingConfiguration_givenProcessingConfiguration_boolIsReturned(
-        string $processingConfiguration,
-        bool $expectedResult
+        bool $isDefault
     ): void {
-        $key = new ThumbnailKey(self::PUBLIC_FILENAME, $processingConfiguration);
+        $key = new ThumbnailKey(self::PUBLIC_FILENAME, $this->processingConfiguration);
+        \Phake::when($this->processingConfiguration)->isDefault()->thenReturn($isDefault);
 
         $result = $key->hasProcessingConfiguration();
 
-        $this->assertEquals($expectedResult, $result);
-    }
-
-    public function processingConfigurationProvider(): array
-    {
-        return [
-            ['', false],
-            ['a', true],
-        ];
+        $this->assertEquals(!$isDefault, $result);
     }
 }

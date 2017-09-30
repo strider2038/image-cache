@@ -19,4 +19,5 @@ interface ProcessingConfigurationInterface
 {
     public function getTransformations(): TransformationsCollection;
     public function getSaveOptions(): SaveOptions;
+    public function isDefault(): bool;
 }

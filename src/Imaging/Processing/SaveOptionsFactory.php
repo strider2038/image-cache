@@ -31,7 +31,6 @@ class SaveOptionsFactory implements SaveOptionsFactoryInterface
     public function create(): SaveOptions
     {
         $saveOptions = new SaveOptions();
-
         $saveOptions->setQuality($this->quality);
 
         return $saveOptions;

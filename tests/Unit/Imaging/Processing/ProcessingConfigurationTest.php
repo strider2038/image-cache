@@ -14,9 +14,12 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
+use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ProcessingConfigurationTest extends TestCase
 {
+    use ProviderTrait;
+
     /** @var TransformationsCollection */
     private $transformations;
 
@@ -29,11 +32,17 @@ class ProcessingConfigurationTest extends TestCase
         $this->saveOptions = \Phake::mock(SaveOptions::class);
     }
 
-    public function testConstruct_GivenProperties_PropertiesAreSet(): void
+    /**
+     * @test
+     * @param bool $isDefault
+     * @dataProvider boolValuesProvider
+     */
+    public function construct_givenProperties_propertiesAreSet(bool $isDefault): void
     {
-        $configuration = new ProcessingConfiguration($this->transformations, $this->saveOptions);
+        $configuration = new ProcessingConfiguration($this->transformations, $this->saveOptions, $isDefault);
 
         $this->assertSame($this->transformations, $configuration->getTransformations());
         $this->assertSame($this->saveOptions, $configuration->getSaveOptions());
+        $this->assertEquals($isDefault, $configuration->isDefault());
     }
 }

@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Strider2038\ImgCache\Core\ControllerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
@@ -26,8 +27,8 @@ class Application
     private const LOGGER_ID = 'logger';
     private const REQUEST_ID = 'request';
     private const ROUTER_ID = 'router';
-    private const RESPONSE_FACTORY_ID = 'responseFactory';
-    private const RESPONSE_SENDER_ID = 'responseSender';
+    private const RESPONSE_FACTORY_ID = 'response_factory';
+    private const RESPONSE_SENDER_ID = 'response_sender';
 
     /** @var ContainerInterface */
     private $container;
@@ -81,12 +82,11 @@ class Application
         }
 
         $exitCode = 0;
-
         try {
-
             $this->logger->debug('Application started');
 
             $route = $this->router->getRoute($this->request);
+            /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
             $response = $controller->runAction($route->getActionId(), $route->getLocation());
             $this->responseSender->send($response);
@@ -95,21 +95,19 @@ class Application
                 'Application ended. Response %d is sent',
                 $response->getStatusCode()->getValue()
             ));
-
         } catch (\Exception $exception) {
-
             $exitCode = 1;
             $this->logger->error($exception);
 
             $response = $this->responseFactory->createExceptionResponse($exception);
             $this->responseSender->send($response);
-
         }
 
         return $exitCode;
     }
 
-    public static function onShutdown(LoggerInterface $logger = null, array $error = null) {
+    public static function onShutdown(LoggerInterface $logger = null, array $error = null): void
+    {
         $logger = $logger ?? new NullLogger();
 
         $error = $error ?? error_get_last();
@@ -117,7 +115,7 @@ class Application
         if ($error !== null) {
             $message = implode(PHP_EOL, array_map(
                 function ($value, $key) {
-                    return sprintf("%s: %s", ucfirst($key), $value);
+                    return sprintf('%s: %s', ucfirst($key), $value);
                 },
                 $error,
                 array_keys($error)
@@ -126,5 +124,4 @@ class Application
             $logger->critical($message);
         }
     }
-
 }

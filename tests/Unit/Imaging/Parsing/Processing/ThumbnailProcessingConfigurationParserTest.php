@@ -40,49 +40,59 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     }
 
     /**
+     * @test
+     * @param string $configuration
+     * @param int $count
+     * @param bool $isDefault
      * @dataProvider configurationsProvider
      */
-    public function testParse_GivenConfigurationWithTransformations_CountOfTransformationsReturned(
+    public function parse_givenConfigurationWithTransformations_countOfTransformationsReturned(
         string $configuration,
-        int $count
+        int $count,
+        bool $isDefault
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
-        $this->givenTransformationsFactory_Create_Returns_Transformation();
-        $defaultSaveOptions = $this->givenSaveOptionsFactory_Create_Returns_SaveOptions();
+        $this->givenTransformationsFactory_create_returnsTransformation();
+        $defaultSaveOptions = $this->givenSaveOptionsFactory_create_returns_saveOptions();
 
         $parsedConfiguration = $parser->parse($configuration);
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
-        $this->assertTransformationsFactory_Create_IsCalled($count);
-        $this->assertSaveOptionsConfigurator_Configure_IsCalled(0);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions);
+        $this->assertTransformationsFactory_create_isCalled($count);
+        $this->assertSaveOptionsConfigurator_configure_isCalled(0);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
     }
 
     /**
+     * @test
+     * @param string $configuration
+     * @param int $count
+     * @param bool $isDefault
      * @dataProvider configurationsProvider
      */
-    public function testGetRequestConfiguration_GivenConfigurationWithSaveOptions_CountOfSaveOptionsConfiguratorConfigureVerified(
+    public function getRequestConfiguration_givenConfigurationWithSaveOptions_countOfSaveOptionsConfiguratorConfigureVerified(
         string $configuration,
-        int $count
+        int $count,
+        bool $isDefault
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
-        $this->givenTransformationsFactory_Create_Returns_Null();
-        $defaultSaveOptions = $this->givenSaveOptionsFactory_Create_Returns_SaveOptions();
+        $this->givenTransformationsFactory_create_returnsNull();
+        $defaultSaveOptions = $this->givenSaveOptionsFactory_create_returns_saveOptions();
 
         $parsedConfiguration = $parser->parse($configuration);
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
-        $this->assertTransformationsFactory_Create_IsCalled($count);
-        $this->assertSaveOptionsConfigurator_Configure_IsCalled($count);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions);
+        $this->assertTransformationsFactory_create_isCalled($count);
+        $this->assertSaveOptionsConfigurator_configure_isCalled($count);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
     }
 
     public function configurationsProvider(): array
     {
         return [
-            ['', 0],
-            ['q95', 1],
-            ['sz85_q7', 2],
+            ['', 0, true],
+            ['q95', 1, false],
+            ['sz85_q7', 2, false],
         ];
     }
 
@@ -97,7 +107,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         return $parser;
     }
 
-    private function givenTransformationsFactory_Create_Returns_Transformation(): void
+    private function givenTransformationsFactory_create_returnsTransformation(): void
     {
         $transformation = \Phake::mock(TransformationInterface::class);
 
@@ -108,12 +118,14 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
     private function verifyProcessingConfiguration(
         ProcessingConfigurationInterface $configuration,
-        SaveOptions $defaultSaveOptions
+        SaveOptions $defaultSaveOptions,
+        bool $isDefault
     ): void {
         $this->assertInstanceOf(ProcessingConfiguration::class, $configuration);
         $this->assertInstanceOf(TransformationsCollection::class, $configuration->getTransformations());
-        $this->assertSaveOptionsFactory_Create_IsCalledOnce();
+        $this->assertSaveOptionsFactory_create_isCalledOnce();
         $this->assertSame($defaultSaveOptions, $configuration->getSaveOptions());
+        $this->assertEquals($isDefault, $configuration->isDefault());
     }
 
     private function assertTransformationsCount(int $count, ProcessingConfigurationInterface $configuration): void
@@ -122,37 +134,34 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $this->assertEquals($count, $transformations->count());
     }
 
-    private function assertTransformationsFactory_Create_IsCalled(int $times): void
+    private function assertTransformationsFactory_create_isCalled(int $times): void
     {
         \Phake::verify($this->transformationsCreator, \Phake::times($times))
             ->create(\Phake::anyParameters());
     }
 
-    private function assertSaveOptionsConfigurator_Configure_IsCalled(int $times): void
+    private function assertSaveOptionsConfigurator_configure_isCalled(int $times): void
     {
         \Phake::verify($this->saveOptionsConfigurator, \Phake::times($times))
             ->configure(\Phake::anyParameters());
     }
 
-    private function givenTransformationsFactory_Create_Returns_Null(): void
+    private function givenTransformationsFactory_create_returnsNull(): void
     {
         \Phake::when($this->transformationsCreator)
             ->create(\Phake::anyParameters())
             ->thenReturn(null);
     }
 
-    private function givenSaveOptionsFactory_Create_Returns_SaveOptions(): SaveOptions
+    private function givenSaveOptionsFactory_create_returns_saveOptions(): SaveOptions
     {
         $defaultSaveOptions = \Phake::mock(SaveOptions::class);
-
-        \Phake::when($this->saveOptionsFactory)
-            ->create()
-            ->thenReturn($defaultSaveOptions);
+        \Phake::when($this->saveOptionsFactory)->create()->thenReturn($defaultSaveOptions);
 
         return $defaultSaveOptions;
     }
 
-    private function assertSaveOptionsFactory_Create_IsCalledOnce(): void
+    private function assertSaveOptionsFactory_create_isCalledOnce(): void
     {
         \Phake::verify($this->saveOptionsFactory, \Phake::times(1))->create();
     }

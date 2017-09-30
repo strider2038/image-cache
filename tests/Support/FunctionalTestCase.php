@@ -52,9 +52,9 @@ class FunctionalTestCase extends TestCase
         $fileLocator = new FileLocator(self::APPLICATION_DIRECTORY);
         $loader = new YamlFileLoader($container, $fileLocator);
         $loader->load('config/' . $filename);
-        $container->setParameter('test.webDirectory', self::WEB_DIRECTORY);
-        $container->setParameter('test.filesourceDirectory', self::FILESOURCE_DIRECTORY);
-        $container->setParameter('test.runtimeDirectory', self::RUNTIME_DIRECTORY);
+        $container->setParameter('test.web_directory', self::WEB_DIRECTORY);
+        $container->setParameter('test.filesource_directory', self::FILESOURCE_DIRECTORY);
+        $container->setParameter('test.runtime_directory', self::RUNTIME_DIRECTORY);
 
         return $container;
     }
