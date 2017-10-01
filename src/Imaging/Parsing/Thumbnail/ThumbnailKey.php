@@ -10,28 +10,21 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
 
+use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ThumbnailKey implements ThumbnailKeyInterface
+class ThumbnailKey extends SourceKey implements ThumbnailKeyInterface
 {
-    /** @var string */
-    private $publicFilename;
-
     /** @var ProcessingConfigurationInterface */
     private $processingConfiguration;
 
     public function __construct(string $publicFilename, ProcessingConfigurationInterface $processingConfiguration)
     {
-        $this->publicFilename = $publicFilename;
+        parent::__construct($publicFilename);
         $this->processingConfiguration = $processingConfiguration;
-    }
-
-    public function getPublicFilename(): string
-    {
-        return $this->publicFilename;
     }
 
     public function getProcessingConfiguration(): ProcessingConfigurationInterface

@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Validation;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */

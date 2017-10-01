@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Imaging\Validation;
 
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -20,10 +19,14 @@ class ImageValidator implements ImageValidatorInterface
 {
     public function isValidImageMimeType(string $mime): bool
     {
-        return in_array($mime, [
-            'image/jpeg',
-            'image/png',
-        ]);
+        return in_array(
+            $mime,
+            [
+                'image/jpeg',
+                'image/png',
+            ],
+            true
+        );
     }
 
     public function hasFileValidImageMimeType(string $filename): bool
@@ -39,9 +42,9 @@ class ImageValidator implements ImageValidatorInterface
 
     public function hasBlobValidImageMimeType(string $blob): bool
     {
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_buffer($finfo, $blob);
-        finfo_close($finfo);
+        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_buffer($fileInfo, $blob);
+        finfo_close($fileInfo);
 
         return $this->isValidImageMimeType($mime);
     }
@@ -50,7 +53,6 @@ class ImageValidator implements ImageValidatorInterface
     {
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-        return in_array($ext, ['jpg', 'jpeg', 'png']);
+        return in_array($ext, ['jpg', 'jpeg', 'png'], true);
     }
-
 }
