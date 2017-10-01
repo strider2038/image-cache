@@ -89,12 +89,14 @@ class OriginalImageCacheTest extends FunctionalTestCase
     }
 
     /** @test */
-    public function delete_imageExistsInCache_imageIsDeleted(): void
+    public function delete_imageExistsInSourceAndCache_imageIsDeleted(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
 
         $this->cache->delete(self::IMAGE_JPEG_CACHE_KEY);
 
         $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
     }
 }
