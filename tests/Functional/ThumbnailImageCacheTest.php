@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
-class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
+class ThumbnailImageCacheTest extends FunctionalTestCase
 {
     private const FILE_NOT_EXIST = '/not-exist.jpg';
     private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
@@ -36,7 +36,7 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
     protected function setUp()
     {
         parent::setUp();
-        $container = $this->loadContainer('file-source.yml');
+        $container = $this->loadContainer('thumbnail-image-cache.yml');
         $this->cache = $container->get('image_cache');
     }
 
