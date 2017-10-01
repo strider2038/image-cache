@@ -8,8 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
-
+namespace Strider2038\ImgCache\Collection;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
