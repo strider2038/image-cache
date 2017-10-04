@@ -21,9 +21,16 @@ class ThumbnailKey extends SourceKey implements ThumbnailKeyInterface
     /** @var ProcessingConfigurationInterface */
     private $processingConfiguration;
 
-    public function __construct(string $publicFilename, ProcessingConfigurationInterface $processingConfiguration)
-    {
+    /** @var string */
+    private $thumbnailMask;
+
+    public function __construct(
+        string $publicFilename,
+        string $thumbnailMask,
+        ProcessingConfigurationInterface $processingConfiguration
+    ) {
         parent::__construct($publicFilename);
+        $this->thumbnailMask = $thumbnailMask;
         $this->processingConfiguration = $processingConfiguration;
     }
 
@@ -35,5 +42,10 @@ class ThumbnailKey extends SourceKey implements ThumbnailKeyInterface
     public function hasProcessingConfiguration(): bool
     {
         return !$this->processingConfiguration->isDefault();
+    }
+
+    public function getThumbnailMask(): string
+    {
+        return $this->thumbnailMask;
     }
 }

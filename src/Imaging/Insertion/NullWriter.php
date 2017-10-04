@@ -33,4 +33,9 @@ class NullWriter implements ImageWriterInterface
     {
         throw new NotAllowedException('Method is not allowed');
     }
+
+    public function getFileMask(string $key): string
+    {
+        throw new NotAllowedException('Method is not allowed');
+    }
 }

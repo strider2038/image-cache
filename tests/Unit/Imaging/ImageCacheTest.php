@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
@@ -31,8 +32,9 @@ class ImageCacheTest extends TestCase
     private const GET_KEY = '/a.jpg';
     private const GET_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/a.jpg';
     private const INSERT_KEY = '/b.jpg';
-    private const INSERT_DATA = 'data';
     private const DELETE_KEY = '/c.jpg';
+    private const DELETE_KEY_FILENAME_MASK = '/c*.jpg';
+    private const DELETE_KEY_DESTINATION_FILENAME_MASK = self::BASE_DIRECTORY . '/c*.jpg';
     private const DELETE_KEY_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/c.jpg';
     private const REBUILD_KEY = '/d.jpg';
     private const REBUILD_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/d.jpg';
@@ -115,11 +117,10 @@ class ImageCacheTest extends TestCase
     {
         $writer = \Phake::mock(ImageWriterInterface::class);
         $cache = $this->createImageCache($writer);
-        $this->givenFileOperations_isFile_returns(
-            $this->fileOperations,
-            self::DELETE_KEY_DESTINATION_FILENAME,
-            true
-        );
+        \Phake::when($writer)->getFileMask(self::DELETE_KEY)->thenReturn(self::DELETE_KEY_FILENAME_MASK);
+        \Phake::when($this->fileOperations)
+            ->findByMask(self::DELETE_KEY_DESTINATION_FILENAME_MASK)
+            ->thenReturn(new StringList([self::DELETE_KEY_DESTINATION_FILENAME]));
 
         $cache->delete(self::DELETE_KEY);
 

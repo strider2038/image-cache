@@ -48,4 +48,10 @@ class SourceImageWriter implements ImageWriterInterface
         $parsedKey = $this->keyParser->parse($key);
         $this->sourceAccessor->delete($parsedKey->getPublicFilename());
     }
+
+    public function getFileMask(string $key): string
+    {
+        $parsedKey = $this->keyParser->parse($key);
+        return $parsedKey->getPublicFilename();
+    }
 }

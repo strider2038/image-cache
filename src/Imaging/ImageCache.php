@@ -94,11 +94,11 @@ class ImageCache implements ImageCacheInterface
         $this->validateKey($key);
         $this->imageWriter->delete($key);
 
-        $filename = $this->baseDirectory . $key;
-        if ($this->fileOperations->isFile($filename)) {
-            $this->fileOperations->deleteFile($filename);
+        $mask = $this->imageWriter->getFileMask($key);
+        $cachedFiles = $this->fileOperations->findByMask($this->baseDirectory . $mask);
+        foreach ($cachedFiles as $cachedFile) {
+            $this->fileOperations->deleteFile($cachedFile);
         }
-        // @todo delete all thumbnails
     }
     
     public function exists(string $key): bool

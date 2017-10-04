@@ -26,4 +26,11 @@ class StringList extends IterableCollection
     {
         $this->elements[] = $value;
     }
+
+    public function process(\Closure $closure): void
+    {
+        foreach ($this->elements as $key => $value) {
+            $this->elements[$key] = $closure->call($this, $value);
+        }
+    }
 }

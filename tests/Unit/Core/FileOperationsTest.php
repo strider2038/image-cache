@@ -28,6 +28,9 @@ class FileOperationsTest extends FileTestCase
     private const CREATE_FILENAME_CONTENTS = 'create_filename';
     private const CREATE_DIRECTORY_NAME = '/tmp/test';
     private const EMPTY_FILENAME = self::TEST_CACHE_DIR . '/empty.dat';
+    private const FILE_LIST_FILENAME1 = self::TEST_CACHE_DIR . '/file.dat';
+    private const FILE_LIST_FILENAME2 = self::TEST_CACHE_DIR . '/file_2.dat';
+    private const FILE_LIST_MASK = self::TEST_CACHE_DIR . '/file*.dat';
 
     /** @var Filesystem */
     private $filesystem;
@@ -104,6 +107,19 @@ class FileOperationsTest extends FileTestCase
         $exist = $fileOperations->isDirectory($directory);
 
         $this->assertTrue($exist);
+    }
+
+    /** @test */
+    public function findByMask_givenFiles_filesInList(): void
+    {
+        $this->givenAssetFile(self::FILE_JSON,self::FILE_LIST_FILENAME1);
+        $this->givenAssetFile(self::FILE_JSON,self::FILE_LIST_FILENAME2);
+        $fileOperations = $this->createFileOperations();
+
+        $list = $fileOperations->findByMask(self::FILE_LIST_MASK);
+
+        $this->assertContains(self::FILE_LIST_FILENAME1, $list->toArray());
+        $this->assertContains(self::FILE_LIST_FILENAME2, $list->toArray());
     }
 
     /** @test */

@@ -12,9 +12,9 @@ namespace Strider2038\ImgCache\Imaging\Insertion;
 
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
+use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
-
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -35,25 +35,30 @@ class ThumbnailImageWriter implements ImageWriterInterface
 
     public function exists(string $key): bool
     {
-        $thumbnailKey = $this->keyParser->parse($key);
-        return $this->sourceAccessor->exists($thumbnailKey->getPublicFilename());
+        $parsedKey = $this->parseKey($key);
+        return $this->sourceAccessor->exists($parsedKey->getPublicFilename());
     }
 
     public function insert(string $key, StreamInterface $data): void
     {
-        $parsedKey = $this->keyParser->parse($key);
-        if ($parsedKey->hasProcessingConfiguration()) {
-            throw new InvalidRequestValueException(sprintf(
-                "Image name '%s' for source image cannot have process configuration",
-                $key
-            ));
-        }
-
+        $parsedKey = $this->parseKey($key);
         $this->sourceAccessor->put($parsedKey->getPublicFilename(), $data);
     }
 
     public function delete(string $key): void
     {
+        $parsedKey = $this->parseKey($key);
+        $this->sourceAccessor->delete($parsedKey->getPublicFilename());
+    }
+
+    public function getFileMask(string $key): string
+    {
+        $parsedKey = $this->parseKey($key);
+        return $parsedKey->getThumbnailMask();
+    }
+
+    private function parseKey(string $key): ThumbnailKeyInterface
+    {
         $parsedKey = $this->keyParser->parse($key);
         if ($parsedKey->hasProcessingConfiguration()) {
             throw new InvalidRequestValueException(sprintf(
@@ -62,6 +67,6 @@ class ThumbnailImageWriter implements ImageWriterInterface
             ));
         }
 
-        $this->sourceAccessor->delete($parsedKey->getPublicFilename());
+        return $parsedKey;
     }
 }

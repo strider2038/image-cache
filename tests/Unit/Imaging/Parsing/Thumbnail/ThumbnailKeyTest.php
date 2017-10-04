@@ -20,6 +20,7 @@ class ThumbnailKeyTest extends TestCase
     use ProviderTrait;
 
     private const PUBLIC_FILENAME = 'a.jpg';
+    private const THUMBNAIL_MASK = 'thumbnail_mask';
 
     /** @var ProcessingConfigurationInterface */
     private $processingConfiguration;
@@ -32,9 +33,10 @@ class ThumbnailKeyTest extends TestCase
     /** @test */
     public function construct_givenProperties_propertiesAreSet(): void
     {
-        $key = new ThumbnailKey(self::PUBLIC_FILENAME, $this->processingConfiguration);
+        $key = $this->createThumbnailKey();
 
         $this->assertEquals(self::PUBLIC_FILENAME, $key->getPublicFilename());
+        $this->assertEquals(self::THUMBNAIL_MASK, $key->getThumbnailMask());
         $this->assertSame($this->processingConfiguration, $key->getProcessingConfiguration());
     }
 
@@ -46,11 +48,20 @@ class ThumbnailKeyTest extends TestCase
     public function hasProcessingConfiguration_givenProcessingConfiguration_boolIsReturned(
         bool $isDefault
     ): void {
-        $key = new ThumbnailKey(self::PUBLIC_FILENAME, $this->processingConfiguration);
+        $key = $this->createThumbnailKey();
         \Phake::when($this->processingConfiguration)->isDefault()->thenReturn($isDefault);
 
         $result = $key->hasProcessingConfiguration();
 
         $this->assertEquals(!$isDefault, $result);
+    }
+
+    private function createThumbnailKey(): ThumbnailKey
+    {
+        return new ThumbnailKey(
+            self::PUBLIC_FILENAME,
+            self::THUMBNAIL_MASK,
+            $this->processingConfiguration
+        );
     }
 }
