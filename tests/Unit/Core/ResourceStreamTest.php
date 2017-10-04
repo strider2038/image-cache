@@ -15,16 +15,16 @@ use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class ResourceStreamTest extends FileTestCase
 {
-    private const MODE_READ_ONLY = 'r';
-    private const MODE_READ_AND_WRITE = 'r+';
-    private const MODE_WRITE_ONLY = 'w';
-    private const MODE_WRITE_AND_READ = 'w+';
-    private const MODE_APPEND_ONLY = 'a';
-    private const MODE_APPEND_AND_READ = 'a+';
-    private const MODE_WRITE_IF_NOT_EXIST = 'x';
-    private const MODE_WRITE_AND_READ_IF_NOT_EXIST = 'x+';
-    private const MODE_WRITE_WITHOUT_TRUNCATE = 'c';
-    private const MODE_WRITE_AND_READ_WITHOUT_TRUNCATE = 'c+';
+    private const MODE_READ_ONLY = 'rb';
+    private const MODE_READ_AND_WRITE = 'rb+';
+    private const MODE_WRITE_ONLY = 'wb';
+    private const MODE_WRITE_AND_READ = 'wb+';
+    private const MODE_APPEND_ONLY = 'ab';
+    private const MODE_APPEND_AND_READ = 'ab+';
+    private const MODE_WRITE_IF_NOT_EXIST = 'xb';
+    private const MODE_WRITE_AND_READ_IF_NOT_EXIST = 'xb+';
+    private const MODE_WRITE_WITHOUT_TRUNCATE = 'cb';
+    private const MODE_WRITE_AND_READ_WITHOUT_TRUNCATE = 'cb+';
     private const FILENAME_WRITE = self::TEST_CACHE_DIR . '/file_write.json';
     private const CONTENTS = 'contents';
 

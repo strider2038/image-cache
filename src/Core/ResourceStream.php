@@ -15,16 +15,16 @@ namespace Strider2038\ImgCache\Core;
  */
 class ResourceStream implements StreamInterface
 {
-    public const MODE_READ_ONLY = 'r';
-    public const MODE_READ_AND_WRITE = 'r+';
-    public const MODE_WRITE_ONLY = 'w';
-    public const MODE_WRITE_AND_READ = 'w+';
-    public const MODE_APPEND_ONLY = 'a';
-    public const MODE_APPEND_AND_READ = 'a+';
-    public const MODE_WRITE_IF_NOT_EXIST = 'x';
-    public const MODE_WRITE_AND_READ_IF_NOT_EXIST = 'x+';
-    public const MODE_WRITE_WITHOUT_TRUNCATE = 'c';
-    public const MODE_WRITE_AND_READ_WITHOUT_TRUNCATE = 'c+';
+    public const MODE_READ_ONLY = 'rb';
+    public const MODE_READ_AND_WRITE = 'rb+';
+    public const MODE_WRITE_ONLY = 'wb';
+    public const MODE_WRITE_AND_READ = 'wb+';
+    public const MODE_APPEND_ONLY = 'ab';
+    public const MODE_APPEND_AND_READ = 'ab+';
+    public const MODE_WRITE_IF_NOT_EXIST = 'xb';
+    public const MODE_WRITE_AND_READ_IF_NOT_EXIST = 'xb+';
+    public const MODE_WRITE_WITHOUT_TRUNCATE = 'cb';
+    public const MODE_WRITE_AND_READ_WITHOUT_TRUNCATE = 'cb+';
 
     /** @var resource */
     protected $resource;
