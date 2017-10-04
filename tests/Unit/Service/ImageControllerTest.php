@@ -171,34 +171,6 @@ class ImageControllerTest extends TestCase
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
     }
 
-    /** @test */
-    public function rebuild_fileExistsInCache_rebuildIsCalledAndOkResponseIsReturned(): void
-    {
-        $controller = $this->createImageController();
-        $this->givenImageCache_exists_returns(true);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::OK);
-
-        $response = $controller->actionRebuild(self::LOCATION);
-
-        $this->assertImageCache_rebuild_isCalledOnce();
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::OK);
-    }
-
-    /** @test */
-    public function rebuild_fileDoesNotExistInCache_notFoundResponseIsReturned(): void
-    {
-        $controller = $this->createImageController();
-        $this->givenImageCache_exists_returns(false);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::NOT_FOUND);
-
-        $response = $controller->actionRebuild(self::LOCATION);
-
-        $this->assertImageCache_rebuild_isNeverCalled();
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
-    }
-
     /**
      * @test
      * @param string $action
@@ -225,7 +197,6 @@ class ImageControllerTest extends TestCase
             ['create', HttpStatusCodeEnum::FORBIDDEN],
             ['replace', HttpStatusCodeEnum::FORBIDDEN],
             ['delete', HttpStatusCodeEnum::FORBIDDEN],
-            ['rebuild', HttpStatusCodeEnum::FORBIDDEN],
         ];
     }
 
@@ -269,10 +240,6 @@ class ImageControllerTest extends TestCase
                 return new Response(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
             }
 
-            public function actionRebuild(string $location): ResponseInterface
-            {
-                return new Response(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
-            }
         };
 
         return $controller;
@@ -318,16 +285,6 @@ class ImageControllerTest extends TestCase
     private function assertImageCache_delete_isCalledOnce(): void
     {
         \Phake::verify($this->imageCache, \Phake::times(1))->delete(self::LOCATION);
-    }
-
-    private function assertImageCache_rebuild_isCalledOnce(): void
-    {
-        \Phake::verify($this->imageCache, \Phake::times(1))->rebuild(self::LOCATION);
-    }
-
-    private function assertImageCache_rebuild_isNeverCalled(): void
-    {
-        \Phake::verify($this->imageCache, \Phake::never())->rebuild(\Phake::anyParameters());
     }
 
     private function givenResponseFactory_createMessageResponse_returnsResponseWithCode(int $code): void

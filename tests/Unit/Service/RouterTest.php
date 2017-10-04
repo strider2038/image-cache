@@ -113,9 +113,9 @@ class RouterTest extends TestCase
         string $actionName
     ): void {
         $router = $this->createRouter();
-        $this->givenRequest_GetMethod_Returns($requestMethod);
-        $this->givenRequest_GetUri_GetPath_Returns(self::REQUEST_URL);
-        $this->givenImageValidator_HasValidImageExtension_Returns(self::REQUEST_URL,true);
+        $this->givenRequest_getMethod_returns($requestMethod);
+        $this->givenRequest_getUri_getPath_returns(self::REQUEST_URL);
+        $this->givenImageValidator_hasValidImageExtension_returns(self::REQUEST_URL,true);
 
         $route = $router->getRoute($this->request);
         
@@ -132,7 +132,6 @@ class RouterTest extends TestCase
             [self::REQUEST_METHOD_GET, 'get'],
             ['POST', 'create'],
             ['PUT', 'replace'],
-            ['PATCH', 'rebuild'],
             ['DELETE', 'delete'],
         ];
     }
@@ -143,10 +142,10 @@ class RouterTest extends TestCase
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Route not found
      */
-    public function getRoute_RequestMethodIsNotSet_ExceptionThrown(): void
+    public function getRoute_requestMethodIsNotSet_exceptionThrown(): void
     {
         $router = $this->createRouter();
-        $this->givenRequest_GetUri_GetPath_Returns('');
+        $this->givenRequest_getUri_getPath_returns('');
         
         $router->getRoute($this->request);
     }
@@ -157,12 +156,12 @@ class RouterTest extends TestCase
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Requested file has incorrect extension
      */
-    public function getRoute_RequestedFileHasNotAllowedExtension_ExceptionThrown(): void
+    public function getRoute_requestedFileHasNotAllowedExtension_exceptionThrown(): void
     {
         $router = $this->createRouter();
-        $this->givenRequest_GetMethod_Returns(self::REQUEST_METHOD_GET);
-        $this->givenRequest_GetUri_GetPath_Returns('/a.php');
-        $this->givenImageValidator_HasValidImageExtension_Returns(self::REQUEST_URL,false);
+        $this->givenRequest_getMethod_returns(self::REQUEST_METHOD_GET);
+        $this->givenRequest_getUri_getPath_returns('/a.php');
+        $this->givenImageValidator_hasValidImageExtension_returns(self::REQUEST_URL,false);
         
         $router->getRoute($this->request);
     }
@@ -175,16 +174,16 @@ class RouterTest extends TestCase
      * @param string $location
      * @dataProvider validUrlMaskToControllersMapAndUrlAndControllerIdAndLocationProvider
      */
-    public function getRoute_GivenUrlMaskToControllersMap_RouteWithGivenControllerIdAndLocationIsReturned(
+    public function getRoute_givenUrlMaskToControllersMap_routeWithGivenControllerIdAndLocationIsReturned(
         array $map,
         string $requestUrl,
         string $controllerId,
         string $location
     ): void {
         $router = $this->createRouter($map);
-        $this->givenRequest_GetMethod_Returns(self::REQUEST_METHOD_GET);
-        $this->givenRequest_GetUri_GetPath_Returns($requestUrl);
-        $this->givenImageValidator_HasValidImageExtension_Returns($requestUrl,true);
+        $this->givenRequest_getMethod_returns(self::REQUEST_METHOD_GET);
+        $this->givenRequest_getUri_getPath_returns($requestUrl);
+        $this->givenImageValidator_hasValidImageExtension_returns($requestUrl,true);
 
         $route = $router->getRoute($this->request);
 
@@ -202,14 +201,14 @@ class RouterTest extends TestCase
      * @param string $requestUrl
      * @dataProvider invalidUrlMaskToControllersMapAndUrlAndControllerIdAndLocationProvider
      */
-    public function getRoute_GivenInvalidUrlMaskToControllersMap_ExceptionThrown(
+    public function getRoute_givenInvalidUrlMaskToControllersMap_exceptionThrown(
         array $map,
         string $requestUrl
     ): void {
         $router = $this->createRouter($map);
-        $this->givenRequest_GetMethod_Returns(self::REQUEST_METHOD_GET);
-        $this->givenRequest_GetUri_GetPath_Returns($requestUrl);
-        $this->givenImageValidator_HasValidImageExtension_Returns($requestUrl,true);
+        $this->givenRequest_getMethod_returns(self::REQUEST_METHOD_GET);
+        $this->givenRequest_getUri_getPath_returns($requestUrl);
+        $this->givenImageValidator_hasValidImageExtension_returns($requestUrl,true);
 
         $router->getRoute($this->request);
     }
@@ -245,21 +244,21 @@ class RouterTest extends TestCase
         return $router;
     }
 
-    private function givenRequest_GetMethod_Returns(string $requestMethod): void
+    private function givenRequest_getMethod_returns(string $requestMethod): void
     {
         \Phake::when($this->request)
             ->getMethod()
             ->thenReturn(new HttpMethodEnum($requestMethod));
     }
 
-    private function givenRequest_GetUri_GetPath_Returns(string $value): void
+    private function givenRequest_getUri_getPath_returns(string $value): void
     {
         $uri = \Phake::mock(UriInterface::class);
         \Phake::when($this->request)->getUri()->thenReturn($uri);
         \Phake::when($uri)->getPath()->thenReturn($value);
     }
 
-    private function givenImageValidator_HasValidImageExtension_Returns(string $url, bool $value): void
+    private function givenImageValidator_hasValidImageExtension_returns(string $url, bool $value): void
     {
         \Phake::when($this->imageValidator)->hasValidImageExtension($url)->thenReturn($value);
     }

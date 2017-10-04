@@ -95,7 +95,7 @@ class ImageCache implements ImageCacheInterface
         $this->imageWriter->delete($key);
 
         $mask = $this->imageWriter->getFileMask($key);
-        $cachedFiles = $this->fileOperations->findByMask($this->baseDirectory . $mask);
+        $cachedFiles = $this->fileOperations->findByMask($this->composeDestinationFilename($mask));
         foreach ($cachedFiles as $cachedFile) {
             $this->fileOperations->deleteFile($cachedFile);
         }
@@ -106,19 +106,6 @@ class ImageCache implements ImageCacheInterface
         $this->validateKey($key);
 
         return $this->imageWriter->exists($key);
-    }
-
-    public function rebuild(string $key): void
-    {
-        $this->validateKey($key);
-
-        // @todo cascade thumbnail rebuild
-        $destinationFilename = $this->composeDestinationFilename($key);
-        if ($this->fileOperations->isFile($destinationFilename)) {
-            $this->fileOperations->deleteFile($destinationFilename);
-        }
-
-        $this->get($key);
     }
 
     private function composeDestinationFilename(string $key): string

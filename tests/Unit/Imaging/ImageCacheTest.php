@@ -141,19 +141,6 @@ class ImageCacheTest extends TestCase
         $this->assertTrue($result);
     }
 
-    /** @test */
-    public function rebuild_cachedImageExists_imageRemovedFromCacheAndSavedFromSourceToWebDirectory(): void
-    {
-        $cache = $this->createImageCacheWithMockedGetMethod();
-        $this->givenFileOperations_isFile_returns($this->fileOperations, self::REBUILD_DESTINATION_FILENAME, true);
-
-        $cache->rebuild(self::REBUILD_KEY);
-
-        $this->assertFileNotExists(self::REBUILD_DESTINATION_FILENAME);
-        $this->assertEquals(self::REBUILD_KEY, $cache->testGetKey);
-        $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::REBUILD_DESTINATION_FILENAME);
-    }
-
     /**
      * @test
      * @param string $method
@@ -178,7 +165,6 @@ class ImageCacheTest extends TestCase
             ['put', [self::INVALID_KEY, $this->givenStream()]],
             ['delete', [self::INVALID_KEY]],
             ['exists', [self::INVALID_KEY]],
-            ['rebuild', [self::INVALID_KEY]],
         ];
     }
 
@@ -193,27 +179,6 @@ class ImageCacheTest extends TestCase
             $this->imageExtractor,
             $writer
         );
-
-        return $cache;
-    }
-
-    private function createImageCacheWithMockedGetMethod()
-    {
-        $dir = self::BASE_DIRECTORY;
-        $fileOperations = $this->fileOperations;
-        $imageFactory = $this->imageFactory;
-        $imageExtractor = $this->imageExtractor;
-
-        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
-
-        $cache = new class ($dir, $fileOperations, $imageFactory, $imageExtractor) extends ImageCache {
-            public $testGetKey = null;
-            public function get(string $key): ?ImageInterface
-            {
-                $this->testGetKey = $key;
-                return null;
-            }
-        };
 
         return $cache;
     }
