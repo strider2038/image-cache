@@ -41,7 +41,6 @@ class Router implements RouterInterface
         HttpMethodEnum::GET    => 'get',
         HttpMethodEnum::POST   => 'create',
         HttpMethodEnum::PUT    => 'replace',
-        HttpMethodEnum::PATCH  => 'rebuild',
         HttpMethodEnum::DELETE => 'delete',
     ];
 

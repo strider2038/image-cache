@@ -72,12 +72,14 @@ class ThumbnailKeyParserTest extends TestCase
      * @test
      * @param string $key
      * @param string $publicFilename
+     * @param string $thumbnailMask
      * @param string $processingConfigurationString
      * @dataProvider validKeyProvider
      */
     public function parse_givenKey_keyParsedToThumbnailKey(
         string $key,
         string $publicFilename,
+        string $thumbnailMask,
         string $processingConfigurationString
     ): void {
         $parser = $this->createThumbnailKeyParser();
@@ -89,6 +91,7 @@ class ThumbnailKeyParserTest extends TestCase
 
         $this->assertInstanceOf(ThumbnailKey::class, $thumbnailKey);
         $this->assertEquals($publicFilename, $thumbnailKey->getPublicFilename());
+        $this->assertEquals($thumbnailMask, $thumbnailKey->getThumbnailMask());
         $this->assertProcessingConfigurationParser_parse_isCalledOnceWith($processingConfigurationString);
         $this->assertSame($processingConfiguration, $thumbnailKey->getProcessingConfiguration());
     }
@@ -96,10 +99,10 @@ class ThumbnailKeyParserTest extends TestCase
     public function validKeyProvider(): array
     {
         return [
-            ['a.jpg', 'a.jpg', ''],
-            ['/a_q1.jpg', '/a.jpg', 'q1'],
-            ['/b_a1_b2.png', '/b.png', 'a1_b2'],
-            ['/a/b/c/d_q5.jpg', '/a/b/c/d.jpg', 'q5'],
+            ['a.jpg', 'a.jpg', 'a*.jpg', ''],
+            ['/a_q1.jpg', '/a.jpg', '/a*.jpg', 'q1'],
+            ['/b_a1_b2.png', '/b.png', '/b*.png', 'a1_b2'],
+            ['/a/b/c/d_q5.jpg', '/a/b/c/d.jpg', '/a/b/c/d*.jpg', 'q5'],
         ];
     }
 

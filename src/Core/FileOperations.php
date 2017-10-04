@@ -4,6 +4,7 @@ namespace Strider2038\ImgCache\Core;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Exception\FileOperationException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -35,6 +36,13 @@ class FileOperations implements FileOperationsInterface
     public function isDirectory(string $directory): bool
     {
         return is_dir($directory);
+    }
+
+    public function findByMask(string $filenameMask): StringList
+    {
+        $list = glob($filenameMask);
+
+        return new StringList($list);
     }
 
     public function copyFileTo(string $source, string $destination): void

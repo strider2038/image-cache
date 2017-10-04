@@ -149,31 +149,4 @@ class ImageController extends Controller
 
         return $response;
     }
-
-    /**
-     * Handles PATCH request for rebuilding cached resource with all its thumbnails
-     * @param string $location
-     * @return ResponseInterface
-     */
-    public function actionRebuild(string $location): ResponseInterface
-    {
-        if (!$this->imageCache->exists($location)) {
-            $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND),
-                sprintf("File '%s' does not exist", $location)
-            );
-        } else {
-            $this->imageCache->rebuild($location);
-
-            $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCodeEnum(HttpStatusCodeEnum::OK),
-                sprintf(
-                    "File '%s' was successfully rebuilt with all its thumbnails",
-                    $location
-                )
-            );
-        }
-
-        return $response;
-    }
 }

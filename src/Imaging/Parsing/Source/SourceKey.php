@@ -13,7 +13,18 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Source;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SourceKeyInterface
+class SourceKey implements SourceKeyInterface
 {
-    public function getPublicFilename(): string;
+    /** @var string */
+    private $publicFilename;
+
+    public function __construct(string $publicFilename)
+    {
+        $this->publicFilename = $publicFilename;
+    }
+
+    public function getPublicFilename(): string
+    {
+        return $this->publicFilename;
+    }
 }

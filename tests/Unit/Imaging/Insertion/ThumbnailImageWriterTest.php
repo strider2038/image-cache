@@ -24,6 +24,7 @@ class ThumbnailImageWriterTest extends TestCase
 
     private const KEY = 'key';
     private const PUBLIC_FILENAME = 'public_filename';
+    private const THUMBNAIL_MASK = 'thumbnail_mask';
 
     /** @var ThumbnailKeyParserInterface */
     private $keyParser;
@@ -66,21 +67,6 @@ class ThumbnailImageWriterTest extends TestCase
         $this->assertSourceAccessor_put_isCalledOnceWith($stream);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessageRegExp /Image name .* for source image cannot have process configuration/
-     */
-    public function insert_givenKeyHasProcessingConfiguration_exceptionThrown(): void
-    {
-        $writer = $this->createThumbnailImageWriter();
-        $stream = \Phake::mock(StreamInterface::class);
-        $this->givenKeyParser_parse_returnsThumbnailKey(true);
-
-        $writer->insert(self::KEY, $stream);
-    }
-
     /** @test */
     public function delete_givenKey_keyIsParsedAndSourceAccessorDeleteIsCalled(): void
     {
@@ -93,18 +79,45 @@ class ThumbnailImageWriterTest extends TestCase
         $this->assertSourceAccessor_delete_isCalledOnce();
     }
 
+    /** @test */
+    public function getFileMask_givenKey_keyIsParsedAndThumbnailMaskIsReturned(): void
+    {
+        $writer = $this->createThumbnailImageWriter();
+        $this->givenKeyParser_parse_returnsThumbnailKey();
+
+        $filename = $writer->getFileMask(self::KEY);
+
+        $this->assertKeyParser_parse_isCalledOnce();
+        $this->assertEquals(self::THUMBNAIL_MASK, $filename);
+    }
+
     /**
      * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
      * @expectedExceptionMessageRegExp /Image name .* for source image cannot have process configuration/
+     * @param string $method
+     * @param array $parameters
+     * @dataProvider methodAndParametersProvider
      */
-    public function delete_givenKeyHasProcessingConfiguration_exceptionThrown(): void
-    {
+    public function method_givenKeyHasProcessingConfiguration_exceptionThrown(
+        string $method,
+        array $parameters
+    ): void {
         $writer = $this->createThumbnailImageWriter();
         $this->givenKeyParser_parse_returnsThumbnailKey(true);
 
-        $writer->delete(self::KEY);
+        call_user_func_array([$writer, $method], $parameters);
+    }
+
+    public function methodAndParametersProvider(): array
+    {
+        return [
+            ['exists', [self::KEY]],
+            ['insert', [self::KEY, \Phake::mock(StreamInterface::class)]],
+            ['delete', [self::KEY]],
+            ['getFileMask', [self::KEY]],
+        ];
     }
 
     private function givenKeyParser_parse_returnsThumbnailKey(
@@ -113,6 +126,7 @@ class ThumbnailImageWriterTest extends TestCase
         $parsedKey = \Phake::mock(ThumbnailKeyInterface::class);
         \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($parsedKey);
         \Phake::when($parsedKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
+        \Phake::when($parsedKey)->getThumbnailMask()->thenReturn(self::THUMBNAIL_MASK);
         \Phake::when($parsedKey)->hasProcessingConfiguration()->thenReturn($hasProcessingConfiguration);
 
         return $parsedKey;

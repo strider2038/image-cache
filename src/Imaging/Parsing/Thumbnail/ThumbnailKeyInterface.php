@@ -20,4 +20,5 @@ interface ThumbnailKeyInterface extends SourceKeyInterface
 {
     public function getProcessingConfiguration(): ProcessingConfigurationInterface;
     public function hasProcessingConfiguration(): bool;
+    public function getThumbnailMask(): string;
 }

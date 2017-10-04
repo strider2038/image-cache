@@ -79,6 +79,18 @@ class SourceImageWriterTest extends TestCase
         $this->assertSourceAccessor_delete_isCalledOnce();
     }
 
+    /** @test */
+    public function getFileMask_givenKey_keyIsParsedAndFileMaskIsReturned(): void
+    {
+        $writer = $this->createSourceImageWriter();
+        $this->givenKeyParser_parse_returnsSourceKey();
+
+        $filename = $writer->getFileMask(self::KEY);
+
+        $this->assertKeyParser_parse_isCalledOnce();
+        $this->assertEquals(self::PUBLIC_FILENAME, $filename);
+    }
+
     private function givenKeyParser_parse_returnsSourceKey(): SourceKeyInterface
     {
         $parsedKey = \Phake::mock(SourceKeyInterface::class);

@@ -15,17 +15,13 @@ use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
-class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
+class OriginalImageCacheTest extends FunctionalTestCase
 {
     private const FILE_NOT_EXIST = '/not-exist.jpg';
     private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
     private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_RUNTIME_FILENAME = self::RUNTIME_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    private const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
-    private const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
-    private const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
-    private const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
     private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
@@ -36,7 +32,7 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
     protected function setUp()
     {
         parent::setUp();
-        $container = $this->loadContainer('file-source.yml');
+        $container = $this->loadContainer('original-image-cache.yml');
         $this->cache = $container->get('image_cache');
     }
 
@@ -57,21 +53,6 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
 
         $this->assertInstanceOf(ImageFile::class, $image);
         $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
-    }
-
-    /** @test */
-    public function get_givenImageInRootOfSourceAndThumbnailRequested_thumbnailCreatedAndImageIsReturned(): void
-    {
-        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
-
-        $image = $this->cache->get(self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
-
-        $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertFileExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
-        [$width, $height, $type] = getimagesize(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
-        $this->assertEquals(self::IMAGE_JPEG_THUMBNAIL_WIDTH, $width);
-        $this->assertEquals(self::IMAGE_JPEG_THUMBNAIL_HEIGHT, $height);
-        $this->assertEquals(IMAGETYPE_JPEG, $type);
     }
 
     /** @test */
@@ -108,12 +89,32 @@ class ImageCacheWithFilesystemSourceTest extends FunctionalTestCase
     }
 
     /** @test */
-    public function delete_imageExistsInCache_imageIsDeleted(): void
+    public function delete_imageExistsInSourceAndCache_imageIsDeleted(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
 
         $this->cache->delete(self::IMAGE_JPEG_CACHE_KEY);
 
         $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
+    }
+
+    /** @test */
+    public function delete_imageExistsInSource_trueIsReturned(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+
+        $exists = $this->cache->exists(self::IMAGE_JPEG_CACHE_KEY);
+
+        $this->assertTrue($exists);
+    }
+
+    /** @test */
+    public function delete_imageDoesNotExistInSource_falseIsReturned(): void
+    {
+        $exists = $this->cache->exists(self::IMAGE_JPEG_CACHE_KEY);
+
+        $this->assertFalse($exists);
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Core\IterableCollection;
+use Strider2038\ImgCache\Collection\IterableCollection;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
