@@ -120,4 +120,16 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
         $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
     }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
+     * @expectedExceptionCode 400
+     */
+    public function exists_invalidKey_exceptionThrown(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+
+        $this->cache->delete(self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
+    }
 }

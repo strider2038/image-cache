@@ -10,9 +10,7 @@
 - [x] Migrate to PSR-7 request and response interfaces (PSR like realisation)
 - [x] Image writing to sources
 - [x] Move processing configuration parsing into key parser
-- [ ] Functional testing
-    * split tests across all types of sources
-    * thumbnail test checks invalid key
+- [x] Functional testing
 - [ ] Google map source
 - [ ] Yandex.Disk source
 - [ ] Shift transformation

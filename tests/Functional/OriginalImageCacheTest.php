@@ -99,4 +99,22 @@ class OriginalImageCacheTest extends FunctionalTestCase
         $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
     }
+
+    /** @test */
+    public function delete_imageExistsInSource_trueIsReturned(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+
+        $exists = $this->cache->exists(self::IMAGE_JPEG_CACHE_KEY);
+
+        $this->assertTrue($exists);
+    }
+
+    /** @test */
+    public function delete_imageDoesNotExistInSource_falseIsReturned(): void
+    {
+        $exists = $this->cache->exists(self::IMAGE_JPEG_CACHE_KEY);
+
+        $this->assertFalse($exists);
+    }
 }
