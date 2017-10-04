@@ -29,7 +29,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Strider2038\\ImgCache\\": "src/",
+            "Strider2038\\ImgCache\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Strider2038\\ImgCache\\Tests\\": "tests/"
         }
     }
