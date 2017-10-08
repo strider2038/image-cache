@@ -11,7 +11,6 @@
 - [x] Image writing to sources
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
-- [ ] Google map source
 - [ ] Yandex.Disk source
 - [ ] Shift transformation
 - [ ] Rotate transformation
@@ -24,4 +23,4 @@
 - [ ] Support for phpDocumentor
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
-
+- [ ] Google map source (inspect licensing problems)
