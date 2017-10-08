@@ -11,6 +11,7 @@
 - [x] Image writing to sources
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
+- [ ] Yandex Static Map source
 - [ ] Yandex.Disk source
 - [ ] Shift transformation
 - [ ] Rotate transformation

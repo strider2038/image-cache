@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Key;
+namespace Strider2038\ImgCache\Imaging\Parsing\Yandex;
+
+use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface FilenameKeyInterface
+interface YandexMapParametersParserInterface
 {
-    public function getValue(): string;
+    public function parse(string $key): YandexMapParametersInterface;
 }

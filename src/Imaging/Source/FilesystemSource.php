@@ -92,9 +92,7 @@ class FilesystemSource implements FilesystemSourceInterface
 
     private function composeSourceFilename(FilenameKeyInterface $key): string
     {
-        $sourceFilename = $this->baseDirectory . $key->getValue();
-
-        return $sourceFilename;
+        return $this->baseDirectory . $key->getValue();
     }
 
 }
