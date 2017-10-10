@@ -14,8 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser;
+use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersFactoryInterface;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
 
 class YandexMapParametersParserTest extends TestCase
 {
@@ -74,6 +74,7 @@ class YandexMapParametersParserTest extends TestCase
             ['key=1.jpg', 'key', '1'],
             ['/k=v.jpg', 'k', 'v'],
             ['/k=.jpg', 'k', ''],
+            ['/ll=37.620070,55.753630.jpg', 'll', '37.620070,55.753630'],
             ['/directory/subdirectory/key=value.jpg', 'key', 'value'],
         ];
     }
@@ -112,9 +113,9 @@ class YandexMapParametersParserTest extends TestCase
         return new YandexMapParametersParser($this->valueConfiguratorFactory, $this->parametersFactory);
     }
 
-    private function givenParametersFactory_create_returnsParameters(): YandexMapParametersInterface
+    private function givenParametersFactory_create_returnsParameters(): YandexMapParameters
     {
-        $parameters = \Phake::mock(YandexMapParametersInterface::class);
+        $parameters = \Phake::mock(YandexMapParameters::class);
         \Phake::when($this->parametersFactory)->create()->thenReturn($parameters);
 
         return $parameters;
@@ -132,7 +133,7 @@ class YandexMapParametersParserTest extends TestCase
     private function assertValueConfigurator_configure_isCalledOnceWith(
         string $parameterValue,
         ValueConfiguratorInterface $configurator,
-        YandexMapParametersInterface $expectedParameters
+        YandexMapParameters $expectedParameters
     ): void {
         \Phake::verify($configurator, \Phake::times(1))->configure($parameterValue, $expectedParameters);
     }
