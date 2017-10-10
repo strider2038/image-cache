@@ -30,7 +30,7 @@ class ImageCache implements ImageCacheInterface
      * Web directory that contains image files
      * @var string
      */
-    private $baseDirectory;
+    private $webDirectory;
 
     /** @var FileOperationsInterface */
     private $fileOperations;
@@ -45,17 +45,17 @@ class ImageCache implements ImageCacheInterface
     private $imageFactory;
     
     public function __construct(
-        string $baseDirectory,
+        string $webDirectory,
         FileOperationsInterface $fileOperations,
         ImageFactoryInterface $imageFactory,
         ImageExtractorInterface $imageExtractor,
         ImageWriterInterface $imageWriter = null
     ) {
         $this->fileOperations = $fileOperations;
-        if (!$this->fileOperations->isDirectory($baseDirectory)) {
-            throw new InvalidConfigurationException("Directory '{$baseDirectory}' does not exist");
+        if (!$this->fileOperations->isDirectory($webDirectory)) {
+            throw new InvalidConfigurationException("Directory '{$webDirectory}' does not exist");
         }
-        $this->baseDirectory = rtrim($baseDirectory, '/');
+        $this->webDirectory = rtrim($webDirectory, '/');
         $this->imageFactory = $imageFactory;
         $this->imageExtractor = $imageExtractor;
         $this->imageWriter = $imageWriter ?? new NullWriter();
@@ -110,7 +110,7 @@ class ImageCache implements ImageCacheInterface
 
     private function composeDestinationFilename(string $key): string
     {
-        return $this->baseDirectory . $key;
+        return $this->webDirectory . $key;
     }
 
     private function validateKey(string $key): void

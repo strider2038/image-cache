@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Yandex\Map;
  */
 interface ValueConfiguratorFactoryInterface
 {
-    public function create(string $key): ValueConfiguratorInterface;
+    public function create(string $name): ValueConfiguratorInterface;
 }
