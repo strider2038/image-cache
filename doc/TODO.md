@@ -13,6 +13,8 @@
 - [x] Functional testing
 - [ ] Yandex Static Map source
 - [ ] Yandex.Disk source
+- [ ] Migrate to collections based on Doctrine ArrayCollection
+- [ ] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
@@ -20,7 +22,7 @@
 - [ ] Acceptance testing
 - [ ] Move all todos to github issues
 - [ ] Cache mechanism for source accessor
-- [ ] Performance optimization (lazy services)
+- [ ] Performance optimization (lazy services, validation cache)
 - [ ] Support for phpDocumentor
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
