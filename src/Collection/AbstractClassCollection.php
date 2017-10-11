@@ -22,7 +22,7 @@ abstract class AbstractClassCollection extends ArrayCollection
 
     public function __construct(array $elements = [], string $className)
     {
-        if (!class_exists($className)) {
+        if (!class_exists($className) && !interface_exists($className)) {
             throw new \DomainException(sprintf('Class "%s" does not exist', $className));
         }
 
