@@ -27,6 +27,16 @@ class StringListTest extends TestCase
     }
 
     /** @test */
+    public function add_givenString_stringValueIsInCollection(): void
+    {
+        $list = new StringList();
+
+        $list->add(self::STRING_VALUE);
+
+        $this->assertContains(self::STRING_VALUE, $list);
+    }
+
+    /** @test */
     public function process_givenString_stringValueIsConcatenated(): void
     {
         $list = new StringList([self::STRING_VALUE]);
