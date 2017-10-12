@@ -14,8 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\YandexMapExtractor;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParserInterface;
+use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessorInterface;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
 
 class YandexMapExtractorTest extends TestCase
 {
@@ -24,21 +24,21 @@ class YandexMapExtractorTest extends TestCase
     /** @var YandexMapParametersParserInterface */
     private $parser;
 
-    /** @var YandexMapSourceInterface */
-    private $source;
+    /** @var YandexMapAccessorInterface */
+    private $accessor;
 
     protected function setUp()
     {
         $this->parser = \Phake::mock(YandexMapParametersParserInterface::class);
-        $this->source = \Phake::mock(YandexMapSourceInterface::class);
+        $this->accessor = \Phake::mock(YandexMapAccessorInterface::class);
     }
 
     /** @test */
     public function extract_givenKey_keyIsParsedAndImageIsReturned(): void
     {
-        $extractor = new YandexMapExtractor($this->parser, $this->source);
+        $extractor = new YandexMapExtractor($this->parser, $this->accessor);
         $parameters = $this->givenParser_parse_returnsParameters();
-        $this->givenSource_get_returnsImage($parameters);
+        $this->givenAccessor_get_returnsImage($parameters);
 
         $image = $extractor->extract(self::KEY);
 
@@ -54,9 +54,9 @@ class YandexMapExtractorTest extends TestCase
         return $parameters;
     }
 
-    private function givenSource_get_returnsImage(YandexMapParametersInterface $parameters): void
+    private function givenAccessor_get_returnsImage(YandexMapParametersInterface $parameters): void
     {
         $expectedImage = \Phake::mock(ImageInterface::class);
-        \Phake::when($this->source)->get($parameters)->thenReturn($expectedImage);
+        \Phake::when($this->accessor)->get($parameters)->thenReturn($expectedImage);
     }
 }

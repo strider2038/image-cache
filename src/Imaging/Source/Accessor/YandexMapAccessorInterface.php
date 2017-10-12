@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Yandex;
+namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
-use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface YandexMapSourceInterface
+interface YandexMapAccessorInterface
 {
-    public function get(QueryParametersCollection $queryParameters): ImageInterface;
+    public function get(YandexMapParametersInterface $parameters): ImageInterface;
 }
