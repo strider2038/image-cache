@@ -21,4 +21,16 @@ class QueryParametersCollection extends AbstractClassCollection
     {
         parent::__construct($elements, QueryParameterInterface::class);
     }
+
+    public function toArray(): array
+    {
+        $parameters = [];
+
+        /** @var QueryParameterInterface $parameter */
+        foreach (parent::toArray() as $parameter) {
+            $parameters[$parameter->getName()] = $parameter->getValue();
+        }
+
+        return $parameters;
+    }
 }
