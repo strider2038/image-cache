@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageFile extends AbstractImage implements ImageInterface
+class ImageFile extends AbstractImage
 {
     /** @var string */
     private $filename;
@@ -46,9 +46,7 @@ class ImageFile extends AbstractImage implements ImageInterface
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        $processingImage = $engine->openFromFile($this->filename, $this->saveOptions);
-
-        return $processingImage;
+        return $engine->openFromFile($this->filename, $this->saveOptions);
     }
 
     public function getBlob(): string

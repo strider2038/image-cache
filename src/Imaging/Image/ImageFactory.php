@@ -16,7 +16,6 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -61,9 +60,7 @@ class ImageFactory implements ImageFactoryInterface
             throw new InvalidMediaTypeException('Image has unsupported mime type');
         }
 
-        $image = new ImageBlob($blob, $this->fileOperations, $this->createSaveOptions());
-
-        return $image;
+        return new ImageBlob($blob, $this->fileOperations, $this->createSaveOptions());
     }
 
     private function createSaveOptions(): SaveOptions

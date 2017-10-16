@@ -15,11 +15,10 @@ use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageBlob extends AbstractImage implements ImageInterface
+class ImageBlob extends AbstractImage
 {
     /** @var string */
     private $data;
@@ -37,9 +36,7 @@ class ImageBlob extends AbstractImage implements ImageInterface
 
     public function open(ProcessingEngineInterface $engine): ProcessingImageInterface
     {
-        $processingImage = $engine->openFromBlob($this->data, $this->saveOptions);
-
-        return $processingImage;
+        return $engine->openFromBlob($this->data, $this->saveOptions);
     }
 
     public function getBlob(): string
