@@ -44,4 +44,9 @@ class StringList extends ArrayCollection
             $this[$key] = $closure->call($this, $value);
         }
     }
+
+    public function implode(string $glue = ','): string
+    {
+        return implode($glue, $this->toArray());
+    }
 }

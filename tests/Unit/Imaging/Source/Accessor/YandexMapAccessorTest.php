@@ -11,6 +11,9 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Accessor;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Collection\StringList;
+use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessor;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
@@ -20,6 +23,21 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class YandexMapAccessorTest extends TestCase
 {
+    private const LAYER = 'layer';
+    private const LONGITUDE = 1.0;
+    private const LATITUDE = -1.0;
+    private const ZOOM = 4;
+    private const WIDTH = 150;
+    private const HEIGHT = 100;
+    private const SCALE = 2.5;
+    private const EXPECTED_QUERY_PARAMETERS = [
+        'l' => self::LAYER,
+        'll' => self::LONGITUDE . ',' . self::LATITUDE,
+        'z' => self::ZOOM,
+        'size' => self::WIDTH . ',' . self::HEIGHT,
+        'scale' => self::SCALE,
+    ];
+
     /** @var ModelValidatorInterface */
     private $validator;
 
@@ -45,12 +63,27 @@ class YandexMapAccessorTest extends TestCase
     public function get_givenInvalidParameters_exceptionThrown(): void
     {
         $source = $this->createAccessor();
-        $parameters = \Phake::mock(YandexMapParametersInterface::class);
+        $parameters = $this->givenParameters();
         $violations = $this->givenValidator_validate_returnViolations($parameters);
         $this->givenViolations_count_returns($violations, 1);
         \Phake::when($this->formatter)->format($violations)->thenReturn('formatted violations');
 
         $source->get($parameters);
+    }
+
+    /** @test */
+    public function get_givenValidParameters_sourceGetIsCalledWithQueryParameters(): void
+    {
+        $source = $this->createAccessor();
+        $parameters = $this->givenParameters();
+        $this->givenValidator_validate_returnViolations($parameters);
+        $expectedImage = $this->givenSource_get_returnsImage();
+
+        $image = $source->get($parameters);
+
+        $this->assertInstanceOf(ImageInterface::class, $image);
+        $this->assertSame($expectedImage, $image);
+        $this->assertSource_get_isCalledOnceWithQueryParameters();
     }
 
     private function createAccessor(): YandexMapAccessor
@@ -70,5 +103,36 @@ class YandexMapAccessorTest extends TestCase
     private function givenViolations_count_returns(ConstraintViolationListInterface $violations, int $count): void
     {
         \Phake::when($violations)->count()->thenReturn($count);
+    }
+
+    private function givenParameters(): YandexMapParametersInterface
+    {
+        $parameters = \Phake::mock(YandexMapParametersInterface::class);
+        \Phake::when($parameters)->getLayers()->thenReturn(new StringList([self::LAYER]));
+        \Phake::when($parameters)->getLongitude()->thenReturn(self::LONGITUDE);
+        \Phake::when($parameters)->getLatitude()->thenReturn(self::LATITUDE);
+        \Phake::when($parameters)->getZoom()->thenReturn(self::ZOOM);
+        \Phake::when($parameters)->getWidth()->thenReturn(self::WIDTH);
+        \Phake::when($parameters)->getHeight()->thenReturn(self::HEIGHT);
+        \Phake::when($parameters)->getScale()->thenReturn(self::SCALE);
+
+        return $parameters;
+    }
+
+    private function assertSource_get_isCalledOnceWithQueryParameters(): void
+    {
+        /** @var QueryParametersCollection $queryParameters */
+        \Phake::verify($this->source, \Phake::times(1))
+            ->get(\Phake::capture($queryParameters));
+
+        $this->assertEquals(self::EXPECTED_QUERY_PARAMETERS, $queryParameters->toArray());
+    }
+
+    private function givenSource_get_returnsImage(): ImageInterface
+    {
+        $image = \Phake::mock(ImageInterface::class);
+        \Phake::when($this->source)->get(\Phake::anyParameters())->thenReturn($image);
+
+        return $image;
     }
 }

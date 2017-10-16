@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
+use Strider2038\ImgCache\Core\QueryParameter;
+use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
@@ -50,6 +52,22 @@ class YandexMapAccessor implements YandexMapAccessorInterface
             );
         }
 
+        $query = new QueryParametersCollection([
+            new QueryParameter('l', $parameters->getLayers()->implode()),
+            new QueryParameter('ll', sprintf(
+                '%s,%s',
+                $parameters->getLongitude(),
+                $parameters->getLatitude())
+            ),
+            new QueryParameter('z', $parameters->getZoom()),
+            new QueryParameter('size', sprintf(
+                '%s,%s',
+                $parameters->getWidth(),
+                $parameters->getHeight()
+            )),
+            new QueryParameter('scale', $parameters->getScale())
+        ]);
 
+        return $this->source->get($query);
     }
 }
