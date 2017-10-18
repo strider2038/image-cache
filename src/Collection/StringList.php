@@ -20,8 +20,9 @@ class StringList extends ArrayCollection
     public function __construct(array $elements = [])
     {
         foreach ($elements as $key => $value) {
-            $this->set($key, $value);
+            $elements[$key] = (string) $value;
         }
+        parent::__construct($elements);
     }
 
     /**
@@ -48,5 +49,10 @@ class StringList extends ArrayCollection
     public function implode(string $glue = ','): string
     {
         return implode($glue, $this->toArray());
+    }
+
+    public static function createFromString(string $list, $delimiter = ','): StringList
+    {
+        return new self(explode($delimiter, $list));
     }
 }

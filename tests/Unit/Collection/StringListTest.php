@@ -59,4 +59,12 @@ class StringListTest extends TestCase
 
         $this->assertEquals(self::STRING_IMPLODED_VALUE, $value);
     }
+
+    /** @test */
+    public function createFromString_givenString_listIsCreated(): void
+    {
+        $list = StringList::createFromString(self::STRING_IMPLODED_VALUE);
+
+        $this->assertEquals(self::STRING_EXPLODED_VALUE, $list->toArray());
+    }
 }
