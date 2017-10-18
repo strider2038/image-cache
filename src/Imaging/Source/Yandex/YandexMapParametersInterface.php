@@ -27,43 +27,37 @@ interface YandexMapParametersInterface extends ModelInterface
     public function getLayers(): StringList;
 
     /**
-     * @Assert\GreaterThanOrEqual(-180)
-     * @Assert\LessThanOrEqual(180)
+     * @Assert\Range(min = -180, max = 180)
      * @return float
      */
     public function getLongitude(): float;
 
     /**
-     * @Assert\GreaterThanOrEqual(-180)
-     * @Assert\LessThanOrEqual(180)
+     * @Assert\Range(min = -180, max = 180)
      * @return float
      */
     public function getLatitude(): float;
 
     /**
-     * @Assert\GreaterThanOrEqual(0)
-     * @Assert\LessThanOrEqual(17)
+     * @Assert\Range(min = 0, max = 17)
      * @return int
      */
     public function getZoom(): int;
 
     /**
-     * @Assert\GreaterThanOrEqual(50)
-     * @Assert\LessThanOrEqual(650)
+     * @Assert\Range(min = 50, max = 650)
      * @return int
      */
     public function getWidth(): int;
 
     /**
-     * @Assert\GreaterThanOrEqual(50)
-     * @Assert\LessThanOrEqual(450)
+     * @Assert\Range(min = 50, max = 450)
      * @return int
      */
     public function getHeight(): int;
 
     /**
-     * @Assert\GreaterThanOrEqual(1.0)
-     * @Assert\LessThanOrEqual(4.0)
+     * @Assert\Range(min = 1.0, max = 4.0)
      * @return float
      */
     public function getScale(): float;
