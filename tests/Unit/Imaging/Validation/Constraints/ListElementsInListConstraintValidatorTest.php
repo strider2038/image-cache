@@ -38,7 +38,7 @@ class ListElementsInListConstraintValidatorTest extends TestCase
     public function validate_givenValidValues_noViolationsCreated(): void
     {
         $constraint = new ListElementsInListConstraint([
-            'value' => self::VALUE_A
+            'value' => [self::VALUE_A]
         ]);
         $context = $this->givenContext();
         $validator = new ListElementsInListConstraintValidator();
@@ -53,7 +53,7 @@ class ListElementsInListConstraintValidatorTest extends TestCase
     public function validate_givenInvalidValues_violationsCreated(): void
     {
         $constraint = new ListElementsInListConstraint([
-            'value' => self::VALUE_B
+            'value' => [self::VALUE_B]
         ]);
         $context = $this->givenContext();
         $violationBuilder = $this->givenContext_buildViolation_returnsViolationBuilder($context);
