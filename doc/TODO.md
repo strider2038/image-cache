@@ -12,6 +12,8 @@
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
 - [ ] Yandex Static Map source
+  - response mime type detection and validation
+  - format conversion
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
