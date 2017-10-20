@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Imaging\Source\Yandex;
 
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\ModelInterface;
-use Strider2038\ImgCache\Imaging\Validation\Constraints\ListElementsInListConstraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -21,7 +20,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 interface YandexMapParametersInterface extends ModelInterface
 {
     /**
-     * @ListElementsInListConstraint({"map", "sat", "skl", "trf"})
+     * @Assert\All({
+     *     @Assert\Choice({"map", "sat", "skl", "trf"})
+     * })
      * @return StringList
      */
     public function getLayers(): StringList;
