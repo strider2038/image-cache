@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Yandex;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorFactoryInterface;
+use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersFactoryInterface;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -37,7 +37,7 @@ class YandexMapParametersParser implements YandexMapParametersParserInterface
         $this->parametersFactory = $parametersFactory;
     }
 
-    public function parse(string $key): YandexMapParametersInterface
+    public function parse(string $key): YandexMapParameters
     {
         $path = pathinfo($key);
         $extension = $path['extension'] ?? '';

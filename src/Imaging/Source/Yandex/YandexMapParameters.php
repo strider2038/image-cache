@@ -11,31 +11,57 @@
 namespace Strider2038\ImgCache\Imaging\Source\Yandex;
 
 use Strider2038\ImgCache\Collection\StringList;
+use Strider2038\ImgCache\Core\ModelInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class YandexMapParameters implements YandexMapParametersInterface
+class YandexMapParameters implements ModelInterface
 {
-    /** @var StringList */
+    /**
+     * @Assert\Count(min = 1)
+     * @Assert\All({
+     *     @Assert\Choice({"map", "sat", "skl", "trf"})
+     * })
+     * @return StringList
+     */
     private $layers;
 
-    /** @var float */
+    /**
+     * @Assert\Range(min = -180, max = 180)
+     * @return float
+     */
     private $longitude = 0;
 
-    /** @var float */
+    /**
+     * @Assert\Range(min = -180, max = 180)
+     * @return float
+     */
     private $latitude = 0;
 
-    /** @var int */
+    /**
+     * @Assert\Range(min = 0, max = 17)
+     * @return int
+     */
     private $zoom = 0;
 
-    /** @var int */
+    /**
+     * @Assert\Range(min = 50, max = 650)
+     * @return int
+     */
     private $width = 0;
 
-    /** @var int */
+    /**
+     * @Assert\Range(min = 50, max = 450)
+     * @return int
+     */
     private $height = 0;
 
-    /** @var float */
+    /**
+     * @Assert\Range(min = 1.0, max = 4.0)
+     * @return float
+     */
     private $scale = 0;
 
     public function __construct()

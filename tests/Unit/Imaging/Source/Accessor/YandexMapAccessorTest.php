@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessor;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
+use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
@@ -92,7 +92,7 @@ class YandexMapAccessorTest extends TestCase
     }
 
     private function givenValidator_validate_returnViolations(
-        YandexMapParametersInterface $parameters
+        YandexMapParameters $parameters
     ): ConstraintViolationListInterface {
         $violations = \Phake::mock(ConstraintViolationListInterface::class);
         \Phake::when($this->validator)->validate($parameters)->thenReturn($violations);
@@ -105,16 +105,16 @@ class YandexMapAccessorTest extends TestCase
         \Phake::when($violations)->count()->thenReturn($count);
     }
 
-    private function givenParameters(): YandexMapParametersInterface
+    private function givenParameters(): YandexMapParameters
     {
-        $parameters = \Phake::mock(YandexMapParametersInterface::class);
-        \Phake::when($parameters)->getLayers()->thenReturn(new StringList([self::LAYER]));
-        \Phake::when($parameters)->getLongitude()->thenReturn(self::LONGITUDE);
-        \Phake::when($parameters)->getLatitude()->thenReturn(self::LATITUDE);
-        \Phake::when($parameters)->getZoom()->thenReturn(self::ZOOM);
-        \Phake::when($parameters)->getWidth()->thenReturn(self::WIDTH);
-        \Phake::when($parameters)->getHeight()->thenReturn(self::HEIGHT);
-        \Phake::when($parameters)->getScale()->thenReturn(self::SCALE);
+        $parameters = new YandexMapParameters();
+        $parameters->setLayers(new StringList([self::LAYER]));
+        $parameters->setLongitude(self::LONGITUDE);
+        $parameters->setLatitude(self::LATITUDE);
+        $parameters->setZoom(self::ZOOM);
+        $parameters->setWidth(self::WIDTH);
+        $parameters->setHeight(self::HEIGHT);
+        $parameters->setScale(self::SCALE);
 
         return $parameters;
     }

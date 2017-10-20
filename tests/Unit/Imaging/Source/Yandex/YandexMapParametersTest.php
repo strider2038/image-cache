@@ -29,6 +29,14 @@ class YandexMapParametersTest extends TestCase
     /**
      * @test
      * @dataProvider parametersAndViolationsCountProvider
+     * @param array $layers
+     * @param float $longitude
+     * @param float $latitude
+     * @param int $zoom
+     * @param int $width
+     * @param int $height
+     * @param float $scale
+     * @param int $violationsCount
      */
     public function validate_givenParameters_expectedViolationsCountFound(
         array $layers,
@@ -65,6 +73,7 @@ class YandexMapParametersTest extends TestCase
             [['map', 'trf'], 0, 0, 0, 100, 150, 1.0, 0],
             [['sat', 'skl'], 0, 0, 0, 100, 150, 1.0, 0],
             [['trf', 'sat', 'skl'], 0, 0, 0, 100, 150, 1.0, 0],
+            [[], 0, 0, 0, 100, 150, 1.0, 1],
             [['a'], 0, 0, 0, 100, 150, 1.0, 1],
             [['a', 'b'], 0, 0, 0, 100, 150, 1.0, 2],
             [['sat'], -180.1, 0, 1, 100, 150, 1.0, 1],

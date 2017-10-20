@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Imaging\Extraction\YandexMapExtractor;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessorInterface;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
+use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 
 class YandexMapExtractorTest extends TestCase
 {
@@ -43,18 +43,17 @@ class YandexMapExtractorTest extends TestCase
         $image = $extractor->extract(self::KEY);
 
         $this->assertInstanceOf(ImageInterface::class, $image);
-
     }
 
-    private function givenParser_parse_returnsParameters(): YandexMapParametersInterface
+    private function givenParser_parse_returnsParameters(): YandexMapParameters
     {
-        $parameters = \Phake::mock(YandexMapParametersInterface::class);
+        $parameters = new YandexMapParameters();
         \Phake::when($this->parser)->parse(self::KEY)->thenReturn($parameters);
 
         return $parameters;
     }
 
-    private function givenAccessor_get_returnsImage(YandexMapParametersInterface $parameters): void
+    private function givenAccessor_get_returnsImage(YandexMapParameters $parameters): void
     {
         $expectedImage = \Phake::mock(ImageInterface::class);
         \Phake::when($this->accessor)->get($parameters)->thenReturn($expectedImage);

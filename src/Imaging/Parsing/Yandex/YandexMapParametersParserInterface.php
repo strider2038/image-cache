@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Yandex;
 
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersInterface;
+use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface YandexMapParametersParserInterface
 {
-    public function parse(string $key): YandexMapParametersInterface;
+    public function parse(string $key): YandexMapParameters;
 }
