@@ -20,8 +20,10 @@ use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 class YandexMapImageCacheTest extends FunctionalTestCase
 {
     private const IMAGE_WITH_INVALID_PARAMETERS = '/size=0,0.jpg';
-    private const IMAGE_NAME = '/ll=60.715799,28.729073_size=150,100.jpg';
-    private const IMAGE_WEB_FILENAME = self::WEB_DIRECTORY . '/ll=60.715799,28.729073_size=150,100.jpg';
+    private const IMAGE_JPEG_CACHE_KEY = '/ll=60.715799,28.729073_size=150,100.jpg';
+    private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . '/ll=60.715799,28.729073_size=150,100.jpg';
+    private const IMAGE_PNG_CACHE_KEY = '/ll=60.715799,28.729073_size=150,100.png';
+    private const IMAGE_PNG_WEB_FILENAME = self::WEB_DIRECTORY . '/ll=60.715799,28.729073_size=150,100.png';
 
     /** @var ImageCache */
     private $cache;
@@ -44,11 +46,22 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     }
 
     /** @test */
-    public function get_givenNameWithValidParameters_imageIsCreated(): void
+    public function get_givenJpegName_imageIsCreated(): void
     {
-        $image = $this->cache->get(self::IMAGE_NAME);
+        $image = $this->cache->get(self::IMAGE_JPEG_CACHE_KEY);
 
         $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertFileExists(self::IMAGE_WEB_FILENAME);
+        $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
+        $this->assertFileHasMimeType(self::IMAGE_JPEG_WEB_FILENAME, self::MIME_TYPE_JPEG);
+    }
+
+    /** @test */
+    public function get_givenPngName_imageIsCreated(): void
+    {
+        $image = $this->cache->get(self::IMAGE_PNG_CACHE_KEY);
+
+        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertFileExists(self::IMAGE_PNG_WEB_FILENAME);
+        $this->assertFileHasMimeType(self::IMAGE_PNG_WEB_FILENAME, self::MIME_TYPE_PNG);
     }
 }

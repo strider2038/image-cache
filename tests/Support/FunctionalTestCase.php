@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 class FunctionalTestCase extends TestCase
 {
+    protected const MIME_TYPE_JPEG = 'image/jpeg';
+    protected const MIME_TYPE_PNG = 'image/png';
+
     protected const APPLICATION_DIRECTORY = __DIR__ . '/../app';
     protected const FILESOURCE_DIRECTORY = self::APPLICATION_DIRECTORY . '/filesource';
     protected const WEB_DIRECTORY = self::APPLICATION_DIRECTORY . '/web';
@@ -73,5 +76,10 @@ class FunctionalTestCase extends TestCase
                 sprintf("Cannot copy '%s' to '%s'", self::IMAGE_JPEG_FILENAME, $filename)
             );
         }
+    }
+
+    protected function assertFileHasMimeType(string $filename, string $expectedMime): void
+    {
+        $this->assertEquals($expectedMime, mime_content_type($filename));
     }
 }
