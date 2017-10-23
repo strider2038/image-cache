@@ -41,7 +41,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
         $this->saveOptionsConfigurator = $saveOptionsConfigurator;
     }
 
-    public function parse(string $configuration): ProcessingConfigurationInterface
+    public function parse(string $configuration): ProcessingConfiguration
     {
         $transformations = new TransformationsCollection();
         $saveOptions = $this->saveOptionsFactory->create();

@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
@@ -150,8 +151,8 @@ class ThumbnailKeyParserTest extends TestCase
 
     private function givenProcessingConfigurationParser_parse_returns(
         string $processingConfigurationString
-    ): ProcessingConfigurationInterface {
-        $processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
+    ): ProcessingConfiguration {
+        $processingConfiguration = \Phake::mock(ProcessingConfiguration::class);
         \Phake::when($this->processingConfigurationParser)
             ->parse($processingConfigurationString)
             ->thenReturn($processingConfiguration);

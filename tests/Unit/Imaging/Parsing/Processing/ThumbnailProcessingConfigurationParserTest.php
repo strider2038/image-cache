@@ -117,7 +117,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     }
 
     private function verifyProcessingConfiguration(
-        ProcessingConfigurationInterface $configuration,
+        ProcessingConfiguration $configuration,
         SaveOptions $defaultSaveOptions,
         bool $isDefault
     ): void {
@@ -128,7 +128,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $this->assertEquals($isDefault, $configuration->isDefault());
     }
 
-    private function assertTransformationsCount(int $count, ProcessingConfigurationInterface $configuration): void
+    private function assertTransformationsCount(int $count, ProcessingConfiguration $configuration): void
     {
         $transformations = $configuration->getTransformations();
         $this->assertEquals($count, $transformations->count());

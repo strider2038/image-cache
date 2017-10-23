@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
@@ -65,9 +66,9 @@ class SourceImageExtractorTest extends TestCase
         return new SourceImageExtractor($this->keyParser, $this->sourceAccessor);
     }
 
-    private function givenKeyParser_parse_returnsSourceKey(): SourceKeyInterface
+    private function givenKeyParser_parse_returnsSourceKey(): SourceKey
     {
-        $sourceKey = \Phake::mock(SourceKeyInterface::class);
+        $sourceKey = \Phake::mock(SourceKey::class);
         \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($sourceKey);
         \Phake::when($sourceKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
 

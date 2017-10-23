@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ProcessingConfiguration implements ProcessingConfigurationInterface
+class ProcessingConfiguration
 {
     /** @var TransformationsCollection */
     private $transformations;
