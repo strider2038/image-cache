@@ -10,25 +10,24 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
- * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-abstract class AbstractImage implements ImageInterface
+class Image
 {
     /** @var SaveOptions */
-    protected $saveOptions;
+    private $saveOptions;
 
-    /** @var FileOperationsInterface */
-    protected $fileOperations;
+    /** @var StreamInterface */
+    private $data;
 
-    public function __construct(FileOperationsInterface $fileOperations, SaveOptions $saveOptions)
+    public function __construct(SaveOptions $saveOptions, StreamInterface $data)
     {
-        $this->fileOperations = $fileOperations;
         $this->saveOptions = $saveOptions;
+        $this->data = $data;
     }
 
     public function getSaveOptions(): SaveOptions
@@ -36,8 +35,8 @@ abstract class AbstractImage implements ImageInterface
         return $this->saveOptions;
     }
 
-    public function setSaveOptions(SaveOptions $saveOptions): void
+    public function getData(): StreamInterface
     {
-        $this->saveOptions = $saveOptions;
+        return $this->data;
     }
 }

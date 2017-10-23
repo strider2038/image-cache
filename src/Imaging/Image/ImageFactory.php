@@ -17,6 +17,7 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 /**
+ * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageFactory implements ImageFactoryInterface

@@ -12,6 +12,7 @@
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
 - [ ] Yandex Static Map source
+  - refactor image classes to data object and processing service
   - response mime type detection and validation
   - format conversion
 - [ ] Yandex.Disk source
