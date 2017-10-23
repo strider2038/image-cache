@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
-use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
+use Strider2038\ImgCache\Imaging\Processing\DeprecatedImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
 /**
@@ -26,13 +26,13 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     /** @var SourceAccessorInterface */
     private $sourceAccessor;
 
-    /** @var ImageProcessorInterface */
+    /** @var DeprecatedImageProcessorInterface */
     private $imageProcessor;
 
     public function __construct(
         ThumbnailKeyParserInterface $keyParser,
         SourceAccessorInterface $sourceImageExtractor,
-        ImageProcessorInterface $imageProcessor
+        DeprecatedImageProcessorInterface $imageProcessor
     ) {
         $this->keyParser = $keyParser;
         $this->sourceAccessor = $sourceImageExtractor;

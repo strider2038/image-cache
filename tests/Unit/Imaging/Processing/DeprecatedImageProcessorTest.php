@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
-use Strider2038\ImgCache\Imaging\Processing\ImageProcessor;
+use Strider2038\ImgCache\Imaging\Processing\DeprecatedImageProcessor;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
@@ -21,7 +21,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
-class ImageProcessorTest extends TestCase
+class DeprecatedImageProcessorTest extends TestCase
 {
     use ImageTrait;
 
@@ -77,9 +77,9 @@ class ImageProcessorTest extends TestCase
         $this->assertSaveOptionsIsCalledOnProcessingImage($processingImage, $saveOptions);
     }
 
-    private function createImageProcessor(): ImageProcessor
+    private function createImageProcessor(): DeprecatedImageProcessor
     {
-        $processor = new ImageProcessor($this->processingEngine);
+        $processor = new DeprecatedImageProcessor($this->processingEngine);
 
         return $processor;
     }

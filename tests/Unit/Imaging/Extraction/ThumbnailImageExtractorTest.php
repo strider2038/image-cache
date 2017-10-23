@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
-use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
+use Strider2038\ImgCache\Imaging\Processing\DeprecatedImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
@@ -33,14 +33,14 @@ class ThumbnailImageExtractorTest extends TestCase
     /** @var SourceAccessorInterface */
     private $sourceAccessor;
 
-    /** @var ImageProcessorInterface */
+    /** @var DeprecatedImageProcessorInterface */
     private $imageProcessor;
 
     protected function setUp()
     {
         $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
         $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
-        $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
+        $this->imageProcessor = \Phake::mock(DeprecatedImageProcessorInterface::class);
     }
 
     /** @test */

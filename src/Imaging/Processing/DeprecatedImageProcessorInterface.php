@@ -10,15 +10,13 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
+use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
  * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ProcessingConfigurationInterface
+interface DeprecatedImageProcessorInterface
 {
-    public function getTransformations(): TransformationsCollection;
-    public function getSaveOptions(): SaveOptions;
-    public function isDefault(): bool;
+    public function process(ProcessingConfigurationInterface $configuration, ImageInterface $image): ImageInterface;
 }
