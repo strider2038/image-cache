@@ -16,10 +16,10 @@ use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
+use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -41,13 +41,13 @@ class ImageCache implements ImageCacheInterface
     /** @var ImageWriterInterface */
     private $imageWriter;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-    
+    /** @var ImageProcessorInterface */
+    private $imageProcessor;
+
     public function __construct(
         string $webDirectory,
         FileOperationsInterface $fileOperations,
-        ImageFactoryInterface $imageFactory,
+        ImageProcessorInterface $imageProcessor,
         ImageExtractorInterface $imageExtractor,
         ImageWriterInterface $imageWriter = null
     ) {
@@ -56,7 +56,7 @@ class ImageCache implements ImageCacheInterface
             throw new InvalidConfigurationException("Directory '{$webDirectory}' does not exist");
         }
         $this->webDirectory = rtrim($webDirectory, '/');
-        $this->imageFactory = $imageFactory;
+        $this->imageProcessor = $imageProcessor;
         $this->imageExtractor = $imageExtractor;
         $this->imageWriter = $imageWriter ?? new NullWriter();
     }
@@ -65,22 +65,18 @@ class ImageCache implements ImageCacheInterface
      * First request for image file extracts image from the source and puts it into cache
      * directory. Next requests will be processed by nginx.
      * @param string $key
-     * @return null|ImageInterface
+     * @return null|Image
      */
-    public function get(string $key): ? ImageInterface
+    public function get(string $key): ? Image
     {
         $this->validateKey($key);
 
-        /** @var ImageInterface $extractedImage */
-        $extractedImage = $this->imageExtractor->extract($key);
-        if ($extractedImage === null) {
-            return null;
+        $image = $this->imageExtractor->extract($key);
+        if ($image !== null) {
+            $this->imageProcessor->saveToFile($image, $this->composeDestinationFilename($key));
         }
 
-        $destinationFilename = $this->composeDestinationFilename($key);
-        $extractedImage->saveTo($destinationFilename);
-
-        return $this->imageFactory->createImageFile($destinationFilename);
+        return $image;
     }
 
     public function put(string $key, StreamInterface $data): void
