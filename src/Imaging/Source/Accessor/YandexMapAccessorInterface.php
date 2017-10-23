@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 
 /**
@@ -18,5 +18,5 @@ use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
  */
 interface YandexMapAccessorInterface
 {
-    public function get(YandexMapParameters $parameters): ImageInterface;
+    public function get(YandexMapParameters $parameters): Image;
 }

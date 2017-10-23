@@ -39,7 +39,7 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         $this->processingConfigurationParser = $configurationParser;
     }
 
-    public function parse(string $key): ThumbnailKeyInterface
+    public function parse(string $key): ThumbnailKey
     {
         if (!$this->keyValidator->isValidPublicFilename($key)) {
             throw new InvalidRequestValueException(sprintf('Invalid filename "%s" in request', $key));

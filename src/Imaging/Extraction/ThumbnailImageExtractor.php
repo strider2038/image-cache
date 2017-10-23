@@ -10,9 +10,9 @@
 
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
-use Strider2038\ImgCache\Imaging\Processing\DeprecatedImageProcessorInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
 /**
@@ -26,20 +26,20 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     /** @var SourceAccessorInterface */
     private $sourceAccessor;
 
-    /** @var DeprecatedImageProcessorInterface */
+    /** @var ImageProcessorInterface */
     private $imageProcessor;
 
     public function __construct(
         ThumbnailKeyParserInterface $keyParser,
         SourceAccessorInterface $sourceImageExtractor,
-        DeprecatedImageProcessorInterface $imageProcessor
+        ImageProcessorInterface $imageProcessor
     ) {
         $this->keyParser = $keyParser;
         $this->sourceAccessor = $sourceImageExtractor;
         $this->imageProcessor = $imageProcessor;
     }
 
-    public function extract(string $key): ? ImageInterface
+    public function extract(string $key): ? Image
     {
         $thumbnailKey = $this->keyParser->parse($key);
         $sourceImage = $this->sourceAccessor->get($thumbnailKey->getPublicFilename());
@@ -47,6 +47,6 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
             return null;
         }
 
-        return $this->imageProcessor->process($thumbnailKey->getProcessingConfiguration(), $sourceImage);
+        return $this->imageProcessor->process($sourceImage, $thumbnailKey->getProcessingConfiguration());
     }
 }

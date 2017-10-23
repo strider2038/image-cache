@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 
 /**
+ * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 trait ImageTrait

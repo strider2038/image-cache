@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
  */
 interface ThumbnailKeyParserInterface
 {
-    public function parse(string $key): ThumbnailKeyInterface;
+    public function parse(string $key): ThumbnailKey;
 }
