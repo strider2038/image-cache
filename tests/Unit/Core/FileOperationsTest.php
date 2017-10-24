@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\FileOperations;
 use Strider2038\ImgCache\Core\ResourceStream;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -207,7 +208,7 @@ class FileOperationsTest extends FileTestCase
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Cannot create file
      */
-    public function ceateFile_givenInvalidFilenameAndContents_exceptionThrown(): void
+    public function createFile_givenInvalidFilenameAndContents_exceptionThrown(): void
     {
         $fileOperations = $this->createFileOperations();
         \Phake::when($this->filesystem)->dumpFile(\Phake::anyParameters())->thenThrow(new IOException(''));
@@ -285,8 +286,9 @@ class FileOperationsTest extends FileTestCase
     {
         $fileOperations = $this->createFileOperations();
         $filename = $this->givenFile();
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
 
-        $stream = $fileOperations->openFile($filename, ResourceStream::MODE_READ_ONLY);
+        $stream = $fileOperations->openFile($filename, $mode);
 
         $this->assertInstanceOf(ResourceStream::class, $stream);
     }
@@ -300,8 +302,9 @@ class FileOperationsTest extends FileTestCase
     public function openFile_givenNotExistingFileAndReadOnlyMode_exceptionThrown(): void
     {
         $fileOperations = $this->createFileOperations();
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
 
-        $fileOperations->openFile(self::FILENAME_NOT_EXIST, ResourceStream::MODE_READ_ONLY);
+        $fileOperations->openFile(self::FILENAME_NOT_EXIST, $mode);
     }
 
     private function createFileOperations(): FileOperations

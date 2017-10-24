@@ -47,6 +47,17 @@ trait FileOperationsTrait
         \Phake::when($fileOperations)->getFileContents($filename)->thenReturn($blob);
     }
 
+    protected function givenFileOperations_openFile_returnsStream(
+        FileOperationsInterface $fileOperations,
+        string $filename,
+        string $mode
+    ): StreamInterface {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($fileOperations)->openFile($filename, $mode)->thenReturn($stream);
+
+        return $stream;
+    }
+
     protected function assertFileOperations_copyFileTo_isCalledOnce(
         FileOperationsInterface $fileOperations,
         string $source,
@@ -75,16 +86,5 @@ trait FileOperationsTrait
         string $directory
     ): void {
         \Phake::verify($fileOperations, \Phake::times(1))->createDirectory($directory);
-    }
-
-    protected function givenFileOperations_openFile_isCalledOnce(
-        FileOperationsInterface $fileOperations,
-        string $filename,
-        string $mode
-    ): StreamInterface {
-        $stream = \Phake::mock(StreamInterface::class);
-        \Phake::when($fileOperations)->openFile($filename, $mode)->thenReturn($stream);
-
-        return $stream;
     }
 }

@@ -5,6 +5,7 @@ namespace Strider2038\ImgCache\Core;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Collection\StringList;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\FileOperationException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -49,11 +50,12 @@ class FileOperations implements FileOperationsInterface
     {
         try {
             $this->filesystem->copy($source, $destination);
-            $this->logger->info(
-                "File copied from '{$source}' to '{$destination}'"
-            );
+            $this->logger->info(sprintf('File copied from "%s" to "%s"', $source, $destination));
         } catch (IOException $exception) {
-            throw new FileOperationException("Cannot copy file from '{$source}' to '{$destination}'", $exception);
+            throw new FileOperationException(
+                sprintf('Cannot copy file from "%s" to "%s"', $source, $destination),
+                $exception
+            );
         }
     }
 
@@ -62,14 +64,14 @@ class FileOperations implements FileOperationsInterface
         try {
             $contents = file_get_contents($filename);
         } catch (\Exception $exception) {
-            throw new FileOperationException("Cannot read file '{$filename}'", $exception);
+            throw new FileOperationException(sprintf('Cannot read file "%s"', $filename), $exception);
         }
 
         if (empty($contents)) {
-            throw new FileOperationException("File '{$filename}' is empty");
+            throw new FileOperationException(sprintf('File "%s" is empty', $filename));
         }
 
-        $this->logger->info("Contents of file '{$filename}' was read");
+        $this->logger->info(sprintf('Contents of file "%s" was read', $filename));
 
         return $contents;
     }
@@ -78,23 +80,23 @@ class FileOperations implements FileOperationsInterface
     {
         try {
             $this->filesystem->dumpFile($filename, $data);
-            $this->logger->info("File '{$filename}' was created");
+            $this->logger->info(sprintf('File "%s" was created', $filename));
         } catch (IOException $exception) {
-            throw new FileOperationException("Cannot create file '{$filename}'", $exception);
+            throw new FileOperationException(sprintf('Cannot create file "%s"', $filename), $exception);
         }
     }
 
     public function deleteFile(string $filename): void
     {
         if (!$this->isFile($filename)) {
-            throw new FileOperationException("Cannot delete file '{$filename}': it does not exist");
+            throw new FileOperationException(sprintf('Cannot delete file "%s": it does not exist', $filename));
         }
         try {
             $this->filesystem->remove($filename);
-            $this->logger->info("File '{$filename}' was deleted");
+            $this->logger->info(sprintf('File "%s" was deleted', $filename));
         } catch (IOException $exception) {
             throw new FileOperationException(
-                "Cannot delete file '{$filename}' because of unexpected error",
+                sprintf('Cannot delete file "%s" because of unexpected error', $filename),
                 $exception
             );
         }
@@ -105,21 +107,21 @@ class FileOperations implements FileOperationsInterface
         try {
             $this->filesystem->mkdir($directory, $mode);
             $this->logger->info(sprintf(
-                "Directory '%s' was created recursively with mode %s",
+                'Directory "%s" was created recursively with mode %s',
                 $directory,
                 decoct($mode)
             ));
         } catch (IOException $exception) {
-            throw new FileOperationException("Cannot create directory '{$directory}'", $exception);
+            throw new FileOperationException(sprintf('Cannot create directory "%s"', $directory), $exception);
         }
     }
 
-    public function openFile(string $filename, string $mode): StreamInterface
+    public function openFile(string $filename, ResourceStreamModeEnum $mode): StreamInterface
     {
         try {
             $stream = new ResourceStream($filename, $mode);
             $this->logger->info(sprintf(
-                "File '%s' is succesfully opened in mode '%s'",
+                'File "%s" is successfully opened in mode "%s"',
                 $filename,
                 $mode
             ));
@@ -127,7 +129,7 @@ class FileOperations implements FileOperationsInterface
             return $stream;
         } catch (\Exception $exception) {
             throw new FileOperationException(
-                sprintf("Cannot open file '%s' in mode '%s'", $filename, $mode),
+                sprintf('Cannot open file "%s" in mode "%s"', $filename, $mode),
                 $exception
             );
         }
