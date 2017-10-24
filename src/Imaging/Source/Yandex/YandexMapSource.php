@@ -14,7 +14,6 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
-use Strider2038\ImgCache\Core\StringStream;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\BadApiResponse;
@@ -68,8 +67,8 @@ class YandexMapSource implements YandexMapSourceInterface
             throw new BadApiResponse('Unexpected response from API');
         }
 
-        $stream = new StringStream($response->getBody()->getContents());
+        $data = $response->getBody()->getContents();
 
-        return $this->imageFactory->createFromStream($stream);
+        return $this->imageFactory->createFromData($data);
     }
 }

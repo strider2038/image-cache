@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Tests\Support\Phake;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -53,7 +54,8 @@ trait FileOperationsTrait
         string $mode
     ): StreamInterface {
         $stream = \Phake::mock(StreamInterface::class);
-        \Phake::when($fileOperations)->openFile($filename, $mode)->thenReturn($stream);
+        $modeEnum = new ResourceStreamModeEnum($mode);
+        \Phake::when($fileOperations)->openFile($filename, $modeEnum)->thenReturn($stream);
 
         return $stream;
     }

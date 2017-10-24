@@ -120,7 +120,7 @@ class FilesystemSourceTest extends TestCase
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $givenStream = $this->givenInputStream();
-        $stream = $this->givenFileOperations_openFile_isCalledOnce(
+        $stream = $this->givenFileOperations_openFile_returnsStream(
             $this->fileOperations,
             self::FILENAME_EXISTS_FULL,
             'w+'

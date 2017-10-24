@@ -49,7 +49,7 @@ class YandexMapSourceTest extends TestCase
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenRespose_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
-        $expectedImage = $this->givenImageFactory_createImageBlob_returnsImageBlob();
+        $expectedImage = $this->givenImageFactory_createFromData_returnsImage();
         $this->givenResponse_getBody_returnsStreamWithBlob($response);
 
         $image = $source->get($query);
@@ -150,10 +150,10 @@ class YandexMapSourceTest extends TestCase
         \Phake::when($response)->getStatusCode()->thenReturn($code);
     }
 
-    private function givenImageFactory_createImageBlob_returnsImageBlob(): Image
+    private function givenImageFactory_createFromData_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromStream(self::BLOB)->thenReturn($image);
+        \Phake::when($this->imageFactory)->createFromData(self::BLOB)->thenReturn($image);
 
         return $image;
     }

@@ -11,13 +11,15 @@
 namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StringStream;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 /**
- * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageFactory implements ImageFactoryInterface
@@ -41,27 +43,31 @@ class ImageFactory implements ImageFactoryInterface
         $this->fileOperations = $fileOperations;
     }
 
-    public function createImageFile(string $filename): ImageFile
+    public function createFromFile(string $filename): Image
     {
+        if (!$this->fileOperations->isFile($filename)) {
+            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
+        }
         if (!$this->imageValidator->hasValidImageExtension($filename)) {
-            throw new InvalidMediaTypeException("File '{$filename}' has unsupported image extension");
+            throw new InvalidMediaTypeException(sprintf('File "%s" has unsupported image extension', $filename));
         }
         if (!$this->imageValidator->hasFileValidImageMimeType($filename)) {
-            throw new InvalidMediaTypeException("File '{$filename}' has unsupported mime type");
+            throw new InvalidMediaTypeException(sprintf('File "%s" has unsupported mime type', $filename));
         }
 
-        $image = new ImageFile($filename, $this->fileOperations, $this->createSaveOptions());
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
+        $data = $this->fileOperations->openFile($filename, $mode);
 
-        return $image;
+        return new Image($this->createSaveOptions(), $data);
     }
 
-    public function createImageBlob(string $blob): ImageBlob
+    public function createFromData(string $data): Image
     {
-        if (!$this->imageValidator->hasBlobValidImageMimeType($blob)) {
+        if (!$this->imageValidator->hasBlobValidImageMimeType($data)) {
             throw new InvalidMediaTypeException('Image has unsupported mime type');
         }
 
-        return new ImageBlob($blob, $this->fileOperations, $this->createSaveOptions());
+        return new Image($this->createSaveOptions(), new StringStream($data));
     }
 
     private function createSaveOptions(): SaveOptions
