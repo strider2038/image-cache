@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Source;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
@@ -78,7 +79,8 @@ class FilesystemSource implements FilesystemSourceInterface
         $sourceFilename = $this->composeSourceFilename($key);
         $this->fileOperations->createDirectory(dirname($sourceFilename));
 
-        $outputStream = $this->fileOperations->openFile($sourceFilename, 'w+');
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::WRITE_AND_READ);
+        $outputStream = $this->fileOperations->openFile($sourceFilename, $mode);
         while (!$stream->eof()) {
             $outputStream->write($stream->read(self::CHUNK_SIZE));
         }

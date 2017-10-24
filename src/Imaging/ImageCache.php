@@ -16,7 +16,7 @@ use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
-use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
@@ -65,18 +65,21 @@ class ImageCache implements ImageCacheInterface
      * First request for image file extracts image from the source and puts it into cache
      * directory. Next requests will be processed by nginx.
      * @param string $key
-     * @return null|Image
+     * @return null|ImageFile
      */
-    public function get(string $key): ? Image
+    public function get(string $key): ? ImageFile
     {
         $this->validateKey($key);
 
         $image = $this->imageExtractor->extract($key);
-        if ($image !== null) {
-            $this->imageProcessor->saveToFile($image, $this->composeDestinationFilename($key));
+        if ($image === null) {
+            return null;
         }
 
-        return $image;
+        $filename = $this->composeDestinationFilename($key);
+        $this->imageProcessor->saveToFile($image, $filename);
+
+        return new ImageFile($filename);
     }
 
     public function put(string $key, StreamInterface $data): void
@@ -111,7 +114,7 @@ class ImageCache implements ImageCacheInterface
 
     private function validateKey(string $key): void
     {
-        if (@$key[0] !== '/') {
+        if (strlen($key) <= 0 || $key[0] !== '/') {
             throw new InvalidValueException('Key must start with slash');
         }
     }

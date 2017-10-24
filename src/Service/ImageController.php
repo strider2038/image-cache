@@ -16,7 +16,6 @@ use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 
 /**
@@ -54,7 +53,6 @@ class ImageController extends Controller
      */
     public function actionGet(string $location): ResponseInterface
     {
-        /** @var ImageFile $image */
         $image = $this->imageCache->get($location);
 
         if ($image === null) {

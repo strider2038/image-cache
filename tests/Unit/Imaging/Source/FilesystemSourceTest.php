@@ -14,6 +14,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSource;
@@ -123,7 +124,7 @@ class FilesystemSourceTest extends TestCase
         $stream = $this->givenFileOperations_openFile_returnsStream(
             $this->fileOperations,
             self::FILENAME_EXISTS_FULL,
-            'w+'
+            ResourceStreamModeEnum::WRITE_AND_READ
         );
 
         $source->put($filenameKey, $givenStream);

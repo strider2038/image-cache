@@ -124,9 +124,7 @@ class ResponseFactoryTest extends FileTestCase
 
     private function createResponseFactory(bool $isDebugged = false): ResponseFactory
     {
-        $factory = new ResponseFactory($this->request, $isDebugged);
-
-        return $factory;
+        return new ResponseFactory($this->request, $isDebugged);
     }
 
     private function givenRequest_getProtocolVersion_returns(): void

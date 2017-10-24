@@ -245,7 +245,7 @@ class ImageControllerTest extends TestCase
         return $controller;
     }
 
-    private function givenImageCache_get_returns(?ImageInterface $image): void
+    private function givenImageCache_get_returns(?ImageFile $image): void
     {
         \Phake::when($this->imageCache)->get(self::LOCATION)->thenReturn($image);
     }

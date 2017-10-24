@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
@@ -90,7 +91,7 @@ class ImageCacheTest extends TestCase
 
         $cachedImage = $cache->get(self::GET_KEY);
 
-        $this->assertSame($cachedImage, $image);
+        $this->assertInstanceOf(ImageFile::class, $cachedImage);
         $this->assertImageProcessor_saveToFile_isCalledOnceWith($image);
     }
 
