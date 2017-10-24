@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Imaging\Source\Mapping\FilenameKeyMapperInterface;
@@ -46,7 +46,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
         $this->logger = $logger;
     }
 
-    public function get(string $key): ? ImageInterface
+    public function get(string $key): ? Image
     {
         $filenameKey = $this->composeFilenameKey($key);
 

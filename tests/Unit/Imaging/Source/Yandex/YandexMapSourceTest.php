@@ -19,7 +19,7 @@ use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\Image\ImageBlob;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSource;
 
@@ -150,10 +150,10 @@ class YandexMapSourceTest extends TestCase
         \Phake::when($response)->getStatusCode()->thenReturn($code);
     }
 
-    private function givenImageFactory_createImageBlob_returnsImageBlob(): ImageBlob
+    private function givenImageFactory_createImageBlob_returnsImageBlob(): Image
     {
-        $image = \Phake::mock(ImageBlob::class);
-        \Phake::when($this->imageFactory)->createImageBlob(self::BLOB)->thenReturn($image);
+        $image = \Phake::mock(Image::class);
+        \Phake::when($this->imageFactory)->createFromStream(self::BLOB)->thenReturn($image);
 
         return $image;
     }

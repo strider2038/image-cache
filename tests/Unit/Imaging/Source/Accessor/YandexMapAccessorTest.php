@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Accessor;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessor;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
@@ -81,7 +81,6 @@ class YandexMapAccessorTest extends TestCase
 
         $image = $source->get($parameters);
 
-        $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertSame($expectedImage, $image);
         $this->assertSource_get_isCalledOnceWithQueryParameters();
     }
@@ -128,9 +127,9 @@ class YandexMapAccessorTest extends TestCase
         $this->assertEquals(self::EXPECTED_QUERY_PARAMETERS, $queryParameters->toArray());
     }
 
-    private function givenSource_get_returnsImage(): ImageInterface
+    private function givenSource_get_returnsImage(): Image
     {
-        $image = \Phake::mock(ImageInterface::class);
+        $image = \Phake::mock(Image::class);
         \Phake::when($this->source)->get(\Phake::anyParameters())->thenReturn($image);
 
         return $image;

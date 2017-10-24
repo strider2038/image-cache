@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Insertion;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
@@ -122,8 +122,8 @@ class ThumbnailImageWriterTest extends TestCase
 
     private function givenKeyParser_parse_returnsThumbnailKey(
         bool $hasProcessingConfiguration = false
-    ): ThumbnailKeyInterface {
-        $parsedKey = \Phake::mock(ThumbnailKeyInterface::class);
+    ): ThumbnailKey {
+        $parsedKey = \Phake::mock(ThumbnailKey::class);
         \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($parsedKey);
         \Phake::when($parsedKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
         \Phake::when($parsedKey)->getThumbnailMask()->thenReturn(self::THUMBNAIL_MASK);

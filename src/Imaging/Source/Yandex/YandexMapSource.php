@@ -14,11 +14,12 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\StringStream;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\BadApiResponse;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -44,7 +45,7 @@ class YandexMapSource implements YandexMapSourceInterface
         $this->key = $key;
     }
 
-    public function get(QueryParametersCollection $queryParameters): ImageInterface
+    public function get(QueryParametersCollection $queryParameters): Image
     {
         if ($this->key !== '') {
             $queryParameters = clone $queryParameters;
@@ -67,9 +68,8 @@ class YandexMapSource implements YandexMapSourceInterface
             throw new BadApiResponse('Unexpected response from API');
         }
 
-        $body = $response->getBody();
-        $data = $body->getContents();
+        $stream = new StringStream($response->getBody()->getContents());
 
-        return $this->imageFactory->createImageBlob($data);
+        return $this->imageFactory->createFromStream($stream);
     }
 }

@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Insertion;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
@@ -91,9 +91,9 @@ class SourceImageWriterTest extends TestCase
         $this->assertEquals(self::PUBLIC_FILENAME, $filename);
     }
 
-    private function givenKeyParser_parse_returnsSourceKey(): SourceKeyInterface
+    private function givenKeyParser_parse_returnsSourceKey(): SourceKey
     {
-        $parsedKey = \Phake::mock(SourceKeyInterface::class);
+        $parsedKey = \Phake::mock(SourceKey::class);
         \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($parsedKey);
         \Phake::when($parsedKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
 

@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
@@ -43,7 +43,7 @@ class YandexMapAccessor implements YandexMapAccessorInterface
         $this->source = $source;
     }
 
-    public function get(YandexMapParameters $parameters): ImageInterface
+    public function get(YandexMapParameters $parameters): Image
     {
         $violations = $this->validator->validate($parameters);
         if ($violations->count()) {

@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Source;
 
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 
 /**
@@ -19,7 +19,7 @@ use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
  */
 interface FilesystemSourceInterface
 {
-    public function get(FilenameKeyInterface $key): ? ImageInterface;
+    public function get(FilenameKeyInterface $key): ? Image;
     public function exists(FilenameKeyInterface $key): bool;
     public function put(FilenameKeyInterface $key, StreamInterface $stream): void;
     public function delete(FilenameKeyInterface $key): void;
