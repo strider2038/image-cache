@@ -10,14 +10,11 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Image\Image;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ImageTransformerInterface
+interface SizeInterface
 {
-    public function resize(SizeInterface $size): ImageTransformerInterface;
-    public function crop(RectangleInterface $rectangle): ImageTransformerInterface;
-    public function getImage(): Image;
+    public function getWidth(): int;
+    public function getHeight(): int;
 }
