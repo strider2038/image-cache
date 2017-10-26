@@ -15,7 +15,6 @@ use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestException;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */

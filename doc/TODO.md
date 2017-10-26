@@ -29,6 +29,8 @@
 - [ ] Support for phpDocumentor
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
+- [ ] Rename ImageCache to ImageStorage? ImgCache to CachedImageStorage?
+
+# IDEAS
 - [ ] Google map source (inspect licensing problems)
 - [ ] Yandex map marker
-- [ ] Rename ImageCache to ImageStorage? ImgCache to CachedImageStorage?

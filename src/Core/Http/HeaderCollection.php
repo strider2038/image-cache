@@ -13,7 +13,6 @@ namespace Strider2038\ImgCache\Core\Http;
 use Strider2038\ImgCache\Collection\IterableCollection;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
