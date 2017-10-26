@@ -12,13 +12,10 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
-use Strider2038\ImgCache\Imaging\Transformation\ResizeFactory;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweightInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationsCreator;
-use Strider2038\ImgCache\Tests\Support\TransformationsFactoryInterfaceMock;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -72,16 +69,12 @@ class TransformationsCreatorTest extends TestCase
 
     private function createTransformationsCreator(): TransformationsCreator
     {
-        $creator = new TransformationsCreator($this->factoryFlyweight);
-
-        return $creator;
+        return new TransformationsCreator($this->factoryFlyweight);
     }
 
     private function givenTransformationFactory(): TransformationFactoryInterface
     {
-        $factory = \Phake::mock(TransformationFactoryInterface::class);
-
-        return $factory;
+        return \Phake::mock(TransformationFactoryInterface::class);
     }
 
     private function givenTransformationFactory_Create_ReturnsTransformation(

@@ -11,12 +11,13 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
+use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeFactory implements TransformationFactoryInterface
+class ResizeTransformationFactory implements TransformationFactoryInterface
 {
     public function create(string $configuration): TransformationInterface
     {
@@ -31,17 +32,17 @@ class ResizeFactory implements TransformationFactoryInterface
         }
 
         $width = $matches[1] ?? 0;
-        $height = !empty($matches[3]) ? (int) $matches[3] : null;
-        $mode = Resize::MODE_STRETCH;
+        $height = !empty($matches[3]) ? (int) $matches[3] : $width;
         $modeCode = $matches[4] ?? null;
 
-        switch ($modeCode) {
-            case 'f': $mode = Resize::MODE_FIT_IN; break;
-            case 's': $mode = Resize::MODE_STRETCH; break;
-            case 'w': $mode = Resize::MODE_PRESERVE_WIDTH; break;
-            case 'h': $mode = Resize::MODE_PRESERVE_HEIGHT; break;
+        if (ResizeModeEnum::isValid($modeCode)) {
+            $mode = new ResizeModeEnum($modeCode);
+        } else {
+            $mode = new ResizeModeEnum(ResizeModeEnum::STRETCH);
         }
 
-        return new Resize($width, $height, $mode);
+        $parameters = new ResizeParameters($width, $height, $mode);
+
+        return new ResizeTransformation($parameters);
     }
 }

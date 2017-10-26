@@ -11,15 +11,15 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Collection\IterableCollection;
+use Strider2038\ImgCache\Collection\AbstractClassCollection;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TransformationsCollection extends IterableCollection
+class TransformationsCollection extends AbstractClassCollection
 {
-    public function add(TransformationInterface $transformation): void
+    public function __construct(array $elements = [])
     {
-        $this->elements[] = $transformation;
+        parent::__construct($elements, TransformationInterface::class);
     }
 }

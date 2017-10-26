@@ -19,5 +19,6 @@ interface ImageTransformerInterface
 {
     public function resize(SizeInterface $size): ImageTransformerInterface;
     public function crop(RectangleInterface $rectangle): ImageTransformerInterface;
+    public function getSize(): SizeInterface;
     public function getImage(): Image;
 }

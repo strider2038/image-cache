@@ -11,12 +11,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface TransformationInterface
 {
-    public function apply(ProcessingImageInterface $image): void;
+    public function apply(ImageTransformerInterface $transformer): void;
 }
