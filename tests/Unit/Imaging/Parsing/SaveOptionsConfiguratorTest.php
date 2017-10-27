@@ -16,66 +16,49 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 class SaveOptionsConfiguratorTest extends TestCase
 {
-    const SAVE_OPTIONS_QUALITY = 51;
-    const CONFIG_NOT_SUPPORTED = 'a';
-    const CONFIG_INVALID = 'qa';
-    const CONFIG_VALID = 'q51';
+    private const SAVE_OPTIONS_QUALITY = 51;
+    private const NOT_SUPPORTED_CONFIGURATION = 'a';
+    private const INVALID_CONFIGURATION = 'qa';
+    private const VALID_CONFIGURATION = 'q51';
 
-    public function testConfigure_ConfigIsNotSupported_SaveOptionsValueNotModified(): void
+    /** @test */
+    public function configure_configurationIsNotSupported_saveOptionsValueNotModified(): void
     {
         $saveOptions = $this->givenSaveOptions();
         $configurator = new SaveOptionsConfigurator();
 
-        $configurator->configure($saveOptions, self::CONFIG_NOT_SUPPORTED);
+        $configurator->configure($saveOptions, self::NOT_SUPPORTED_CONFIGURATION);
 
-        $this->assertSetQualityCalled($saveOptions, 0);
+        \Phake::verifyNoInteraction($saveOptions);
     }
 
     private function givenSaveOptions(): SaveOptions
     {
-        $saveOptions = new class extends SaveOptions
-        {
-            public $testSetQualityValue;
-            public $testSetQualityCount = 0;
-
-            public function setQuality(?int $quality): void
-            {
-                $this->testSetQualityValue = $quality;
-                $this->testSetQualityCount++;
-            }
-        };
-
-        return $saveOptions;
-    }
-
-    private function assertSetQualityCalled(SaveOptions $saveOptions, int $times, int $withValue = null): void
-    {
-        $this->assertEquals($times, $saveOptions->testSetQualityCount);
-        if ($withValue !== null) {
-            $this->assertEquals($withValue, $saveOptions->testSetQualityValue);
-        }
+        return \Phake::mock(SaveOptions::class);
     }
 
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid config for quality transformation
+     * @expectedExceptionMessage Invalid configuration for quality transformation
      */
-    public function testConfigure_ConfigIsInvalid_ExceptionThrown(): void
+    public function configure_configurationIsInvalid_exceptionThrown(): void
     {
         $saveOptions = $this->givenSaveOptions();
         $configurator = new SaveOptionsConfigurator();
 
-        $configurator->configure($saveOptions, self::CONFIG_INVALID);
+        $configurator->configure($saveOptions, self::INVALID_CONFIGURATION);
     }
 
-    public function testConfigure_ConfigIsValid_ValueIsSetToSaveOptions(): void
+    /** @test */
+    public function configure_configurationIsValid_valueIsSetToSaveOptions(): void
     {
         $saveOptions = $this->givenSaveOptions();
         $configurator = new SaveOptionsConfigurator();
 
-        $configurator->configure($saveOptions, self::CONFIG_VALID);
+        $configurator->configure($saveOptions, self::VALID_CONFIGURATION);
 
-        $this->assertSetQualityCalled($saveOptions, 1, self::SAVE_OPTIONS_QUALITY);
+        \Phake::verify($saveOptions, \Phake::times(1))->setQuality(self::SAVE_OPTIONS_QUALITY);
     }
 }

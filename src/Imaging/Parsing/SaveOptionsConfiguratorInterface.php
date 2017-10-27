@@ -17,5 +17,5 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
  */
 interface SaveOptionsConfiguratorInterface
 {
-    public function configure(SaveOptions $saveOptions, string $config): void;
+    public function configure(SaveOptions $saveOptions, string $configuration): void;
 }

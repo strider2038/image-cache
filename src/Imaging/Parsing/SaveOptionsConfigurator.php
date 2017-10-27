@@ -18,18 +18,18 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
  */
 class SaveOptionsConfigurator implements SaveOptionsConfiguratorInterface
 {
-    public function configure(SaveOptions $saveOptions, string $config): void
+    public function configure(SaveOptions $saveOptions, string $configuration): void
     {
-        if (substr($config, 0, 1) !== 'q') {
+        if (strlen($configuration) <= 0 || $configuration[0] !== 'q') {
             return;
         }
 
-        $config = substr($config, 1);
+        $value = substr($configuration, 1);
 
-        if (!preg_match('/^\d+$/', $config)) {
+        if (!preg_match('/^\d+$/', $value)) {
             throw new InvalidRequestValueException('Invalid configuration for quality transformation');
         }
 
-        $saveOptions->setQuality((int) $config);
+        $saveOptions->setQuality((int) $value);
     }
 }
