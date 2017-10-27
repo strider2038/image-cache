@@ -14,16 +14,15 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
 use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCreatorInterface;
 
 class ThumbnailProcessingConfigurationParserTest extends TestCase
 {
-    /** @var TransformationsCreatorInterface */
+    /** @var TransformationCreatorInterface */
     private $transformationsCreator;
 
     /** @var SaveOptionsFactoryInterface */
@@ -34,7 +33,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
     protected function setUp()
     {
-        $this->transformationsCreator = \Phake::mock(TransformationsCreatorInterface::class);
+        $this->transformationsCreator = \Phake::mock(TransformationCreatorInterface::class);
         $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
         $this->saveOptionsConfigurator = \Phake::mock(SaveOptionsConfiguratorInterface::class);
     }
@@ -122,7 +121,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         bool $isDefault
     ): void {
         $this->assertInstanceOf(ProcessingConfiguration::class, $configuration);
-        $this->assertInstanceOf(TransformationsCollection::class, $configuration->getTransformations());
+        $this->assertInstanceOf(TransformationCollection::class, $configuration->getTransformations());
         $this->assertSaveOptionsFactory_create_isCalledOnce();
         $this->assertSame($defaultSaveOptions, $configuration->getSaveOptions());
         $this->assertEquals($isDefault, $configuration->isDefault());

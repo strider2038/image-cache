@@ -30,6 +30,11 @@ class Image
         $this->data = $data;
     }
 
+    public function setSaveOptions(SaveOptions $saveOptions): void
+    {
+        $this->saveOptions = $saveOptions;
+    }
+
     public function getSaveOptions(): SaveOptions
     {
         return $this->saveOptions;

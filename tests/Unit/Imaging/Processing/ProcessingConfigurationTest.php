@@ -13,14 +13,14 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ProcessingConfigurationTest extends TestCase
 {
     use ProviderTrait;
 
-    /** @var TransformationsCollection */
+    /** @var TransformationCollection */
     private $transformations;
 
     /** @var SaveOptions */
@@ -28,7 +28,7 @@ class ProcessingConfigurationTest extends TestCase
 
     protected function setUp()
     {
-        $this->transformations = \Phake::mock(TransformationsCollection::class);
+        $this->transformations = \Phake::mock(TransformationCollection::class);
         $this->saveOptions = \Phake::mock(SaveOptions::class);
     }
 

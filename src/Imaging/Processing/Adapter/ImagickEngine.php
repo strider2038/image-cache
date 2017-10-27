@@ -19,6 +19,7 @@ use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
+ * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImagickEngine implements ProcessingEngineInterface

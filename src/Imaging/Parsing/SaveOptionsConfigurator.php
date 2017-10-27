@@ -27,7 +27,7 @@ class SaveOptionsConfigurator implements SaveOptionsConfiguratorInterface
         $config = substr($config, 1);
 
         if (!preg_match('/^\d+$/', $config)) {
-            throw new InvalidRequestValueException('Invalid config for quality transformation');
+            throw new InvalidRequestValueException('Invalid configuration for quality transformation');
         }
 
         $saveOptions->setQuality((int) $config);

@@ -11,15 +11,10 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
-use Strider2038\ImgCache\Collection\AbstractClassCollection;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TransformationsCollection extends AbstractClassCollection
+interface TransformationCreatorInterface
 {
-    public function __construct(array $elements = [])
-    {
-        parent::__construct($elements, TransformationInterface::class);
-    }
+    public function create(string $configuration): ? TransformationInterface;
 }

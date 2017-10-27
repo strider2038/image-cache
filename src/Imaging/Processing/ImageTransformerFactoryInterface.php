@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of ImgCache.
  *
@@ -11,11 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
+use Strider2038\ImgCache\Imaging\Image\Image;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ProcessingEngineInterface
+interface ImageTransformerFactoryInterface
 {
-    public function openFromFile(string $filename, SaveOptions $saveOptions): ProcessingImageInterface;
-    public function openFromBlob(string $data, SaveOptions $saveOptions): ProcessingImageInterface;
+    public function createTransformerForImage(Image $image): ImageTransformerInterface;
 }

@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
- * @todo Add layer support http://php.net/manual/ru/imagick.coalesceimages.php
+ * @deprecated
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImagickImage extends AbstractImage implements ProcessingImageInterface

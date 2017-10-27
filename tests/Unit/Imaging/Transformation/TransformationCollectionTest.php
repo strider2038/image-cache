@@ -11,15 +11,15 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
 
-class TransformationsCollectionTest extends TestCase
+class TransformationCollectionTest extends TestCase
 {
     /** @test */
     public function add_noTransformationsInCollection_oneTransformationInCollection(): void
     {
-        $collection = new TransformationsCollection();
+        $collection = new TransformationCollection();
         $transformation = \Phake::mock(TransformationInterface::class);
 
         $collection->add($transformation);

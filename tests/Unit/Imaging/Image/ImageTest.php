@@ -37,4 +37,15 @@ class ImageTest extends TestCase
         $this->assertSame($this->saveOptions, $image->getSaveOptions());
         $this->assertSame($this->data, $image->getData());
     }
+
+    /** @test */
+    public function setSaveOptions_givenSaveOptions_SaveOptionsIsSet(): void
+    {
+        $saveOptions = \Phake::mock(SaveOptions::class);
+        $image = new Image($this->saveOptions, $this->data);
+
+        $image->setSaveOptions($saveOptions);
+
+        $this->assertSame($saveOptions, $image->getSaveOptions());
+    }
 }

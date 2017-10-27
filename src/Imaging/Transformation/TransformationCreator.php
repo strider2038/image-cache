@@ -14,7 +14,7 @@ namespace Strider2038\ImgCache\Imaging\Transformation;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TransformationsCreator implements TransformationsCreatorInterface
+class TransformationCreator implements TransformationCreatorInterface
 {
     /** @var TransformationFactoryFlyweightInterface */
     private $factoryFlyweight;

@@ -12,15 +12,15 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCreator;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweightInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCreator;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class TransformationsCreatorTest extends TestCase
+class TransformationCreatorTest extends TestCase
 {
     /** @var TransformationFactoryFlyweightInterface */
     private $factoryFlyweight;
@@ -67,9 +67,9 @@ class TransformationsCreatorTest extends TestCase
         $this->assertNull($actualTransformation);
     }
 
-    private function createTransformationsCreator(): TransformationsCreator
+    private function createTransformationsCreator(): TransformationCreator
     {
-        return new TransformationsCreator($this->factoryFlyweight);
+        return new TransformationCreator($this->factoryFlyweight);
     }
 
     private function givenTransformationFactory(): TransformationFactoryInterface

@@ -22,6 +22,7 @@
 - [ ] Rotate transformation
 - [ ] Flip transformation
 - [ ] Support for building docker containers in Travis
+- [ ] Fix tests codestyle
 - [ ] Acceptance testing
 - [ ] Move all todos to github issues
 - [ ] Cache mechanism for source accessor
@@ -34,3 +35,4 @@
 # IDEAS
 - [ ] Google map source (inspect licensing problems)
 - [ ] Yandex map marker
+- [ ] Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php

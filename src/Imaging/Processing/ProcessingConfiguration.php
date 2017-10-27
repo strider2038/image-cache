@@ -10,14 +10,14 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ProcessingConfiguration
 {
-    /** @var TransformationsCollection */
+    /** @var TransformationCollection */
     private $transformations;
 
     /** @var SaveOptions */
@@ -27,7 +27,7 @@ class ProcessingConfiguration
     private $isDefault;
 
     public function __construct(
-        TransformationsCollection $transformations,
+        TransformationCollection $transformations,
         SaveOptions $saveOptions,
         bool $isDefault
     ) {
@@ -36,7 +36,7 @@ class ProcessingConfiguration
         $this->isDefault = $isDefault;
     }
 
-    public function getTransformations(): TransformationsCollection
+    public function getTransformations(): TransformationCollection
     {
         return $this->transformations;
     }
