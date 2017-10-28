@@ -33,7 +33,7 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     /** @var ImageCache */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $container = $this->loadContainer('thumbnail-image-cache.yml');

@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Imagick;
 
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformer;
 use Strider2038\ImgCache\Imaging\Processing\Rectangle;
 use Strider2038\ImgCache\Imaging\Processing\Size;
@@ -21,13 +22,20 @@ class ImagickTransformerTest extends FileTestCase
     private const IMAGE_SOURCE_WIDTH = 4;
     private const IMAGE_FINAL_WIDTH = 8;
     private const IMAGE_FINAL_HEIGHT = 8;
+    private const QUALITY = 70;
+    private const IMAGE_DESTINATION_FILE = self::TEST_CACHE_DIR . '/imagick_result.jpg';
 
     /** @var \Imagick */
     private $imagick;
 
-    protected function setUp()
+    /** @var FileOperationsInterface */
+    private $fileOperations;
+
+    protected function setUp(): void
     {
+        parent::setUp();
         $this->imagick = new \Imagick($this->givenAssetFile(self::IMAGE_BOX_JPG));
+        $this->fileOperations = \Phake::mock(FileOperationsInterface::class);
     }
 
     /** @test */
@@ -69,8 +77,36 @@ class ImagickTransformerTest extends FileTestCase
         $this->assertSame($expectedData, $data->getContents());
     }
 
+    /** @test */
+    public function setCompressionQuality_givenQuality_valueIsSet(): void
+    {
+        $transformer = $this->createTransformer();
+
+        $returnedTransformer = $transformer->setCompressionQuality(self::QUALITY);
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertEquals(self::QUALITY, $transformer->getImagick()->getCompressionQuality());
+    }
+
+    /** @test */
+    public function writeToFile_givenFilename_fileIsCreated(): void
+    {
+        $transformer = $this->createTransformer();
+
+        $returnedTransformer = $transformer->writeToFile(self::IMAGE_DESTINATION_FILE);
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertFileOperations_createDirectory_isCalledOnce();
+        $this->assertFileExists(self::IMAGE_DESTINATION_FILE);
+    }
+
     private function createTransformer(): ImagickTransformer
     {
-        return new ImagickTransformer($this->imagick);
+        return new ImagickTransformer($this->imagick, $this->fileOperations);
+    }
+
+    private function assertFileOperations_createDirectory_isCalledOnce(): void
+    {
+        \Phake::verify($this->fileOperations, \Phake::times(1))->createDirectory(self::TEST_CACHE_DIR);
     }
 }

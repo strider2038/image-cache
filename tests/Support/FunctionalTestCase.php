@@ -65,7 +65,7 @@ class FunctionalTestCase extends TestCase
     protected function givenImageJpeg(string $filename): void
     {
         if (file_exists($filename)) {
-            throw new \Exception("File '{$filename}' already exists");
+            throw new \Exception(sprintf('File "%s" already exists', $filename));
         }
         $dirname = dirname($filename);
         if (!is_dir($dirname)) {
@@ -73,7 +73,7 @@ class FunctionalTestCase extends TestCase
         }
         if (!copy(self::IMAGE_JPEG_FILENAME, $filename)) {
             throw new \Exception(
-                sprintf("Cannot copy '%s' to '%s'", self::IMAGE_JPEG_FILENAME, $filename)
+                sprintf('Cannot copy "%s" to "%s"', self::IMAGE_JPEG_FILENAME, $filename)
             );
         }
     }

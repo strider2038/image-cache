@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Imagick;
 
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformer;
 use Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory;
@@ -17,10 +18,18 @@ use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class ImagickTransformerFactoryTest extends FileTestCase
 {
+    /** @var FileOperationsInterface */
+    private $fileOperations;
+
+    protected function setUp(): void
+    {
+        $this->fileOperations = \Phake::mock(FileOperationsInterface::class);
+    }
+
     /** @test */
     public function createTransformer_givenStream_ImagickTransformerIsReturned(): void
     {
-        $factory = new ImagickTransformerFactory();
+        $factory = new ImagickTransformerFactory($this->fileOperations);
         $stream = $this->givenStream();
 
         $transformer = $factory->createTransformer($stream);

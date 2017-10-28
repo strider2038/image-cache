@@ -28,7 +28,7 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     /** @var ImageCache */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $container = $this->loadContainer('yandex-map-image-cache.yml');
