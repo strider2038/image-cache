@@ -31,8 +31,9 @@ class FunctionalTestCase extends TestCase
 
     private const ASSETS_DIRECTORY = __DIR__ . '/../assets/';
     private const IMAGE_JPEG_FILENAME = self::ASSETS_DIRECTORY . 'sample/cat300.jpg';
+    private const IMAGE_PNG_FILENAME = self::ASSETS_DIRECTORY . 'sample/rider.png';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         exec('rm -rf ' . self::FILESOURCE_DIRECTORY);
@@ -62,20 +63,30 @@ class FunctionalTestCase extends TestCase
         return $container;
     }
 
-    protected function givenImageJpeg(string $filename): void
+    private function givenAssetFile(string $assetFilename, string $copyFilename): void
     {
-        if (file_exists($filename)) {
-            throw new \Exception(sprintf('File "%s" already exists', $filename));
+        if (file_exists($copyFilename)) {
+            throw new \Exception(sprintf('File "%s" already exists', $copyFilename));
         }
-        $dirname = dirname($filename);
+        $dirname = dirname($copyFilename);
         if (!is_dir($dirname)) {
             mkdir($dirname, 0777, true);
         }
-        if (!copy(self::IMAGE_JPEG_FILENAME, $filename)) {
+        if (!copy($assetFilename, $copyFilename)) {
             throw new \Exception(
-                sprintf('Cannot copy "%s" to "%s"', self::IMAGE_JPEG_FILENAME, $filename)
+                sprintf('Cannot copy "%s" to "%s"', $assetFilename, $copyFilename)
             );
         }
+    }
+
+    protected function givenImageJpeg(string $filename): void
+    {
+        $this->givenAssetFile(self::IMAGE_JPEG_FILENAME, $filename);
+    }
+
+    protected function givenImagePng(string $filename): void
+    {
+        $this->givenAssetFile(self::IMAGE_PNG_FILENAME, $filename);
     }
 
     protected function assertFileHasMimeType(string $filename, string $expectedMime): void
