@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
@@ -33,18 +35,25 @@ class YandexMapAccessor implements YandexMapAccessorInterface
     /** @var YandexMapSourceInterface */
     private $source;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         ModelValidatorInterface $validator,
         ViolationsFormatterInterface $formatter,
-        YandexMapSourceInterface $source
+        YandexMapSourceInterface $source,
+        LoggerInterface $logger = null
     ) {
         $this->validator = $validator;
         $this->formatter = $formatter;
         $this->source = $source;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     public function get(YandexMapParameters $parameters): Image
     {
+        $this->logger->info(sprintf('Requesting yandex static map with parameters: %s', json_encode($parameters)));
+
         $violations = $this->validator->validate($parameters);
         if ($violations->count()) {
             throw new InvalidRequestValueException(

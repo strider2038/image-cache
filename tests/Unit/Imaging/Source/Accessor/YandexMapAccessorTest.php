@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Accessor;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Imaging\Image\Image;
@@ -19,10 +20,13 @@ use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class YandexMapAccessorTest extends TestCase
 {
+    use LoggerTrait;
+
     private const LAYER = 'layer';
     private const LONGITUDE = 1.0;
     private const LATITUDE = -1.0;
@@ -47,11 +51,15 @@ class YandexMapAccessorTest extends TestCase
     /** @var YandexMapSourceInterface */
     private $source;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     protected function setUp()
     {
         $this->validator = \Phake::mock(ModelValidatorInterface::class);
         $this->formatter = \Phake::mock(ViolationsFormatterInterface::class);
         $this->source = \Phake::mock(YandexMapSourceInterface::class);
+        $this->logger = $this->givenLogger();
     }
 
     /**
@@ -83,11 +91,12 @@ class YandexMapAccessorTest extends TestCase
 
         $this->assertSame($expectedImage, $image);
         $this->assertSource_get_isCalledOnceWithQueryParameters();
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     private function createAccessor(): YandexMapAccessor
     {
-        return new YandexMapAccessor($this->validator, $this->formatter, $this->source);
+        return new YandexMapAccessor($this->validator, $this->formatter, $this->source, $this->logger);
     }
 
     private function givenValidator_validate_returnViolations(

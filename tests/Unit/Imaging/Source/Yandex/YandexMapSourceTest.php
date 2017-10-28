@@ -15,6 +15,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
@@ -23,9 +24,12 @@ use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSource;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 class YandexMapSourceTest extends TestCase
 {
+    use LoggerTrait;
+
     private const KEY = 'key';
     private const QUERY_PARAMETERS = ['parameter' => 'value'];
     private const QUERY_PARAMETERS_WITH_KEY = ['parameter' => 'value', 'key' => 'key'];
@@ -40,11 +44,15 @@ class YandexMapSourceTest extends TestCase
     /** @var ClientInterface */
     private $client;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     protected function setUp(): void
     {
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->client = \Phake::mock(ClientInterface::class);
+        $this->logger = $this->givenLogger();
     }
 
     /** @test */
@@ -63,6 +71,7 @@ class YandexMapSourceTest extends TestCase
         $this->assertSame($expectedImage, $image);
         $this->assertClient_request_isCalledOnce(self::QUERY_PARAMETERS);
         $this->assertResponse_getBody_isCalledOnce($response);
+        $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
     /** @test */
@@ -131,7 +140,7 @@ class YandexMapSourceTest extends TestCase
 
     private function createSource(string $key = ''): YandexMapSource
     {
-        return new YandexMapSource($this->imageFactory, $this->imageValidator, $this->client, $key);
+        return new YandexMapSource($this->imageFactory, $this->imageValidator, $this->client, $key, $this->logger);
     }
 
     private function givenClient_request_returnsResponse(): ResponseInterface

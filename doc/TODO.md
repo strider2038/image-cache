@@ -12,8 +12,8 @@
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
 - [ ] Yandex Static Map source
-  - logging
   - yandex map api mock for functional test
+- [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations

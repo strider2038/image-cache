@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
@@ -21,9 +22,12 @@ use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 class ImageProcessorTest extends TestCase
 {
+    use LoggerTrait;
+
     private const FILENAME = 'filename';
     private const QUALITY = 75;
 
@@ -33,10 +37,14 @@ class ImageProcessorTest extends TestCase
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     protected function setUp(): void
     {
         $this->transformerFactory = \Phake::mock(ImageTransformerFactoryInterface::class);
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
+        $this->logger = $this->givenLogger();
     }
 
     /** @test */
@@ -61,6 +69,7 @@ class ImageProcessorTest extends TestCase
         $this->assertTransformation_apply_isCalledOnceWith($transformation, $transformer);
         $this->assertProcessingConfiguration_getSaveOptions_isCalledOnce($processingConfiguration);
         $this->assertImageFactory_create_isCalledOnceWith($processedStream, $saveOptions);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     /** @test */
@@ -79,6 +88,7 @@ class ImageProcessorTest extends TestCase
         $this->assertImage_getSaveOptions_isCalledOnce($image);
         $this->assertTransformer_setCompressionQuality_isCalledOnceWith($transformer, self::QUALITY);
         $this->assertTransformer_writeToFile_isCalledOnceWith($transformer, self::FILENAME);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
     private function givenTransformerFactory_createTransformer_returnsTransformer(
@@ -141,7 +151,7 @@ class ImageProcessorTest extends TestCase
 
     private function createImageProcessor(): ImageProcessor
     {
-        return new ImageProcessor($this->transformerFactory, $this->imageFactory);
+        return new ImageProcessor($this->transformerFactory, $this->imageFactory, $this->logger);
     }
 
     private function givenProcessingConfiguration_getSaveOptions_returnsSaveOptions(

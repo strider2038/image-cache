@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
@@ -25,12 +27,17 @@ class ImageProcessor implements ImageProcessorInterface
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         ImageTransformerFactoryInterface $transformerFactory,
-        ImageFactoryInterface $imageFactory
+        ImageFactoryInterface $imageFactory,
+        LoggerInterface $logger = null
     ) {
         $this->transformerFactory = $transformerFactory;
         $this->imageFactory = $imageFactory;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     public function process(Image $image, ProcessingConfiguration $configuration): Image
@@ -42,6 +49,8 @@ class ImageProcessor implements ImageProcessorInterface
             /** @var TransformationInterface $transformation */
             $transformation->apply($transformer);
         }
+
+        $this->logger->info(sprintf('Transformations count applied to image: %d.', $transformations->count()));
 
         $data = $transformer->getData();
         $saveOptions = $configuration->getSaveOptions();
@@ -56,6 +65,12 @@ class ImageProcessor implements ImageProcessorInterface
 
         $transformer->setCompressionQuality($saveOptions->getQuality());
         $transformer->writeToFile($filename);
+
+        $this->logger->info(sprintf(
+            'Image was saved to file "%s" with compression quality %d.',
+            $filename,
+            $saveOptions->getQuality()
+        ));
     }
 
     private function createTransformer(Image $image): ImageTransformerInterface

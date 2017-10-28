@@ -12,6 +12,8 @@ namespace Strider2038\ImgCache\Imaging\Source\Yandex;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
@@ -38,20 +40,31 @@ class YandexMapSource implements YandexMapSourceInterface
     /** @var string */
     private $key;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         ImageFactoryInterface $imageFactory,
         ImageValidatorInterface $imageValidator,
         ClientInterface $client,
-        string $key = ''
+        string $key = '',
+        LoggerInterface $logger = null
     ) {
         $this->imageFactory = $imageFactory;
         $this->imageValidator = $imageValidator;
         $this->client = $client;
         $this->key = $key;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     public function get(QueryParametersCollection $queryParameters): Image
     {
+        $this->logger->info(sprintf(
+            'Sending request to "%s" with parameters: %s',
+            $this->client->getConfig('base_uri'),
+            json_encode($queryParameters->toArray())
+        ));
+
         if ($this->key !== '') {
             $queryParameters = clone $queryParameters;
             $queryParameters->add(new QueryParameter('key', $this->key));
@@ -78,6 +91,8 @@ class YandexMapSource implements YandexMapSourceInterface
         if (!$this->imageValidator->hasDataValidImageMimeType($data)) {
             throw new BadApiResponse('Unsupported mime type in response from API');
         }
+
+        $this->logger->info('Successful response is received and response body validation has passed.');
 
         return $this->imageFactory->createFromData($data);
     }

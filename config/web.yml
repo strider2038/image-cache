@@ -108,6 +108,7 @@ services:
     arguments:
       - '@imagick_transformer_factory'
       - '@image_factory'
+      - '@logger'
   imagick_transformer_factory:
     class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
     arguments:

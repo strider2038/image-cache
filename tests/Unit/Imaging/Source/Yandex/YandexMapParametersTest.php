@@ -18,6 +18,23 @@ use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 
 class YandexMapParametersTest extends TestCase
 {
+    private const LAYERS = ['sat'];
+    private const LONGITUDE = 10;
+    private const LATITUDE = 20;
+    private const ZOOM = 15;
+    private const WIDTH = 120;
+    private const HEIGHT = 90;
+    private const SCALE = 1.5;
+    private const JSON_ARRAY = [
+        'layers' => self::LAYERS,
+        'longitude' => self::LONGITUDE,
+        'latitude' => self::LATITUDE,
+        'zoom' => self::ZOOM,
+        'width' => self::WIDTH,
+        'height' => self::HEIGHT,
+        'scale' => self::SCALE,
+    ];
+
     /** @var ModelValidatorInterface */
     private $validator;
 
@@ -65,9 +82,9 @@ class YandexMapParametersTest extends TestCase
     public function parametersAndViolationsCountProvider(): array
     {
         return [
-            [['sat'], 0, 0, 0, 100, 150, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 100, 150, 1.0, 0],
             [['map'], 0, 0, 0, 100, 150, 1.0, 0],
-            [['sat'], 0, 0, 0, 100, 150, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 100, 150, 1.0, 0],
             [['skl'], 0, 0, 0, 100, 150, 1.0, 0],
             [['trf'], 0, 0, 0, 100, 150, 1.0, 0],
             [['map', 'trf'], 0, 0, 0, 100, 150, 1.0, 0],
@@ -76,27 +93,44 @@ class YandexMapParametersTest extends TestCase
             [[], 0, 0, 0, 100, 150, 1.0, 1],
             [['a'], 0, 0, 0, 100, 150, 1.0, 1],
             [['a', 'b'], 0, 0, 0, 100, 150, 1.0, 2],
-            [['sat'], -180.1, 0, 1, 100, 150, 1.0, 1],
-            [['sat'], 180.1, 0, 1, 100, 150, 1.0, 1],
-            [['sat'], -180, 180.1, 1, 100, 150, 1.0, 1],
-            [['sat'], 180, -180.1, 1, 100, 150, 1.0, 1],
-            [['sat'], 0, 0, -1, 100, 150, 1.0, 1],
-            [['sat'], 0, 0, 18, 100, 150, 1.0, 1],
-            [['sat'], 0, 0, 0, 100, 150, 1.0, 0],
-            [['sat'], 0, 0, 17, 100, 150, 1.0, 0],
-            [['sat'], 0, 0, 0, 49, 150, 1.0, 1],
-            [['sat'], 0, 0, 0, 50, 150, 1.0, 0],
-            [['sat'], 0, 0, 0, 650, 150, 1.0, 0],
-            [['sat'], 0, 0, 0, 651, 150, 1.0, 1],
-            [['sat'], 0, 0, 0, 100, 49, 1.0, 1],
-            [['sat'], 0, 0, 0, 100, 50, 1.0, 0],
-            [['sat'], 0, 0, 0, 100, 450, 1.0, 0],
-            [['sat'], 0, 0, 0, 100, 451, 1.0, 1],
-            [['sat'], 0, 0, 0, 100, 150, 0.9, 1],
-            [['sat'], 0, 0, 0, 100, 150, 1.0, 0],
-            [['sat'], 0, 0, 0, 100, 150, 4.0, 0],
-            [['sat'], 0, 0, 0, 100, 150, 4.1, 1],
-            [['sat'], 0, 0, 0, 100, 150, 1.0, 0],
+            [self::LAYERS, -180.1, 0, 1, 100, 150, 1.0, 1],
+            [self::LAYERS, 180.1, 0, 1, 100, 150, 1.0, 1],
+            [self::LAYERS, -180, 180.1, 1, 100, 150, 1.0, 1],
+            [self::LAYERS, 180, -180.1, 1, 100, 150, 1.0, 1],
+            [self::LAYERS, 0, 0, -1, 100, 150, 1.0, 1],
+            [self::LAYERS, 0, 0, 18, 100, 150, 1.0, 1],
+            [self::LAYERS, 0, 0, 0, 100, 150, 1.0, 0],
+            [self::LAYERS, 0, 0, 17, 100, 150, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 49, 150, 1.0, 1],
+            [self::LAYERS, 0, 0, 0, 50, 150, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 650, 150, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 651, 150, 1.0, 1],
+            [self::LAYERS, 0, 0, 0, 100, 49, 1.0, 1],
+            [self::LAYERS, 0, 0, 0, 100, 50, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 100, 450, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 100, 451, 1.0, 1],
+            [self::LAYERS, 0, 0, 0, 100, 150, 0.9, 1],
+            [self::LAYERS, 0, 0, 0, 100, 150, 1.0, 0],
+            [self::LAYERS, 0, 0, 0, 100, 150, 4.0, 0],
+            [self::LAYERS, 0, 0, 0, 100, 150, 4.1, 1],
+            [self::LAYERS, 0, 0, 0, 100, 150, 1.0, 0],
         ];
+    }
+
+    /** @test */
+    public function jsonSerialize_givenParameters_validJsonIsReturned(): void
+    {
+        $model = new YandexMapParameters();
+        $model->setLayers(new StringList(self::LAYERS));
+        $model->setLongitude(self::LONGITUDE);
+        $model->setLatitude(self::LATITUDE);
+        $model->setZoom(self::ZOOM);
+        $model->setWidth(self::WIDTH);
+        $model->setHeight(self::HEIGHT);
+        $model->setScale(self::SCALE);
+
+        $json = json_encode($model);
+
+        $this->assertEquals(json_encode(self::JSON_ARRAY), $json);
     }
 }

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class YandexMapParameters implements ModelInterface
+class YandexMapParameters implements ModelInterface, \JsonSerializable
 {
     /**
      * @Assert\Count(min = 1)
@@ -137,5 +137,18 @@ class YandexMapParameters implements ModelInterface
     public function setScale(float $scale): void
     {
         $this->scale = $scale;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'layers' => $this->layers->toArray(),
+            'longitude' => $this->longitude,
+            'latitude' => $this->latitude,
+            'zoom' => $this->zoom,
+            'width' => $this->width,
+            'height' => $this->height,
+            'scale' => $this->scale,
+        ];
     }
 }
