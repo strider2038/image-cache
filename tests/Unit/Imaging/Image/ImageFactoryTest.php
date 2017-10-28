@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactory;
@@ -43,6 +44,36 @@ class ImageFactoryTest extends TestCase
         $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->fileOperations = $this->givenFileOperations();
+    }
+
+    /** @test */
+    public function create_givenStreamAndSaveOptions_imageIsReturned(): void
+    {
+        $factory = $this->createImageFactory();
+        $stream = $this->givenStreamWithData();
+        $saveOptions = \Phake::mock(SaveOptions::class);
+        $this->givenImageValidator_hasBlobValidImageMimeType_returns(true);
+
+        $image = $factory->create($stream, $saveOptions);
+
+        $this->assertSame($stream, $image->getData());
+        $this->assertSame($saveOptions, $image->getSaveOptions());
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
+     * @expectedExceptionCode 415
+     * @expectedExceptionMessage Image has unsupported mime type
+     */
+    public function create_givenImageHasInvalidMimeType_exceptionThrown(): void
+    {
+        $factory = $this->createImageFactory();
+        $stream = $this->givenStreamWithData();
+        $saveOptions = \Phake::mock(SaveOptions::class);
+        $this->givenImageValidator_hasBlobValidImageMimeType_returns(false);
+
+        $factory->create($stream, $saveOptions);
     }
 
     /** @test */
@@ -177,5 +208,13 @@ class ImageFactoryTest extends TestCase
         \Phake::when($this->imageValidator)
             ->hasBlobValidImageMimeType(\Phake::anyParameters())
             ->thenReturn($value);
+    }
+
+    private function givenStreamWithData(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($stream)->getContents()->thenReturn(self::DATA);
+
+        return $stream;
     }
 }

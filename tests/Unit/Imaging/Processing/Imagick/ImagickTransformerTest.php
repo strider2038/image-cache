@@ -10,8 +10,6 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Imagick;
 
-use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformer;
 use Strider2038\ImgCache\Imaging\Processing\Rectangle;
 use Strider2038\ImgCache\Imaging\Processing\Size;
@@ -27,13 +25,9 @@ class ImagickTransformerTest extends FileTestCase
     /** @var \Imagick */
     private $imagick;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-
     protected function setUp()
     {
         $this->imagick = new \Imagick($this->givenAssetFile(self::IMAGE_BOX_JPG));
-        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
     }
 
     /** @test */
@@ -65,33 +59,18 @@ class ImagickTransformerTest extends FileTestCase
     }
 
     /** @test */
-    public function getImage_givenImage_imageIsReturnedWithTheSameContents(): void
+    public function getData_givenImage_imageIsReturnedWithTheSameContents(): void
     {
         $transformer = $this->createTransformer();
         $expectedData = $this->imagick->getImageBlob();
-        $createdImage = $this->givenImageFactory_createFromData_returnsImage();
 
-        $image = $transformer->getImage();
+        $data = $transformer->getData();
 
-        $this->assertImageFactory_createFromData_isCalledOnceWith($expectedData);
-        $this->assertSame($createdImage, $image);
+        $this->assertSame($expectedData, $data->getContents());
     }
 
     private function createTransformer(): ImagickTransformer
     {
-        return new ImagickTransformer($this->imagick, $this->imageFactory);
-    }
-
-    private function givenImageFactory_createFromData_returnsImage(): Image
-    {
-        $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromData(\Phake::anyParameters())->thenReturn($image);
-
-        return $image;
-    }
-
-    private function assertImageFactory_createFromData_isCalledOnceWith($expectedData): void
-    {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromData($expectedData);
+        return new ImagickTransformer($this->imagick);
     }
 }

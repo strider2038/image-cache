@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Core\StreamInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageTransformerFactoryInterface
 {
-    public function createTransformerForImage(Image $image): ImageTransformerInterface;
+    public function createTransformer(StreamInterface $stream): ImageTransformerInterface;
 }

@@ -31,6 +31,7 @@
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Rename ImageCache to ImageStorage? ImgCache to CachedImageStorage?
+- [ ] Refactor SaveOptions to be ignored while saving
 
 # IDEAS
 - [ ] Google map source (inspect licensing problems)

@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Core\StreamInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -19,6 +19,8 @@ interface ImageTransformerInterface
 {
     public function resize(SizeInterface $size): ImageTransformerInterface;
     public function crop(RectangleInterface $rectangle): ImageTransformerInterface;
+    public function setCompressionQuality(int $quality): ImageTransformerInterface;
+    public function writeToFile(string $filename): ImageTransformerInterface;
     public function getSize(): SizeInterface;
-    public function getImage(): Image;
+    public function getData(): StreamInterface;
 }

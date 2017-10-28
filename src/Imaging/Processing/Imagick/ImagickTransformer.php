@@ -10,8 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing\Imagick;
 
-use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\StringStream;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
 use Strider2038\ImgCache\Imaging\Processing\RectangleInterface;
 use Strider2038\ImgCache\Imaging\Processing\Size;
@@ -25,13 +25,9 @@ class ImagickTransformer implements ImageTransformerInterface
     /** @var \Imagick */
     private $imagick;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-
-    public function __construct(\Imagick $imagick, ImageFactoryInterface $imageFactory)
+    public function __construct(\Imagick $imagick)
     {
         $this->imagick = $imagick;
-        $this->imageFactory = $imageFactory;
     }
 
     public function resize(SizeInterface $size): ImageTransformerInterface
@@ -58,9 +54,19 @@ class ImagickTransformer implements ImageTransformerInterface
         return new Size($this->imagick->getImageWidth(), $this->imagick->getImageHeight());
     }
 
-    public function getImage(): Image
+    public function getData(): StreamInterface
     {
         $data = $this->imagick->getImageBlob();
-        return $this->imageFactory->createFromData($data);
+        return new StringStream($data);
+    }
+
+    public function setCompressionQuality(int $quality): ImageTransformerInterface
+    {
+        // TODO: Implement setCompressionQuality() method.
+    }
+
+    public function writeToFile(string $filename): ImageTransformerInterface
+    {
+        // TODO: Implement writeToFile() method.
     }
 }

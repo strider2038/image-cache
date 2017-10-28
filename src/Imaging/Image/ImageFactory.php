@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Core\StringStream;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
@@ -41,6 +42,15 @@ class ImageFactory implements ImageFactoryInterface
         $this->saveOptionsFactory = $saveOptionsFactory;
         $this->imageValidator = $imageValidator;
         $this->fileOperations = $fileOperations;
+    }
+
+    public function create(StreamInterface $data, SaveOptions $saveOptions): Image
+    {
+        if (!$this->imageValidator->hasBlobValidImageMimeType($data->getContents())) {
+            throw new InvalidMediaTypeException('Image has unsupported mime type');
+        }
+
+        return new Image($saveOptions, $data);
     }
 
     public function createFromFile(string $filename): Image
