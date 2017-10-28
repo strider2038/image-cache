@@ -74,7 +74,7 @@ class ImageValidatorTest extends FileTestCase
         $validator = $this->createImageValidator();
         $blob = file_get_contents($filename);
 
-        $isValid = $validator->hasBlobValidImageMimeType($blob);
+        $isValid = $validator->hasDataValidImageMimeType($blob);
 
         $this->assertEquals($expectedIsValid, $isValid);
     }
@@ -116,8 +116,6 @@ class ImageValidatorTest extends FileTestCase
 
     private function createImageValidator(): ImageValidator
     {
-        $validator = new ImageValidator();
-
-        return $validator;
+        return new ImageValidator();
     }
 }

@@ -17,6 +17,6 @@ interface ImageValidatorInterface
 {
     public function isValidImageMimeType(string $mime): bool;
     public function hasFileValidImageMimeType(string $filename): bool;
-    public function hasBlobValidImageMimeType(string $blob): bool;
+    public function hasDataValidImageMimeType(string $data): bool;
     public function hasValidImageExtension(string $filename): bool;
 }

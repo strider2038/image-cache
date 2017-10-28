@@ -46,7 +46,7 @@ class ImageFactory implements ImageFactoryInterface
 
     public function create(StreamInterface $data, SaveOptions $saveOptions): Image
     {
-        if (!$this->imageValidator->hasBlobValidImageMimeType($data->getContents())) {
+        if (!$this->imageValidator->hasDataValidImageMimeType($data->getContents())) {
             throw new InvalidMediaTypeException('Image has unsupported mime type');
         }
 
@@ -73,7 +73,7 @@ class ImageFactory implements ImageFactoryInterface
 
     public function createFromData(string $data): Image
     {
-        if (!$this->imageValidator->hasBlobValidImageMimeType($data)) {
+        if (!$this->imageValidator->hasDataValidImageMimeType($data)) {
             throw new InvalidMediaTypeException('Image has unsupported mime type');
         }
 

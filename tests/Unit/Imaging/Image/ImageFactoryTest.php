@@ -52,7 +52,7 @@ class ImageFactoryTest extends TestCase
         $factory = $this->createImageFactory();
         $stream = $this->givenStreamWithData();
         $saveOptions = \Phake::mock(SaveOptions::class);
-        $this->givenImageValidator_hasBlobValidImageMimeType_returns(true);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
 
         $image = $factory->create($stream, $saveOptions);
 
@@ -71,7 +71,7 @@ class ImageFactoryTest extends TestCase
         $factory = $this->createImageFactory();
         $stream = $this->givenStreamWithData();
         $saveOptions = \Phake::mock(SaveOptions::class);
-        $this->givenImageValidator_hasBlobValidImageMimeType_returns(false);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
 
         $factory->create($stream, $saveOptions);
     }
@@ -146,7 +146,7 @@ class ImageFactoryTest extends TestCase
     public function createFromData_givenBlob_imageIsReturned(): void
     {
         $factory = $this->createImageFactory();
-        $this->givenImageValidator_hasBlobValidImageMimeType_returns(true);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
 
         $image = $factory->createFromData(self::DATA);
@@ -164,7 +164,7 @@ class ImageFactoryTest extends TestCase
     public function createFromData_givenImageHasInvalidMimeType_exceptionThrown(): void
     {
         $factory = $this->createImageFactory();
-        $this->givenImageValidator_hasBlobValidImageMimeType_returns(false);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
 
         $factory->createFromData(self::DATA);
     }
@@ -203,10 +203,10 @@ class ImageFactoryTest extends TestCase
             ->thenReturn($value);
     }
 
-    private function givenImageValidator_hasBlobValidImageMimeType_returns(bool $value): void
+    private function givenImageValidator_hasDataValidImageMimeType_returns(bool $value): void
     {
         \Phake::when($this->imageValidator)
-            ->hasBlobValidImageMimeType(\Phake::anyParameters())
+            ->hasDataValidImageMimeType(\Phake::anyParameters())
             ->thenReturn($value);
     }
 

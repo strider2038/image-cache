@@ -22,23 +22,28 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSource;
+use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 class YandexMapSourceTest extends TestCase
 {
     private const KEY = 'key';
     private const QUERY_PARAMETERS = ['parameter' => 'value'];
     private const QUERY_PARAMETERS_WITH_KEY = ['parameter' => 'value', 'key' => 'key'];
-    private const BLOB = 'blob';
+    private const IMAGE_BODY = 'image_body';
 
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
+    /** @var ImageValidatorInterface */
+    private $imageValidator;
+
     /** @var ClientInterface */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
+        $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->client = \Phake::mock(ClientInterface::class);
     }
 
@@ -48,9 +53,10 @@ class YandexMapSourceTest extends TestCase
         $source = $this->createSource();
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
-        $this->givenRespose_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
+        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
         $expectedImage = $this->givenImageFactory_createFromData_returnsImage();
-        $this->givenResponse_getBody_returnsStreamWithBlob($response);
+        $this->givenResponse_getBody_returnsStreamWithImageBody($response);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
 
         $image = $source->get($query);
 
@@ -65,8 +71,9 @@ class YandexMapSourceTest extends TestCase
         $source = $this->createSource(self::KEY);
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
-        $this->givenRespose_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
-        $this->givenResponse_getBody_returnsStreamWithBlob($response);
+        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
+        $this->givenResponse_getBody_returnsStreamWithImageBody($response);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
 
         $source->get($query);
 
@@ -84,7 +91,7 @@ class YandexMapSourceTest extends TestCase
         $source = $this->createSource();
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
-        $this->givenRespose_getStatusCode_returns($response, HttpStatusCodeEnum::BAD_REQUEST);
+        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::BAD_REQUEST);
 
         $source->get($query);
     }
@@ -104,9 +111,27 @@ class YandexMapSourceTest extends TestCase
         $source->get($query);
     }
 
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Unsupported mime type in response from API
+     */
+    public function get_givenResponseBodyHasUnsupportedMimeType_exceptionThrown(): void
+    {
+        $source = $this->createSource();
+        $query = $this->givenQueryParametersCollection();
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
+        $this->givenResponse_getBody_returnsStreamWithImageBody($response);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
+
+        $source->get($query);
+    }
+
     private function createSource(string $key = ''): YandexMapSource
     {
-        return new YandexMapSource($this->imageFactory, $this->client, $key);
+        return new YandexMapSource($this->imageFactory, $this->imageValidator, $this->client, $key);
     }
 
     private function givenClient_request_returnsResponse(): ResponseInterface
@@ -145,7 +170,7 @@ class YandexMapSourceTest extends TestCase
         return $query;
     }
 
-    private function givenRespose_getStatusCode_returns(ResponseInterface $response, int $code): void
+    private function givenResponse_getStatusCode_returns(ResponseInterface $response, int $code): void
     {
         \Phake::when($response)->getStatusCode()->thenReturn($code);
     }
@@ -153,20 +178,25 @@ class YandexMapSourceTest extends TestCase
     private function givenImageFactory_createFromData_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromData(self::BLOB)->thenReturn($image);
+        \Phake::when($this->imageFactory)->createFromData(self::IMAGE_BODY)->thenReturn($image);
 
         return $image;
     }
 
-    private function givenResponse_getBody_returnsStreamWithBlob(ResponseInterface $response): void
+    private function givenResponse_getBody_returnsStreamWithImageBody(ResponseInterface $response): void
     {
         $body = \Phake::mock(StreamInterface::class);
-        \Phake::when($body)->getContents()->thenReturn(self::BLOB);
+        \Phake::when($body)->getContents()->thenReturn(self::IMAGE_BODY);
         \Phake::when($response)->getBody(\Phake::anyParameters())->thenReturn($body);
     }
 
     private function assertResponse_getBody_isCalledOnce(ResponseInterface $response): void
     {
         \Phake::verify($response, \Phake::times(1))->getBody();
+    }
+
+    private function givenImageValidator_hasDataValidImageMimeType_returns(bool $value): void
+    {
+        \Phake::when($this->imageValidator)->hasDataValidImageMimeType(self::IMAGE_BODY)->thenReturn($value);
     }
 }
