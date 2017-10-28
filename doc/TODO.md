@@ -12,9 +12,8 @@
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
 - [ ] Yandex Static Map source
-  - refactor image classes to data object and processing service
-  - response mime type detection and validation
-  - format conversion
+  - logging
+  - yandex map api mock for functional test
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations

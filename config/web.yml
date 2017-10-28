@@ -63,7 +63,7 @@ services:
     arguments:
       - '%image_cache.base_directory%'
       - '@file_operations'
-      - '@image_factory'
+      - '@image_processor'
       - '@thumbnail_image_extractor'
 
   # imaging/image
@@ -105,16 +105,17 @@ services:
     class: \Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator
   image_processor:
     class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
-    arguments: ['@imagick_engine']
-  imagick_engine:
-    class: \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine
-    arguments: ['@file_operations']
-    calls:
-      - [setLogger, ['@logger']]
+    arguments:
+      - '@imagick_transformer_factory'
+      - '@image_factory'
+  imagick_transformer_factory:
+    class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
+    arguments:
+      - '@file_operations'
 
   # imaging/transformation
   transformations_creator:
-    class: \Strider2038\ImgCache\Imaging\Transformation\TransformationsCreator
+    class: \Strider2038\ImgCache\Imaging\Transformation\TransformationCreator
     arguments: ['@transformation_factory_flyweight']
   transformation_factory_flyweight:
     class: \Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight

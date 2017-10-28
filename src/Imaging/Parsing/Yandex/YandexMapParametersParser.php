@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersFactoryInterface;
+use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -23,6 +24,9 @@ class YandexMapParametersParser implements YandexMapParametersParserInterface
     private const PARAMETERS_DELIMITER = '_';
     private const KEY_VALUE_DELIMITER = '=';
 
+    /** @var ImageValidatorInterface */
+    private $imageValidator;
+
     /** @var ValueConfiguratorFactoryInterface */
     private $valueConfiguratorFactory;
 
@@ -30,29 +34,24 @@ class YandexMapParametersParser implements YandexMapParametersParserInterface
     private $parametersFactory;
 
     public function __construct(
+        ImageValidatorInterface $imageValidator,
         ValueConfiguratorFactoryInterface $valueConfiguratorFactory,
         YandexMapParametersFactoryInterface $parametersFactory
     ) {
+        $this->imageValidator = $imageValidator;
         $this->valueConfiguratorFactory = $valueConfiguratorFactory;
         $this->parametersFactory = $parametersFactory;
     }
 
     public function parse(string $key): YandexMapParameters
     {
-        $path = pathinfo($key);
-        $extension = $path['extension'] ?? '';
-        $filename = $path['filename'] ?? '';
-
-        if ($extension !== 'jpg') {
-            throw new InvalidRequestValueException(sprintf(
-                'Unsupported image extension "%s" for "%s". Only "jpg" is allowed.',
-                $extension,
-                $key
-            ));
+        if (!$this->imageValidator->hasValidImageExtension($key)) {
+            throw new InvalidRequestValueException(sprintf('Unsupported image extension for filename "%s".', $key));
         }
 
         $parameters = $this->parametersFactory->create();
 
+        $filename = pathinfo($key, PATHINFO_FILENAME);
         $rawParameters = explode(self::PARAMETERS_DELIMITER, $filename);
         foreach ($rawParameters as $parameter) {
             $parsedParameter = explode(self::KEY_VALUE_DELIMITER, $parameter);

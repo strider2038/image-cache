@@ -16,10 +16,14 @@ use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersFactoryInterface;
+use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 class YandexMapParametersParserTest extends TestCase
 {
     private const INVALID_KEY = 'key';
+
+    /** @var ImageValidatorInterface */
+    private $imageValidator;
 
     /** @var ValueConfiguratorFactoryInterface */
     private $valueConfiguratorFactory;
@@ -27,8 +31,9 @@ class YandexMapParametersParserTest extends TestCase
     /** @var YandexMapParametersFactoryInterface */
     private $parametersFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
+        $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->valueConfiguratorFactory = \Phake::mock(ValueConfiguratorFactoryInterface::class);
         $this->parametersFactory = \Phake::mock(YandexMapParametersFactoryInterface::class);
     }
@@ -42,6 +47,7 @@ class YandexMapParametersParserTest extends TestCase
     public function parse_givenKeyWithInvalidExtension_exceptionThrown(): void
     {
         $parser = $this->createParser();
+        $this->givenImageValidator_hasValidImageExtension_returns(self::INVALID_KEY, false);
 
         $parser->parse(self::INVALID_KEY);
     }
@@ -61,6 +67,7 @@ class YandexMapParametersParserTest extends TestCase
         $parser = $this->createParser();
         $expectedParameters = $this->givenParametersFactory_create_returnsParameters();
         $configurator = $this->givenValueConfiguratorFactory_create_returnsValueConfigurator($parameterName);
+        $this->givenImageValidator_hasValidImageExtension_returns($key, true);
 
         $parameters = $parser->parse($key);
 
@@ -92,6 +99,7 @@ class YandexMapParametersParserTest extends TestCase
         $parser = $this->createParser();
         $expectedParameters = $this->givenParametersFactory_create_returnsParameters();
         $this->givenValueConfiguratorFactory_create_returnsValueConfigurator(\Phake::anyParameters());
+        $this->givenImageValidator_hasValidImageExtension_returns($key, true);
 
         $parameters = $parser->parse($key);
 
@@ -110,7 +118,11 @@ class YandexMapParametersParserTest extends TestCase
 
     private function createParser(): YandexMapParametersParser
     {
-        return new YandexMapParametersParser($this->valueConfiguratorFactory, $this->parametersFactory);
+        return new YandexMapParametersParser(
+            $this->imageValidator,
+            $this->valueConfiguratorFactory,
+            $this->parametersFactory
+        );
     }
 
     private function givenParametersFactory_create_returnsParameters(): YandexMapParameters
@@ -141,5 +153,14 @@ class YandexMapParametersParserTest extends TestCase
     private function assertValueConfiguratorFactory_create_isCalledTimes(int $expectedTimes): void
     {
         \Phake::verify($this->valueConfiguratorFactory, \Phake::times($expectedTimes))->create(\Phake::anyParameters());
+    }
+
+    /**
+     * @param $filename
+     * @param $value
+     */
+    private function givenImageValidator_hasValidImageExtension_returns($filename, $value): void
+    {
+        \Phake::when($this->imageValidator)->hasValidImageExtension($filename)->thenReturn($value);
     }
 }

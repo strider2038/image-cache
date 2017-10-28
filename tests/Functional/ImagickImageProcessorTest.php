@@ -17,7 +17,7 @@ use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImagickImageProcessor extends FunctionalTestCase
+class ImagickImageProcessorTest extends FunctionalTestCase
 {
     private const RUNTIME_SUBDIRECTORY = self::RUNTIME_DIRECTORY . '/subdirectory';
     private const PNG_ORIGINAL_FILENAME = self::RUNTIME_DIRECTORY . '/original.png';

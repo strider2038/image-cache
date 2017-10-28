@@ -23,7 +23,7 @@ services:
     arguments:
       - '%image_cache.base_directory%'
       - '@file_operations'
-      - '@image_factory'
+      - '@image_processor'
       - '@yandex_map_image_extractor'
 
   # imaging/image
@@ -45,6 +45,7 @@ services:
   yandex_map_parameters_parser:
     class: Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser
     arguments:
+      - '@image_validator'
       - '@yandex_map_value_configurator_factory'
       - '@yandex_map_parameters_factory'
   yandex_map_value_configurator_factory:
@@ -63,11 +64,21 @@ services:
     class: Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSource
     arguments:
       - '@image_factory'
+      - '@image_validator'
       - '@yandex_map_client'
 
   # imaging/processing
   save_options_factory:
     class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+  image_processor:
+    class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
+    arguments:
+      - '@imagick_transformer_factory'
+      - '@image_factory'
+  imagick_transformer_factory:
+    class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
+    arguments:
+      - '@file_operations'
 
   # imaging/validation
   image_validator:
