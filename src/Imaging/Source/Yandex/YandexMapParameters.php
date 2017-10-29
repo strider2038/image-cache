@@ -22,7 +22,10 @@ class YandexMapParameters implements ModelInterface, \JsonSerializable
     /**
      * @Assert\Count(min = 1)
      * @Assert\All({
-     *     @Assert\Choice({"map", "sat", "skl", "trf"})
+     *     @Assert\Choice(
+     *      choices={"map", "sat", "skl", "trf"},
+     *      strict=true
+     *     )
      * })
      * @return StringList
      */

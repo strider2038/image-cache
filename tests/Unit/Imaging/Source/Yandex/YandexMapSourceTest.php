@@ -140,7 +140,10 @@ class YandexMapSourceTest extends TestCase
 
     private function createSource(string $key = ''): YandexMapSource
     {
-        return new YandexMapSource($this->imageFactory, $this->imageValidator, $this->client, $key, $this->logger);
+        $source = new YandexMapSource($this->imageFactory, $this->imageValidator, $this->client, $key);
+        $source->setLogger($this->logger);
+
+        return $source;
     }
 
     private function givenClient_request_returnsResponse(): ResponseInterface

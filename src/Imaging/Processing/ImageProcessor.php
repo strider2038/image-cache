@@ -32,12 +32,16 @@ class ImageProcessor implements ImageProcessorInterface
 
     public function __construct(
         ImageTransformerFactoryInterface $transformerFactory,
-        ImageFactoryInterface $imageFactory,
-        LoggerInterface $logger = null
+        ImageFactoryInterface $imageFactory
     ) {
         $this->transformerFactory = $transformerFactory;
         $this->imageFactory = $imageFactory;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function process(Image $image, ProcessingConfiguration $configuration): Image

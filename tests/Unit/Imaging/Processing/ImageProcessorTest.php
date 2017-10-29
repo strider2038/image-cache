@@ -151,7 +151,10 @@ class ImageProcessorTest extends TestCase
 
     private function createImageProcessor(): ImageProcessor
     {
-        return new ImageProcessor($this->transformerFactory, $this->imageFactory, $this->logger);
+        $imageProcessor = new ImageProcessor($this->transformerFactory, $this->imageFactory);
+        $imageProcessor->setLogger($this->logger);
+
+        return $imageProcessor;
     }
 
     private function givenProcessingConfiguration_getSaveOptions_returnsSaveOptions(

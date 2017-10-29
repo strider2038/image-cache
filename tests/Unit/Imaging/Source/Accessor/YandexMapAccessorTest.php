@@ -96,7 +96,10 @@ class YandexMapAccessorTest extends TestCase
 
     private function createAccessor(): YandexMapAccessor
     {
-        return new YandexMapAccessor($this->validator, $this->formatter, $this->source, $this->logger);
+        $accessor = new YandexMapAccessor($this->validator, $this->formatter, $this->source);
+        $accessor->setLogger($this->logger);
+
+        return $accessor;
     }
 
     private function givenValidator_validate_returnViolations(

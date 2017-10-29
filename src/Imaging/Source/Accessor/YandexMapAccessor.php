@@ -41,13 +41,17 @@ class YandexMapAccessor implements YandexMapAccessorInterface
     public function __construct(
         ModelValidatorInterface $validator,
         ViolationsFormatterInterface $formatter,
-        YandexMapSourceInterface $source,
-        LoggerInterface $logger = null
+        YandexMapSourceInterface $source
     ) {
         $this->validator = $validator;
         $this->formatter = $formatter;
         $this->source = $source;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function get(YandexMapParameters $parameters): Image

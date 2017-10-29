@@ -47,14 +47,18 @@ class YandexMapSource implements YandexMapSourceInterface
         ImageFactoryInterface $imageFactory,
         ImageValidatorInterface $imageValidator,
         ClientInterface $client,
-        string $key = '',
-        LoggerInterface $logger = null
+        string $key = ''
     ) {
         $this->imageFactory = $imageFactory;
         $this->imageValidator = $imageValidator;
         $this->client = $client;
         $this->key = $key;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function get(QueryParametersCollection $queryParameters): Image
@@ -71,9 +75,13 @@ class YandexMapSource implements YandexMapSourceInterface
         }
 
         try {
-            $response = $this->client->request(HttpMethodEnum::GET, '', [
-                RequestOptions::QUERY => $queryParameters->toArray()
-            ]);
+            $response = $this->client->request(
+                HttpMethodEnum::GET,
+                '',
+                [
+                    RequestOptions::QUERY => $queryParameters->toArray()
+                ]
+            );
         } catch (\Exception $exception) {
             throw new BadApiResponse(
                 'Unexpected response from API',
