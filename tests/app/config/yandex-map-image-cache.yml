@@ -1,16 +1,10 @@
 parameters:
   image_cache.base_directory: '%test.web_directory%'
-  yandex_map_client.parameters:
-    base_uri: 'https://static-maps.yandex.ru/1.x/'
 
 services:
   # external
   filesystem:
     class: \Symfony\Component\Filesystem\Filesystem
-  yandex_map_client:
-    class: GuzzleHttp\Client
-    arguments:
-      - '%yandex_map_client.parameters%'
 
   # core components
   file_operations:
@@ -65,7 +59,7 @@ services:
     arguments:
       - '@image_factory'
       - '@image_validator'
-      - '@yandex_map_client'
+      - '@client_mock'
 
   # imaging/processing
   save_options_factory:
