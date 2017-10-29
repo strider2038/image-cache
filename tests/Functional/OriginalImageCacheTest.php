@@ -29,7 +29,7 @@ class OriginalImageCacheTest extends FunctionalTestCase
     /** @var ImageCache */
     private $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $container = $this->loadContainer('original-image-cache.yml');

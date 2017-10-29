@@ -11,170 +11,212 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Psr\Log\LoggerInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessor;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingEngineInterface;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingImageInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageTransformerFactoryInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
-use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 class ImageProcessorTest extends TestCase
 {
-    use ImageTrait;
+    use LoggerTrait;
 
-    /** @var ProcessingEngineInterface */
-    private $processingEngine;
+    private const FILENAME = 'filename';
+    private const QUALITY = 75;
 
-    protected function setUp()
+    /** @var ImageTransformerFactoryInterface */
+    private $transformerFactory;
+
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    protected function setUp(): void
     {
-        $this->processingEngine = \Phake::mock(ProcessingEngineInterface::class);
+        $this->transformerFactory = \Phake::mock(ImageTransformerFactoryInterface::class);
+        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
+        $this->logger = $this->givenLogger();
     }
 
-    public function testProcess_NoTransformationsInRequestConfiguration_TransformationsAreNotAppliedToProcessingImage(): void
+    /** @test */
+    public function process_givenImageAndProcessingConfiguration_processedImageIsReturned(): void
     {
         $processor = $this->createImageProcessor();
-        $configuration = $this->givenProcessingConfiguration();
-        $sourceImage = $this->givenImage();
-        $processingImage = $this->givenProcessingEngine_Open_ReturnsProcessingImage($sourceImage);
+        $image = $this->givenImage();
+        $stream = $this->givenImage_getData_returnsStream($image);
+        $processingConfiguration = \Phake::mock(ProcessingConfiguration::class);
+        $transformation = $this->givenProcessingConfiguration_getTransformations_returnsCollectionWithTransformation($processingConfiguration);
+        $transformer = $this->givenTransformerFactory_createTransformer_returnsTransformer($stream);
+        $saveOptions = $this->givenProcessingConfiguration_getSaveOptions_returnsSaveOptions($processingConfiguration);
+        $expectedProcessedImage = $this->givenImageFactory_create_returnsImage();
+        $processedStream = $this->givenTransformer_getData_returnsStream($transformer);
 
-        $processedImage = $processor->process($configuration, $sourceImage);
+        $processedImage = $processor->process($image, $processingConfiguration);
 
-        $this->assertInstanceOf(ProcessingImageInterface::class, $processedImage);
-        $this->assertSame($processingImage, $processedImage);
+        $this->assertSame($expectedProcessedImage, $processedImage);
+        $this->assertImage_getData_isCalledOnce($image);
+        $this->assertTransformerFactory_createTransformer_isCalledOnceWith($stream);
+        $this->assertProcessingConfiguration_getTransformations_isCalledOnce($processingConfiguration);
+        $this->assertTransformation_apply_isCalledOnceWith($transformation, $transformer);
+        $this->assertProcessingConfiguration_getSaveOptions_isCalledOnce($processingConfiguration);
+        $this->assertImageFactory_create_isCalledOnceWith($processedStream, $saveOptions);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
-    public function testProcess_ConfigurationHasTransformations_TransformationsAppliedToProcessingImage(): void
+    /** @test */
+    public function saveToFile_givenImageAndFilename_imageIsSaved(): void
     {
         $processor = $this->createImageProcessor();
-        $transformation = $this->givenTransformation();
-        $transformations = $this->givenTransformationsCollectionWithTransformation($transformation);
-        $requestConfiguration = $this->givenProcessingConfiguration($transformations);
-        $sourceImage = $this->givenImage();
-        $processingImage = $this->givenProcessingEngine_Open_ReturnsProcessingImage($sourceImage);
+        $image = $this->givenImage();
+        $stream = $this->givenImage_getData_returnsStream($image);
+        $transformer = $this->givenTransformerFactory_createTransformer_returnsTransformer($stream);
+        $this->givenImageHasSaveOptionsWithQuality($image, self::QUALITY);
 
-        $processedImage = $processor->process($requestConfiguration, $sourceImage);
+        $processor->saveToFile($image, self::FILENAME);
 
-        $this->assertInstanceOf(ProcessingImageInterface::class, $processedImage);
-        $this->assertSame($processingImage, $processedImage);
-        $this->assertTransformationIsAppliedToProcessingImage($transformation, $processingImage);
+        $this->assertImage_getData_isCalledOnce($image);
+        $this->assertTransformerFactory_createTransformer_isCalledOnceWith($stream);
+        $this->assertImage_getSaveOptions_isCalledOnce($image);
+        $this->assertTransformer_setCompressionQuality_isCalledOnceWith($transformer, self::QUALITY);
+        $this->assertTransformer_writeToFile_isCalledOnceWith($transformer, self::FILENAME);
+        $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
-    public function testProcess_ConfigurationIsGiven_GetSaveOptionsIsCalled(): void
-    {
-        $processor = $this->createImageProcessor();
-        $saveOptions = $this->givenSaveOptions();
-        $configuration = $this->givenProcessingConfiguration(null, $saveOptions);
-        $sourceImage = $this->givenImage();
-        $processingImage = $this->givenProcessingEngine_Open_ReturnsProcessingImage($sourceImage);
+    private function givenTransformerFactory_createTransformer_returnsTransformer(
+        StreamInterface $stream
+    ): ImageTransformerInterface {
+        $transformer = \Phake::mock(ImageTransformerInterface::class);
+        \Phake::when($this->transformerFactory)->createTransformer($stream)->thenReturn($transformer);
+        \Phake::when($transformer)->setCompressionQuality(\Phake::anyParameters())->thenReturn($transformer);
+        \Phake::when($transformer)->writeToFile(\Phake::anyParameters())->thenReturn($transformer);
 
-        $processedImage = $processor->process($configuration, $sourceImage);
-
-        $this->assertInstanceOf(SaveOptions::class, $processedImage->getSaveOptions());
-        $this->assertGetSaveOptionsIsCalledOnRequestConfiguration($configuration);
-        $this->assertSaveOptionsIsCalledOnProcessingImage($processingImage, $saveOptions);
+        return $transformer;
     }
 
-    private function createImageProcessor(): ImageProcessor
+    private function assertTransformerFactory_createTransformer_isCalledOnceWith(StreamInterface $stream): void
     {
-        $processor = new ImageProcessor($this->processingEngine);
-
-        return $processor;
+        \Phake::verify($this->transformerFactory, \Phake::times(1))->createTransformer($stream);
     }
 
-    private function givenEmptyTransformationsCollection(): TransformationsCollection
-    {
-        $transformations = \Phake::mock(TransformationsCollection::class);
-
-        $traversable = \Phake::mock(\Traversable::class);
-
-        \Phake::when($transformations)
-            ->getIterator()
-            ->thenReturn($traversable);
-
-        return $transformations;
+    private function assertProcessingConfiguration_getTransformations_isCalledOnce(
+        ProcessingConfiguration $processingConfiguration
+    ): void {
+        \Phake::verify($processingConfiguration, \Phake::times(1))->getTransformations();
     }
 
-    private function givenSaveOptions(): SaveOptions
-    {
-        $saveOptions = \Phake::mock(SaveOptions::class);
-
-        return $saveOptions;
+    private function assertTransformation_apply_isCalledOnceWith(
+        TransformationInterface $transformation,
+        ImageTransformerInterface $transformer
+    ): void {
+        \Phake::verify($transformation, \Phake::times(1))->apply($transformer);
     }
 
-    private function givenTransformation(): TransformationInterface
-    {
+    private function givenProcessingConfiguration_getTransformations_returnsCollectionWithTransformation(
+        ProcessingConfiguration $processingConfiguration
+    ): TransformationInterface {
         $transformation = \Phake::mock(TransformationInterface::class);
+        $transformations = new TransformationCollection([$transformation]);
+        \Phake::when($processingConfiguration)->getTransformations()->thenReturn($transformations);
 
         return $transformation;
     }
 
-    private function givenTransformationsCollectionWithTransformation(
-        TransformationInterface $transformation
-    ): TransformationsCollection {
-        $transformations = new TransformationsCollection();
-
-        $transformations->add($transformation);
-
-        return $transformations;
+    private function assertProcessingConfiguration_getSaveOptions_isCalledOnce(
+        ProcessingConfiguration $processingConfiguration
+    ): void {
+        \Phake::verify($processingConfiguration, \Phake::times(1))->getSaveOptions();
     }
 
-    private function givenProcessingConfiguration(
-        TransformationsCollection $transformations = null,
-        SaveOptions $saveOptions = null
-    ): ProcessingConfigurationInterface {
-        $configuration = \Phake::mock(ProcessingConfigurationInterface::class);
-
-        if ($transformations === null) {
-            $transformations = $this->givenEmptyTransformationsCollection();
-        }
-
-        \Phake::when($configuration)
-            ->getTransformations()
-            ->thenReturn($transformations);
-
-        if ($saveOptions === null) {
-            $saveOptions = \Phake::mock(SaveOptions::class);
-        }
-
-        \Phake::when($configuration)
-            ->getSaveOptions()
-            ->thenReturn($saveOptions);
-
-        return $configuration;
-    }
-
-    private function givenProcessingEngine_Open_ReturnsProcessingImage(ImageInterface $extractedImage): ProcessingImageInterface
+    private function givenTransformer_getData_returnsStream(ImageTransformerInterface $transformer): StreamInterface
     {
-        $processingImage = \Phake::mock(ProcessingImageInterface::class);
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($transformer)->getData()->thenReturn($stream);
 
-        \Phake::when($extractedImage)
-            ->open($this->processingEngine)
-            ->thenReturn($processingImage);
-
-        return $processingImage;
+        return $stream;
     }
 
-    private function assertTransformationIsAppliedToProcessingImage(
-        TransformationInterface $transformation,
-        ProcessingImageInterface $processingImage
+    private function givenImage(): Image
+    {
+        return \Phake::mock(Image::class);
+    }
+
+    private function createImageProcessor(): ImageProcessor
+    {
+        $imageProcessor = new ImageProcessor($this->transformerFactory, $this->imageFactory);
+        $imageProcessor->setLogger($this->logger);
+
+        return $imageProcessor;
+    }
+
+    private function givenProcessingConfiguration_getSaveOptions_returnsSaveOptions(
+        ProcessingConfiguration $processingConfiguration
+    ): SaveOptions {
+        $saveOptions = \Phake::mock(SaveOptions::class);
+        \Phake::when($processingConfiguration)->getSaveOptions()->thenReturn($saveOptions);
+
+        return $saveOptions;
+    }
+
+    private function assertImage_getSaveOptions_isCalledOnce(Image $image): void
+    {
+        \Phake::verify($image, \Phake::times(1))->getSaveOptions();
+    }
+
+    private function assertTransformer_setCompressionQuality_isCalledOnceWith(
+        ImageTransformerInterface $transformer,
+        int $quality
     ): void {
-        \Phake::verify($transformation, \Phake::times(1))
-            ->apply($processingImage);
+        \Phake::verify($transformer, \Phake::times(1))->setCompressionQuality($quality);
     }
 
-    private function assertGetSaveOptionsIsCalledOnRequestConfiguration(
-        ProcessingConfigurationInterface $requestConfiguration
+    private function givenImageHasSaveOptionsWithQuality(Image $image, int $quality): void
+    {
+        $saveOptions = \Phake::mock(SaveOptions::class);
+        \Phake::when($image)->getSaveOptions()->thenReturn($saveOptions);
+        \Phake::when($saveOptions)->getQuality()->thenReturn($quality);
+    }
+
+    private function assertTransformer_writeToFile_isCalledOnceWith(
+        ImageTransformerInterface $transformer,
+        string $filename
     ): void {
-        \Phake::verify($requestConfiguration, \Phake::times(1))->getSaveOptions();
+        \Phake::verify($transformer, \Phake::times(1))->writeToFile($filename);
     }
 
-    private function assertSaveOptionsIsCalledOnProcessingImage(
-        ProcessingImageInterface $processingImage,
+    private function givenImage_getData_returnsStream(Image $image): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($image)->getData()->thenReturn($stream);
+
+        return $stream;
+    }
+
+    private function assertImage_getData_isCalledOnce(Image $image): void
+    {
+        \Phake::verify($image, \Phake::times(1))->getData();
+    }
+
+    private function givenImageFactory_create_returnsImage(): Image
+    {
+        $image = \Phake::mock(Image::class);
+        \Phake::when($this->imageFactory)->create(\Phake::anyParameters())->thenReturn($image);
+
+        return $image;
+    }
+
+    private function assertImageFactory_create_isCalledOnceWith(
+        StreamInterface $stream,
         SaveOptions $saveOptions
     ): void {
-        \Phake::verify($processingImage, \Phake::times(1))->setSaveOptions($saveOptions);
+        \Phake::verify($this->imageFactory, \Phake::times(1))->create($stream, $saveOptions);
     }
 }

@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
@@ -99,6 +100,7 @@ class ThumbnailKeyParserTest extends TestCase
     public function validKeyProvider(): array
     {
         return [
+            ['a', 'a.', 'a*.', ''],
             ['a.jpg', 'a.jpg', 'a*.jpg', ''],
             ['/a_q1.jpg', '/a.jpg', '/a*.jpg', 'q1'],
             ['/b_a1_b2.png', '/b.png', '/b*.png', 'a1_b2'],
@@ -111,14 +113,25 @@ class ThumbnailKeyParserTest extends TestCase
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
      * @expectedExceptionMessageRegExp  /Invalid filename .* in request/
+     * @param string $key
+     * @dataProvider invalidKeyProvider
      */
-    public function parse_givenKeyHasInvalidProcessingConfig_exceptionThrown(): void
+    public function parse_givenKeyHasInvalidProcessingConfiguration_exceptionThrown(string $key): void
     {
         $parser = $this->createThumbnailKeyParser();
-        $this->givenKeyValidator_isValidPublicFilename_returns(self::KEY_WITH_INVALID_CONFIG,true);
-        $this->givenImageValidator_hasValidImageExtension_returns(self::KEY_WITH_INVALID_CONFIG, true);
+        $this->givenKeyValidator_isValidPublicFilename_returns($key,true);
+        $this->givenImageValidator_hasValidImageExtension_returns($key, true);
 
-        $parser->parse(self::KEY_WITH_INVALID_CONFIG);
+        $parser->parse($key);
+    }
+
+    public function invalidKeyProvider(): array
+    {
+        return [
+            [self::KEY_WITH_INVALID_CONFIG],
+            [''],
+            [' '],
+        ];
     }
 
     private function createThumbnailKeyParser(): ThumbnailKeyParser
@@ -138,8 +151,8 @@ class ThumbnailKeyParserTest extends TestCase
 
     private function givenProcessingConfigurationParser_parse_returns(
         string $processingConfigurationString
-    ): ProcessingConfigurationInterface {
-        $processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
+    ): ProcessingConfiguration {
+        $processingConfiguration = \Phake::mock(ProcessingConfiguration::class);
         \Phake::when($this->processingConfigurationParser)
             ->parse($processingConfigurationString)
             ->thenReturn($processingConfiguration);

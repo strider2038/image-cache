@@ -16,10 +16,10 @@ use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
+use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -30,7 +30,7 @@ class ImageCache implements ImageCacheInterface
      * Web directory that contains image files
      * @var string
      */
-    private $baseDirectory;
+    private $webDirectory;
 
     /** @var FileOperationsInterface */
     private $fileOperations;
@@ -41,22 +41,22 @@ class ImageCache implements ImageCacheInterface
     /** @var ImageWriterInterface */
     private $imageWriter;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-    
+    /** @var ImageProcessorInterface */
+    private $imageProcessor;
+
     public function __construct(
-        string $baseDirectory,
+        string $webDirectory,
         FileOperationsInterface $fileOperations,
-        ImageFactoryInterface $imageFactory,
+        ImageProcessorInterface $imageProcessor,
         ImageExtractorInterface $imageExtractor,
         ImageWriterInterface $imageWriter = null
     ) {
         $this->fileOperations = $fileOperations;
-        if (!$this->fileOperations->isDirectory($baseDirectory)) {
-            throw new InvalidConfigurationException("Directory '{$baseDirectory}' does not exist");
+        if (!$this->fileOperations->isDirectory($webDirectory)) {
+            throw new InvalidConfigurationException("Directory '{$webDirectory}' does not exist");
         }
-        $this->baseDirectory = rtrim($baseDirectory, '/');
-        $this->imageFactory = $imageFactory;
+        $this->webDirectory = rtrim($webDirectory, '/');
+        $this->imageProcessor = $imageProcessor;
         $this->imageExtractor = $imageExtractor;
         $this->imageWriter = $imageWriter ?? new NullWriter();
     }
@@ -65,22 +65,21 @@ class ImageCache implements ImageCacheInterface
      * First request for image file extracts image from the source and puts it into cache
      * directory. Next requests will be processed by nginx.
      * @param string $key
-     * @return null|ImageInterface
+     * @return null|ImageFile
      */
-    public function get(string $key): ? ImageInterface
+    public function get(string $key): ? ImageFile
     {
         $this->validateKey($key);
 
-        /** @var ImageInterface $extractedImage */
-        $extractedImage = $this->imageExtractor->extract($key);
-        if ($extractedImage === null) {
+        $image = $this->imageExtractor->extract($key);
+        if ($image === null) {
             return null;
         }
 
-        $destinationFilename = $this->composeDestinationFilename($key);
-        $extractedImage->saveTo($destinationFilename);
+        $filename = $this->composeDestinationFilename($key);
+        $this->imageProcessor->saveToFile($image, $filename);
 
-        return $this->imageFactory->createImageFile($destinationFilename);
+        return new ImageFile($filename);
     }
 
     public function put(string $key, StreamInterface $data): void
@@ -110,12 +109,12 @@ class ImageCache implements ImageCacheInterface
 
     private function composeDestinationFilename(string $key): string
     {
-        return $this->baseDirectory . $key;
+        return $this->webDirectory . $key;
     }
 
     private function validateKey(string $key): void
     {
-        if (@$key[0] !== '/') {
+        if (strlen($key) <= 0 || $key[0] !== '/') {
             throw new InvalidValueException('Key must start with slash');
         }
     }

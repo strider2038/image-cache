@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Thumbnail;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ThumbnailKeyTest extends TestCase
@@ -22,12 +22,12 @@ class ThumbnailKeyTest extends TestCase
     private const PUBLIC_FILENAME = 'a.jpg';
     private const THUMBNAIL_MASK = 'thumbnail_mask';
 
-    /** @var ProcessingConfigurationInterface */
+    /** @var ProcessingConfiguration */
     private $processingConfiguration;
 
     protected function setUp()
     {
-        $this->processingConfiguration = \Phake::mock(ProcessingConfigurationInterface::class);
+        $this->processingConfiguration = \Phake::mock(ProcessingConfiguration::class);
     }
 
     /** @test */

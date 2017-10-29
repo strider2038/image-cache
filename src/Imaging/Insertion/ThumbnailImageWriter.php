@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Insertion;
 
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
@@ -57,7 +57,7 @@ class ThumbnailImageWriter implements ImageWriterInterface
         return $parsedKey->getThumbnailMask();
     }
 
-    private function parseKey(string $key): ThumbnailKeyInterface
+    private function parseKey(string $key): ThumbnailKey
     {
         $parsedKey = $this->keyParser->parse($key);
         if ($parsedKey->hasProcessingConfiguration()) {

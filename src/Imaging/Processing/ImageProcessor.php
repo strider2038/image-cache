@@ -10,43 +10,75 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationsCollection;
-
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageProcessor implements ImageProcessorInterface
 {
-    /** @var ProcessingEngineInterface */
-    private $processingEngine;
+    /** @var ImageTransformerFactoryInterface */
+    private $transformerFactory;
 
-    public function __construct(ProcessingEngineInterface $processingEngine)
-    {
-        $this->processingEngine = $processingEngine;
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        ImageTransformerFactoryInterface $transformerFactory,
+        ImageFactoryInterface $imageFactory
+    ) {
+        $this->transformerFactory = $transformerFactory;
+        $this->imageFactory = $imageFactory;
+        $this->logger = new NullLogger();
     }
 
-    public function process(ProcessingConfigurationInterface $configuration, ImageInterface $image): ImageInterface
+    public function setLogger(LoggerInterface $logger): void
     {
-        /** @var ProcessingImageInterface $processingImage */
-        $processingImage = $image->open($this->processingEngine);
+        $this->logger = $logger;
+    }
 
-        /** @var TransformationsCollection $transformations */
+    public function process(Image $image, ProcessingConfiguration $configuration): Image
+    {
+        $transformer = $this->createTransformer($image);
+
         $transformations = $configuration->getTransformations();
-
         foreach ($transformations as $transformation) {
             /** @var TransformationInterface $transformation */
-            $transformation->apply($processingImage);
+            $transformation->apply($transformer);
         }
 
-        /** @var SaveOptions $saveOptions */
+        $this->logger->info(sprintf('Transformations count applied to image: %d.', $transformations->count()));
+
+        $data = $transformer->getData();
         $saveOptions = $configuration->getSaveOptions();
 
-        $processingImage->setSaveOptions($saveOptions);
-
-        return $processingImage;
+        return $this->imageFactory->create($data, $saveOptions);
     }
 
+    public function saveToFile(Image $image, string $filename): void
+    {
+        $transformer = $this->createTransformer($image);
+        $saveOptions = $image->getSaveOptions();
+
+        $transformer->setCompressionQuality($saveOptions->getQuality());
+        $transformer->writeToFile($filename);
+
+        $this->logger->info(sprintf(
+            'Image was saved to file "%s" with compression quality %d.',
+            $filename,
+            $saveOptions->getQuality()
+        ));
+    }
+
+    private function createTransformer(Image $image): ImageTransformerInterface
+    {
+        return $this->transformerFactory->createTransformer($image->getData());
+    }
 }

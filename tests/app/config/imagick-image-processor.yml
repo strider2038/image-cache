@@ -1,0 +1,32 @@
+services:
+  # external
+  filesystem:
+    class: \Symfony\Component\Filesystem\Filesystem
+
+  # core components
+  file_operations:
+    class: \Strider2038\ImgCache\Core\FileOperations
+    arguments: ['@filesystem']
+
+  # imaging/processing
+  image_processor:
+    class: Strider2038\ImgCache\Imaging\Processing\ImageProcessor
+    arguments:
+      - '@imagick_transformer_factory'
+      - '@image_factory'
+  image_factory:
+    class: Strider2038\ImgCache\Imaging\Image\ImageFactory
+    arguments:
+      - '@save_options_factory'
+      - '@image_validator'
+      - '@file_operations'
+  save_options_factory:
+    class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+  imagick_transformer_factory:
+    class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
+    arguments:
+      - '@file_operations'
+
+  # imaging/validation
+  image_validator:
+    class: \Strider2038\ImgCache\Imaging\Validation\ImageValidator

@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Enum;
 
 use MyCLabs\Enum\Enum;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -33,4 +32,5 @@ class HttpStatusCodeEnum extends Enum
     public const CONFLICT               = 409;
     public const UNSUPPORTED_MEDIA_TYPE = 415;
     public const INTERNAL_SERVER_ERROR  = 500;
+    public const BAD_GATEWAY            = 502;
 }

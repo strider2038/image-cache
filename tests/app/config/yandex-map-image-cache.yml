@@ -1,0 +1,83 @@
+parameters:
+  image_cache.base_directory: '%test.web_directory%'
+
+services:
+  # external
+  filesystem:
+    class: \Symfony\Component\Filesystem\Filesystem
+
+  # core components
+  file_operations:
+    class: \Strider2038\ImgCache\Core\FileOperations
+    arguments: ['@filesystem']
+
+  # imaging
+  image_cache:
+    class: \Strider2038\ImgCache\Imaging\ImageCache
+    arguments:
+      - '%image_cache.base_directory%'
+      - '@file_operations'
+      - '@image_processor'
+      - '@yandex_map_image_extractor'
+
+  # imaging/image
+  image_factory:
+    class: \Strider2038\ImgCache\Imaging\Image\ImageFactory
+    arguments:
+      - '@save_options_factory'
+      - '@image_validator'
+      - '@file_operations'
+
+  # imaging/extraction
+  yandex_map_image_extractor:
+    class: Strider2038\ImgCache\Imaging\Extraction\YandexMapExtractor
+    arguments:
+      - '@yandex_map_parameters_parser'
+      - '@yandex_map_accessor'
+
+  # imaging/parsing
+  yandex_map_parameters_parser:
+    class: Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser
+    arguments:
+      - '@image_validator'
+      - '@yandex_map_value_configurator_factory'
+      - '@yandex_map_parameters_factory'
+  yandex_map_value_configurator_factory:
+    class: Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorFactory
+
+  # imaging/source
+  yandex_map_parameters_factory:
+    class: Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersFactory
+  yandex_map_accessor:
+    class: Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessor
+    arguments:
+      - '@model_validator'
+      - '@violations_formatter'
+      - '@yandex_map_source'
+  yandex_map_source:
+    class: Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSource
+    arguments:
+      - '@image_factory'
+      - '@image_validator'
+      - '@client_mock'
+
+  # imaging/processing
+  save_options_factory:
+    class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+  image_processor:
+    class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
+    arguments:
+      - '@imagick_transformer_factory'
+      - '@image_factory'
+  imagick_transformer_factory:
+    class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
+    arguments:
+      - '@file_operations'
+
+  # imaging/validation
+  image_validator:
+    class: \Strider2038\ImgCache\Imaging\Validation\ImageValidator
+  model_validator:
+    class: Strider2038\ImgCache\Imaging\Validation\ModelValidator
+  violations_formatter:
+    class: Strider2038\ImgCache\Imaging\Validation\ViolationsFormatter

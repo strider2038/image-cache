@@ -32,7 +32,7 @@ class ImageValidator implements ImageValidatorInterface
     public function hasFileValidImageMimeType(string $filename): bool
     {
         if (!file_exists($filename)) {
-            throw new FileNotFoundException("File '{$filename}' not found");
+            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
         }
 
         $mime = mime_content_type($filename);
@@ -40,10 +40,10 @@ class ImageValidator implements ImageValidatorInterface
         return $this->isValidImageMimeType($mime);
     }
 
-    public function hasBlobValidImageMimeType(string $blob): bool
+    public function hasDataValidImageMimeType(string $data): bool
     {
         $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_buffer($fileInfo, $blob);
+        $mime = finfo_buffer($fileInfo, $data);
         finfo_close($fileInfo);
 
         return $this->isValidImageMimeType($mime);

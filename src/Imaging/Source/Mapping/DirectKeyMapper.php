@@ -20,8 +20,6 @@ class DirectKeyMapper implements FilenameKeyMapperInterface
 {
     public function getKey(string $filename): FilenameKeyInterface
     {
-        $filenameKey = new FilenameKey($filename);
-
-        return $filenameKey;
+        return new FilenameKey($filename);
     }
 }

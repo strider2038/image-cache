@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Enum;
 
 use MyCLabs\Enum\Enum;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */

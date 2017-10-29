@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use Strider2038\ImgCache\Core\ResourceStream;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class ResourceStreamTest extends FileTestCase
@@ -43,7 +44,7 @@ class ResourceStreamTest extends FileTestCase
         bool $isWritable
     ): void {
         $filename = $filename ?? $this->givenFile();
-        $stream = $this->createResourceStream($filename, $mode);
+        $stream = $this->createResourceStream($filename, new ResourceStreamModeEnum($mode));
 
         $this->assertEquals($isReadable, $stream->isReadable());
         $this->assertEquals($isWritable, $stream->isWritable());
@@ -134,7 +135,7 @@ class ResourceStreamTest extends FileTestCase
     /** @test */
     public function write_givenFile_contentIsWrittenToFile(): void
     {
-        $stream = $this->createResourceStream(self::FILENAME_WRITE, 'w');
+        $stream = $this->createResourceStream(self::FILENAME_WRITE, self::MODE_WRITE_ONLY);
 
         $count = $stream->write(self::CONTENTS);
         $stream->close();
@@ -153,11 +154,12 @@ class ResourceStreamTest extends FileTestCase
         $this->assertEquals(substr(self::FILE_JSON_CONTENTS, 0, 4), $contents);
     }
 
-    private function createResourceStream(string $filename = null, string $mode = 'r+'): ResourceStream
-    {
+    private function createResourceStream(
+        string $filename = null,
+        string $mode = self::MODE_READ_AND_WRITE
+    ): ResourceStream {
         $filename = $filename ?? $this->givenFile();
-        $stream = new ResourceStream($filename, $mode);
 
-        return $stream;
+        return new ResourceStream($filename, new ResourceStreamModeEnum($mode));
     }
 }

@@ -17,6 +17,8 @@ class StringListTest extends TestCase
 {
     private const STRING_VALUE = 'a';
     private const STRING_CONCATENATED_VALUE = 'ba';
+    private const STRING_EXPLODED_VALUE = ['a', 'b'];
+    private const STRING_IMPLODED_VALUE = 'a,b';
 
     /** @test */
     public function construct_givenString_stringInCollection(): void
@@ -24,6 +26,16 @@ class StringListTest extends TestCase
         $list = new StringList([self::STRING_VALUE]);
 
         $this->assertContains(self::STRING_VALUE, $list->toArray());
+    }
+
+    /** @test */
+    public function add_givenString_stringValueIsInCollection(): void
+    {
+        $list = new StringList();
+
+        $list->add(self::STRING_VALUE);
+
+        $this->assertContains(self::STRING_VALUE, $list);
     }
 
     /** @test */
@@ -36,5 +48,23 @@ class StringListTest extends TestCase
         });
 
         $this->assertEquals(self::STRING_CONCATENATED_VALUE, $list->toArray()[0]);
+    }
+
+    /** @test */
+    public function implode_givenValues_implodedValuesReturned(): void
+    {
+        $list = new StringList(self::STRING_EXPLODED_VALUE);
+
+        $value = $list->implode();
+
+        $this->assertEquals(self::STRING_IMPLODED_VALUE, $value);
+    }
+
+    /** @test */
+    public function createFromString_givenString_listIsCreated(): void
+    {
+        $list = StringList::createFromString(self::STRING_IMPLODED_VALUE);
+
+        $this->assertEquals(self::STRING_EXPLODED_VALUE, $list->toArray());
     }
 }

@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Processing;
 
-use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
+use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ProcessingConfigurationParserInterface
 {
-    public function parse(string $configuration): ProcessingConfigurationInterface;
+    public function parse(string $configuration): ProcessingConfiguration;
 }

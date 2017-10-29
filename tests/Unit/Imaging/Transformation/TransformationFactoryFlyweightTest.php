@@ -10,40 +10,43 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 
-use Strider2038\ImgCache\Imaging\Transformation\ResizeFactory;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight;
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Transformation\ResizeTransformationFactory;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryInterface;
 use Strider2038\ImgCache\Tests\Support\TransformationsFactoryInterfaceMock;
 
 class TransformationFactoryFlyweightTest extends TestCase
 {
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage does not exist
      */
-    public function testConstruct_NotAClassInBuildersMap_ExceptionThrown(): void
+    public function construct_notAClassInBuildersMap_exceptionThrown(): void
     {
         new TransformationFactoryFlyweight(['a' => 'notAClass']);
     }
 
     /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage must implement
      */
-    public function testConstruct_IncorrectClassInBuildersMap_ExceptionThrown(): void
+    public function construct_incorrectClassInBuildersMap_exceptionThrown(): void
     {
         new TransformationFactoryFlyweight(['a' => self::class]);
     }
 
     /**
+     * @test
      * @param string $index
      * @param string $instance
      * @dataProvider factoryIndexProvider
      */
-    public function testFindFactory_GivenDefaultFactoriesMapAndIndex_FactoryIsReturned(
+    public function findFactory_givenDefaultFactoriesMapAndIndex_factoryIsReturned(
         string $index,
         string $instance
     ): void {
@@ -54,7 +57,8 @@ class TransformationFactoryFlyweightTest extends TestCase
         $this->assertInstanceOf($instance, $factory);
     }
 
-    public function testFindFactory_GivenCustomBuildersMapAndValidIndex_FactoryIsReturned(): void
+    /** @test */
+    public function findFactory_givenCustomBuildersMapAndValidIndex_factoryIsReturned(): void
     {
         $flyweight = new TransformationFactoryFlyweight([
             'a' => TransformationsFactoryInterfaceMock::class,
@@ -65,7 +69,8 @@ class TransformationFactoryFlyweightTest extends TestCase
         $this->assertInstanceOf(TransformationFactoryInterface::class, $factory);
     }
 
-    public function testFindFactory_GivenCustomBuildersMapAndInvalidIndex_NullIsReturned(): void
+    /** @test */
+    public function findFactory_givenCustomBuildersMapAndInvalidIndex_nullIsReturned(): void
     {
         $flyweight = new TransformationFactoryFlyweight([
             'a' => TransformationsFactoryInterfaceMock::class,
@@ -79,7 +84,7 @@ class TransformationFactoryFlyweightTest extends TestCase
     public function factoryIndexProvider(): array
     {
         return [
-            ['s', ResizeFactory::class],
+            ['s', ResizeTransformationFactory::class],
         ];
     }
 }

@@ -14,8 +14,9 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSource;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
@@ -84,11 +85,11 @@ class FilesystemSourceTest extends TestCase
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
-        $this->givenImageFactory_createImageFile_returnsImageFile(self::FILENAME_EXISTS);
+        $this->givenImageFactory_createFromFile_returnsImage(self::FILENAME_EXISTS);
 
         $image = $source->get($filenameKey);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertInstanceOf(Image::class, $image);
     }
 
     /** @test */
@@ -120,10 +121,10 @@ class FilesystemSourceTest extends TestCase
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $givenStream = $this->givenInputStream();
-        $stream = $this->givenFileOperations_openFile_isCalledOnce(
+        $stream = $this->givenFileOperations_openFile_returnsStream(
             $this->fileOperations,
             self::FILENAME_EXISTS_FULL,
-            'w+'
+            ResourceStreamModeEnum::WRITE_AND_READ
         );
 
         $source->put($filenameKey, $givenStream);
@@ -161,15 +162,15 @@ class FilesystemSourceTest extends TestCase
         return $filenameKey;
     }
 
-    private function givenImageFactory_createImageFile_returnsImageFile($imageFilename): ImageFile
+    private function givenImageFactory_createFromFile_returnsImage($imageFilename): Image
     {
-        $imageFile = \Phake::mock(ImageFile::class);
+        $image = \Phake::mock(Image::class);
 
         \Phake::when($this->imageFactory)
-            ->createImageFile($imageFilename)
-            ->thenReturn($imageFile);
+            ->createFromFile($imageFilename)
+            ->thenReturn($image);
 
-        return $imageFile;
+        return $image;
     }
 
     private function givenInputStream(): StreamInterface
@@ -180,5 +181,4 @@ class FilesystemSourceTest extends TestCase
 
         return $givenStream;
     }
-
 }

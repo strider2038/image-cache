@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -17,7 +19,8 @@ class ReadOnlyResourceStream extends ResourceStream
 {
     public function __construct(string $stream)
     {
-        parent::__construct($stream, self::MODE_READ_ONLY);
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
+        parent::__construct($stream, $mode);
     }
 
     public function write(string $string): int

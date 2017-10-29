@@ -14,7 +14,6 @@ use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */

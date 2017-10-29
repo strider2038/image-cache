@@ -45,7 +45,7 @@ class ResponseFactory implements ResponseFactoryInterface
     public function createExceptionResponse(\Throwable $exception): ResponseInterface
     {
         $code = $exception->getCode();
-        if (HttpStatusCodeEnum::isValid($code) && $code >= 400 && $code < 600) {
+        if (HttpStatusCodeEnum::isValid($code)) {
             $httpStatusCode = new HttpStatusCodeEnum($code);
         } else {
             $httpStatusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::INTERNAL_SERVER_ERROR);
@@ -70,7 +70,7 @@ class ResponseFactory implements ResponseFactoryInterface
     public function createFileResponse(HttpStatusCodeEnum $code, string $filename): ResponseInterface
     {
         if (!file_exists($filename)) {
-            throw new FileNotFoundException(sprintf("File '%s' not found", $filename));
+            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
         }
 
         $response = new Response($code);

@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Imaging\Transformation;
 
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -51,7 +50,7 @@ class TransformationFactoryFlyweight implements TransformationFactoryFlyweightIn
     public function getDefaultFactoriesMap(): array
     {
         return [
-            's' => ResizeFactory::class,
+            's' => ResizeTransformationFactory::class,
         ];
     }
 

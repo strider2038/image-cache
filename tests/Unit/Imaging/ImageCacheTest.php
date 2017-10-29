@@ -15,11 +15,11 @@ use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
 use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
+use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
@@ -36,8 +36,6 @@ class ImageCacheTest extends TestCase
     private const DELETE_KEY_FILENAME_MASK = '/c*.jpg';
     private const DELETE_KEY_DESTINATION_FILENAME_MASK = self::BASE_DIRECTORY . '/c*.jpg';
     private const DELETE_KEY_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/c.jpg';
-    private const REBUILD_KEY = '/d.jpg';
-    private const REBUILD_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/d.jpg';
 
     /** @var FileOperationsInterface */
     private $fileOperations;
@@ -45,15 +43,15 @@ class ImageCacheTest extends TestCase
     /** @var ImageExtractorInterface */
     private $imageExtractor;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
+    /** @var ImageProcessorInterface */
+    private $imageProcessor;
 
     protected function setUp()
     {
         parent::setUp();
         $this->fileOperations = $this->givenFileOperations();
         $this->imageExtractor = \Phake::mock(ImageExtractorInterface::class);
-        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
+        $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
     }
 
     /**
@@ -69,7 +67,7 @@ class ImageCacheTest extends TestCase
         new ImageCache(
             self::BASE_DIRECTORY,
             $this->fileOperations,
-            $this->imageFactory,
+            $this->imageProcessor,
             $this->imageExtractor
         );
     }
@@ -89,15 +87,12 @@ class ImageCacheTest extends TestCase
     public function get_imageExistsInSource_sourceImageSavedToWebDirectoryAndCachedImageIsReturned(): void
     {
         $cache = $this->createImageCache();
-        $extractedImage = $this->givenImageExtractor_extract_returnsImage(self::GET_KEY);
-        $createdImage = $this->givenImageFactory_CreateImageFile_ReturnsImage($this->imageFactory, self::GET_DESTINATION_FILENAME);
+        $image = $this->givenImageExtractor_extract_returnsImage(self::GET_KEY);
 
-        $image = $cache->get(self::GET_KEY);
+        $cachedImage = $cache->get(self::GET_KEY);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertImage_SavedTo_IsCalledOnce($extractedImage, self::GET_DESTINATION_FILENAME);
-        $this->assertImageFactory_CreateImageFile_IsCalledOnce($this->imageFactory, self::GET_DESTINATION_FILENAME);
-        $this->assertSame($createdImage, $image);
+        $this->assertInstanceOf(ImageFile::class, $cachedImage);
+        $this->assertImageProcessor_saveToFile_isCalledOnceWith($image);
     }
 
     /** @test */
@@ -175,7 +170,7 @@ class ImageCacheTest extends TestCase
         $cache = new ImageCache(
             self::BASE_DIRECTORY,
             $this->fileOperations,
-            $this->imageFactory,
+            $this->imageProcessor,
             $this->imageExtractor,
             $writer
         );
@@ -190,9 +185,9 @@ class ImageCacheTest extends TestCase
             ->thenReturn(null);
     }
 
-    private function givenImageExtractor_extract_returnsImage(string $imageKey): ImageInterface
+    private function givenImageExtractor_extract_returnsImage(string $imageKey): Image
     {
-        $image = \Phake::mock(ImageInterface::class);
+        $image = \Phake::mock(Image::class);
 
         \Phake::when($this->imageExtractor)
             ->extract($imageKey)
@@ -204,6 +199,12 @@ class ImageCacheTest extends TestCase
     private function givenStream(): StreamInterface
     {
         return \Phake::mock(StreamInterface::class);
+    }
+
+    private function assertImageProcessor_saveToFile_isCalledOnceWith(Image $image): void
+    {
+        \Phake::verify($this->imageProcessor, \Phake::times(1))
+            ->saveToFile($image, self::GET_DESTINATION_FILENAME);
     }
 
 }

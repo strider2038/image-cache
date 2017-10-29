@@ -39,28 +39,31 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         $this->processingConfigurationParser = $configurationParser;
     }
 
-    public function parse(string $key): ThumbnailKeyInterface
+    public function parse(string $key): ThumbnailKey
     {
         if (!$this->keyValidator->isValidPublicFilename($key)) {
-            throw new InvalidRequestValueException("Invalid filename '{$key}' in request");
+            throw new InvalidRequestValueException(sprintf('Invalid filename "%s" in request', $key));
         }
-
         if (!$this->imageValidator->hasValidImageExtension($key)) {
-            throw new InvalidRequestValueException("Unsupported image extension for '{$key}'");
+            throw new InvalidRequestValueException(sprintf('Unsupported image extension for "%s"', $key));
         }
 
         $path = pathinfo($key);
-        if (substr($path['filename'], -1, 1) === '_') {
-            throw new InvalidRequestValueException("Invalid filename '{$key}' in request");
+        $filename = trim($path['filename'] ?? '');
+        $filenameLength = strlen($filename);
+        $extension = $path['extension'] ?? '';
+        $directoryName = $path['dirname'] ?? '';
+        if ($filenameLength <= 0 || $filename[$filenameLength - 1] === '_') {
+            throw new InvalidRequestValueException(sprintf('Invalid filename "%s" in request', $key));
         }
 
-        $filename = explode('_', $path['filename']);
-        $directory = $path['dirname'] === '.' ? '' : (rtrim($path['dirname'], '/') . '/');
-        $baseFilename = array_shift($filename);
-        $sourceFilename = sprintf('%s%s.%s', $directory, $baseFilename, $path['extension']);
-        $thumbnailMask = sprintf('%s%s*.%s', $directory, $baseFilename, $path['extension']);
+        $filenameParts = explode('_', $filename);
+        $directory = $directoryName === '.' ? '' : (rtrim($directoryName, '/') . '/');
+        $baseFilename = array_shift($filenameParts);
+        $sourceFilename = sprintf('%s%s.%s', $directory, $baseFilename, $extension);
+        $thumbnailMask = sprintf('%s%s*.%s', $directory, $baseFilename, $extension);
 
-        $processingConfigurationString = implode('_', $filename);
+        $processingConfigurationString = implode('_', $filenameParts);
         $processingConfiguration = $this->processingConfigurationParser->parse($processingConfigurationString);
 
         return new ThumbnailKey($sourceFilename, $thumbnailMask, $processingConfiguration);

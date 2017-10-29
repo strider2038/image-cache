@@ -10,27 +10,49 @@
 
 namespace Strider2038\ImgCache\Collection;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class StringList extends IterableCollection
+class StringList extends ArrayCollection
 {
-    public function __construct(array $stringList = [])
+    public function __construct(array $elements = [])
     {
-        foreach ($stringList as $value) {
-            $this->add($value);
+        foreach ($elements as $key => $value) {
+            $elements[$key] = (string) $value;
         }
+        parent::__construct($elements);
     }
 
-    public function add(string $value): void
+    /**
+     * @param string $element
+     * @return bool
+     */
+    public function add($element): bool
     {
-        $this->elements[] = $value;
+        return parent::add((string) $element);
+    }
+
+    public function set($key, $value): void
+    {
+        parent::set($key, (string) $value);
     }
 
     public function process(\Closure $closure): void
     {
-        foreach ($this->elements as $key => $value) {
-            $this->elements[$key] = $closure->call($this, $value);
+        foreach ($this as $key => $value) {
+            $this[$key] = $closure->call($this, $value);
         }
+    }
+
+    public function implode(string $glue = ','): string
+    {
+        return implode($glue, $this->toArray());
+    }
+
+    public static function createFromString(string $list, $delimiter = ','): StringList
+    {
+        return new self(explode($delimiter, $list));
     }
 }

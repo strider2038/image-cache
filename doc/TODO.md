@@ -11,16 +11,29 @@
 - [x] Image writing to sources
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
+- [x] Yandex Static Map source
+- [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
+- [ ] Split ImageCache class to ImageStorage and ImageCache
+- [ ] Split ImageController to action classes
 - [ ] Yandex.Disk source
+- [ ] Migrate to collections based on Doctrine ArrayCollection
+- [ ] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
 - [ ] Support for building docker containers in Travis
+- [ ] Fix tests codestyle
 - [ ] Acceptance testing
 - [ ] Move all todos to github issues
 - [ ] Cache mechanism for source accessor
-- [ ] Performance optimization (lazy services)
+- [ ] Performance optimization (lazy services, validation cache)
 - [ ] Support for phpDocumentor
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
+- [ ] Refactor SaveOptions to be ignored while saving
+- [ ] Rename project to "Image caching microservice"
+
+# IDEAS
 - [ ] Google map source (inspect licensing problems)
+- [ ] Yandex map marker
+- [ ] Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php

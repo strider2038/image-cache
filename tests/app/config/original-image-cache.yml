@@ -18,7 +18,7 @@ services:
     arguments:
       - '%image_cache.base_directory%'
       - '@file_operations'
-      - '@image_factory'
+      - '@image_processor'
       - '@original_image_extractor'
       - '@original_image_writer'
 
@@ -57,10 +57,13 @@ services:
     class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
   image_processor:
     class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
-    arguments: ['@imagick_engine']
-  imagick_engine:
-    class: \Strider2038\ImgCache\Imaging\Processing\Adapter\ImagickEngine
-    arguments: ['@file_operations']
+    arguments:
+      - '@imagick_transformer_factory'
+      - '@image_factory'
+  imagick_transformer_factory:
+    class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
+    arguments:
+      - '@file_operations'
 
   # imaging/source
   filesystem_source_accessor:

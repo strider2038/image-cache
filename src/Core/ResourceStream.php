@@ -10,29 +10,20 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ResourceStream implements StreamInterface
 {
-    public const MODE_READ_ONLY = 'rb';
-    public const MODE_READ_AND_WRITE = 'rb+';
-    public const MODE_WRITE_ONLY = 'wb';
-    public const MODE_WRITE_AND_READ = 'wb+';
-    public const MODE_APPEND_ONLY = 'ab';
-    public const MODE_APPEND_AND_READ = 'ab+';
-    public const MODE_WRITE_IF_NOT_EXIST = 'xb';
-    public const MODE_WRITE_AND_READ_IF_NOT_EXIST = 'xb+';
-    public const MODE_WRITE_WITHOUT_TRUNCATE = 'cb';
-    public const MODE_WRITE_AND_READ_WITHOUT_TRUNCATE = 'cb+';
-
     /** @var resource */
     protected $resource;
 
-    /** @var string */
+    /** @var ResourceStreamModeEnum */
     private $mode;
 
-    public function __construct(string $stream, string $mode)
+    public function __construct(string $stream, ResourceStreamModeEnum $mode)
     {
         $this->resource = fopen($stream, $mode);
         $this->mode = $mode;
@@ -74,7 +65,7 @@ class ResourceStream implements StreamInterface
 
     public function isWritable(): bool
     {
-        return is_resource($this->resource) && $this->isModeWritable($this->mode);
+        return is_resource($this->resource) && $this->mode->isWritable();
     }
 
     public function write(string $string): int
@@ -84,47 +75,11 @@ class ResourceStream implements StreamInterface
 
     public function isReadable(): bool
     {
-        return is_resource($this->resource) && $this->isModeReadable($this->mode);
+        return is_resource($this->resource) && $this->mode->isReadable();
     }
 
     public function read(int $length): string
     {
         return fread($this->resource, $length);
-    }
-
-    public function isModeReadable(string $mode): bool
-    {
-        return in_array(
-            $mode,
-            [
-                self::MODE_READ_ONLY,
-                self::MODE_READ_AND_WRITE,
-                self::MODE_WRITE_AND_READ,
-                self::MODE_APPEND_AND_READ,
-                self::MODE_WRITE_AND_READ_IF_NOT_EXIST,
-                self::MODE_WRITE_AND_READ_WITHOUT_TRUNCATE,
-            ],
-            true
-        );
-    }
-
-    public function isModeWritable(string $mode): bool
-    {
-        return in_array(
-            $mode,
-            [
-                self::MODE_READ_AND_WRITE,
-                self::MODE_READ_AND_WRITE,
-                self::MODE_WRITE_ONLY,
-                self::MODE_WRITE_AND_READ,
-                self::MODE_APPEND_ONLY,
-                self::MODE_APPEND_AND_READ,
-                self::MODE_WRITE_IF_NOT_EXIST,
-                self::MODE_WRITE_AND_READ_IF_NOT_EXIST,
-                self::MODE_WRITE_WITHOUT_TRUNCATE,
-                self::MODE_WRITE_AND_READ_WITHOUT_TRUNCATE,
-            ],
-            true
-        );
     }
 }

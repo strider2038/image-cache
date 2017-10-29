@@ -33,7 +33,7 @@ class SourceKeyParser implements SourceKeyParserInterface
         $this->imageValidator = $imageValidator;
     }
 
-    public function parse(string $key): SourceKeyInterface
+    public function parse(string $key): SourceKey
     {
         if (!$this->keyValidator->isValidPublicFilename($key)) {
             throw new InvalidRequestValueException("Invalid filename '{$key}' in request");

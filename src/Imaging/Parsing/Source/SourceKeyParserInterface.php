@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Source;
  */
 interface SourceKeyParserInterface
 {
-    public function parse(string $key): SourceKeyInterface;
+    public function parse(string $key): SourceKey;
 }

@@ -13,18 +13,17 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Accessor;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Imaging\Source\Mapping\FilenameKeyMapperInterface;
-use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class FilesystemSourceAccessorTest extends TestCase
 {
-    use ImageTrait, ProviderTrait, LoggerTrait;
+    use ProviderTrait, LoggerTrait;
 
     private const KEY = 'test';
 
@@ -62,12 +61,11 @@ class FilesystemSourceAccessorTest extends TestCase
     {
         $accessor = $this->createFilesystemSourceAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
-        $sourceImage = $this->givenImage();
+        $sourceImage = \Phake::mock(Image::class);
         $this->givenSource_get_returns($filenameKey, $sourceImage);
 
         $image = $accessor->get(self::KEY);
 
-        $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertSame($sourceImage, $image);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
@@ -131,7 +129,7 @@ class FilesystemSourceAccessorTest extends TestCase
         return $filenameKey;
     }
 
-    private function givenSource_get_returns(FilenameKeyInterface $filenameKey, ?ImageInterface $image): void
+    private function givenSource_get_returns(FilenameKeyInterface $filenameKey, ?Image $image): void
     {
         \Phake::when($this->source)->get($filenameKey)->thenReturn($image);
     }

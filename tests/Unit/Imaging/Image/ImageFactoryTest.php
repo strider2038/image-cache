@@ -13,9 +13,10 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Imaging\Image\ImageBlob;
+use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactory;
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
@@ -25,8 +26,8 @@ class ImageFactoryTest extends TestCase
 {
     use FileOperationsTrait;
 
-    const FILENAME = 'file';
-    const BLOB = 'blob';
+    private const FILENAME = 'file';
+    private const DATA = 'data';
 
     /** @var SaveOptionsFactoryInterface */
     private $saveOptionsFactory;
@@ -45,70 +46,127 @@ class ImageFactoryTest extends TestCase
         $this->fileOperations = $this->givenFileOperations();
     }
 
-    public function testCreateImageFile_GivenImage_ImageFileIsReturned(): void
+    /** @test */
+    public function create_givenStreamAndSaveOptions_imageIsReturned(): void
     {
         $factory = $this->createImageFactory();
-        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
-        $this->givenImageValidator_HasValidImageExtension_Returns(true);
-        $this->givenImageValidator_HasFileValidImageMimeType_Returns(true);
-        $saveOptions = $this->givenSaveOptionsFactory_Create_ReturnsSaveOptions();
+        $stream = $this->givenStreamWithData();
+        $saveOptions = \Phake::mock(SaveOptions::class);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
 
-        $image = $factory->createImageFile(self::FILENAME);
+        $image = $factory->create($stream, $saveOptions);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertSame($stream, $image->getData());
         $this->assertSame($saveOptions, $image->getSaveOptions());
     }
 
     /**
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
-     * @expectedExceptionCode 415
-     * @expectedExceptionMessageRegExp /File .* has unsupported image extension/
-     */
-    public function testCreateImageFile_GivenImageHasInvalidExtension_ExceptionThrown(): void
-    {
-        $factory = $this->createImageFactory();
-        $this->givenImageValidator_HasValidImageExtension_Returns(false);
-
-        $factory->createImageFile(self::FILENAME);
-    }
-
-    /**
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
-     * @expectedExceptionCode 415
-     * @expectedExceptionMessageRegExp /File .* has unsupported mime type/
-     */
-    public function testCreateImageFile_GivenImageHasInvalidMimeType_ExceptionThrown(): void
-    {
-        $factory = $this->createImageFactory();
-        $this->givenImageValidator_HasValidImageExtension_Returns(true);
-        $this->givenImageValidator_HasFileValidImageMimeType_Returns(false);
-
-        $factory->createImageFile(self::FILENAME);
-    }
-
-    public function testCreateImageBlob_GivenBlob_ImageBlobIsReturned(): void
-    {
-        $factory = $this->createImageFactory();
-        $this->givenImageValidator_HasBlobValidImageMimeType_Returns(true);
-        $saveOptions = $this->givenSaveOptionsFactory_Create_ReturnsSaveOptions();
-
-        $image = $factory->createImageBlob(self::BLOB);
-
-        $this->assertInstanceOf(ImageBlob::class, $image);
-        $this->assertSame($saveOptions, $image->getSaveOptions());
-    }
-
-    /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
      * @expectedExceptionCode 415
      * @expectedExceptionMessage Image has unsupported mime type
      */
-    public function testCreateImageBlob_GivenImageHasInvalidMimeType_ExceptionThrown(): void
+    public function create_givenImageHasInvalidMimeType_exceptionThrown(): void
     {
         $factory = $this->createImageFactory();
-        $this->givenImageValidator_HasBlobValidImageMimeType_Returns(false);
+        $stream = $this->givenStreamWithData();
+        $saveOptions = \Phake::mock(SaveOptions::class);
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
 
-        $factory->createImageBlob(self::BLOB);
+        $factory->create($stream, $saveOptions);
+    }
+
+    /** @test */
+    public function createFromFile_givenImage_imageIsReturned(): void
+    {
+        $factory = $this->createImageFactory();
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
+        $this->givenImageValidator_hasValidImageExtension_returns(true);
+        $this->givenImageValidator_hasFileValidImageMimeType_returns(true);
+        $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+        $expectedStream = $this->givenFileOperations_openFile_returnsStream(
+            $this->fileOperations,
+            self::FILENAME,
+            ResourceStreamModeEnum::READ_ONLY
+        );
+
+        $image = $factory->createFromFile(self::FILENAME);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertSame($expectedStream, $image->getData());
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* not found/
+     */
+    public function createFromFile_givenFileDoesNotExist_exceptionThrown(): void
+    {
+        $factory = $this->createImageFactory();
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, false);
+
+        $factory->createFromFile(self::FILENAME);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
+     * @expectedExceptionCode 415
+     * @expectedExceptionMessageRegExp /File .* has unsupported image extension/
+     */
+    public function createFromFile_givenImageHasInvalidExtension_exceptionThrown(): void
+    {
+        $factory = $this->createImageFactory();
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
+        $this->givenImageValidator_hasValidImageExtension_returns(false);
+
+        $factory->createFromFile(self::FILENAME);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
+     * @expectedExceptionCode 415
+     * @expectedExceptionMessageRegExp /File .* has unsupported mime type/
+     */
+    public function createFromFile_givenImageHasInvalidMimeType_exceptionThrown(): void
+    {
+        $factory = $this->createImageFactory();
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
+        $this->givenImageValidator_hasValidImageExtension_returns(true);
+        $this->givenImageValidator_hasFileValidImageMimeType_returns(false);
+
+        $factory->createFromFile(self::FILENAME);
+    }
+
+    /** @test */
+    public function createFromData_givenBlob_imageIsReturned(): void
+    {
+        $factory = $this->createImageFactory();
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
+        $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+
+        $image = $factory->createFromData(self::DATA);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($saveOptions, $image->getSaveOptions());
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
+     * @expectedExceptionCode 415
+     * @expectedExceptionMessage Image has unsupported mime type
+     */
+    public function createFromData_givenImageHasInvalidMimeType_exceptionThrown(): void
+    {
+        $factory = $this->createImageFactory();
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
+
+        $factory->createFromData(self::DATA);
     }
 
     private function createImageFactory(): ImageFactory
@@ -122,7 +180,7 @@ class ImageFactoryTest extends TestCase
         return $factory;
     }
 
-    private function givenSaveOptionsFactory_Create_ReturnsSaveOptions(): SaveOptions
+    private function givenSaveOptionsFactory_create_returnsSaveOptions(): SaveOptions
     {
         $saveOptions = \Phake::mock(SaveOptions::class);
 
@@ -131,24 +189,32 @@ class ImageFactoryTest extends TestCase
         return $saveOptions;
     }
 
-    private function givenImageValidator_HasValidImageExtension_Returns(bool $value): void
+    private function givenImageValidator_hasValidImageExtension_returns(bool $value): void
     {
         \Phake::when($this->imageValidator)
             ->hasValidImageExtension(\Phake::anyParameters())
             ->thenReturn($value);
     }
 
-    private function givenImageValidator_HasFileValidImageMimeType_Returns(bool $value): void
+    private function givenImageValidator_hasFileValidImageMimeType_returns(bool $value): void
     {
         \Phake::when($this->imageValidator)
             ->hasFileValidImageMimeType(\Phake::anyParameters())
             ->thenReturn($value);
     }
 
-    private function givenImageValidator_HasBlobValidImageMimeType_Returns(bool $value): void
+    private function givenImageValidator_hasDataValidImageMimeType_returns(bool $value): void
     {
         \Phake::when($this->imageValidator)
-            ->hasBlobValidImageMimeType(\Phake::anyParameters())
+            ->hasDataValidImageMimeType(\Phake::anyParameters())
             ->thenReturn($value);
+    }
+
+    private function givenStreamWithData(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($stream)->getContents()->thenReturn(self::DATA);
+
+        return $stream;
     }
 }
