@@ -11,7 +11,7 @@
 - [x] Image writing to sources
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
-- [ ] Yandex Static Map source
+- [x] Yandex Static Map source
 - [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Split ImageCache class to ImageStorage and ImageCache
 - [ ] Split ImageController to action classes
