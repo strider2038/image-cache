@@ -14,13 +14,15 @@
 - [x] Yandex Static Map source
 - [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Split ImageCache class to ImageStorage and ImageCache
-- [ ] Split ImageController to action classes
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
+- [ ] Add CodeSniffer to CI
+- [ ] Tune console and IDE debug via docker, not ssh
+- [ ] Migrate from supervisor to systemd daemons
 - [ ] Support for building docker containers in Travis
 - [ ] Fix tests codestyle
 - [ ] Acceptance testing
@@ -28,10 +30,10 @@
 - [ ] Cache mechanism for source accessor
 - [ ] Performance optimization (lazy services, validation cache)
 - [ ] Support for phpDocumentor
-- [ ] Migrate from supervisor to systemd daemons
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor SaveOptions to be ignored while saving
 - [ ] Rename project to "Image caching microservice"
+- [ ] Split ImageController to action classes
 
 # IDEAS
 - [ ] Google map source (inspect licensing problems)
