@@ -21,7 +21,7 @@
 - [ ] Rotate transformation
 - [ ] Flip transformation
 - [ ] Add CodeSniffer to CI
-- [ ] Tune console and IDE debug via docker, not ssh
+- [x] Tune console and IDE debug via docker, not ssh
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] Support for building docker containers in Travis
 - [ ] Fix tests codestyle

@@ -1,10 +1,12 @@
 FROM strider2038:imgcache-service
 MAINTAINER Igor Lazarev <strider2038@rambler.ru>
 
+ENV XDEBUG_CONFIG="remote_enable=1 remote_mode=req remote_port=9001 remote_host=172.17.0.1 remote_log=/var/log/xdebug/remote.log"
+ENV PHP_IDE_CONFIG="serverName=default"
+
 COPY ./.docker/composer/auth.json /var/run/composer/auth.json
 
 RUN apk add --update \
-    openssh \
     nano \
     iputils && \
     pecl install xdebug && \
@@ -13,12 +15,8 @@ RUN apk add --update \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer install
 
-COPY ./.docker/supervisor/sshd.conf /etc/supervisord/sshd.conf
 COPY ./.docker/composer/auth.json /var/run/composer/auth.json
 COPY ./.docker/php/* /usr/local/etc/php/conf.d/
-COPY ./.docker/sshd/* /etc/ssh/
-COPY ./.docker/env/dev.sh /etc/profile.d/dev.sh
-
-RUN chmod 600 /etc/ssh/ssh_host_*
+COPY ./.docker/env/aliases.sh /etc/profile.d/aliases.sh
 
 EXPOSE 22 80 9001
