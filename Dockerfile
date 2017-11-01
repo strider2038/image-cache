@@ -40,4 +40,4 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 EXPOSE 80
 
-CMD /usr/bin/supervisord --configuration /etc/supervisord.conf
+ENTRYPOINT ["/usr/bin/supervisord", "--configuration", "/etc/supervisord.conf"]

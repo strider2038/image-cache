@@ -12,7 +12,7 @@ echo "========================================================================="
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 
-if [ $build_prod -eq 1 ]; then
+if [ ${build_prod} -eq 1 ]; then
     ./build.sh
 fi
 
