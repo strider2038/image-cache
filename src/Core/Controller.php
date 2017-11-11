@@ -28,7 +28,7 @@ abstract class Controller implements ControllerInterface
     public function __construct(ResponseFactoryInterface $responseFactory, SecurityInterface $security = null)
     {
         $this->responseFactory = $responseFactory;
-        $this->security = $security;
+        $this->security = $security ?? new NullSecurity();
     }
 
     public function runAction(string $action, string $location): ResponseInterface
@@ -53,7 +53,7 @@ abstract class Controller implements ControllerInterface
     
     private function isActionSafe(string $action): bool
     {
-        if ($this->security === null || in_array($action, $this->getSafeActions(), true)) {
+        if (in_array($action, $this->getSafeActions(), true)) {
             return true;
         }
 
