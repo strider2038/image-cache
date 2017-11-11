@@ -22,38 +22,43 @@ abstract class Controller implements ControllerInterface
     /** @var ResponseFactoryInterface */
     protected $responseFactory;
 
+    /** @var ActionFactoryInterface */
+    protected $actionFactory;
+
     /** @var SecurityInterface */
     protected $security;
 
-    public function __construct(ResponseFactoryInterface $responseFactory, SecurityInterface $security = null)
-    {
+    public function __construct(
+        ResponseFactoryInterface $responseFactory,
+        ActionFactoryInterface $actionFactory,
+        SecurityInterface $security = null
+    ) {
         $this->responseFactory = $responseFactory;
+        $this->actionFactory = $actionFactory;
         $this->security = $security ?? new NullSecurity();
     }
 
-    public function runAction(string $action, string $location): ResponseInterface
+    public function runAction(string $actionId, string $location): ResponseInterface
     {
-        if (!$this->isActionSafe($action)) {
+        if (!$this->isActionSafe($actionId)) {
             return $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::FORBIDDEN)
             );
         }
 
-        $action = $this->createAction($action, $location);
+        $action = $this->actionFactory->createAction($actionId, $location);
 
         return $action->run();
     }
     
-    protected function getSafeActions(): array
+    protected function getSafeActionIds(): array
     {
         return [];
     }
 
-    abstract protected function createAction(string $action, string $location): ActionInterface;
-    
-    private function isActionSafe(string $action): bool
+    private function isActionSafe(string $actionId): bool
     {
-        if (in_array($action, $this->getSafeActions(), true)) {
+        if (\in_array($actionId, $this->getSafeActionIds(), true)) {
             return true;
         }
 

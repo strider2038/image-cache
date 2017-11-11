@@ -12,9 +12,12 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\{
-    ActionInterface, Controller, Http\ResponseFactoryInterface, Http\ResponseInterface, SecurityInterface
-};
+use Strider2038\ImgCache\Core\ActionFactoryInterface;
+use Strider2038\ImgCache\Core\ActionInterface;
+use Strider2038\ImgCache\Core\Controller;
+use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
+use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Core\SecurityInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
@@ -28,12 +31,16 @@ class ControllerTest extends TestCase
     /** @var ResponseFactoryInterface */
     private $responseFactory;
 
+    /** @var ActionFactoryInterface */
+    private $actionFactory;
+
     /** @var SecurityInterface */
     private $security;
 
     protected function setUp()
     {
         $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
+        $this->actionFactory = \Phake::mock(ActionFactoryInterface::class);
         $this->security = \Phake::mock(SecurityInterface::class);
     }
 
@@ -41,12 +48,12 @@ class ControllerTest extends TestCase
     public function runAction_actionExistsNoSecurityControl_methodExecuted(): void
     {
         $controller = $this->createController();
-        $action = $this->givenController_createAction_returnsAction($controller);
+        $action = $this->givenActionFactory_createAction_returnsAction();
         $expectedResponse = $this->givenAction_run_returnsResponse($action);
 
         $response = $controller->runAction(self::ACTION_ID, self::LOCATION);
 
-        $this->assertController_createAction_isCalledOnceWithActionAndLocation($controller);
+        $this->assertActionFactory_createAction_isCalledOnceWithActionAndLocation();
         $this->assertAction_run_isCalledOnce($action);
         $this->assertSame($expectedResponse, $response);
     }
@@ -62,7 +69,7 @@ class ControllerTest extends TestCase
 
         $this->assertEquals(HttpStatusCodeEnum::FORBIDDEN, $result->getStatusCode()->getValue());
         $this->assertResponseFactory_createMessageResponse_calledWithForbiddenCode();
-        $this->assertController_createAction_isNotCalled($controller);
+        $this->assertActionFactory_createAction_isNotCalled();
     }
 
     /** @test */
@@ -70,12 +77,12 @@ class ControllerTest extends TestCase
     {
         $controller = $this->createController($this->security);
         $this->givenSecurity_isAuthorized_returns(true);
-        $action = $this->givenController_createAction_returnsAction($controller);
+        $action = $this->givenActionFactory_createAction_returnsAction();
         $expectedResponse = $this->givenAction_run_returnsResponse($action);
 
         $response = $controller->runAction(self::ACTION_ID, self::LOCATION);
 
-        $this->assertController_createAction_isCalledOnceWithActionAndLocation($controller);
+        $this->assertActionFactory_createAction_isCalledOnceWithActionAndLocation();
         $this->assertAction_run_isCalledOnce($action);
         $this->assertSame($expectedResponse, $response);
     }
@@ -83,21 +90,34 @@ class ControllerTest extends TestCase
     /** @test */
     public function runAction_actionIsSafeAndSecurityIsDefined_methodExecuted(): void
     {
-        $controller = $this->createController($this->security);
-        $this->givenController_getSafeActions_returnsArrayWithActionId($controller);
-        $action = $this->givenController_createAction_returnsAction($controller);
+        $controller = $this->createController($this->security, [self::ACTION_ID]);
+        $action = $this->givenActionFactory_createAction_returnsAction();
         $expectedResponse = $this->givenAction_run_returnsResponse($action);
 
         $response = $controller->runAction(self::ACTION_ID, self::LOCATION);
 
-        $this->assertController_createAction_isCalledOnceWithActionAndLocation($controller);
+        $this->assertActionFactory_createAction_isCalledOnceWithActionAndLocation();
         $this->assertAction_run_isCalledOnce($action);
         $this->assertSame($expectedResponse, $response);
     }
 
-    private function createController(SecurityInterface $security = null): Controller
-    {
-        return \Phake::partialMock(Controller::class, $this->responseFactory, $security);
+    private function createController(
+        SecurityInterface $security = null,
+        array $safeActionIds = []
+    ): Controller {
+        $controller = new class($this->responseFactory, $this->actionFactory, $security) extends Controller
+        {
+            public $safeActionIds;
+
+            protected function getSafeActionIds(): array
+            {
+                return $this->safeActionIds;
+            }
+        };
+
+        $controller->safeActionIds = $safeActionIds;
+
+        return $controller;
     }
 
     private function givenSecurity_isAuthorized_returns(bool $value): void
@@ -126,22 +146,22 @@ class ControllerTest extends TestCase
         $this->assertEquals(HttpStatusCodeEnum::FORBIDDEN, $httpStatusCode->getValue());
     }
 
-    private function givenController_createAction_returnsAction(Controller $controller): ActionInterface
+    private function givenActionFactory_createAction_returnsAction(): ActionInterface
     {
         $action = \Phake::mock(ActionInterface::class);
-        \Phake::when($controller)->createAction(\Phake::anyParameters())->thenReturn($action);
+        \Phake::when($this->actionFactory)->createAction(\Phake::anyParameters())->thenReturn($action);
 
         return $action;
     }
 
-    private function assertController_createAction_isCalledOnceWithActionAndLocation(Controller $controller): void
+    private function assertActionFactory_createAction_isCalledOnceWithActionAndLocation(): void
     {
-        \Phake::verify($controller, \Phake::times(1))->createAction(self::ACTION_ID, self::LOCATION);
+        \Phake::verify($this->actionFactory, \Phake::times(1))->createAction(self::ACTION_ID, self::LOCATION);
     }
 
-    private function assertController_createAction_isNotCalled(Controller $controller): void
+    private function assertActionFactory_createAction_isNotCalled(): void
     {
-        \Phake::verify($controller, \Phake::times(0))->createAction(\Phake::anyParameters());
+        \Phake::verify($this->actionFactory, \Phake::times(0))->createAction(\Phake::anyParameters());
     }
 
     private function assertAction_run_isCalledOnce(ActionInterface $action): void
@@ -155,10 +175,5 @@ class ControllerTest extends TestCase
         \Phake::when($action)->run()->thenReturn($response);
 
         return $response;
-    }
-
-    private function givenController_getSafeActions_returnsArrayWithActionId(Controller $controller): void
-    {
-        \Phake::when($controller)->getSafeActions()->thenReturn([self::ACTION_ID]);
     }
 }
