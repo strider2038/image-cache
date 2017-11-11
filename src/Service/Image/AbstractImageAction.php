@@ -19,12 +19,12 @@ use Strider2038\ImgCache\Imaging\ImageCacheInterface;
  */
 abstract class AbstractImageAction implements ActionInterface
 {
-    /** @var ResponseFactoryInterface */
-    protected $responseFactory;
     /** @var string */
     protected $location;
     /** @var ImageCacheInterface */
     protected $imageCache;
+    /** @var ResponseFactoryInterface */
+    protected $responseFactory;
 
     public function __construct(string $location, ImageCacheInterface $imageCache, ResponseFactoryInterface $responseFactory)
     {
