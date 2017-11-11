@@ -13,11 +13,8 @@ namespace Strider2038\ImgCache\Core;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
- * Description of Controller
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 abstract class Controller implements ControllerInterface
@@ -36,27 +33,27 @@ abstract class Controller implements ControllerInterface
 
     public function runAction(string $action, string $location): ResponseInterface
     {
-        $actionName = 'action' . ucfirst($action);
-        if (!method_exists($this, $actionName)) {
-            throw new ApplicationException("Action '{$actionName}' does not exists");
-        }
         if (!$this->isActionSafe($action)) {
             return $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::FORBIDDEN)
             );
         }
-        
-        return call_user_func([$this, $actionName], $location);
+
+        $action = $this->createAction($action, $location);
+
+        return $action->run();
     }
     
     protected function getSafeActions(): array
     {
         return [];
     }
+
+    abstract protected function createAction(string $action, string $location): ActionInterface;
     
     private function isActionSafe(string $action): bool
     {
-        if ($this->security === null || in_array($action, $this->getSafeActions())) {
+        if ($this->security === null || in_array($action, $this->getSafeActions(), true)) {
             return true;
         }
 
