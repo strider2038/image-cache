@@ -65,15 +65,25 @@ services:
     class: Strider2038\ImgCache\Service\ImageController
     arguments:
       - '@response_factory'
+      - '@filesystem_cache_action_factory'
       - '@security'
+  filesystem_cache_action_factory:
+    class: Strider2038\ImgCache\Service\Image\ImageActionFactory
+    arguments:
       - '@filesystem_image_cache'
+      - '@response_factory'
       - '@request'
   yandex_map_cache_image_controller:
     class: Strider2038\ImgCache\Service\ImageController
     arguments:
       - '@response_factory'
+      - '@yandex_map_cache_action_factory'
       - '@security'
+  yandex_map_cache_action_factory:
+    class: Strider2038\ImgCache\Service\Image\ImageActionFactory
+    arguments:
       - '@yandex_map_image_cache'
+      - '@response_factory'
       - '@request'
 
   # imaging

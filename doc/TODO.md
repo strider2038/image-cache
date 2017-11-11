@@ -12,7 +12,7 @@
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
 - [x] Yandex Static Map source
-- [ ] Split ImageController to action classes
+- [x] Split ImageController to action classes
 - [ ] Split ImageCache class to ImageStorage and ImageCache
 - [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Yandex.Disk source
