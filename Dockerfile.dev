@@ -19,4 +19,4 @@ COPY ./.docker/composer/auth.json /var/run/composer/auth.json
 COPY ./.docker/php/* /usr/local/etc/php/conf.d/
 COPY ./.docker/env/aliases.sh /etc/profile.d/aliases.sh
 
-EXPOSE 22 80 9001
+EXPOSE 80 9001
