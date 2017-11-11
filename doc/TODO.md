@@ -12,8 +12,9 @@
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
 - [x] Yandex Static Map source
-- [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
+- [x] Split ImageController to action classes
 - [ ] Split ImageCache class to ImageStorage and ImageCache
+- [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
@@ -33,7 +34,6 @@
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor SaveOptions to be ignored while saving
 - [ ] Rename project to "Image caching microservice"
-- [ ] Split ImageController to action classes
 
 # IDEAS
 - [ ] Google map source (inspect licensing problems)

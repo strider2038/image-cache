@@ -10,11 +10,10 @@
 
 namespace Strider2038\ImgCache\Core;
 
-use Strider2038\ImgCache\Core\Http\ResponseInterface;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ControllerInterface {
-    public function runAction(string $actionId, string $location): ResponseInterface;
+interface ActionFactoryInterface
+{
+    public function createAction(string $actionId, string $location): ActionInterface;
 }

@@ -13,11 +13,8 @@ namespace Strider2038\ImgCache\Core;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
- * Description of Controller
- *
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 abstract class Controller implements ControllerInterface
@@ -25,38 +22,43 @@ abstract class Controller implements ControllerInterface
     /** @var ResponseFactoryInterface */
     protected $responseFactory;
 
+    /** @var ActionFactoryInterface */
+    protected $actionFactory;
+
     /** @var SecurityInterface */
     protected $security;
 
-    public function __construct(ResponseFactoryInterface $responseFactory, SecurityInterface $security = null)
-    {
+    public function __construct(
+        ResponseFactoryInterface $responseFactory,
+        ActionFactoryInterface $actionFactory,
+        SecurityInterface $security = null
+    ) {
         $this->responseFactory = $responseFactory;
-        $this->security = $security;
+        $this->actionFactory = $actionFactory;
+        $this->security = $security ?? new NullSecurity();
     }
 
-    public function runAction(string $action, string $location): ResponseInterface
+    public function runAction(string $actionId, string $location): ResponseInterface
     {
-        $actionName = 'action' . ucfirst($action);
-        if (!method_exists($this, $actionName)) {
-            throw new ApplicationException("Action '{$actionName}' does not exists");
-        }
-        if (!$this->isActionSafe($action)) {
+        if (!$this->isActionSafe($actionId)) {
             return $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::FORBIDDEN)
             );
         }
-        
-        return call_user_func([$this, $actionName], $location);
+
+        $action = $this->actionFactory->createAction($actionId, $location);
+
+        return $action->run();
     }
     
-    protected function getSafeActions(): array
+    protected function getSafeActionIds(): array
     {
         return [];
     }
-    
-    private function isActionSafe(string $action): bool
+
+    private function isActionSafe(string $actionId): bool
     {
-        if ($this->security === null || in_array($action, $this->getSafeActions())) {
+        if (\in_array($actionId, $this->getSafeActionIds(), true)) {
             return true;
         }
 
