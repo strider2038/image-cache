@@ -90,7 +90,7 @@ class ControllerTest extends TestCase
     /** @test */
     public function runAction_actionIsSafeAndSecurityIsDefined_methodExecuted(): void
     {
-        $controller = $this->createController($this->security, [self::ACTION_ID]);
+        $controller = $this->createControllerWithSafeActions([self::ACTION_ID]);
         $action = $this->givenActionFactory_createAction_returnsAction();
         $expectedResponse = $this->givenAction_run_returnsResponse($action);
 
@@ -101,11 +101,14 @@ class ControllerTest extends TestCase
         $this->assertSame($expectedResponse, $response);
     }
 
-    private function createController(
-        SecurityInterface $security = null,
-        array $safeActionIds = []
-    ): Controller {
-        $controller = new class($this->responseFactory, $this->actionFactory, $security) extends Controller
+    private function createController(SecurityInterface $security = null): Controller
+    {
+        return new class($this->responseFactory, $this->actionFactory, $security) extends Controller {};
+    }
+
+    private function createControllerWithSafeActions(array $safeActionIds = []): Controller
+    {
+        $controller = new class($this->responseFactory, $this->actionFactory, $this->security) extends Controller
         {
             public $safeActionIds;
 
