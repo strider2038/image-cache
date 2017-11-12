@@ -71,7 +71,7 @@ class CreateAction implements ActionInterface
 
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
-                sprintf('File "%s" was successfully put to storage', $this->location)
+                sprintf('File "%s" was successfully put to storage.', $this->location)
             );
         }
 

@@ -60,14 +60,14 @@ class DeleteAction implements ActionInterface
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::OK),
                 sprintf(
                     'File "%s" was successfully deleted from'
-                    . ' image storage and all thumbnails were deleted from cache',
+                    . ' image storage and all thumbnails were deleted from cache.',
                     $this->location
                 )
             );
         } else {
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND),
-                sprintf('File "%s" does not exist', $this->location)
+                sprintf('File "%s" does not exist.', $this->location)
             );
         }
 
