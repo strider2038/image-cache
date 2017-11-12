@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Tests\Support\Phake;
 
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
@@ -88,5 +89,19 @@ trait FileOperationsTrait
         string $directory
     ): void {
         \Phake::verify($fileOperations, \Phake::times(1))->createDirectory($directory);
+    }
+
+    protected function assertFileOperations_findByMask_isCalledOnceWith(
+        FileOperationsInterface $fileOperations,
+        string $mask
+    ): void {
+        \Phake::verify($fileOperations, \Phake::times(1))->findByMask($mask);
+    }
+
+    protected function givenFileOperations_findByMask_returnsStringListWithValues(
+        FileOperationsInterface $fileOperations,
+        array $list
+    ): void {
+        \Phake::when($fileOperations)->findByMask(\Phake::anyParameters())->thenReturn(new StringList($list));
     }
 }

@@ -15,10 +15,11 @@
 - [x] Split ImageController to action classes
 - [ ] Split ImageCache class to ImageStorage and ImageCache
 - [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
-- [ ] Yandex.Disk source
 - [ ] Router rewrites Request URI, eliminate location in controllers
+- [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
+  - storage and cache key as data object
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
