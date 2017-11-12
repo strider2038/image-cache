@@ -28,10 +28,10 @@ class GetActionTest extends TestCase
     private const IMAGE_FILENAME = 'image.jpg';
 
     /** @var ImageStorageInterface */
-    protected $imageStorage;
+    private $imageStorage;
 
     /** @var ImageCacheInterface */
-    protected $imageCache;
+    private $imageCache;
 
     protected function setUp(): void
     {

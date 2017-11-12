@@ -18,4 +18,6 @@ use Strider2038\ImgCache\Imaging\Image\Image;
 interface ImageStorageInterface
 {
     public function find(string $key): ? Image;
+    public function put(string $key, Image $image): void;
+    public function exists(string $key): bool;
 }
