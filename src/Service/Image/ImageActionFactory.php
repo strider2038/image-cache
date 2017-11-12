@@ -15,7 +15,9 @@ use Strider2038\ImgCache\Core\ActionInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
-use Strider2038\ImgCache\Imaging\DeprecatedImageCacheInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
+use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -27,8 +29,14 @@ class ImageActionFactory implements ActionFactoryInterface
     private const ACTION_ID_REPLACE = 'replace';
     private const ACTION_ID_DELETE = 'delete';
 
-    /** @var DeprecatedImageCacheInterface */
+    /** @var ImageStorageInterface */
+    private $imageStorage;
+
+    /** @var ImageCacheInterface */
     private $imageCache;
+
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
 
     /** @var ResponseFactoryInterface */
     private $responseFactory;
@@ -37,11 +45,15 @@ class ImageActionFactory implements ActionFactoryInterface
     private $request;
 
     public function __construct(
-        DeprecatedImageCacheInterface $imageCache,
+        ImageStorageInterface $imageStorage,
+        ImageCacheInterface $imageCache,
+        ImageFactoryInterface $imageFactory,
         ResponseFactoryInterface $responseFactory,
         RequestInterface $request
     ) {
+        $this->imageStorage = $imageStorage;
         $this->imageCache = $imageCache;
+        $this->imageFactory = $imageFactory;
         $this->responseFactory = $responseFactory;
         $this->request = $request;
     }
@@ -51,13 +63,13 @@ class ImageActionFactory implements ActionFactoryInterface
         $action = null;
 
         if ($actionId === self::ACTION_ID_GET) {
-            $action = new GetAction($location, $this->imageCache, $this->responseFactory);
+            $action = new GetAction($location, $this->responseFactory, $this->imageStorage, $this->imageCache);
         } elseif ($actionId === self::ACTION_ID_CREATE) {
-            $action = new CreateAction($location, $this->imageCache, $this->responseFactory, $this->request);
+            $action = new CreateAction($location, $this->responseFactory, $this->imageStorage, $this->imageFactory, $this->request);
         } elseif ($actionId === self::ACTION_ID_REPLACE) {
-            $action = new ReplaceAction($location, $this->imageCache, $this->responseFactory, $this->request);
+            $action = new ReplaceAction($location, $this->responseFactory, $this->imageStorage, $this->imageCache, $this->imageFactory, $this->request);
         } elseif ($actionId === self::ACTION_ID_DELETE) {
-            $action = new DeleteAction($location, $this->imageCache, $this->responseFactory);
+            $action = new DeleteAction($location, $this->responseFactory, $this->imageStorage, $this->imageCache);
         }
 
         if ($action === null) {
