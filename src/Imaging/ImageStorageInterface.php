@@ -11,13 +11,11 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ImageCacheInterface
+interface ImageStorageInterface
 {
-    public function get(string $filename): ImageFile;
-    public function put(string $filename, Image $image): void;
+    public function find(string $key): ? Image;
 }

@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCacheInterface;
 use Strider2038\ImgCache\Service\Image\DeleteAction;
 use Strider2038\ImgCache\Tests\Support\Phake\ResponseFactoryTrait;
 
@@ -23,12 +23,12 @@ class DeleteActionTest extends TestCase
 
     private const LOCATION = 'a.jpg';
 
-    /** @var ImageCacheInterface */
+    /** @var DeprecatedImageCacheInterface */
     private $imageCache;
 
     protected function setUp()
     {
-        $this->imageCache = \Phake::mock(ImageCacheInterface::class);
+        $this->imageCache = \Phake::mock(DeprecatedImageCacheInterface::class);
         $this->givenResponseFactory();
     }
 

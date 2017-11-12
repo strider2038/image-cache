@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Core\ActionInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCacheInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -27,7 +27,7 @@ class ImageActionFactory implements ActionFactoryInterface
     private const ACTION_ID_REPLACE = 'replace';
     private const ACTION_ID_DELETE = 'delete';
 
-    /** @var ImageCacheInterface */
+    /** @var DeprecatedImageCacheInterface */
     private $imageCache;
 
     /** @var ResponseFactoryInterface */
@@ -37,7 +37,7 @@ class ImageActionFactory implements ActionFactoryInterface
     private $request;
 
     public function __construct(
-        ImageCacheInterface $imageCache,
+        DeprecatedImageCacheInterface $imageCache,
         ResponseFactoryInterface $responseFactory,
         RequestInterface $request
     ) {

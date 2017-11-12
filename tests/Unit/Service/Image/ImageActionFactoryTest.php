@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCacheInterface;
 use Strider2038\ImgCache\Service\Image\CreateAction;
 use Strider2038\ImgCache\Service\Image\DeleteAction;
 use Strider2038\ImgCache\Service\Image\GetAction;
@@ -25,7 +25,7 @@ class ImageActionFactoryTest extends TestCase
     private const LOCATION = 'location';
     private const ACTION_ID_INVALID = 'invalid';
 
-    /** @var ImageCacheInterface */
+    /** @var DeprecatedImageCacheInterface */
     private $imageCache;
 
     /** @var ResponseFactoryInterface */
@@ -36,7 +36,7 @@ class ImageActionFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->imageCache = \Phake::mock(ImageCacheInterface::class);
+        $this->imageCache = \Phake::mock(DeprecatedImageCacheInterface::class);
         $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
         $this->request = \Phake::mock(RequestInterface::class);
     }

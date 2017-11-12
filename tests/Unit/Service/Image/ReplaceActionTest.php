@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCacheInterface;
 use Strider2038\ImgCache\Service\Image\ReplaceAction;
 use Strider2038\ImgCache\Tests\Support\Phake\ResponseFactoryTrait;
 
@@ -25,7 +25,7 @@ class ReplaceActionTest extends TestCase
 
     private const LOCATION = 'a.jpg';
 
-    /** @var ImageCacheInterface */
+    /** @var DeprecatedImageCacheInterface */
     private $imageCache;
 
     /** @var RequestInterface */
@@ -33,7 +33,7 @@ class ReplaceActionTest extends TestCase
 
     protected function setUp()
     {
-        $this->imageCache = \Phake::mock(ImageCacheInterface::class);
+        $this->imageCache = \Phake::mock(DeprecatedImageCacheInterface::class);
         $this->request = \Phake::mock(RequestInterface::class);
         $this->givenResponseFactory();
     }

@@ -24,7 +24,7 @@ use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageCache implements ImageCacheInterface
+class DeprecatedImageCache implements DeprecatedImageCacheInterface
 {
     /**
      * Web directory that contains image files

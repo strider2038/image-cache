@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Service\Image;
 
 use Strider2038\ImgCache\Core\ActionInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCacheInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -21,12 +21,12 @@ abstract class AbstractImageAction implements ActionInterface
 {
     /** @var string */
     protected $location;
-    /** @var ImageCacheInterface */
+    /** @var DeprecatedImageCacheInterface */
     protected $imageCache;
     /** @var ResponseFactoryInterface */
     protected $responseFactory;
 
-    public function __construct(string $location, ImageCacheInterface $imageCache, ResponseFactoryInterface $responseFactory)
+    public function __construct(string $location, DeprecatedImageCacheInterface $imageCache, ResponseFactoryInterface $responseFactory)
     {
         $this->location = $location;
         $this->imageCache = $imageCache;

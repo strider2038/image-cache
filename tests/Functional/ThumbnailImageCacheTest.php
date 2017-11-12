@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCache;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
-use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 class ThumbnailImageCacheTest extends FunctionalTestCase
@@ -30,7 +30,7 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
 
-    /** @var ImageCache */
+    /** @var DeprecatedImageCache */
     private $cache;
 
     protected function setUp(): void

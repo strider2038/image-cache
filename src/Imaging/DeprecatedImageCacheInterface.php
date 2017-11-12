@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of ImgCache.
  *
@@ -10,14 +11,16 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ImageCacheInterface
+interface DeprecatedImageCacheInterface
 {
-    public function get(string $filename): ImageFile;
-    public function put(string $filename, Image $image): void;
+    public function get(string $key): ? ImageFile;
+    public function put(string $key, StreamInterface $data): void;
+    public function delete(string $key): void;
+    public function exists(string $key): bool;
 }

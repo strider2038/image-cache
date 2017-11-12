@@ -14,8 +14,8 @@ use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCache;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
-use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 /**
@@ -34,7 +34,7 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     /** @var ClientInterface */
     private $client;
 
-    /** @var ImageCache */
+    /** @var DeprecatedImageCache */
     private $cache;
 
     protected function setUp(): void

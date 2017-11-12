@@ -14,7 +14,7 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCacheInterface;
 
 /**
  * Handles POST request for creating resource. If resource already exists then response with
@@ -28,7 +28,7 @@ class CreateAction extends AbstractImageAction
 
     public function __construct(
         string $location,
-        ImageCacheInterface $imageCache,
+        DeprecatedImageCacheInterface $imageCache,
         ResponseFactoryInterface $responseFactory,
         RequestInterface $request
     ) {

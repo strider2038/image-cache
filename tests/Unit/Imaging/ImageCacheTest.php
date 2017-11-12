@@ -14,10 +14,10 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Imaging\DeprecatedImageCache;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
-use Strider2038\ImgCache\Imaging\ImageCache;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
@@ -64,7 +64,7 @@ class ImageCacheTest extends TestCase
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, false);
 
-        new ImageCache(
+        new DeprecatedImageCache(
             self::BASE_DIRECTORY,
             $this->fileOperations,
             $this->imageProcessor,
@@ -163,11 +163,11 @@ class ImageCacheTest extends TestCase
         ];
     }
 
-    private function createImageCache(ImageWriterInterface $writer = null): ImageCache
+    private function createImageCache(ImageWriterInterface $writer = null): DeprecatedImageCache
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
 
-        $cache = new ImageCache(
+        $cache = new DeprecatedImageCache(
             self::BASE_DIRECTORY,
             $this->fileOperations,
             $this->imageProcessor,
