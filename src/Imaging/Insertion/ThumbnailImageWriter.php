@@ -51,7 +51,7 @@ class ThumbnailImageWriter implements ImageWriterInterface
         $this->sourceAccessor->delete($parsedKey->getPublicFilename());
     }
 
-    public function getFileMask(string $key): string
+    public function getFileNameMask(string $key): string
     {
         $parsedKey = $this->parseKey($key);
         return $parsedKey->getThumbnailMask();
@@ -62,7 +62,7 @@ class ThumbnailImageWriter implements ImageWriterInterface
         $parsedKey = $this->keyParser->parse($key);
         if ($parsedKey->hasProcessingConfiguration()) {
             throw new InvalidRequestValueException(sprintf(
-                "Image name '%s' for source image cannot have process configuration",
+                'Image name "%s" for source image cannot have process configuration',
                 $key
             ));
         }

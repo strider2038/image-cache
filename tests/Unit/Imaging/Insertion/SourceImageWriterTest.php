@@ -85,7 +85,7 @@ class SourceImageWriterTest extends TestCase
         $writer = $this->createSourceImageWriter();
         $this->givenKeyParser_parse_returnsSourceKey();
 
-        $filename = $writer->getFileMask(self::KEY);
+        $filename = $writer->getFileNameMask(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
         $this->assertEquals(self::PUBLIC_FILENAME, $filename);

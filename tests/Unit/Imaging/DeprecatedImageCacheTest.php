@@ -23,7 +23,7 @@ use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
-class ImageCacheTest extends TestCase
+class DeprecatedImageCacheTest extends TestCase
 {
     use FileOperationsTrait, ImageTrait;
 

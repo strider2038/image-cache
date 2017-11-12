@@ -85,7 +85,7 @@ class ThumbnailImageWriterTest extends TestCase
         $writer = $this->createThumbnailImageWriter();
         $this->givenKeyParser_parse_returnsThumbnailKey();
 
-        $filename = $writer->getFileMask(self::KEY);
+        $filename = $writer->getFileNameMask(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
         $this->assertEquals(self::THUMBNAIL_MASK, $filename);
