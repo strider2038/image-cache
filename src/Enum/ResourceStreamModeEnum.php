@@ -30,7 +30,7 @@ class ResourceStreamModeEnum extends Enum
 
     public function isReadable(): bool
     {
-        return in_array(
+        return \in_array(
             $this->value,
             [
                 self::READ_ONLY,
@@ -46,7 +46,7 @@ class ResourceStreamModeEnum extends Enum
 
     public function isWritable(): bool
     {
-        return in_array(
+        return \in_array(
             $this->value,
             [
                 self::READ_AND_WRITE,

@@ -16,6 +16,7 @@
 - [ ] Split ImageCache class to ImageStorage and ImageCache
 - [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Yandex.Disk source
+- [ ] Router rewrites Request URI, eliminate location in controllers
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation

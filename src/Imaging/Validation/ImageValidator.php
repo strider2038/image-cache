@@ -19,7 +19,7 @@ class ImageValidator implements ImageValidatorInterface
 {
     public function isValidImageMimeType(string $mime): bool
     {
-        return in_array(
+        return \in_array(
             $mime,
             [
                 'image/jpeg',
@@ -53,6 +53,6 @@ class ImageValidator implements ImageValidatorInterface
     {
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-        return in_array($ext, ['jpg', 'jpeg', 'png'], true);
+        return \in_array($ext, ['jpg', 'jpeg', 'png'], true);
     }
 }
