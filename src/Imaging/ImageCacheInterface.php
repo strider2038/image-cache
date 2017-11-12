@@ -18,6 +18,7 @@ use Strider2038\ImgCache\Imaging\Image\ImageFile;
  */
 interface ImageCacheInterface
 {
-    public function get(string $filename): ImageFile;
-    public function put(string $filename, Image $image): void;
+    public function get(string $fileName): ImageFile;
+    public function put(string $fileName, Image $image): void;
+    public function deleteByMask(string $fileNameMask): void;
 }

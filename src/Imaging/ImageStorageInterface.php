@@ -20,4 +20,6 @@ interface ImageStorageInterface
     public function find(string $key): ? Image;
     public function put(string $key, Image $image): void;
     public function exists(string $key): bool;
+    public function delete(string $key): void;
+    public function getFileNameMask(string $key): string;
 }
