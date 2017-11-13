@@ -13,9 +13,9 @@ namespace Strider2038\ImgCache\Tests\Functional;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
-use Strider2038\ImgCache\Imaging\ImageCache;
+use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 /**
@@ -34,8 +34,11 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     /** @var ClientInterface */
     private $client;
 
-    /** @var ImageCache */
-    private $cache;
+    /** @var ImageController */
+    private $controller;
+
+    /** @var RequestInterface */
+    private $request;
 
     protected function setUp(): void
     {
@@ -43,7 +46,9 @@ class YandexMapImageCacheTest extends FunctionalTestCase
         $container = $this->loadContainer('yandex-map-image-cache.yml');
         $this->client = \Phake::mock(ClientInterface::class);
         $container->set('client_mock', $this->client);
-        $this->cache = $container->get('image_cache');
+        $this->request = \Phake::mock(RequestInterface::class);
+        $container->set('request', $this->request);
+        $this->controller = $container->get('image_controller');
     }
 
     /**
@@ -53,7 +58,7 @@ class YandexMapImageCacheTest extends FunctionalTestCase
      */
     public function get_givenNameWithInvalidParameters_exceptionThrown(): void
     {
-        $this->cache->get(self::IMAGE_WITH_INVALID_PARAMETERS);
+        $this->controller->runAction('get',self::IMAGE_WITH_INVALID_PARAMETERS);
     }
 
     /** @test */
@@ -63,10 +68,9 @@ class YandexMapImageCacheTest extends FunctionalTestCase
         $this->givenImagePng(self::PNG_FILENAME);
         $this->givenResponse_getBody_getContents_returns($response, file_get_contents(self::PNG_FILENAME));
 
-        $image = $this->cache->get(self::IMAGE_JPEG_CACHE_KEY);
+        $response = $this->controller->runAction('get',self::IMAGE_JPEG_CACHE_KEY);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
-        $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileHasMimeType(self::IMAGE_JPEG_WEB_FILENAME, self::MIME_TYPE_JPEG);
     }
 
@@ -77,9 +81,9 @@ class YandexMapImageCacheTest extends FunctionalTestCase
         $this->givenImageJpeg(self::JPEG_FILENAME);
         $this->givenResponse_getBody_getContents_returns($response, file_get_contents(self::JPEG_FILENAME));
 
-        $image = $this->cache->get(self::IMAGE_PNG_CACHE_KEY);
+        $response = $this->controller->runAction('get',self::IMAGE_PNG_CACHE_KEY);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_PNG_WEB_FILENAME);
         $this->assertFileHasMimeType(self::IMAGE_PNG_WEB_FILENAME, self::MIME_TYPE_PNG);
     }

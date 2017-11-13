@@ -11,46 +11,32 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCache;
-use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
-use Strider2038\ImgCache\Tests\Support\Phake\ImageTrait;
 
 class ImageCacheTest extends TestCase
 {
-    use FileOperationsTrait, ImageTrait;
+    use FileOperationsTrait;
 
-    private const BASE_DIRECTORY = '/cache';
-    private const INVALID_KEY = 'a';
-    private const GET_KEY = '/a.jpg';
-    private const GET_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/a.jpg';
-    private const INSERT_KEY = '/b.jpg';
-    private const DELETE_KEY = '/c.jpg';
-    private const DELETE_KEY_FILENAME_MASK = '/c*.jpg';
-    private const DELETE_KEY_DESTINATION_FILENAME_MASK = self::BASE_DIRECTORY . '/c*.jpg';
-    private const DELETE_KEY_DESTINATION_FILENAME = self::BASE_DIRECTORY . '/c.jpg';
+    private const WEB_DIRECTORY = 'web_directory';
+    private const FILE_NAME = '/file_name';
+    private const CACHE_FILE_NAME = self::WEB_DIRECTORY . self::FILE_NAME;
+    private const FOUND_FILE_NAME = self::WEB_DIRECTORY . '/found';
+    private const INVALID_FILE_NAME = 'file_name';
 
     /** @var FileOperationsInterface */
     private $fileOperations;
 
-    /** @var ImageExtractorInterface */
-    private $imageExtractor;
-
     /** @var ImageProcessorInterface */
     private $imageProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
-        $this->fileOperations = $this->givenFileOperations();
-        $this->imageExtractor = \Phake::mock(ImageExtractorInterface::class);
+        $this->fileOperations = \Phake::mock(FileOperationsInterface::class);
         $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
     }
 
@@ -62,149 +48,100 @@ class ImageCacheTest extends TestCase
      */
     public function construct_cacheDirectoryIsInvalid_exceptionThrown(): void
     {
-        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, false);
+        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::WEB_DIRECTORY, false);
 
-        new ImageCache(
-            self::BASE_DIRECTORY,
-            $this->fileOperations,
-            $this->imageProcessor,
-            $this->imageExtractor
-        );
+        new ImageCache(self::WEB_DIRECTORY, $this->fileOperations, $this->imageProcessor);
     }
 
-    /** @test */
-    public function get_imageDoesNotExistInSource_nullIsReturned(): void
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* does not exist/
+     */
+    public function get_fileDoesNotExist_exceptionThrown(): void
     {
         $cache = $this->createImageCache();
-        $this->givenImageExtractor_extract_returnsNull();
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::CACHE_FILE_NAME, false);
 
-        $image = $cache->get(self::GET_KEY);
-
-        $this->assertNull($image);
+        $cache->get(self::FILE_NAME);
     }
 
     /** @test */
-    public function get_imageExistsInSource_sourceImageSavedToWebDirectoryAndCachedImageIsReturned(): void
+    public function get_fileExists_imageFileReturned(): void
     {
         $cache = $this->createImageCache();
-        $image = $this->givenImageExtractor_extract_returnsImage(self::GET_KEY);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::CACHE_FILE_NAME, true);
 
-        $cachedImage = $cache->get(self::GET_KEY);
+        $image = $cache->get(self::FILE_NAME);
 
-        $this->assertInstanceOf(ImageFile::class, $cachedImage);
-        $this->assertImageProcessor_saveToFile_isCalledOnceWith($image);
+        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertEquals(self::CACHE_FILE_NAME, $image->getFilename());
     }
 
     /** @test */
-    public function put_imageWriterIsSpecified_insertMethodCalled(): void
+    public function put_givenFileNameAndImage_imageIsSavedInCache(): void
     {
-        $writer = \Phake::mock(ImageWriterInterface::class);
-        $cache = $this->createImageCache($writer);
-        $stream = $this->givenStream();
+        $cache = $this->createImageCache();
+        $image = $this->givenImage();
 
-        $cache->put(self::INSERT_KEY, $stream);
+        $cache->put(self::FILE_NAME, $image);
 
-        \Phake::verify($writer, \Phake::times(1))->insert(self::INSERT_KEY, $stream);
+        $this->assertImageProcessor_saveToFile_isCalledOnceWith($image, self::CACHE_FILE_NAME);
     }
 
     /** @test */
-    public function delete_imageWriterIsSpecified_deleteMethodCalled(): void
+    public function deleteByMask_givenFileNameMask_allImagesDeletedFromCache(): void
     {
-        $writer = \Phake::mock(ImageWriterInterface::class);
-        $cache = $this->createImageCache($writer);
-        \Phake::when($writer)->getFileMask(self::DELETE_KEY)->thenReturn(self::DELETE_KEY_FILENAME_MASK);
-        \Phake::when($this->fileOperations)
-            ->findByMask(self::DELETE_KEY_DESTINATION_FILENAME_MASK)
-            ->thenReturn(new StringList([self::DELETE_KEY_DESTINATION_FILENAME]));
+        $cache = $this->createImageCache();
+        $this->givenFileOperations_findByMask_returnsStringListWithValues($this->fileOperations, [self::FOUND_FILE_NAME]);
 
-        $cache->delete(self::DELETE_KEY);
+        $cache->deleteByMask(self::FILE_NAME);
 
-        \Phake::verify($writer, \Phake::times(1))->delete(self::DELETE_KEY);
-        $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::DELETE_KEY_DESTINATION_FILENAME);
-    }
-
-    /** @test */
-    public function exists_keyIsSet_existsCalledWithKeyAndValueReturned(): void
-    {
-        $writer = \Phake::mock(ImageWriterInterface::class);
-        $cache = $this->createImageCache($writer);
-        \Phake::when($writer)->exists(self::GET_KEY)->thenReturn(true);
-
-        $result = $cache->exists(self::GET_KEY);
-
-        \Phake::verify($writer, \Phake::times(1))->exists(self::GET_KEY);
-        $this->assertTrue($result);
+        $this->assertFileOperations_findByMask_isCalledOnceWith($this->fileOperations, self::CACHE_FILE_NAME);
+        $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FOUND_FILE_NAME);
     }
 
     /**
      * @test
      * @param string $method
-     * @param array $params
-     * @dataProvider invalidKeyProvider
+     * @param array $parameters
+     * @dataProvider methodAndParametersWithInvalidKeyProvider
      * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
      * @expectedExceptionCode 500
-     * @expectedExceptionMessage Key must start with slash
+     * @expectedExceptionMessage Filename must start with slash
      */
-    public function givenMethod_givenInvalidKey_exceptionThrown(string $method, array $params): void
+    public function givenMethod_givenInvalidKey_exceptionThrown(string $method, array $parameters): void
     {
         $cache = $this->createImageCache();
 
-        call_user_func_array([$cache, $method], $params);
+        \call_user_func_array([$cache, $method], $parameters);
     }
 
-    public function invalidKeyProvider(): array
+    public function methodAndParametersWithInvalidKeyProvider(): array
     {
         return [
             ['get', ['']],
-            ['get', [self::INVALID_KEY]],
-            ['put', [self::INVALID_KEY, $this->givenStream()]],
-            ['delete', [self::INVALID_KEY]],
-            ['exists', [self::INVALID_KEY]],
+            ['get', [self::INVALID_FILE_NAME]],
+            ['put', [self::INVALID_FILE_NAME, $this->givenImage()]],
+            ['deleteByMask', [self::INVALID_FILE_NAME]],
         ];
     }
 
-    private function createImageCache(ImageWriterInterface $writer = null): ImageCache
+    private function givenImage(): Image
     {
-        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
-
-        $cache = new ImageCache(
-            self::BASE_DIRECTORY,
-            $this->fileOperations,
-            $this->imageProcessor,
-            $this->imageExtractor,
-            $writer
-        );
-
-        return $cache;
+        return \Phake::mock(Image::class);
     }
 
-    private function givenImageExtractor_extract_returnsNull(): void
+    private function createImageCache(): ImageCache
     {
-        \Phake::when($this->imageExtractor)
-            ->extract(\Phake::anyParameters())
-            ->thenReturn(null);
+        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::WEB_DIRECTORY, true);
+
+        return new ImageCache(self::WEB_DIRECTORY, $this->fileOperations, $this->imageProcessor);
     }
 
-    private function givenImageExtractor_extract_returnsImage(string $imageKey): Image
+    private function assertImageProcessor_saveToFile_isCalledOnceWith(Image $image, string $fileName): void
     {
-        $image = \Phake::mock(Image::class);
-
-        \Phake::when($this->imageExtractor)
-            ->extract($imageKey)
-            ->thenReturn($image);
-
-        return $image;
+        \Phake::verify($this->imageProcessor, \Phake::times(1))->saveToFile($image, $fileName);
     }
-
-    private function givenStream(): StreamInterface
-    {
-        return \Phake::mock(StreamInterface::class);
-    }
-
-    private function assertImageProcessor_saveToFile_isCalledOnceWith(Image $image): void
-    {
-        \Phake::verify($this->imageProcessor, \Phake::times(1))
-            ->saveToFile($image, self::GET_DESTINATION_FILENAME);
-    }
-
 }

@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of ImgCache.
  *
@@ -12,13 +11,11 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
-use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
-use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
-use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 
 /**
@@ -35,87 +32,58 @@ class ImageCache implements ImageCacheInterface
     /** @var FileOperationsInterface */
     private $fileOperations;
 
-    /** @var ImageExtractorInterface */
-    private $imageExtractor;
-
-    /** @var ImageWriterInterface */
-    private $imageWriter;
-
     /** @var ImageProcessorInterface */
     private $imageProcessor;
 
     public function __construct(
         string $webDirectory,
         FileOperationsInterface $fileOperations,
-        ImageProcessorInterface $imageProcessor,
-        ImageExtractorInterface $imageExtractor,
-        ImageWriterInterface $imageWriter = null
+        ImageProcessorInterface $imageProcessor
     ) {
+        if (!$fileOperations->isDirectory($webDirectory)) {
+            throw new InvalidConfigurationException(sprintf(
+                'Directory "%s" does not exist',
+                $webDirectory
+            ));
+        }
+
+        $this->webDirectory = $webDirectory;
         $this->fileOperations = $fileOperations;
-        if (!$this->fileOperations->isDirectory($webDirectory)) {
-            throw new InvalidConfigurationException("Directory '{$webDirectory}' does not exist");
-        }
-        $this->webDirectory = rtrim($webDirectory, '/');
         $this->imageProcessor = $imageProcessor;
-        $this->imageExtractor = $imageExtractor;
-        $this->imageWriter = $imageWriter ?? new NullWriter();
     }
 
-    /**
-     * First request for image file extracts image from the source and puts it into cache
-     * directory. Next requests will be processed by nginx.
-     * @param string $key
-     * @return null|ImageFile
-     */
-    public function get(string $key): ? ImageFile
+    public function get(string $fileName): ImageFile
     {
-        $this->validateKey($key);
+        $destinationFileName = $this->composeDestinationFileName($fileName);
 
-        $image = $this->imageExtractor->extract($key);
-        if ($image === null) {
-            return null;
+        if (!$this->fileOperations->isFile($destinationFileName)) {
+            throw new FileNotFoundException(sprintf('File "%s" does not exist', $destinationFileName));
         }
 
-        $filename = $this->composeDestinationFilename($key);
-        $this->imageProcessor->saveToFile($image, $filename);
-
-        return new ImageFile($filename);
+        return new ImageFile($destinationFileName);
     }
 
-    public function put(string $key, StreamInterface $data): void
+    public function put(string $fileName, Image $image): void
     {
-        $this->validateKey($key);
-        $this->imageWriter->insert($key, $data);
+        $destinationFileName = $this->composeDestinationFileName($fileName);
+        $this->imageProcessor->saveToFile($image, $destinationFileName);
     }
 
-    public function delete(string $key): void
+    public function deleteByMask(string $fileNameMask): void
     {
-        $this->validateKey($key);
-        $this->imageWriter->delete($key);
-
-        $mask = $this->imageWriter->getFileMask($key);
-        $cachedFiles = $this->fileOperations->findByMask($this->composeDestinationFilename($mask));
-        foreach ($cachedFiles as $cachedFile) {
-            $this->fileOperations->deleteFile($cachedFile);
+        $destinationFileNameMask = $this->composeDestinationFileName($fileNameMask);
+        $cachedFileNames = $this->fileOperations->findByMask($destinationFileNameMask);
+        foreach ($cachedFileNames as $cachedFileName) {
+            $this->fileOperations->deleteFile($cachedFileName);
         }
     }
-    
-    public function exists(string $key): bool
-    {
-        $this->validateKey($key);
 
-        return $this->imageWriter->exists($key);
-    }
-
-    private function composeDestinationFilename(string $key): string
+    private function composeDestinationFileName(string $fileName): string
     {
-        return $this->webDirectory . $key;
-    }
-
-    private function validateKey(string $key): void
-    {
-        if (strlen($key) <= 0 || $key[0] !== '/') {
-            throw new InvalidValueException('Key must start with slash');
+        if (\strlen($fileName) <= 0 || $fileName[0] !== '/') {
+            throw new InvalidValueException('Filename must start with slash');
         }
+
+        return $this->webDirectory . $fileName;
     }
 }

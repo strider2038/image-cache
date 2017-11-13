@@ -13,7 +13,9 @@ namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 use Strider2038\ImgCache\Service\Image\CreateAction;
 use Strider2038\ImgCache\Service\Image\DeleteAction;
 use Strider2038\ImgCache\Service\Image\GetAction;
@@ -25,8 +27,14 @@ class ImageActionFactoryTest extends TestCase
     private const LOCATION = 'location';
     private const ACTION_ID_INVALID = 'invalid';
 
+    /** @var ImageStorageInterface */
+    private $imageStorage;
+
     /** @var ImageCacheInterface */
     private $imageCache;
+
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
 
     /** @var ResponseFactoryInterface */
     private $responseFactory;
@@ -36,7 +44,9 @@ class ImageActionFactoryTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->imageStorage = \Phake::mock(ImageStorageInterface::class);
         $this->imageCache = \Phake::mock(ImageCacheInterface::class);
+        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
         $this->request = \Phake::mock(RequestInterface::class);
     }
@@ -81,6 +91,12 @@ class ImageActionFactoryTest extends TestCase
 
     protected function createFactory(): ImageActionFactory
     {
-        return new ImageActionFactory($this->imageCache, $this->responseFactory, $this->request);
+        return new ImageActionFactory(
+            $this->imageStorage,
+            $this->imageCache,
+            $this->imageFactory,
+            $this->responseFactory,
+            $this->request
+        );
     }
 }

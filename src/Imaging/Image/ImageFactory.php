@@ -80,6 +80,15 @@ class ImageFactory implements ImageFactoryInterface
         return new Image($this->createSaveOptions(), new StringStream($data));
     }
 
+    public function createFromStream(StreamInterface $stream): Image
+    {
+        if (!$this->imageValidator->hasDataValidImageMimeType($stream->getContents())) {
+            throw new InvalidMediaTypeException('Image has unsupported mime type');
+        }
+
+        return new Image($this->createSaveOptions(), $stream);
+    }
+
     private function createSaveOptions(): SaveOptions
     {
         return $this->saveOptionsFactory->create();

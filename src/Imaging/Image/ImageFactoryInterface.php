@@ -21,4 +21,5 @@ interface ImageFactoryInterface
     public function create(StreamInterface $data, SaveOptions $saveOptions): Image;
     public function createFromFile(string $filename): Image;
     public function createFromData(string $data): Image;
+    public function createFromStream(StreamInterface $stream): Image;
 }

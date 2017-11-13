@@ -85,7 +85,7 @@ class ThumbnailImageWriterTest extends TestCase
         $writer = $this->createThumbnailImageWriter();
         $this->givenKeyParser_parse_returnsThumbnailKey();
 
-        $filename = $writer->getFileMask(self::KEY);
+        $filename = $writer->getFileNameMask(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
         $this->assertEquals(self::THUMBNAIL_MASK, $filename);
@@ -116,7 +116,7 @@ class ThumbnailImageWriterTest extends TestCase
             ['exists', [self::KEY]],
             ['insert', [self::KEY, \Phake::mock(StreamInterface::class)]],
             ['delete', [self::KEY]],
-            ['getFileMask', [self::KEY]],
+            ['getFileNameMask', [self::KEY]],
         ];
     }
 
