@@ -10,9 +10,11 @@
 
 namespace Strider2038\ImgCache\Tests\Functional;
 
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
-use Strider2038\ImgCache\Imaging\DeprecatedImageCache;
-use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
+use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 class ThumbnailImageCacheTest extends FunctionalTestCase
@@ -30,43 +32,48 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
 
-    /** @var DeprecatedImageCache */
-    private $cache;
+    /** @var ImageController */
+    private $controller;
+
+    /** @var RequestInterface */
+    private $request;
 
     protected function setUp(): void
     {
         parent::setUp();
         $container = $this->loadContainer('thumbnail-image-cache.yml');
-        $this->cache = $container->get('image_cache');
+        $this->request = \Phake::mock(RequestInterface::class);
+        $container->set('request', $this->request);
+        $this->controller = $container->get('image_controller');
     }
 
     /** @test */
-    public function get_givenImageNotExistInSource_nullIsReturned(): void
+    public function get_givenImageNotExistInSource_notFoundResponseReturned(): void
     {
-        $image = $this->cache->get(self::FILE_NOT_EXIST);
+        $response = $this->controller->runAction('get',self::FILE_NOT_EXIST);
 
-        $this->assertNull($image);
+        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
     }
 
     /** @test */
-    public function get_givenImageInRootOfSource_imageIsReturned(): void
+    public function get_givenImageInRootOfSource_imageCreatedInCacheAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
 
-        $image = $this->cache->get(self::IMAGE_JPEG_CACHE_KEY);
+        $response = $this->controller->runAction('get',self::IMAGE_JPEG_CACHE_KEY);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
     }
 
     /** @test */
-    public function get_givenImageInRootOfSourceAndThumbnailRequested_thumbnailCreatedAndImageIsReturned(): void
+    public function get_givenImageInRootOfSourceAndThumbnailRequested_thumbnailCreatedAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
 
-        $image = $this->cache->get(self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
+        $response = $this->controller->runAction('get',self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
         [$width, $height, $type] = getimagesize(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
         $this->assertEquals(self::IMAGE_JPEG_THUMBNAIL_WIDTH, $width);
@@ -75,61 +82,59 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     }
 
     /** @test */
-    public function get_givenImageInSubdirectoryRequested_imageIsReturned(): void
+    public function get_givenImageInSubdirectoryRequested_imageCreatedAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
 
-        $image = $this->cache->get(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
+        $response = $this->controller->runAction('get',self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
-        $this->assertInstanceOf(ImageFile::class, $image);
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
     }
 
     /** @test */
-    public function put_givenStream_imageIsCreated(): void
+    public function replace_givenStream_imageIsCreatedAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
         $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenRequest_getBody_returns($stream);
 
-        $this->cache->put(self::IMAGE_JPEG_CACHE_KEY, $stream);
+        $response = $this->controller->runAction('replace',self::IMAGE_JPEG_CACHE_KEY);
 
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
     }
 
     /** @test */
-    public function put_givenStream_imageIsCreatedInSubdirectory(): void
+    public function replace_givenStream_imageIsCreatedInCacheSubdirectoryAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
         $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenRequest_getBody_returns($stream);
 
-        $this->cache->put(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY, $stream);
+        $response = $this->controller->runAction('replace',self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
+        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
     }
 
     /** @test */
-    public function delete_imageExistsInSourceAndIsCachedAndThumbnailExists_imageAndThumbnailIsDeleted(): void
+    public function delete_imageExistsInSourceAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
 
-        $this->cache->delete(self::IMAGE_JPEG_CACHE_KEY);
+        $response = $this->controller->runAction('delete',self::IMAGE_JPEG_CACHE_KEY);
 
+        $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
         $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
-     * @expectedExceptionCode 400
-     */
-    public function exists_invalidKey_exceptionThrown(): void
+    private function givenRequest_getBody_returns(StreamInterface $stream): void
     {
-        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
-
-        $this->cache->delete(self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
+        \Phake::when($this->request)->getBody()->thenReturn($stream);
     }
 }

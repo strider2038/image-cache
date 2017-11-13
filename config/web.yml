@@ -70,7 +70,9 @@ services:
   filesystem_cache_action_factory:
     class: Strider2038\ImgCache\Service\Image\ImageActionFactory
     arguments:
+      - '@filesystem_image_storage'
       - '@filesystem_image_cache'
+      - '@image_factory'
       - '@response_factory'
       - '@request'
   yandex_map_cache_image_controller:
@@ -82,25 +84,33 @@ services:
   yandex_map_cache_action_factory:
     class: Strider2038\ImgCache\Service\Image\ImageActionFactory
     arguments:
+      - '@yandex_map_image_storage'
       - '@yandex_map_image_cache'
+      - '@image_factory'
       - '@response_factory'
       - '@request'
 
   # imaging
+  filesystem_image_storage:
+    class: Strider2038\ImgCache\Imaging\ImageStorage
+    arguments:
+      - '@thumbnail_image_extractor'
   filesystem_image_cache:
     class: Strider2038\ImgCache\Imaging\ImageCache
     arguments:
       - '%filesystem_image_cache.base_directory%'
       - '@file_operations'
       - '@image_processor'
-      - '@thumbnail_image_extractor'
+  yandex_map_image_storage:
+    class: Strider2038\ImgCache\Imaging\ImageStorage
+    arguments:
+      - '@yandex_map_image_extractor'
   yandex_map_image_cache:
     class: Strider2038\ImgCache\Imaging\ImageCache
     arguments:
       - '%yandex_map_image_cache.base_directory%'
       - '@file_operations'
       - '@image_processor'
-      - '@yandex_map_image_extractor'
 
   # imaging/image
   image_factory:

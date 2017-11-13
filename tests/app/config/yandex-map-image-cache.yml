@@ -10,15 +10,37 @@ services:
   file_operations:
     class: \Strider2038\ImgCache\Core\FileOperations
     arguments: ['@filesystem']
+  response_factory:
+    class: Strider2038\ImgCache\Core\Http\ResponseFactory
+    arguments:
+      - '@request'
+
+  # service
+  image_controller:
+    class: \Strider2038\ImgCache\Service\ImageController
+    arguments:
+      - '@response_factory'
+      - '@image_action_factory'
+  image_action_factory:
+    class: Strider2038\ImgCache\Service\Image\ImageActionFactory
+    arguments:
+      - '@image_storage'
+      - '@image_cache'
+      - '@image_factory'
+      - '@response_factory'
+      - '@request'
 
   # imaging
+  image_storage:
+    class: \Strider2038\ImgCache\Imaging\ImageStorage
+    arguments:
+      - '@yandex_map_image_extractor'
   image_cache:
     class: \Strider2038\ImgCache\Imaging\ImageCache
     arguments:
       - '%image_cache.base_directory%'
       - '@file_operations'
       - '@image_processor'
-      - '@yandex_map_image_extractor'
 
   # imaging/image
   image_factory:

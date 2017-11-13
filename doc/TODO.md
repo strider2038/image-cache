@@ -13,7 +13,7 @@
 - [x] Functional testing
 - [x] Yandex Static Map source
 - [x] Split ImageController to action classes
-- [ ] Split ImageCache class to ImageStorage and ImageCache
+- [x] Split ImageCache class to ImageStorage and ImageCache
 - [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Router rewrites Request URI, eliminate location in controllers
 - [ ] Yandex.Disk source
