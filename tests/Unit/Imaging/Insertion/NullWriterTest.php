@@ -40,7 +40,7 @@ class NullWriterTest extends TestCase
             ['exists', [self::KEY]],
             ['insert', [self::KEY, \Phake::mock(StreamInterface::class)]],
             ['delete', [self::KEY]],
-            ['getFileMask', [self::KEY]],
+            ['getFileNameMask', [self::KEY]],
         ];
     }
 }

@@ -38,7 +38,7 @@ class ImageFactoryTest extends TestCase
     /** @var FileOperationsInterface */
     private $fileOperations;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
@@ -169,6 +169,37 @@ class ImageFactoryTest extends TestCase
         $factory->createFromData(self::DATA);
     }
 
+    /** @test */
+    public function createFromStream_givenStream_imageIsReturned(): void
+    {
+        $factory = $this->createImageFactory();
+        $stream = $this->givenStreamWithData();
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
+        $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+
+        $image = $factory->createFromStream($stream);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertSame($stream, $image->getData());
+        $this->assertImageValidator_hasDataValidImageMimeType_isCalledOnceWith(self::DATA);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
+     * @expectedExceptionCode 415
+     * @expectedExceptionMessage Image has unsupported mime type
+     */
+    public function createFromStream_givenImageHasInvalidMimeType_exceptionThrown(): void
+    {
+        $factory = $this->createImageFactory();
+        $stream = $this->givenStreamWithData();
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
+
+        $factory->createFromStream($stream);
+    }
+
     private function createImageFactory(): ImageFactory
     {
         $factory = new ImageFactory(
@@ -208,6 +239,12 @@ class ImageFactoryTest extends TestCase
         \Phake::when($this->imageValidator)
             ->hasDataValidImageMimeType(\Phake::anyParameters())
             ->thenReturn($value);
+    }
+
+    private function assertImageValidator_hasDataValidImageMimeType_isCalledOnceWith(string $data): void
+    {
+        \Phake::verify($this->imageValidator, \Phake::times(1))
+            ->hasDataValidImageMimeType($data);
     }
 
     private function givenStreamWithData(): StreamInterface
