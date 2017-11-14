@@ -40,7 +40,7 @@ class RouterTest extends TestCase
     /** @var LoggerInterface */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = \Phake::mock(RequestInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);

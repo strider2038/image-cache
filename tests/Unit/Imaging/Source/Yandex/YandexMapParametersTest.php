@@ -38,7 +38,7 @@ class YandexMapParametersTest extends TestCase
     /** @var ModelValidatorInterface */
     private $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validator = new ModelValidator();
     }
