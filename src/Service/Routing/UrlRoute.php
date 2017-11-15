@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Service\Routing;
 
+use Strider2038\ImgCache\Core\Http\UriInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -18,13 +20,13 @@ class UrlRoute
     /** @var string */
     private $controllerId;
 
-    /** @var string */
-    private $url;
+    /** @var UriInterface */
+    private $uri;
 
-    public function __construct(string $controllerId, string $url)
+    public function __construct(string $controllerId, UriInterface $uri)
     {
         $this->controllerId = $controllerId;
-        $this->url = $url;
+        $this->uri = $uri;
     }
 
     public function getControllerId(): string
@@ -32,8 +34,8 @@ class UrlRoute
         return $this->controllerId;
     }
 
-    public function getUrl(): string
+    public function getUri(): UriInterface
     {
-        return $this->url;
+        return $this->uri;
     }
 }

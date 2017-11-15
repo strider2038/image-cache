@@ -56,7 +56,7 @@ class UrlRouteDetectorTest extends TestCase
         $this->assertRequest_getUri_isCalledOnce($request);
         $this->assertUri_getPath_isCalledOnce($uri);
         $this->assertEquals($controllerId, $route->getControllerId());
-        $this->assertEquals($routeUrl, $route->getUrl());
+        $this->assertEquals($routeUrl, $route->getUri()->getPath());
     }
 
     /**

@@ -35,7 +35,7 @@ class ImageDefaultRouteDetectorTest extends TestCase
         $this->assertRequest_getUri_isCalledOnce($request);
         $this->assertUri_getPath_isCalledOnce($uri);
         $this->assertEquals(self::CONTROLLER_ID, $route->getControllerId());
-        $this->assertEquals(self::REQUEST_PATH, $route->getUrl());
+        $this->assertEquals(self::REQUEST_PATH, $route->getUri()->getPath());
     }
 
     private function givenRequest_getUri_returnsUri(RequestInterface $request): UriInterface

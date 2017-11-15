@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Service\Routing;
 
 use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\Http\Uri;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
 
@@ -43,7 +44,9 @@ class UrlRouteDetector implements UrlRouteDetectorInterface
                 && array_key_exists('url', $matches)
                 && count($matches['url']) > 0
             ) {
-                return new UrlRoute($path->getControllerId(), '/' . $matches['url'][0]);
+                $uri = new Uri('/' . $matches['url'][0]);
+
+                return new UrlRoute($path->getControllerId(), $uri);
             }
         }
 

@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Service;
 
 use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\Http\Uri;
 use Strider2038\ImgCache\Service\Routing\UrlRoute;
 use Strider2038\ImgCache\Service\Routing\UrlRouteDetectorInterface;
 
@@ -25,6 +26,6 @@ class ImageDefaultRouteDetector implements UrlRouteDetectorInterface
     {
         $path = $request->getUri()->getPath();
 
-        return new UrlRoute(self::CONTROLLER_ID, $path);
+        return new UrlRoute(self::CONTROLLER_ID, new Uri($path));
     }
 }
