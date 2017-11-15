@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Core\Http\RequestInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -21,14 +23,14 @@ class Route
     /** @var string */
     private $actionId;
 
-    /** @var string */
-    private $location;
+    /** @var RequestInterface */
+    private $request;
 
-    public function __construct(string $controllerId, string $actionId, string $location)
+    public function __construct(string $controllerId, string $actionId, RequestInterface $request)
     {
         $this->controllerId = $controllerId;
         $this->actionId = $actionId;
-        $this->location = $location;
+        $this->request = $request;
     }
     
     public function getControllerId(): string
@@ -41,8 +43,8 @@ class Route
         return $this->actionId;
     }
 
-    public function getLocation(): string
+    public function getRequest(): RequestInterface
     {
-        return $this->location;
+        return $this->request;
     }
 }

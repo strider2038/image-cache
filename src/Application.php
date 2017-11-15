@@ -88,7 +88,7 @@ class Application
             $route = $this->router->getRoute($this->request);
             /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
-            $response = $controller->runAction($route->getActionId(), $route->getLocation());
+            $response = $controller->runAction($route->getActionId(), $route->getRequest());
             $this->responseSender->send($response);
 
             $this->logger->debug(sprintf(
