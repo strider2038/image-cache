@@ -28,4 +28,20 @@ class RequestTest extends TestCase
         $this->assertSame($method, $request->getMethod());
         $this->assertSame($uri, $request->getUri());
     }
+
+    /** @test */
+    public function withUri_givenRequestWithMethodAndUri_requestWithNewUriReturned(): void
+    {
+        $method = \Phake::mock(HttpMethodEnum::class);
+        $uri = \Phake::mock(UriInterface::class);
+        $request = new Request($method, $uri);
+        $newUri = \Phake::mock(UriInterface::class);
+
+        $requestWithNewUri = $request->withUri($newUri);
+
+        $this->assertSame($method, $request->getMethod());
+        $this->assertSame($uri, $request->getUri());
+        $this->assertSame($method, $requestWithNewUri->getMethod());
+        $this->assertSame($newUri, $requestWithNewUri->getUri());
+    }
 }
