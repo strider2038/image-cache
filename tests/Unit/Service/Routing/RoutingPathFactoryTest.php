@@ -13,11 +13,11 @@ namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
-use Strider2038\ImgCache\Service\Routing\RoutingMapFactory;
 use Strider2038\ImgCache\Service\Routing\RoutingPath;
+use Strider2038\ImgCache\Service\Routing\RoutingPathFactory;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class RoutingMapFactoryTest extends TestCase
+class RoutingPathFactoryTest extends TestCase
 {
     private const PREFIX = 'prefix';
     private const CONTROLLER_ID = 'controllerId';
@@ -35,14 +35,14 @@ class RoutingMapFactoryTest extends TestCase
     }
 
     /** @test */
-    public function createRoutingMap_givenValidRoutingMapInArray_mapWithValidPathsCreated(): void
+    public function createRoutingPathCollection_givenValidRoutingMapInArray_mapWithValidPathsCreated(): void
     {
         $mapInArray = [self::PREFIX => self::CONTROLLER_ID];
-        $factory = $this->createRoutingMapFactory();
+        $factory = $this->createRoutingPathFactory();
         $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 0);
 
-        $map = $factory->createRoutingMap($mapInArray);
+        $map = $factory->createRoutingPathCollection($mapInArray);
 
         $this->assertCount(1, $map);
         /** @var RoutingPath $firstPath */
@@ -57,19 +57,19 @@ class RoutingMapFactoryTest extends TestCase
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Invalid routing map
      */
-    public function createRoutingMap_givenInvalidRoutingMapInArray_exceptionThrown(): void
+    public function createRoutingPathCollection_givenInvalidRoutingMapInArray_exceptionThrown(): void
     {
         $mapInArray = [self::PREFIX => self::CONTROLLER_ID];
-        $factory = $this->createRoutingMapFactory();
+        $factory = $this->createRoutingPathFactory();
         $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 1);
 
-        $factory->createRoutingMap($mapInArray);
+        $factory->createRoutingPathCollection($mapInArray);
     }
 
-    private function createRoutingMapFactory(): RoutingMapFactory
+    private function createRoutingPathFactory(): RoutingPathFactory
     {
-        return new RoutingMapFactory($this->validator, $this->violationsFormatter);
+        return new RoutingPathFactory($this->validator, $this->violationsFormatter);
     }
 
     private function givenValidator_validate_returnViolations(): ConstraintViolationListInterface

@@ -13,7 +13,8 @@ namespace Strider2038\ImgCache\Service\Routing;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface RoutingMapFactoryInterface
+interface RoutingPathFactoryInterface
 {
-    public function createRoutingMap(array $routingMap): RoutingPathCollection;
+    public function createRoutingPath(string $ulrPrefix, string $controllerId): RoutingPath;
+    public function createRoutingPathCollection(array $routingMap): RoutingPathCollection;
 }

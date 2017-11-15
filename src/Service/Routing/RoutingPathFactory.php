@@ -17,7 +17,7 @@ use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class RoutingMapFactory implements RoutingMapFactoryInterface
+class RoutingPathFactory implements RoutingPathFactoryInterface
 {
     /** @var ModelValidatorInterface */
     private $validator;
@@ -31,22 +31,27 @@ class RoutingMapFactory implements RoutingMapFactoryInterface
         $this->violationsFormatter = $violationsFormatter;
     }
 
-    public function createRoutingMap(array $routingMap): RoutingPathCollection
+    public function createRoutingPath(string $urlPrefix, string $controllerId): RoutingPath
+    {
+        $path = new RoutingPath($urlPrefix, $controllerId);
+        $violations = $this->validator->validate($path);
+
+        if (count($violations) > 0) {
+            throw new InvalidConfigurationException(sprintf(
+                'Invalid routing map: %s',
+                $this->violationsFormatter->format($violations)
+            ));
+        }
+
+        return $path;
+    }
+
+    public function createRoutingPathCollection(array $routingMap): RoutingPathCollection
     {
         $map = new RoutingPathCollection();
 
-        foreach ($routingMap as $prefix => $controllerId) {
-            $path = new RoutingPath($prefix, $controllerId);
-            $violations = $this->validator->validate($path);
-
-            if (count($violations) > 0) {
-                throw new InvalidConfigurationException(sprintf(
-                    'Invalid routing map: %s',
-                    $this->violationsFormatter->format($violations)
-                ));
-            }
-
-            $map->add($path);
+        foreach ($routingMap as $urlPrefix => $controllerId) {
+            $map->add($this->createRoutingPath($urlPrefix, $controllerId));
         }
 
         return $map;
