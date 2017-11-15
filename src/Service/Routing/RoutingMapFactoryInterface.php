@@ -10,15 +10,10 @@
 
 namespace Strider2038\ImgCache\Service\Routing;
 
-use Strider2038\ImgCache\Collection\AbstractClassCollection;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class RoutingMap extends AbstractClassCollection
+interface RoutingMapFactoryInterface
 {
-    public function __construct(array $elements = [])
-    {
-        parent::__construct($elements, RoutingMapPath::class);
-    }
+    public function createRoutingMap(array $routingMap): RoutingPathCollection;
 }

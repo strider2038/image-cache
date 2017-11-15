@@ -13,10 +13,10 @@ namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
-use Strider2038\ImgCache\Service\Routing\RoutingMapPath;
+use Strider2038\ImgCache\Service\Routing\RoutingPath;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
-class RoutingMapPathTest extends TestCase
+class RoutingPathTest extends TestCase
 {
     /** @var ModelValidatorInterface */
     private $validator;
@@ -38,7 +38,7 @@ class RoutingMapPathTest extends TestCase
         string $controllerId,
         string $invalidParameterName
     ): void {
-        $path = new RoutingMapPath($urlPrefix, $controllerId);
+        $path = new RoutingPath($urlPrefix, $controllerId);
 
         $violations = $this->validator->validate($path);
 

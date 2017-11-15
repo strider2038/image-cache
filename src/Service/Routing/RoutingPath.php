@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class RoutingMapPath implements ModelInterface
+class RoutingPath implements ModelInterface
 {
     /**
      * @Assert\NotBlank()

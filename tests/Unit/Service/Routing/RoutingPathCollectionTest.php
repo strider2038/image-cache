@@ -11,17 +11,17 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Service\Routing\RoutingMap;
-use Strider2038\ImgCache\Service\Routing\RoutingMapPath;
+use Strider2038\ImgCache\Service\Routing\RoutingPath;
+use Strider2038\ImgCache\Service\Routing\RoutingPathCollection;
 
-class RoutingMapTest extends TestCase
+class RoutingPathCollectionTest extends TestCase
 {
     /** @test */
     public function construct_givenRoutingMapPath_pathIsSet(): void
     {
-        $path = new RoutingMapPath('prefix', 'controller');
+        $path = new RoutingPath('prefix', 'controller');
 
-        $map = new RoutingMap([$path]);
+        $map = new RoutingPathCollection([$path]);
 
         $this->assertEquals($path, $map->first());
     }
