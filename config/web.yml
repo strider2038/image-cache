@@ -10,11 +10,7 @@ parameters:
   filesystem_source.base_directory: '%app.directory%/tests/assets'
   yandex_map_client.parameters:
     base_uri: 'https://static-maps.yandex.ru/1.x/'
-  yandex_map_client:
-    class: GuzzleHttp\Client
-    arguments:
-      - '%yandex_map_client.parameters%'
-  routes:
+  routing_map:
     /i: 'filesystem_cache_image_controller'
     /yandex_map: 'yandex_map_cache_image_controller'
 
@@ -31,36 +27,66 @@ services:
   request_factory:
     class: Strider2038\ImgCache\Core\Http\RequestFactory
   request:
-    factory: ['@request_factory', 'createRequest']
-    arguments: ['%server_configuration%']
+    factory:
+      - '@request_factory'
+      - 'createRequest'
+    arguments:
+      - '%server_configuration%'
   response_sender:
     class: Strider2038\ImgCache\Core\Http\ResponseSender
   response_factory:
     class: Strider2038\ImgCache\Core\Http\ResponseFactory
-    arguments: ['@request', '%app.debug%']
+    arguments:
+      - '@request'
+      - '%app.debug%'
   security:
     class: Strider2038\ImgCache\Core\Security
-    arguments: ['@request', '%security.access_token%']
+    arguments:
+      - '@request'
+      - '%security.access_token%'
   logger_factory:
     class: Strider2038\ImgCache\Core\LoggerFactory
-    arguments: ['%log.directory%']
+    arguments:
+      - '%log.directory%'
   logger:
-    factory: ['@logger_factory', 'createLogger']
-    arguments: ['%log.name%', '%log.level%']
+    factory:
+      - '@logger_factory'
+      - 'createLogger'
+    arguments:
+      - '%log.name%'
+      - '%log.level%'
   file_operations:
     class: Strider2038\ImgCache\Core\FileOperations
-    arguments: ['@filesystem']
+    arguments:
+      - '@filesystem'
     calls:
       - [setLogger, ['@logger']]
 
   # routing components
   router:
     class: Strider2038\ImgCache\Service\Router
-    arguments: ['@image_validator', '%routes%']
+    arguments:
+      - '@image_validator'
+      - '@url_route_detector'
     calls:
       - [setLogger, ['@logger']]
+  url_route_detector:
+    class: Strider2038\ImgCache\Service\Routing\UrlRouteDetector
+    arguments:
+      - '@routing_paths'
+  routing_path_factory:
+    class: Strider2038\ImgCache\Service\Routing\RoutingPathFactory
+    arguments:
+      - '@model_validator'
+      - '@violations_formatter'
+  routing_paths:
+    factory:
+      - '@routing_path_factory'
+      - 'createRoutingPathCollection'
+    arguments:
+      - '%routing_map%'
 
-  # controllers
+  # filesystem cache controller
   filesystem_cache_image_controller:
     class: Strider2038\ImgCache\Service\ImageController
     arguments:
@@ -70,11 +96,37 @@ services:
   filesystem_cache_action_factory:
     class: Strider2038\ImgCache\Service\Image\ImageActionFactory
     arguments:
+      - '@filesystem_cache_action_get'
+      - '@filesystem_cache_action_create'
+      - '@filesystem_cache_action_replace'
+      - '@filesystem_cache_action_delete'
+  filesystem_cache_action_get:
+    class: Strider2038\ImgCache\Service\Image\GetAction
+    arguments:
+      - '@response_factory'
+      - '@filesystem_image_storage'
+      - '@filesystem_image_cache'
+  filesystem_cache_action_create:
+    class: Strider2038\ImgCache\Service\Image\CreateAction
+    arguments:
+      - '@response_factory'
+      - '@filesystem_image_storage'
+      - '@image_factory'
+  filesystem_cache_action_replace:
+    class: Strider2038\ImgCache\Service\Image\ReplaceAction
+    arguments:
+      - '@response_factory'
       - '@filesystem_image_storage'
       - '@filesystem_image_cache'
       - '@image_factory'
+  filesystem_cache_action_delete:
+    class: Strider2038\ImgCache\Service\Image\DeleteAction
+    arguments:
       - '@response_factory'
-      - '@request'
+      - '@filesystem_image_storage'
+      - '@filesystem_image_cache'
+
+  # yandex map cache controller
   yandex_map_cache_image_controller:
     class: Strider2038\ImgCache\Service\ImageController
     arguments:
@@ -84,11 +136,35 @@ services:
   yandex_map_cache_action_factory:
     class: Strider2038\ImgCache\Service\Image\ImageActionFactory
     arguments:
+      - '@yandex_map_cache_action_get'
+      - '@yandex_map_cache_action_create'
+      - '@yandex_map_cache_action_replace'
+      - '@yandex_map_cache_action_delete'
+  yandex_map_cache_action_get:
+    class: Strider2038\ImgCache\Service\Image\GetAction
+    arguments:
+      - '@response_factory'
+      - '@yandex_map_image_storage'
+      - '@yandex_map_image_cache'
+  yandex_map_cache_action_create:
+    class: Strider2038\ImgCache\Service\Image\CreateAction
+    arguments:
+      - '@response_factory'
+      - '@yandex_map_image_storage'
+      - '@image_factory'
+  yandex_map_cache_action_replace:
+    class: Strider2038\ImgCache\Service\Image\ReplaceAction
+    arguments:
+      - '@response_factory'
       - '@yandex_map_image_storage'
       - '@yandex_map_image_cache'
       - '@image_factory'
+  yandex_map_cache_action_delete:
+    class: Strider2038\ImgCache\Service\Image\DeleteAction
+    arguments:
       - '@response_factory'
-      - '@request'
+      - '@yandex_map_image_storage'
+      - '@yandex_map_image_cache'
 
   # imaging
   filesystem_image_storage:

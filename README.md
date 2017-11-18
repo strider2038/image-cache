@@ -20,7 +20,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Yandex Static Map source
 - [x] Split ImageController to action classes
 - [x] Split ImageCache class to ImageStorage and ImageCache
-- [ ] Router rewrites Request URI, eliminate location in controllers
+- [x] Router rewrites Request URI, eliminate location in controllers
 - [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection

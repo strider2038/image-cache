@@ -45,6 +45,7 @@ class ResponseFactory implements ResponseFactoryInterface
     public function createExceptionResponse(\Throwable $exception): ResponseInterface
     {
         $code = $exception->getCode();
+
         if (HttpStatusCodeEnum::isValid($code)) {
             $httpStatusCode = new HttpStatusCodeEnum($code);
         } else {

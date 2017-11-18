@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\ControllerInterface;
-use Strider2038\ImgCache\Core\Http\RequestFactoryInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
@@ -22,11 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ApplicationTest extends TestCase 
 {
-    const SERVER_CONFIGURATION_ARRAY = ['server' => 'configuration'];
     use ProviderTrait, LoggerTrait;
 
-    private const SERVER_CONFIGURATION_PARAMETER_ID = 'server_configuration';
-    private const REQUEST_FACTORY_ID = 'request_factory';
+    private const REQUEST_ID = 'request';
     private const RESPONSE_FACTORY_ID = 'response_factory';
     private const RESPONSE_SENDER_ID = 'response_sender';
     private const ROUTER_ID = 'router';
@@ -38,8 +35,8 @@ class ApplicationTest extends TestCase
     /** @var ContainerInterface */
     private $container;
 
-    /** @var RequestFactoryInterface */
-    private $requestFactory;
+    /** @var RequestInterface */
+    private $request;
 
     /** @var ResponseFactoryInterface */
     private $responseFactory;
@@ -56,7 +53,7 @@ class ApplicationTest extends TestCase
     protected function setUp(): void
     {
         $this->container = \Phake::mock(ContainerInterface::class);
-        $this->requestFactory = \Phake::mock(RequestFactoryInterface::class);
+        $this->request = \Phake::mock(RequestInterface::class);
         $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
         $this->responseSender = \Phake::mock(ResponseSenderInterface::class);
         $this->router = \Phake::mock(RouterInterface::class);
@@ -82,8 +79,6 @@ class ApplicationTest extends TestCase
     public function run_allServicesExists_responseIsSentAnd0IsReturned(): void
     {
         $application = $this->createApplicationWithAllServices();
-        $this->givenContainer_getParameter_returnsArray(self::SERVER_CONFIGURATION_ARRAY);
-        $request = $this->givenRequestFactory_createRequest_returnsRequest();
         $routerRequest = $this->givenRequest();
         $this->givenRouter_getRoute_returnsRouteWithParameters(
             self::CONTROLLER_ID,
@@ -96,9 +91,7 @@ class ApplicationTest extends TestCase
         $exitCode = $application->run();
 
         $this->assertEquals(0, $exitCode);
-        $this->assertContainer_getParameter_isCalledOnceWithParameterId(self::SERVER_CONFIGURATION_PARAMETER_ID);
-        $this->assertRequestFactory_createRequest_isCalledOnceWithServerConfiguration(self::SERVER_CONFIGURATION_ARRAY);
-        $this->assertRouter_getRoute_isCalledOnceWithRequest($request);
+        $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
         $this->assertContainer_get_isCalledOnceWithControllerId(self::CONTROLLER_ID);
         $this->assertController_runAction_isCalledOnceWithActionIdAndRequest($controller, self::ACTION_ID, $routerRequest);
         $this->assertResponseSender_send_isCalledOnceWithResponse($response);
@@ -108,17 +101,13 @@ class ApplicationTest extends TestCase
     public function run_allServicesExistsAndRouterThrowsException_errorResponseIsSent(): void
     {
         $application = $this->createApplicationWithAllServices();
-        $this->givenContainer_getParameter_returnsArray(self::SERVER_CONFIGURATION_ARRAY);
-        $request = $this->givenRequestFactory_createRequest_returnsRequest();
         $this->givenRouter_getRoute_throwsException();
         $response = $this->givenResponseFactory_createExceptionResponse_returnsResponse();
 
         $exitCode = $application->run();
 
         $this->assertEquals(1, $exitCode);
-        $this->assertContainer_getParameter_isCalledOnceWithParameterId(self::SERVER_CONFIGURATION_PARAMETER_ID);
-        $this->assertRequestFactory_createRequest_isCalledOnceWithServerConfiguration(self::SERVER_CONFIGURATION_ARRAY);
-        $this->assertRouter_getRoute_isCalledOnceWithRequest($request);
+        $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
         $this->assertLogger_error_isCalledOnce($this->logger);
         $this->assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters();
         $this->assertResponseSender_send_isCalledOnceWithResponse($response);
@@ -141,7 +130,7 @@ class ApplicationTest extends TestCase
 
     private function createApplicationWithAllServices(): Application
     {
-        \Phake::when($this->container)->get(self::REQUEST_FACTORY_ID)->thenReturn($this->requestFactory);
+        \Phake::when($this->container)->get(self::REQUEST_ID)->thenReturn($this->request);
         \Phake::when($this->container)->get(self::RESPONSE_FACTORY_ID)->thenReturn($this->responseFactory);
         \Phake::when($this->container)->get(self::RESPONSE_SENDER_ID)->thenReturn($this->responseSender);
         \Phake::when($this->container)->get(self::ROUTER_ID)->thenReturn($this->router);
@@ -198,19 +187,6 @@ class ApplicationTest extends TestCase
         return \Phake::mock(RequestInterface::class);
     }
 
-    private function givenRequestFactory_createRequest_returnsRequest(): RequestInterface
-    {
-        $request = $this->givenRequest();
-        \Phake::when($this->requestFactory)->createRequest(\Phake::anyParameters())->thenReturn($request);
-
-        return $request;
-    }
-
-    private function givenContainer_getParameter_returnsArray(array $serverConfiguration): void
-    {
-        \Phake::when($this->container)->getParameter(\Phake::anyParameters())->thenReturn($serverConfiguration);
-    }
-
     private function givenContainer_get_returnsController(string $controllerId): ControllerInterface
     {
         $controller = \Phake::mock(ControllerInterface::class);
@@ -243,16 +219,6 @@ class ApplicationTest extends TestCase
     private function assertRouter_getRoute_isCalledOnceWithRequest(RequestInterface $request): void
     {
         \Phake::verify($this->router, \Phake::times(1))->getRoute($request);
-    }
-
-    private function assertContainer_getParameter_isCalledOnceWithParameterId(string $parameterId): void
-    {
-        \Phake::verify($this->container, \Phake::times(1))->getParameter($parameterId);
-    }
-
-    private function assertRequestFactory_createRequest_isCalledOnceWithServerConfiguration(array $serverConfiguration): void
-    {
-        \Phake::verify($this->requestFactory, \Phake::times(1))->createRequest($serverConfiguration);
     }
 
     private function assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters(): void

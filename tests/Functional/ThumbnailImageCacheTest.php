@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -50,7 +51,9 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     /** @test */
     public function get_givenImageNotExistInSource_notFoundResponseReturned(): void
     {
-        $response = $this->controller->runAction('get',self::FILE_NOT_EXIST);
+        $this->givenRequest_getUri_getPath_returnsPath(self::FILE_NOT_EXIST);
+
+        $response = $this->controller->runAction('get', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
     }
@@ -59,8 +62,9 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     public function get_givenImageInRootOfSource_imageCreatedInCacheAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
 
-        $response = $this->controller->runAction('get',self::IMAGE_JPEG_CACHE_KEY);
+        $response = $this->controller->runAction('get', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
@@ -70,8 +74,9 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     public function get_givenImageInRootOfSourceAndThumbnailRequested_thumbnailCreatedAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
 
-        $response = $this->controller->runAction('get',self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
+        $response = $this->controller->runAction('get', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
@@ -85,8 +90,9 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     public function get_givenImageInSubdirectoryRequested_imageCreatedAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
-        $response = $this->controller->runAction('get',self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
+        $response = $this->controller->runAction('get', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
@@ -97,9 +103,10 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
         $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 
-        $response = $this->controller->runAction('replace',self::IMAGE_JPEG_CACHE_KEY);
+        $response = $this->controller->runAction('replace', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
@@ -110,9 +117,10 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
         $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 
-        $response = $this->controller->runAction('replace',self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
+        $response = $this->controller->runAction('replace', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
@@ -124,13 +132,21 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
 
-        $response = $this->controller->runAction('delete',self::IMAGE_JPEG_CACHE_KEY);
+        $response = $this->controller->runAction('delete', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
         $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
+    }
+
+    private function givenRequest_getUri_getPath_returnsPath(string $path): void
+    {
+        $uri = \Phake::mock(UriInterface::class);
+        \Phake::when($this->request)->getUri()->thenReturn($uri);
+        \Phake::when($uri)->getPath()->thenReturn($path);
     }
 
     private function givenRequest_getBody_returns(StreamInterface $stream): void

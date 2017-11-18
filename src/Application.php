@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\ControllerInterface;
-use Strider2038\ImgCache\Core\Http\RequestFactoryInterface;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\RouterInterface;
@@ -24,8 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Application
 {
-    private const SERVER_CONFIGURATION_PARAMETER_ID = 'server_configuration';
-    private const REQUEST_FACTORY_ID = 'request_factory';
+    private const REQUEST_ID = 'request';
     private const RESPONSE_FACTORY_ID = 'response_factory';
     private const RESPONSE_SENDER_ID = 'response_sender';
     private const ROUTER_ID = 'router';
@@ -34,8 +33,8 @@ class Application
     /** @var ContainerInterface */
     private $container;
 
-    /** @var RequestFactoryInterface */
-    private $requestFactory;
+    /** @var RequestInterface */
+    private $request;
 
     /** @var ResponseFactoryInterface */
     private $responseFactory;
@@ -65,7 +64,7 @@ class Application
         register_shutdown_function([$this, 'onShutdown'], $this->logger);
 
         try {
-            $this->requestFactory = $this->container->get(self::REQUEST_FACTORY_ID);
+            $this->request = $this->container->get(self::REQUEST_ID);
             $this->responseSender = $this->container->get(self::RESPONSE_SENDER_ID);
             $this->responseFactory = $this->container->get(self::RESPONSE_FACTORY_ID);
             $this->router = $this->container->get(self::ROUTER_ID);
@@ -86,10 +85,7 @@ class Application
         try {
             $this->logger->debug('Application started');
 
-            $serverConfiguration = $this->container->getParameter(self::SERVER_CONFIGURATION_PARAMETER_ID);
-            $request = $this->requestFactory->createRequest($serverConfiguration);
-            $route = $this->router->getRoute($request);
-
+            $route = $this->router->getRoute($this->request);
             /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
             $response = $controller->runAction($route->getActionId(), $route->getRequest());

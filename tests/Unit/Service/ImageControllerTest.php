@@ -14,6 +14,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Service;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\ActionFactoryInterface;
 use Strider2038\ImgCache\Core\ActionInterface;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\SecurityInterface;
@@ -25,9 +26,6 @@ use Strider2038\ImgCache\Service\ImageController;
  */
 class ImageControllerTest extends TestCase
 {
-    private const LOCATION = '/a.jpg';
-    private const ACTION_ID = 'test';
-
     /** @var ResponseFactoryInterface */
     private $responseFactory;
 
@@ -37,7 +35,7 @@ class ImageControllerTest extends TestCase
     /** @var SecurityInterface */
     private $security;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
         $this->actionFactory = \Phake::mock(ActionFactoryInterface::class);
@@ -50,7 +48,7 @@ class ImageControllerTest extends TestCase
      * @param int $expectedHttpStatusCode
      * @dataProvider safeActionsProvider
      */
-    public function runAction_givenActionAndSecurityReturnsFalse_responseIsReturned(
+    public function runAction_givenActionAndSecurityReturnsFalse_responseReturned(
         string $actionId,
         int $expectedHttpStatusCode
     ): void {
@@ -59,8 +57,9 @@ class ImageControllerTest extends TestCase
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithForbiddenCode();
         $action = $this->givenActionFactory_createAction_returnsAction();
         $this->givenAction_run_returnsResponseWithStatusCodeOk($action);
+        $request = $this->givenRequest();
 
-        $response = $controller->runAction($actionId, self::LOCATION);
+        $response = $controller->runAction($actionId, $request);
 
         $this->assertEquals($expectedHttpStatusCode, $response->getStatusCode()->getValue());
     }
@@ -86,6 +85,11 @@ class ImageControllerTest extends TestCase
         return $controller;
     }
 
+    private function givenRequest(): RequestInterface
+    {
+        return \Phake::mock(RequestInterface::class);
+    }
+
     private function givenSecurity_isAuthorized_returnsFalse(): void
     {
         \Phake::when($this->security)->isAuthorized()->thenReturn(false);
@@ -102,7 +106,7 @@ class ImageControllerTest extends TestCase
     private function givenAction_run_returnsResponseWithStatusCodeOk(ActionInterface $action): void
     {
         $returnedResponse = \Phake::mock(ResponseInterface::class);
-        \Phake::when($action)->run()->thenReturn($returnedResponse);
+        \Phake::when($action)->processRequest(\Phake::anyParameters())->thenReturn($returnedResponse);
         $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::OK);
         \Phake::when($returnedResponse)->getStatusCode()->thenReturn($statusCode);
     }
