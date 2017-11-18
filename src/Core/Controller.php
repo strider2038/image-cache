@@ -47,9 +47,9 @@ abstract class Controller implements ControllerInterface
             );
         }
 
-        $action = $this->actionFactory->createAction($actionId, $location);
+        $action = $this->actionFactory->createAction($actionId);
 
-        return $action->run();
+        return $action->processRequest($request);
     }
     
     protected function getSafeActionIds(): array

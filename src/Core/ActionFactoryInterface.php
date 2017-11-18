@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Core;
  */
 interface ActionFactoryInterface
 {
-    public function createAction(string $actionId, string $location): ActionInterface;
+    public function createAction(string $actionId): ActionInterface;
 }
