@@ -11,7 +11,9 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
@@ -41,33 +43,41 @@ class GetActionTest extends TestCase
     }
 
     /** @test */
-    public function run_imageDoesNotExistInStorage_notFoundResponseWasReturned(): void
+    public function processRequest_imageDoesNotExistInStorage_notFoundResponseWasReturned(): void
     {
         $action = $this->createAction();
         $this->givenImageStorage_find_returns(null);
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::NOT_FOUND);
+        $request = $this->givenRequest();
+        $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
 
-        $response = $action->run();
+        $response = $action->processRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertRequest_getUri_isCalledOnce($request);
+        $this->assertUri_getPath_isCalledOnce($uri);
         $this->assertImageStorage_find_isCalledOnceWithLocation();
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
         $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
     }
 
     /** @test */
-    public function run_imageExistsInStorage_imageIsCachedAndFileResponseWasReturned(): void
+    public function processRequest_imageExistsInStorage_imageIsCachedAndFileResponseWasReturned(): void
     {
         $action = $this->createAction();
-        $storedImage = \Phake::mock(Image::class);
+        $storedImage = $this->givenImage();
         $this->givenImageStorage_find_returns($storedImage);
-        $cachedImage = $this->givenImageFile();
+        $cachedImage = $this->givenImageFileWithFilename(self::IMAGE_FILENAME);
         $this->givenImageCache_get_returns($cachedImage);
         $this->givenResponseFactory_createFileResponse_returnsResponse();
+        $request = $this->givenRequest();
+        $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
 
-        $response = $action->run();
+        $response = $action->processRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertRequest_getUri_isCalledOnce($request);
+        $this->assertUri_getPath_isCalledOnce($uri);
         $this->assertImageStorage_find_isCalledOnceWithLocation();
         $this->assertImageCache_put_isCalledOnceWithLocationAnd($storedImage);
         $this->assertImageCache_get_isCalledOnceWithLocation();
@@ -79,13 +89,32 @@ class GetActionTest extends TestCase
 
     private function createAction(): GetAction
     {
-        return new GetAction(self::LOCATION, $this->responseFactory, $this->imageStorage, $this->imageCache);
+        return new GetAction($this->responseFactory, $this->imageStorage, $this->imageCache);
     }
 
-    private function givenImageFile(): ImageFile
+    private function givenRequest(): RequestInterface
+    {
+        return \Phake::mock(RequestInterface::class);
+    }
+
+    private function givenRequest_getUri_returnsUriWithPath(RequestInterface $request, string $path): UriInterface
+    {
+        $uri = \Phake::mock(UriInterface::class);
+        \Phake::when($request)->getUri()->thenReturn($uri);
+        \Phake::when($uri)->getPath()->thenReturn($path);
+
+        return $uri;
+    }
+
+    private function givenImage(): Image
+    {
+        return \Phake::mock(Image::class);
+    }
+
+    private function givenImageFileWithFilename(string $filename): ImageFile
     {
         $image = \Phake::mock(ImageFile::class);
-        \Phake::when($image)->getFilename()->thenReturn(self::IMAGE_FILENAME);
+        \Phake::when($image)->getFilename()->thenReturn($filename);
 
         return $image;
     }
@@ -113,5 +142,15 @@ class GetActionTest extends TestCase
     private function givenImageCache_get_returns(ImageFile $cachedImage): void
     {
         \Phake::when($this->imageCache)->get(\Phake::anyParameters())->thenReturn($cachedImage);
+    }
+
+    private function assertRequest_getUri_isCalledOnce(RequestInterface $request): void
+    {
+        \Phake::verify($request, \Phake::times(1))->getUri();
+    }
+
+    private function assertUri_getPath_isCalledOnce(UriInterface $uri): void
+    {
+        \Phake::verify($uri, \Phake::times(1))->getPath();
     }
 }

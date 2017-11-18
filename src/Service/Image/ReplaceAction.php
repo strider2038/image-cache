@@ -27,55 +27,47 @@ use Strider2038\ImgCache\Imaging\ImageStorageInterface;
  */
 class ReplaceAction implements ActionInterface
 {
-    /** @var string */
-    protected $location;
-
     /** @var ResponseFactoryInterface */
-    protected $responseFactory;
+    private $responseFactory;
 
     /** @var ImageStorageInterface */
-    protected $imageStorage;
+    private $imageStorage;
 
     /** @var ImageCacheInterface */
-    protected $imageCache;
+    private $imageCache;
 
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
-    /** @var RequestInterface */
-    private $request;
-
     public function __construct(
-        string $location,
         ResponseFactoryInterface $responseFactory,
         ImageStorageInterface $imageStorage,
         ImageCacheInterface $imageCache,
-        ImageFactoryInterface $imageFactory,
-        RequestInterface $request
+        ImageFactoryInterface $imageFactory
     ) {
-        $this->location = $location;
         $this->responseFactory = $responseFactory;
         $this->imageStorage = $imageStorage;
         $this->imageCache = $imageCache;
         $this->imageFactory = $imageFactory;
-        $this->request = $request;
     }
 
-    public function run(): ResponseInterface
+    public function processRequest(RequestInterface $request): ResponseInterface
     {
-        if ($this->imageStorage->exists($this->location)) {
-            $this->imageStorage->delete($this->location);
-            $fileNameMask = $this->imageStorage->getFileNameMask($this->location);
+        $location = $request->getUri()->getPath();
+
+        if ($this->imageStorage->exists($location)) {
+            $this->imageStorage->delete($location);
+            $fileNameMask = $this->imageStorage->getFileNameMask($location);
             $this->imageCache->deleteByMask($fileNameMask);
         }
 
-        $stream = $this->request->getBody();
+        $stream = $request->getBody();
         $image = $this->imageFactory->createFromStream($stream);
-        $this->imageStorage->put($this->location, $image);
+        $this->imageStorage->put($location, $image);
 
         return $this->responseFactory->createMessageResponse(
             new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
-            sprintf('Image "%s" successfully put to storage.', $this->location)
+            sprintf('Image "%s" successfully put to storage.', $location)
         );
     }
 }
