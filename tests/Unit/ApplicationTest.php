@@ -23,22 +23,41 @@ class ApplicationTest extends TestCase
 {
     use ProviderTrait, LoggerTrait;
 
-    private const LOGGER_ID = 'logger';
-    private const ROUTER_ID = 'router';
     private const REQUEST_ID = 'request';
     private const RESPONSE_FACTORY_ID = 'response_factory';
     private const RESPONSE_SENDER_ID = 'response_sender';
+    private const ROUTER_ID = 'router';
+    private const LOGGER_ID = 'logger';
     private const CONTROLLER_ID = 'controller';
     private const ACTION_ID = 'action';
-    private const LOCATION = '/image.jpeg';
     private const EXCEPTION_MESSAGE = 'application exception message';
 
     /** @var ContainerInterface */
     private $container;
 
-    protected function setUp()
+    /** @var RequestInterface */
+    private $request;
+
+    /** @var ResponseFactoryInterface */
+    private $responseFactory;
+
+    /** @var ResponseSenderInterface */
+    private $responseSender;
+
+    /** @var RouterInterface */
+    private $router;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    protected function setUp(): void
     {
         $this->container = \Phake::mock(ContainerInterface::class);
+        $this->request = \Phake::mock(RequestInterface::class);
+        $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
+        $this->responseSender = \Phake::mock(ResponseSenderInterface::class);
+        $this->router = \Phake::mock(RouterInterface::class);
+        $this->logger = \Phake::mock(LoggerInterface::class);
     }
 
     /**
@@ -59,129 +78,80 @@ class ApplicationTest extends TestCase
     /** @test */
     public function run_allServicesExists_responseIsSentAnd0IsReturned(): void
     {
-        $responseSender = $this->givenContainer_get_returnsResponseSender();
-        $request = $this->givenContainer_get_returnsRequest();
-        $router = $this->givenContainer_get_returnsRouter();
-        $this->givenRouter_getRoute_returnsRoute($router, $request);
-        $controller = $this->givenController();
-        $response = $this->givenController_runAction_returns($controller);
-        $application = $this->createApplication();
+        $application = $this->createApplicationWithAllServices();
+        $routerRequest = $this->givenRequest();
+        $this->givenRouter_getRoute_returnsRouteWithParameters(
+            self::CONTROLLER_ID,
+            self::ACTION_ID,
+            $routerRequest
+        );
+        $controller = $this->givenContainer_get_returnsController(self::CONTROLLER_ID);
+        $response = $this->givenController_runAction_returnsResponse($controller);
 
         $exitCode = $application->run();
 
         $this->assertEquals(0, $exitCode);
-        $this->assertResponseSender_send_isCalledOnce($responseSender, $response);
+        $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
+        $this->assertContainer_get_isCalledOnceWithControllerId(self::CONTROLLER_ID);
+        $this->assertController_runAction_isCalledOnceWithActionIdAndRequest($controller, self::ACTION_ID, $routerRequest);
+        $this->assertResponseSender_send_isCalledOnceWithResponse($response);
     }
 
     /** @test */
     public function run_allServicesExistsAndRouterThrowsException_errorResponseIsSent(): void
     {
-        $logger = $this->givenContainer_get_returnsLogger();
-        $responseSender = $this->givenContainer_get_returnsResponseSender();
-        $responseFactory = $this->givenContainer_get_returnsResponseFactory();
-        $response = $this->givenResponseFactory_createExceptionResponse_returnsResponse($responseFactory);
-        $request = $this->givenContainer_get_returnsRequest();
-        $router = $this->givenContainer_get_returnsRouter();
-        $this->givenRouter_getRoute_throwsException($router);
-        $application = $this->createApplication();
+        $application = $this->createApplicationWithAllServices();
+        $this->givenRouter_getRoute_throwsException();
+        $response = $this->givenResponseFactory_createExceptionResponse_returnsResponse();
 
         $exitCode = $application->run();
 
         $this->assertEquals(1, $exitCode);
-        $this->assertLogger_error_isCalledOnce($logger);
-        $this->assertResponseSender_send_isCalledOnce($responseSender, $response);
+        $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
+        $this->assertLogger_error_isCalledOnce($this->logger);
+        $this->assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters();
+        $this->assertResponseSender_send_isCalledOnceWithResponse($response);
     }
 
     /** @test */
     public function onShutdown_givenLoggerAndError_loggerCriticalIsCalled(): void
     {
-        $logger = \Phake::mock(LoggerInterface::class);
-        $error = ['message' => 'error'];
+        $logger = $this->givenLogger();
 
-        Application::onShutdown($logger, $error);
+        Application::onShutdown($logger, ['message' => 'error']);
 
-        \Phake::verify($logger, \Phake::times(1))->critical('Message: error');
+        $this->assertLogger_critical_isCalledOnce($logger, 'Message: error');
     }
 
     private function createApplication(): Application
     {
-        $application = new Application($this->container);
-
-        return $application;
+        return new Application($this->container);
     }
 
-    private function givenContainer_get_returnsRequest(): RequestInterface
+    private function createApplicationWithAllServices(): Application
     {
-        $request = \Phake::mock(RequestInterface::class);
-        \Phake::when($this->container)->get(self::REQUEST_ID)->thenReturn($request);
-
-        return $request;
-    }
-
-    private function givenContainer_get_returnsRouter(): RouterInterface
-    {
-        $router = \Phake::mock(RouterInterface::class);
-
-        \Phake::when($this->container)->get(self::ROUTER_ID)->thenReturn($router);
-
-        return $router;
-    }
-
-    private function givenContainer_get_returnsResponseSender(): ResponseSenderInterface
-    {
-        $responseSender = \Phake::mock(ResponseSenderInterface::class);
-
-        \Phake::when($this->container)->get(self::RESPONSE_SENDER_ID)->thenReturn($responseSender);
-
-        return $responseSender;
-    }
-
-    private function givenContainer_get_returnsResponseFactory(): ResponseFactoryInterface
-    {
-        $responseFactory = \Phake::mock(ResponseFactoryInterface::class);
-
-        \Phake::when($this->container)->get(self::RESPONSE_FACTORY_ID)->thenReturn($responseFactory);
-
-        return $responseFactory;
-    }
-
-    private function givenContainer_get_returnsLogger(): LoggerInterface
-    {
-        $logger = $this->givenLogger();
-
+        \Phake::when($this->container)->get(self::REQUEST_ID)->thenReturn($this->request);
+        \Phake::when($this->container)->get(self::RESPONSE_FACTORY_ID)->thenReturn($this->responseFactory);
+        \Phake::when($this->container)->get(self::RESPONSE_SENDER_ID)->thenReturn($this->responseSender);
+        \Phake::when($this->container)->get(self::ROUTER_ID)->thenReturn($this->router);
         \Phake::when($this->container)->has(self::LOGGER_ID)->thenReturn(true);
-        \Phake::when($this->container)->get(self::LOGGER_ID)->thenReturn($logger);
+        \Phake::when($this->container)->get(self::LOGGER_ID)->thenReturn($this->logger);
 
-        return $logger;
+        return new Application($this->container);
     }
 
-    private function givenRouter_getRoute_returnsRoute(RouterInterface $router, RequestInterface $request): void
-    {
+    private function givenRouter_getRoute_returnsRouteWithParameters(
+        string $controllerId,
+        string $actionId,
+        RequestInterface $request
+    ): void {
         $route = \Phake::mock(Route::class);
 
-        \Phake::when($route)->getControllerId()->thenReturn(self::CONTROLLER_ID);
-        \Phake::when($route)->getActionId()->thenReturn(self::ACTION_ID);
-        \Phake::when($route)->getLocation()->thenReturn(self::LOCATION);
+        \Phake::when($route)->getControllerId()->thenReturn($controllerId);
+        \Phake::when($route)->getActionId()->thenReturn($actionId);
+        \Phake::when($route)->getRequest()->thenReturn($request);
 
-        \Phake::when($router)->getRoute($request)->thenReturn($route);
-    }
-
-    private function givenController(): ControllerInterface
-    {
-        $controller = \Phake::mock(ControllerInterface::class);
-
-        \Phake::when($this->container)->get(self::CONTROLLER_ID)->thenReturn($controller);
-
-        return $controller;
-    }
-
-    private function givenController_runAction_returns($controller): ResponseInterface
-    {
-        $response = \Phake::mock(ResponseInterface::class);
-
-        \Phake::when($controller)->runAction(self::ACTION_ID, self::LOCATION)->thenReturn($response);
-
-        return $response;
+        \Phake::when($this->router)->getRoute(\Phake::anyParameters())->thenReturn($route);
     }
 
     private function givenContainer_get_throwsException(): void
@@ -191,26 +161,68 @@ class ApplicationTest extends TestCase
             ->thenThrow(new \Exception(self::EXCEPTION_MESSAGE));
     }
 
-    private function assertResponseSender_send_isCalledOnce(
-        ResponseSenderInterface $responseSender,
-        ResponseInterface $response
-    ): void {
-        \Phake::verify($responseSender, \Phake::times(1))->send($response);
-    }
-
-    private function givenRouter_getRoute_throwsException(RouterInterface $router): void
+    private function assertResponseSender_send_isCalledOnceWithResponse(ResponseInterface $response): void
     {
-        \Phake::when($router)->getRoute(\Phake::anyParameters())->thenThrow(new \Exception());
+        \Phake::verify($this->responseSender, \Phake::times(1))->send($response);
     }
 
-    private function givenResponseFactory_createExceptionResponse_returnsResponse($responseFactory): ResponseInterface
+    private function givenRouter_getRoute_throwsException(): void
+    {
+        \Phake::when($this->router)->getRoute(\Phake::anyParameters())->thenThrow(new \Exception());
+    }
+
+    private function givenResponseFactory_createExceptionResponse_returnsResponse(): ResponseInterface
     {
         $response = \Phake::mock(ResponseInterface::class);
 
-        \Phake::when($responseFactory)
+        \Phake::when($this->responseFactory)
             ->createExceptionResponse(\Phake::anyParameters())
             ->thenReturn($response);
 
         return $response;
+    }
+
+    private function givenRequest(): RequestInterface
+    {
+        return \Phake::mock(RequestInterface::class);
+    }
+
+    private function givenContainer_get_returnsController(string $controllerId): ControllerInterface
+    {
+        $controller = \Phake::mock(ControllerInterface::class);
+        \Phake::when($this->container)->get($controllerId)->thenReturn($controller);
+
+        return $controller;
+    }
+
+    private function givenController_runAction_returnsResponse(ControllerInterface $controller): ResponseInterface
+    {
+        $response = \Phake::mock(ResponseInterface::class);
+        \Phake::when($controller)->runAction(\Phake::anyParameters())->thenReturn($response);
+
+        return $response;
+    }
+
+    private function assertContainer_get_isCalledOnceWithControllerId(string $controllerId): void
+    {
+        \Phake::verify($this->container, \Phake::times(1))->get($controllerId);
+    }
+
+    private function assertController_runAction_isCalledOnceWithActionIdAndRequest(
+        ControllerInterface $controller,
+        string $actionId,
+        RequestInterface $routerRequest
+    ): void {
+        \Phake::verify($controller, \Phake::times(1))->runAction($actionId, $routerRequest);
+    }
+
+    private function assertRouter_getRoute_isCalledOnceWithRequest(RequestInterface $request): void
+    {
+        \Phake::verify($this->router, \Phake::times(1))->getRoute($request);
+    }
+
+    private function assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters(): void
+    {
+        \Phake::verify($this->responseFactory, \Phake::times(1))->createExceptionResponse(\Phake::anyParameters());
     }
 }

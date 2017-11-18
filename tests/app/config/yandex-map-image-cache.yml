@@ -24,11 +24,35 @@ services:
   image_action_factory:
     class: Strider2038\ImgCache\Service\Image\ImageActionFactory
     arguments:
+      - '@image_action_get'
+      - '@image_action_create'
+      - '@image_action_replace'
+      - '@image_action_delete'
+  image_action_get:
+    class: Strider2038\ImgCache\Service\Image\GetAction
+    arguments:
+      - '@response_factory'
+      - '@image_storage'
+      - '@image_cache'
+  image_action_create:
+    class: Strider2038\ImgCache\Service\Image\CreateAction
+    arguments:
+      - '@response_factory'
+      - '@image_storage'
+      - '@image_factory'
+  image_action_replace:
+    class: Strider2038\ImgCache\Service\Image\ReplaceAction
+    arguments:
+      - '@response_factory'
       - '@image_storage'
       - '@image_cache'
       - '@image_factory'
+  image_action_delete:
+    class: Strider2038\ImgCache\Service\Image\DeleteAction
+    arguments:
       - '@response_factory'
-      - '@request'
+      - '@image_storage'
+      - '@image_cache'
 
   # imaging
   image_storage:

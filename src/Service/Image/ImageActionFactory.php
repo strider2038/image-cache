@@ -12,12 +12,7 @@ namespace Strider2038\ImgCache\Service\Image;
 
 use Strider2038\ImgCache\Core\ActionFactoryInterface;
 use Strider2038\ImgCache\Core\ActionInterface;
-use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\ImageCacheInterface;
-use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -29,53 +24,50 @@ class ImageActionFactory implements ActionFactoryInterface
     private const ACTION_ID_REPLACE = 'replace';
     private const ACTION_ID_DELETE = 'delete';
 
-    /** @var ImageStorageInterface */
-    private $imageStorage;
+    /** @var GetAction */
+    private $getAction;
 
-    /** @var ImageCacheInterface */
-    private $imageCache;
+    /** @var CreateAction */
+    private $createAction;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
+    /** @var ReplaceAction */
+    private $replaceAction;
 
-    /** @var ResponseFactoryInterface */
-    private $responseFactory;
-
-    /** @var RequestInterface */
-    private $request;
+    /** @var DeleteAction */
+    private $deleteAction;
 
     public function __construct(
-        ImageStorageInterface $imageStorage,
-        ImageCacheInterface $imageCache,
-        ImageFactoryInterface $imageFactory,
-        ResponseFactoryInterface $responseFactory,
-        RequestInterface $request
+        GetAction $getAction,
+        CreateAction $createAction,
+        ReplaceAction $replaceAction,
+        DeleteAction $deleteAction
     ) {
-        $this->imageStorage = $imageStorage;
-        $this->imageCache = $imageCache;
-        $this->imageFactory = $imageFactory;
-        $this->responseFactory = $responseFactory;
-        $this->request = $request;
+        $this->getAction = $getAction;
+        $this->createAction = $createAction;
+        $this->replaceAction = $replaceAction;
+        $this->deleteAction = $deleteAction;
     }
 
-    public function createAction(string $actionId, string $location): ActionInterface
+    public function createAction(string $actionId): ActionInterface
     {
-        $action = null;
+        $map = $this->getActionsMap();
 
-        if ($actionId === self::ACTION_ID_GET) {
-            $action = new GetAction($location, $this->responseFactory, $this->imageStorage, $this->imageCache);
-        } elseif ($actionId === self::ACTION_ID_CREATE) {
-            $action = new CreateAction($location, $this->responseFactory, $this->imageStorage, $this->imageFactory, $this->request);
-        } elseif ($actionId === self::ACTION_ID_REPLACE) {
-            $action = new ReplaceAction($location, $this->responseFactory, $this->imageStorage, $this->imageCache, $this->imageFactory, $this->request);
-        } elseif ($actionId === self::ACTION_ID_DELETE) {
-            $action = new DeleteAction($location, $this->responseFactory, $this->imageStorage, $this->imageCache);
-        }
-
-        if ($action === null) {
+        if (array_key_exists($actionId, $map)) {
+            $action = $map[$actionId];
+        } else {
             throw new InvalidRouteException(sprintf('Action "%s" not found', $actionId));
         }
 
         return $action;
+    }
+
+    private function getActionsMap(): array
+    {
+        return [
+            self::ACTION_ID_GET => $this->getAction,
+            self::ACTION_ID_CREATE => $this->createAction,
+            self::ACTION_ID_REPLACE => $this->replaceAction,
+            self::ACTION_ID_DELETE => $this->deleteAction
+        ];
     }
 }

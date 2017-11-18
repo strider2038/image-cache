@@ -24,23 +24,23 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Application
 {
-    private const LOGGER_ID = 'logger';
     private const REQUEST_ID = 'request';
-    private const ROUTER_ID = 'router';
     private const RESPONSE_FACTORY_ID = 'response_factory';
     private const RESPONSE_SENDER_ID = 'response_sender';
+    private const ROUTER_ID = 'router';
+    private const LOGGER_ID = 'logger';
 
     /** @var ContainerInterface */
     private $container;
 
-    /** @var ResponseSenderInterface */
-    private $responseSender;
+    /** @var RequestInterface */
+    private $request;
 
     /** @var ResponseFactoryInterface */
     private $responseFactory;
 
-    /** @var RequestInterface */
-    private $request;
+    /** @var ResponseSenderInterface */
+    private $responseSender;
 
     /** @var RouterInterface */
     private $router;
@@ -64,9 +64,9 @@ class Application
         register_shutdown_function([$this, 'onShutdown'], $this->logger);
 
         try {
+            $this->request = $this->container->get(self::REQUEST_ID);
             $this->responseSender = $this->container->get(self::RESPONSE_SENDER_ID);
             $this->responseFactory = $this->container->get(self::RESPONSE_FACTORY_ID);
-            $this->request = $this->container->get(self::REQUEST_ID);
             $this->router = $this->container->get(self::ROUTER_ID);
             $this->ready = true;
         } catch (\Exception $exception) {
@@ -88,7 +88,7 @@ class Application
             $route = $this->router->getRoute($this->request);
             /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
-            $response = $controller->runAction($route->getActionId(), $route->getLocation());
+            $response = $controller->runAction($route->getActionId(), $route->getRequest());
             $this->responseSender->send($response);
 
             $this->logger->debug(sprintf(

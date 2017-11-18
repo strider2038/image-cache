@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Service\Routing;
+
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ActionFactoryInterface
+interface UrlRouteDetectorInterface
 {
-    public function createAction(string $actionId): ActionInterface;
+    public function getUrlRoute(RequestInterface $request): UrlRoute;
 }

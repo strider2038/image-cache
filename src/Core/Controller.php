@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -38,7 +39,7 @@ abstract class Controller implements ControllerInterface
         $this->security = $security ?? new NullSecurity();
     }
 
-    public function runAction(string $actionId, string $location): ResponseInterface
+    public function runAction(string $actionId, RequestInterface $request): ResponseInterface
     {
         if (!$this->isActionSafe($actionId)) {
             return $this->responseFactory->createMessageResponse(
@@ -46,9 +47,9 @@ abstract class Controller implements ControllerInterface
             );
         }
 
-        $action = $this->actionFactory->createAction($actionId, $location);
+        $action = $this->actionFactory->createAction($actionId);
 
-        return $action->run();
+        return $action->processRequest($request);
     }
     
     protected function getSafeActionIds(): array

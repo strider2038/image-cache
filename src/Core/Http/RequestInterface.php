@@ -19,4 +19,5 @@ interface RequestInterface extends MessageInterface
 {
     public function getMethod(): HttpMethodEnum;
     public function getUri(): UriInterface;
+    public function withUri(UriInterface $uri): RequestInterface;
 }

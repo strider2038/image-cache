@@ -14,6 +14,7 @@ use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
+use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
@@ -58,7 +59,9 @@ class YandexMapImageCacheTest extends FunctionalTestCase
      */
     public function get_givenNameWithInvalidParameters_exceptionThrown(): void
     {
-        $this->controller->runAction('get',self::IMAGE_WITH_INVALID_PARAMETERS);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_WITH_INVALID_PARAMETERS);
+
+        $this->controller->runAction('get', $this->request);
     }
 
     /** @test */
@@ -66,9 +69,10 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     {
         $response = $this->givenClient_request_returnsResponseWithStatus200();
         $this->givenImagePng(self::PNG_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
         $this->givenResponse_getBody_getContents_returns($response, file_get_contents(self::PNG_FILENAME));
 
-        $response = $this->controller->runAction('get',self::IMAGE_JPEG_CACHE_KEY);
+        $response = $this->controller->runAction('get', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileHasMimeType(self::IMAGE_JPEG_WEB_FILENAME, self::MIME_TYPE_JPEG);
@@ -80,12 +84,20 @@ class YandexMapImageCacheTest extends FunctionalTestCase
         $response = $this->givenClient_request_returnsResponseWithStatus200();
         $this->givenImageJpeg(self::JPEG_FILENAME);
         $this->givenResponse_getBody_getContents_returns($response, file_get_contents(self::JPEG_FILENAME));
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_PNG_CACHE_KEY);
 
-        $response = $this->controller->runAction('get',self::IMAGE_PNG_CACHE_KEY);
+        $response = $this->controller->runAction('get', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
         $this->assertFileExists(self::IMAGE_PNG_WEB_FILENAME);
         $this->assertFileHasMimeType(self::IMAGE_PNG_WEB_FILENAME, self::MIME_TYPE_PNG);
+    }
+
+    private function givenRequest_getUri_getPath_returnsPath(string $path): void
+    {
+        $uri = \Phake::mock(UriInterface::class);
+        \Phake::when($this->request)->getUri()->thenReturn($uri);
+        \Phake::when($uri)->getPath()->thenReturn($path);
     }
 
     private function givenClient_request_returnsResponseWithStatus200(): ResponseInterface

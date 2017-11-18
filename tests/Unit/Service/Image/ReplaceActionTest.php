@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
@@ -38,57 +39,61 @@ class ReplaceActionTest extends TestCase
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
-    /** @var RequestInterface */
-    private $request;
-
     protected function setUp(): void
     {
         $this->imageStorage = \Phake::mock(ImageStorageInterface::class);
         $this->imageCache = \Phake::mock(ImageCacheInterface::class);
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->givenResponseFactory();
-        $this->request = \Phake::mock(RequestInterface::class);
     }
 
     /** @test */
-    public function run_fileDoesNotExistInStorage_imagePutToStorageAndCreatedResponseReturned(): void
+    public function processRequest_fileDoesNotExistInStorage_imagePutToStorageAndCreatedResponseReturned(): void
     {
         $action = $this->createAction();
         $this->givenImageStorage_exists_returns(false);
-        $stream = $this->givenRequest_getBody_returnsStream();
+        $request = $this->givenRequest();
+        $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
+        $stream = $this->givenRequest_getBody_returnsStream($request);
         $image = $this->givenImageFactory_createFromStream_returnsImage();
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
-        $response = $action->run();
+        $response = $action->processRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertRequest_getUri_isCalledOnce($request);
+        $this->assertUri_getPath_isCalledOnce($uri);
         $this->assertImageStorage_exists_isCalledOnceWithLocation();
         $this->assertImageStorage_delete_isNeverCalled();
         $this->assertImageCache_deleteByMask_isNeverCalled();
-        $this->assertRequest_getBody_isCalledOnce();
+        $this->assertRequest_getBody_isCalledOnceWithRequest($request);
         $this->assertImageFactory_createFromStream_isCalledOnceWith($stream);
         $this->assertImageStorage_put_isCalledOnceWithLocationAnd($image);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
     }
 
     /** @test */
-    public function run_fileExistsInStorage_imageReplacedInStorageAndCreatedResponseReturned(): void
+    public function processRequest_fileExistsInStorage_imageReplacedInStorageAndCreatedResponseReturned(): void
     {
         $action = $this->createAction();
+        $request = $this->givenRequest();
+        $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
         $this->givenImageStorage_exists_returns(true);
         $this->givenImageStorage_getFileNameMask_returnsFileNameMask();
-        $stream = $this->givenRequest_getBody_returnsStream();
+        $stream = $this->givenRequest_getBody_returnsStream($request);
         $image = $this->givenImageFactory_createFromStream_returnsImage();
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
-        $response = $action->run();
+        $response = $action->processRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertRequest_getUri_isCalledOnce($request);
+        $this->assertUri_getPath_isCalledOnce($uri);
         $this->assertImageStorage_exists_isCalledOnceWithLocation();
         $this->assertImageStorage_delete_isCalledOnceWithLocation();
         $this->assertImageStorage_getFileNameMask_isCalledOnceWithLocation();
         $this->assertImageCache_deleteByMask_isCalledOnceWithFileNameMask();
-        $this->assertRequest_getBody_isCalledOnce();
+        $this->assertRequest_getBody_isCalledOnceWithRequest($request);
         $this->assertImageFactory_createFromStream_isCalledOnceWith($stream);
         $this->assertImageStorage_put_isCalledOnceWithLocationAnd($image);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
@@ -96,13 +101,27 @@ class ReplaceActionTest extends TestCase
 
     private function createAction(): ReplaceAction
     {
-        return new ReplaceAction(self::LOCATION, $this->responseFactory, $this->imageStorage, $this->imageCache, $this->imageFactory, $this->request);
+        return new ReplaceAction($this->responseFactory, $this->imageStorage, $this->imageCache, $this->imageFactory);
     }
 
-    private function givenRequest_getBody_returnsStream(): StreamInterface
+    private function givenRequest(): RequestInterface
+    {
+        return \Phake::mock(RequestInterface::class);
+    }
+
+    private function givenRequest_getUri_returnsUriWithPath(RequestInterface $request, string $path): UriInterface
+    {
+        $uri = \Phake::mock(UriInterface::class);
+        \Phake::when($request)->getUri()->thenReturn($uri);
+        \Phake::when($uri)->getPath()->thenReturn($path);
+
+        return $uri;
+    }
+
+    private function givenRequest_getBody_returnsStream(RequestInterface $request): StreamInterface
     {
         $stream = \Phake::mock(StreamInterface::class);
-        \Phake::when($this->request)->getBody()->thenReturn($stream);
+        \Phake::when($request)->getBody()->thenReturn($stream);
 
         return $stream;
     }
@@ -125,9 +144,19 @@ class ReplaceActionTest extends TestCase
         \Phake::when($this->imageStorage)->getFileNameMask(\Phake::anyParameters())->thenReturn(self::FILE_NAME_MASK);
     }
 
-    private function assertRequest_getBody_isCalledOnce(): void
+    private function assertRequest_getUri_isCalledOnce(RequestInterface $request): void
     {
-        \Phake::verify($this->request, \Phake::times(1))->getBody();
+        \Phake::verify($request, \Phake::times(1))->getUri();
+    }
+
+    private function assertUri_getPath_isCalledOnce(UriInterface $uri): void
+    {
+        \Phake::verify($uri, \Phake::times(1))->getPath();
+    }
+
+    private function assertRequest_getBody_isCalledOnceWithRequest(RequestInterface $request): void
+    {
+        \Phake::verify($request, \Phake::times(1))->getBody();
     }
 
     private function assertImageFactory_createFromStream_isCalledOnceWith(StreamInterface $stream): void

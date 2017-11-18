@@ -54,7 +54,7 @@ class YandexMapAccessorTest extends TestCase
     /** @var LoggerInterface */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->validator = \Phake::mock(ModelValidatorInterface::class);
         $this->formatter = \Phake::mock(ViolationsFormatterInterface::class);

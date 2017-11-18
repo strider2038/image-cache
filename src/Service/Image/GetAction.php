@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Service\Image;
 
 use Strider2038\ImgCache\Core\ActionInterface;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -24,41 +25,38 @@ use Strider2038\ImgCache\Imaging\ImageStorageInterface;
  */
 class GetAction implements ActionInterface
 {
-    /** @var string */
-    protected $location;
-
     /** @var ResponseFactoryInterface */
-    protected $responseFactory;
+    private $responseFactory;
 
     /** @var ImageStorageInterface */
-    protected $imageStorage;
+    private $imageStorage;
 
     /** @var ImageCacheInterface */
-    protected $imageCache;
+    private $imageCache;
 
     public function __construct(
-        string $location,
         ResponseFactoryInterface $responseFactory,
         ImageStorageInterface $imageStorage,
         ImageCacheInterface $imageCache
     ) {
-        $this->location = $location;
         $this->responseFactory = $responseFactory;
         $this->imageStorage = $imageStorage;
         $this->imageCache = $imageCache;
     }
 
-    public function run(): ResponseInterface
+    public function processRequest(RequestInterface $request): ResponseInterface
     {
-        $storedImage = $this->imageStorage->find($this->location);
+        $location = $request->getUri()->getPath();
+
+        $storedImage = $this->imageStorage->find($location);
 
         if ($storedImage === null) {
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND)
             );
         } else {
-            $this->imageCache->put($this->location, $storedImage);
-            $cachedImage = $this->imageCache->get($this->location);
+            $this->imageCache->put($location, $storedImage);
+            $cachedImage = $this->imageCache->get($location);
 
             $response = $this->responseFactory->createFileResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),

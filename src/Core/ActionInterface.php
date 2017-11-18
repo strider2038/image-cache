@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 
 /**
@@ -17,5 +18,5 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
  */
 interface ActionInterface
 {
-    public function run(): ResponseInterface;
+    public function processRequest(RequestInterface $request): ResponseInterface;
 }
