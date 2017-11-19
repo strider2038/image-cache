@@ -23,6 +23,11 @@ trait LoggerTrait
         return \Phake::mock(LoggerInterface::class);
     }
 
+    public function assertLogger_debug_isCalledTimes(LoggerInterface $logger, int $times): void
+    {
+        \Phake::verify($logger, \Phake::times($times))->debug(\Phake::anyParameters());
+    }
+
     public function assertLogger_info_isCalledOnce(LoggerInterface $logger, string $message = null): void
     {
         $params = $message ?? \Phake::anyParameters();

@@ -95,6 +95,7 @@ class ApplicationTest extends TestCase
         $this->assertContainer_get_isCalledOnceWithControllerId(self::CONTROLLER_ID);
         $this->assertController_runAction_isCalledOnceWithActionIdAndRequest($controller, self::ACTION_ID, $routerRequest);
         $this->assertResponseSender_send_isCalledOnceWithResponse($response);
+        $this->assertLogger_debug_isCalledTimes($this->logger, 2);
     }
 
     /** @test */
@@ -111,6 +112,7 @@ class ApplicationTest extends TestCase
         $this->assertLogger_error_isCalledOnce($this->logger);
         $this->assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters();
         $this->assertResponseSender_send_isCalledOnceWithResponse($response);
+        $this->assertLogger_debug_isCalledTimes($this->logger, 2);
     }
 
     /** @test */

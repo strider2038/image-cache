@@ -32,7 +32,7 @@ class RequestFactory implements RequestFactoryInterface
     {
         $requestMethodName = strtoupper($serverConfiguration['REQUEST_METHOD'] ?? '');
         if (!HttpMethodEnum::isValid($requestMethodName)) {
-            throw new InvalidRequestException(sprintf("Unsupported http method '%s'", $requestMethodName));
+            throw new InvalidRequestException(sprintf('Unsupported http method "%s"', $requestMethodName));
         }
 
         $method = new HttpMethodEnum($requestMethodName);

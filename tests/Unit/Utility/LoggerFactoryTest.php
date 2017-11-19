@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Utility;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Monolog\Processor\UidProcessor;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Utility\LoggerFactory;
 
@@ -39,7 +40,7 @@ class LoggerFactoryTest extends TestCase
     }
 
     /** @test */
-    public function createLogger_givenCustomLogNameAndDirectoryAndLevel_LlgNameAndDirectoryAreSet(): void
+    public function createLogger_givenCustomLogNameAndDirectoryAndLevel_logNameAndDirectoryAreSet(): void
     {
         $loggerFactory = new LoggerFactory(self::LOG_DIRECTORY_CUSTOM);
 
@@ -50,7 +51,7 @@ class LoggerFactoryTest extends TestCase
     }
 
     /** @test */
-    public function createLogger_givenDefaultParametersAndDryRunIsOn_LogglrHasNullHandler(): void
+    public function createLogger_givenDefaultParametersAndDryRunIsOn_LoggerHasNullHandler(): void
     {
         $loggerFactory = new LoggerFactory(self::LOG_DIRECTORY_DEFAULT, true);
 
@@ -65,11 +66,16 @@ class LoggerFactoryTest extends TestCase
     private function verifyLogger(Logger $logger, string $name, int $level, string $filename): void
     {
         $this->assertEquals($name, $logger->getName());
+
         $handlers = $logger->getHandlers();
         $this->assertCount(1, $handlers);
         /** @var StreamHandler $handler */
         $handler = $handlers[0];
         $this->assertEquals($level, $handler->getLevel());
         $this->assertEquals($filename, $handler->getUrl());
+
+        $processors = $logger->getProcessors();
+        $this->assertCount(1, $processors);
+        $this->assertInstanceOf(UidProcessor::class, $processors[0]);
     }
 }

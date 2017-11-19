@@ -22,7 +22,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Split ImageController to action classes
 - [x] Split ImageCache class to ImageStorage and ImageCache
 - [x] Router rewrites Request URI, eliminate location in controllers
-- [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
+- [x] Logging guzzle requests
 - [ ] Add CodeSniffer and Sensio Labs to CI
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection

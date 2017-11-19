@@ -82,19 +82,15 @@ class Application
         }
 
         $exitCode = 0;
+
         try {
-            $this->logger->debug('Application started');
+            $this->logger->debug('Application started.');
 
             $route = $this->router->getRoute($this->request);
             /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
             $response = $controller->runAction($route->getActionId(), $route->getRequest());
             $this->responseSender->send($response);
-
-            $this->logger->debug(sprintf(
-                'Application ended. Response %d is sent',
-                $response->getStatusCode()->getValue()
-            ));
         } catch (\Exception $exception) {
             $exitCode = 1;
             $this->logger->error($exception);
@@ -102,6 +98,12 @@ class Application
             $response = $this->responseFactory->createExceptionResponse($exception);
             $this->responseSender->send($response);
         }
+
+        $this->logger->debug(sprintf(
+            'Application ended. Response %d %s is sent.',
+            $response->getStatusCode()->getValue(),
+            $response->getReasonPhrase()
+        ));
 
         return $exitCode;
     }
