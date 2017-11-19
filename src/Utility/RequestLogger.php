@@ -32,12 +32,12 @@ class RequestLogger implements RequestLoggerInterface
     public function logCurrentRequest(): void
     {
         $this->logger->info(sprintf(
-            'Processing request %s %s from ip %s, referrer %s, user agent %s by server %s',
+            'Processing request %s %s from ip %s, referrer "%s", user agent "%s" by server "%s"',
             $this->serverConfiguration['REQUEST_METHOD'] ?? '',
             $this->serverConfiguration['REQUEST_URI'] ?? '',
             $this->serverConfiguration['REMOTE_ADDR'] ?? '',
-            $this->serverConfiguration['HTTP_REFERER'] ?? '',
-            $this->serverConfiguration['HTTP_USER_AGENT'] ?? '',
+            $this->serverConfiguration['HTTP_REFERER'] ?? 'undefined',
+            $this->serverConfiguration['HTTP_USER_AGENT'] ?? 'undefined',
             $this->serverConfiguration['SERVER_NAME'] ?? ''
         ));
     }

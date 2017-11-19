@@ -64,6 +64,11 @@ services:
     arguments:
       - '%log.name%'
       - '%log.level%'
+  request_logger:
+    class: Strider2038\ImgCache\Utility\RequestLogger
+    arguments:
+      - '@logger'
+      - '%server_configuration%'
   guzzle_handler_stack_factory:
     class: Strider2038\ImgCache\Utility\GuzzleHandlerStackFactory
     arguments:
