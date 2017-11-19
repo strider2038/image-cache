@@ -10,6 +10,7 @@ parameters:
   filesystem_source.base_directory: '%app.directory%/tests/assets'
   yandex_map_client.parameters:
     base_uri: 'https://static-maps.yandex.ru/1.x/'
+    handler: '@guzzle_logger_handler_stack'
   routing_map:
     /i: 'filesystem_cache_image_controller'
     /yandex_map: 'yandex_map_cache_image_controller'
@@ -44,8 +45,16 @@ services:
     arguments:
       - '@request'
       - '%security.access_token%'
+  file_operations:
+    class: Strider2038\ImgCache\Core\FileOperations
+    arguments:
+      - '@filesystem'
+    calls:
+      - [setLogger, ['@logger']]
+
+  # utilities
   logger_factory:
-    class: Strider2038\ImgCache\Core\LoggerFactory
+    class: Strider2038\ImgCache\Utility\LoggerFactory
     arguments:
       - '%log.directory%'
   logger:
@@ -55,12 +64,14 @@ services:
     arguments:
       - '%log.name%'
       - '%log.level%'
-  file_operations:
-    class: Strider2038\ImgCache\Core\FileOperations
+  guzzle_handler_stack_factory:
+    class: Strider2038\ImgCache\Utility\GuzzleHandlerStackFactory
     arguments:
-      - '@filesystem'
-    calls:
-      - [setLogger, ['@logger']]
+      - '@logger'
+  guzzle_logger_handler_stack:
+    factory:
+      - '@guzzle_handler_stack_factory'
+      - 'createLoggerStack'
 
   # routing components
   router:
