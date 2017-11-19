@@ -51,8 +51,10 @@ class Response extends Message implements ResponseInterface
             HttpStatusCodeEnum::FORBIDDEN              => 'Forbidden',
             HttpStatusCodeEnum::NOT_FOUND              => 'Not Found',
             HttpStatusCodeEnum::METHOD_NOT_ALLOWED     => 'Method Not Allowed',
+            HttpStatusCodeEnum::CONFLICT               => 'Conflict',
             HttpStatusCodeEnum::UNSUPPORTED_MEDIA_TYPE => 'Unsupported Media Type',
             HttpStatusCodeEnum::INTERNAL_SERVER_ERROR  => 'Internal Server Error',
+            HttpStatusCodeEnum::BAD_GATEWAY            => 'Bad Gateway',
         ];
     }
 }

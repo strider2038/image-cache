@@ -26,4 +26,32 @@ class ResponseTest extends TestCase
         $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
         $this->assertEquals('OK', $response->getReasonPhrase());
     }
+
+    /**
+     * @test
+     * @dataProvider statusCodeProvider
+     * @param int $code
+     */
+    public function construct_givenStatusCode_responseHasReasonPhrase(int $code): void
+    {
+        $statusCode = new HttpStatusCodeEnum($code);
+
+        $response = new Response($statusCode);
+
+        $this->assertEquals($code, $response->getStatusCode()->getValue());
+        $this->assertGreaterThan(0, strlen($response->getReasonPhrase()));
+    }
+
+    public function statusCodeProvider(): array
+    {
+        $items = [];
+        $codes = HttpStatusCodeEnum::values();
+
+        foreach ($codes as $code) {
+            /** @var HttpStatusCodeEnum $code */
+            $items[] = [$code->getValue()];
+        }
+
+        return $items;
+    }
 }
