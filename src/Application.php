@@ -17,6 +17,8 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\RouterInterface;
+use Strider2038\ImgCache\Utility\NullRequestLogger;
+use Strider2038\ImgCache\Utility\RequestLoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,6 +31,7 @@ class Application
     private const RESPONSE_SENDER_ID = 'response_sender';
     private const ROUTER_ID = 'router';
     private const LOGGER_ID = 'logger';
+    private const REQUEST_LOGGER_ID = 'request_logger';
 
     /** @var ContainerInterface */
     private $container;
@@ -48,6 +51,9 @@ class Application
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var RequestLoggerInterface */
+    private $requestLogger;
+
     /** @var bool */
     private $ready = false;
 
@@ -55,10 +61,16 @@ class Application
     {
         $this->container = $container;
 
-        if (!$this->container->has(self::LOGGER_ID)) {
-            $this->logger = new NullLogger();
-        } else {
+        if ($this->container->has(self::LOGGER_ID)) {
             $this->logger = $this->container->get(self::LOGGER_ID);
+        } else {
+            $this->logger = new NullLogger();
+        }
+
+        if ($this->container->has(self::REQUEST_LOGGER_ID)) {
+            $this->requestLogger = $this->container->get(self::REQUEST_LOGGER_ID);
+        } else {
+            $this->requestLogger = new NullRequestLogger();
         }
 
         register_shutdown_function([$this, 'onShutdown'], $this->logger);
@@ -82,19 +94,16 @@ class Application
         }
 
         $exitCode = 0;
+
         try {
-            $this->logger->debug('Application started');
+            $this->logger->debug('Application started.');
+            $this->requestLogger->logCurrentRequest();
 
             $route = $this->router->getRoute($this->request);
             /** @var ControllerInterface $controller */
             $controller = $this->container->get($route->getControllerId());
             $response = $controller->runAction($route->getActionId(), $route->getRequest());
             $this->responseSender->send($response);
-
-            $this->logger->debug(sprintf(
-                'Application ended. Response %d is sent',
-                $response->getStatusCode()->getValue()
-            ));
         } catch (\Exception $exception) {
             $exitCode = 1;
             $this->logger->error($exception);
@@ -102,6 +111,12 @@ class Application
             $response = $this->responseFactory->createExceptionResponse($exception);
             $this->responseSender->send($response);
         }
+
+        $this->logger->debug(sprintf(
+            'Application ended. Response %d %s is sent.',
+            $response->getStatusCode()->getValue(),
+            $response->getReasonPhrase()
+        ));
 
         return $exitCode;
     }

@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
+use Strider2038\ImgCache\Utility\RequestLoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -24,6 +25,7 @@ class ApplicationTest extends TestCase
     use ProviderTrait, LoggerTrait;
 
     private const REQUEST_ID = 'request';
+    private const REQUEST_LOGGER_ID = 'request_logger';
     private const RESPONSE_FACTORY_ID = 'response_factory';
     private const RESPONSE_SENDER_ID = 'response_sender';
     private const ROUTER_ID = 'router';
@@ -50,6 +52,9 @@ class ApplicationTest extends TestCase
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var RequestLoggerInterface */
+    private $requestLogger;
+
     protected function setUp(): void
     {
         $this->container = \Phake::mock(ContainerInterface::class);
@@ -58,6 +63,7 @@ class ApplicationTest extends TestCase
         $this->responseSender = \Phake::mock(ResponseSenderInterface::class);
         $this->router = \Phake::mock(RouterInterface::class);
         $this->logger = \Phake::mock(LoggerInterface::class);
+        $this->requestLogger = \Phake::mock(RequestLoggerInterface::class);
     }
 
     /**
@@ -91,10 +97,12 @@ class ApplicationTest extends TestCase
         $exitCode = $application->run();
 
         $this->assertEquals(0, $exitCode);
+        $this->assertLoggerRequest_logCurrentRequest_isCalledOnce();
         $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
         $this->assertContainer_get_isCalledOnceWithControllerId(self::CONTROLLER_ID);
         $this->assertController_runAction_isCalledOnceWithActionIdAndRequest($controller, self::ACTION_ID, $routerRequest);
         $this->assertResponseSender_send_isCalledOnceWithResponse($response);
+        $this->assertLogger_debug_isCalledTimes($this->logger, 2);
     }
 
     /** @test */
@@ -107,10 +115,12 @@ class ApplicationTest extends TestCase
         $exitCode = $application->run();
 
         $this->assertEquals(1, $exitCode);
+        $this->assertLoggerRequest_logCurrentRequest_isCalledOnce();
         $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
         $this->assertLogger_error_isCalledOnce($this->logger);
         $this->assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters();
         $this->assertResponseSender_send_isCalledOnceWithResponse($response);
+        $this->assertLogger_debug_isCalledTimes($this->logger, 2);
     }
 
     /** @test */
@@ -136,6 +146,8 @@ class ApplicationTest extends TestCase
         \Phake::when($this->container)->get(self::ROUTER_ID)->thenReturn($this->router);
         \Phake::when($this->container)->has(self::LOGGER_ID)->thenReturn(true);
         \Phake::when($this->container)->get(self::LOGGER_ID)->thenReturn($this->logger);
+        \Phake::when($this->container)->has(self::REQUEST_LOGGER_ID)->thenReturn(true);
+        \Phake::when($this->container)->get(self::REQUEST_LOGGER_ID)->thenReturn($this->requestLogger);
 
         return new Application($this->container);
     }
@@ -224,5 +236,10 @@ class ApplicationTest extends TestCase
     private function assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters(): void
     {
         \Phake::verify($this->responseFactory, \Phake::times(1))->createExceptionResponse(\Phake::anyParameters());
+    }
+
+    private function assertLoggerRequest_logCurrentRequest_isCalledOnce(): void
+    {
+        \Phake::verify($this->requestLogger, \Phake::times(1))->logCurrentRequest();
     }
 }

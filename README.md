@@ -18,10 +18,12 @@ Image caching microservice with connection to cloud hostings
 - [x] Move processing configuration parsing into key parser
 - [x] Functional testing
 - [x] Yandex Static Map source
+- [x] Tune console and IDE debug via docker, not ssh
 - [x] Split ImageController to action classes
 - [x] Split ImageCache class to ImageStorage and ImageCache
 - [x] Router rewrites Request URI, eliminate location in controllers
-- [ ] Logging guzzle requests https://michaelstivala.com/logging-guzzle-requests/
+- [x] Logging guzzle requests
+- [ ] Add CodeSniffer and Sensio Labs to CI
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
@@ -29,8 +31,6 @@ Image caching microservice with connection to cloud hostings
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
-- [ ] Add CodeSniffer to CI
-- [x] Tune console and IDE debug via docker, not ssh
 - [ ] Migrate from supervisor to systemd daemons
 - [ ] Support for building docker containers in Travis
 - [ ] Fix tests codestyle
