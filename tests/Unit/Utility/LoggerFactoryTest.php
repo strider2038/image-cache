@@ -8,26 +8,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Core;
+namespace Strider2038\ImgCache\Tests\Unit\Utility;
 
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Strider2038\ImgCache\Core\LoggerFactory;
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Utility\LoggerFactory;
 
 class LoggerFactoryTest extends TestCase
 {
-    const LOG_NAME_DEFAULT = 'runtime.log';
-    const LOG_DIRECTORY_DEFAULT = '/var/log/imgcache/';
-    const LOG_FILENAME_DEFAULT = self::LOG_DIRECTORY_DEFAULT . self::LOG_NAME_DEFAULT;
-    const LOG_LEVEL_DEFAULT = Logger::INFO;
-    const LOG_NAME_CUSTOM = 'custom.log';
-    const LOG_DIRECTORY_CUSTOM = '/tmp/';
-    const LOG_FILENAME_CUSTOM = self::LOG_DIRECTORY_CUSTOM . self::LOG_NAME_CUSTOM;
-    const LOG_LEVEL_CUSTOM = Logger::DEBUG;
+    private const LOG_NAME_DEFAULT = 'runtime.log';
+    private const LOG_DIRECTORY_DEFAULT = '/var/log/imgcache/';
+    private const LOG_FILENAME_DEFAULT = self::LOG_DIRECTORY_DEFAULT . self::LOG_NAME_DEFAULT;
+    private const LOG_LEVEL_DEFAULT = Logger::INFO;
+    private const LOG_NAME_CUSTOM = 'custom.log';
+    private const LOG_DIRECTORY_CUSTOM = '/tmp/';
+    private const LOG_FILENAME_CUSTOM = self::LOG_DIRECTORY_CUSTOM . self::LOG_NAME_CUSTOM;
+    private const LOG_LEVEL_CUSTOM = Logger::DEBUG;
 
-    public function testCreateLogger_GivenDefaultLogNameAndDirectoryAndLevel_LogNameAndDirectoryAreSet(): void
+    /** @test */
+    public function createLogger_givenDefaultLogNameAndDirectoryAndLevel_logNameAndDirectoryAreSet(): void
     {
         $loggerFactory = new LoggerFactory();
 
@@ -37,7 +38,8 @@ class LoggerFactoryTest extends TestCase
         $this->verifyLogger($logger,self::LOG_NAME_DEFAULT, self::LOG_LEVEL_DEFAULT, self::LOG_FILENAME_DEFAULT);
     }
 
-    public function testCreateLogger_GivenCustomLogNameAndDirectoryAndLevel_LogNameAndDirectoryAreSet(): void
+    /** @test */
+    public function createLogger_givenCustomLogNameAndDirectoryAndLevel_LlgNameAndDirectoryAreSet(): void
     {
         $loggerFactory = new LoggerFactory(self::LOG_DIRECTORY_CUSTOM);
 
@@ -47,7 +49,8 @@ class LoggerFactoryTest extends TestCase
         $this->verifyLogger($logger,self::LOG_NAME_CUSTOM, self::LOG_LEVEL_CUSTOM, self::LOG_FILENAME_CUSTOM);
     }
 
-    public function testCreateLogger_GivenDefaultParametersAndDryRunIsOn_LoggerHasNullHandler(): void
+    /** @test */
+    public function createLogger_givenDefaultParametersAndDryRunIsOn_LogglrHasNullHandler(): void
     {
         $loggerFactory = new LoggerFactory(self::LOG_DIRECTORY_DEFAULT, true);
 

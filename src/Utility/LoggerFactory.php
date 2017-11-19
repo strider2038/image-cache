@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Utility;
 
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\NullHandler;
@@ -16,14 +16,13 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class LoggerFactory
 {
-    const LOG_NAME_DEFAULT = 'runtime.log';
-    const LOG_DIRECTORY_DEFAULT = '/var/log/imgcache/';
+    private const LOG_NAME_DEFAULT = 'runtime.log';
+    private const LOG_DIRECTORY_DEFAULT = '/var/log/imgcache/';
 
     /** @var string */
     private $logDirectory;
