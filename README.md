@@ -23,7 +23,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Split ImageCache class to ImageStorage and ImageCache
 - [x] Router rewrites Request URI, eliminate location in controllers
 - [x] Logging guzzle requests
-- [ ] Add CodeSniffer and Sensio Labs to CI
+- [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
 - [ ] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
@@ -49,3 +49,4 @@ Image caching microservice with connection to cloud hostings
 - Google map source (inspect licensing problems)
 - Yandex map marker
 - Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php
+- Add referrer control to Security component

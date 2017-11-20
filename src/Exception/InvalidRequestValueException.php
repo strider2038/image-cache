@@ -19,7 +19,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 class InvalidRequestValueException extends ApplicationException
 {
     public function __construct(
-        string $message = "",
+        string $message = '',
         int $code = HttpStatusCodeEnum::BAD_REQUEST,
         \Throwable $previous = null
     ) {

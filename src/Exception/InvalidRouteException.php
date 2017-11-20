@@ -21,7 +21,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 class InvalidRouteException extends ApplicationException
 {
     public function __construct(
-        string $message = "", 
+        string $message = '',
         int $code = HttpStatusCodeEnum::NOT_FOUND,
         \Throwable $previous = null
     ) {

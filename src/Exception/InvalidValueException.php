@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 class InvalidValueException extends ApplicationException
 {
     public function __construct(
-        $message = "",
+        $message = '',
         $code = HttpStatusCodeEnum::INTERNAL_SERVER_ERROR,
         \Throwable $previous = null
     ) {

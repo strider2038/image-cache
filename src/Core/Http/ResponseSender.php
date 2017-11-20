@@ -22,7 +22,7 @@ class ResponseSender implements ResponseSenderInterface
     public function send(ResponseInterface $response): void
     {
         header(sprintf(
-            "HTTP/%s %d %s",
+            'HTTP/%s %d %s',
             $response->getProtocolVersion()->getValue(),
             $response->getStatusCode()->getValue(),
             $response->getReasonPhrase()

@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 class FileOperationException extends ApplicationException
 {
     public function __construct(
-        $message = "",
+        $message = '',
         \Throwable $previous = null
     ) {
         parent::__construct($message, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR, $previous);

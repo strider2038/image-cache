@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 class BadApiResponse extends ApplicationException
 {
     public function __construct(
-        $message = "",
+        $message = '',
         $code = HttpStatusCodeEnum::BAD_GATEWAY,
         \Throwable $previous = null
     ) {

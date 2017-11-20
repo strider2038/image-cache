@@ -27,7 +27,7 @@ class SecurityTest extends TestCase
     /** @var RequestInterface */
     private $request;
 
-    public function setUp() 
+    public function setUp(): void
     {
         $this->request = \Phake::mock(RequestInterface::class);
     }

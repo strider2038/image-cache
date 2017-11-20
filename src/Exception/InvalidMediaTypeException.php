@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 class InvalidMediaTypeException extends ApplicationException
 {
     public function __construct(
-        string $message = "",
+        string $message = '',
         int $code = HttpStatusCodeEnum::UNSUPPORTED_MEDIA_TYPE,
         \Throwable $previous = null
     ) {

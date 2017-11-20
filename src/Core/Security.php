@@ -30,29 +30,26 @@ class Security implements SecurityInterface
         if (strlen($token) < 32) {
             throw new ApplicationException('Access token is insecure');
         }
+
         $this->request = $request;
         $this->accessToken = $token;
     }
 
     public function isTokenValid(): bool 
     {
+        $isTokenValid = false;
         $headerName = new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION);
         $authenticationData = $this->request->getHeaderLine($headerName);
+
         if (preg_match('/^Bearer\s+(.*?)$/', $authenticationData, $matches)) {
-            return $matches[1] === $this->accessToken;
+            $isTokenValid = $matches[1] === $this->accessToken;
         }
         
-        return false;
+        return $isTokenValid;
     }
 
-    /** @todo add referrer security control */
-    public function isReferrerValid(): bool 
+    public function isAuthorized(): bool
     {
-        return true;
-    }
-    
-    public function isAuthorized(): bool 
-    {
-        return $this->isTokenValid() && $this->isReferrerValid();
+        return $this->isTokenValid();
     }
 }

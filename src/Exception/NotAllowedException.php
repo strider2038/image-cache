@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 class NotAllowedException extends ApplicationException
 {
     public function __construct(
-        $message = "",
+        $message = '',
         $code = HttpStatusCodeEnum::METHOD_NOT_ALLOWED,
         \Throwable $previous = null
     ) {
