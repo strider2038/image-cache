@@ -19,7 +19,6 @@
         "symfony/config": "^3.3",
         "symfony/filesystem": "^3.3",
         "symfony/validator": "^3.3",
-        "symfony/cache": "^3.3",
         "monolog/monolog": "^1.23",
         "myclabs/php-enum": "^1.5",
         "nixsolutions/yandex-php-library": "^3.0",
