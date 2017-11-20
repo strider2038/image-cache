@@ -1,0 +1,24 @@
+@startuml
+
+:User: --> (Get image)
+:Authenticated user: --> (Get image)
+:Authenticated user: --> (Post image)
+:Authenticated user: --> (Replace image)
+:Authenticated user: --> (Delete image)
+
+(Get image) --|> (Get from nginx)
+(Get image) --|> (Get from storage)
+
+(Post image) --|> (Post to storage)
+
+(Replace image) --|> (Delete from storage)
+(Replace image) --|> (Post to storage)
+
+(Delete image) --|> (Delete from storage)
+
+note "via web application" as Note_via_application
+(Get from storage) .. Note_via_application
+(Post to storage) .. Note_via_application
+(Delete from storage) .. Note_via_application
+
+@enduml
