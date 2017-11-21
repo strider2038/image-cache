@@ -1,4 +1,4 @@
-# Image Cache microservice
+# Image caching microservice
 
 [![Build Status](https://travis-ci.org/strider2038/imgcache-service.svg?branch=master)](https://travis-ci.org/strider2038/imgcache-service) [![Coverage Status](https://coveralls.io/repos/github/strider2038/imgcache-service/badge.svg?branch=master)](https://coveralls.io/github/strider2038/imgcache-service?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/strider2038/imgcache-service/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/strider2038/imgcache-service/?branch=master)
 
@@ -27,6 +27,8 @@ Image caching microservice with connection to cloud hostings
 - [x] Logging guzzle requests
 - [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
 - [ ] Yandex.Disk source
+  - YandexDiskSource
+  - YandexDiskSourceAccessor
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
   - storage and cache key as data object
@@ -40,6 +42,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Move all todos to github issues
 - [ ] Rename project to "Image caching microservice"
 - [ ] Refactor SaveOptions to be ignored while saving
+- [ ] Write project description in README.md
 
 ## Goals for version v1.1
 - [ ] Cache mechanism for source accessor

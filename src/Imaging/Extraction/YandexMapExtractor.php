@@ -34,6 +34,7 @@ class YandexMapExtractor implements ImageExtractorInterface
     public function extract(string $key): ? Image
     {
         $parameters = $this->parser->parse($key);
+
         return $this->accessor->get($parameters);
     }
 }

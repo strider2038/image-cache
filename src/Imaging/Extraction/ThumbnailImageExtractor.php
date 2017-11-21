@@ -43,6 +43,7 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     {
         $thumbnailKey = $this->keyParser->parse($key);
         $sourceImage = $this->sourceAccessor->get($thumbnailKey->getPublicFilename());
+
         if ($sourceImage === null) {
             return null;
         }
