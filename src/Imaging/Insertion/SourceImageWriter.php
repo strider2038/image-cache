@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Insertion;
 
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
@@ -31,25 +31,25 @@ class SourceImageWriter implements ImageWriterInterface
         $this->sourceAccessor = $sourceAccessor;
     }
 
-    public function exists(string $key): bool
+    public function imageExists(string $key): bool
     {
         $parsedKey = $this->keyParser->parse($key);
         return $this->sourceAccessor->exists($parsedKey->getPublicFilename());
     }
 
-    public function insert(string $key, StreamInterface $data): void
+    public function insertImage(string $key, Image $image): void
     {
         $parsedKey = $this->keyParser->parse($key);
-        $this->sourceAccessor->put($parsedKey->getPublicFilename(), $data);
+        $this->sourceAccessor->put($parsedKey->getPublicFilename(), $image);
     }
 
-    public function delete(string $key): void
+    public function deleteImage(string $key): void
     {
         $parsedKey = $this->keyParser->parse($key);
         $this->sourceAccessor->delete($parsedKey->getPublicFilename());
     }
 
-    public function getFileNameMask(string $key): string
+    public function getImageFileNameMask(string $key): string
     {
         $parsedKey = $this->keyParser->parse($key);
         return $parsedKey->getPublicFilename();

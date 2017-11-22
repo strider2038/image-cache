@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
-use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 
 /**
@@ -20,6 +19,6 @@ interface SourceAccessorInterface
 {
     public function get(string $key): ? Image;
     public function exists(string $key): bool;
-    public function put(string $key, StreamInterface $stream): void;
+    public function put(string $key, Image $image): void;
     public function delete(string $key): void;
 }

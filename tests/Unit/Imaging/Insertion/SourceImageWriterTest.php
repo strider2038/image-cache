@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Insertion;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
@@ -49,7 +49,7 @@ class SourceImageWriterTest extends TestCase
         $this->givenKeyParser_parse_returnsSourceKey();
         $this->givenSourceAccessor_exists_returns($publicFilename, $expectedExists);
 
-        $actualExists = $writer->exists(self::KEY);
+        $actualExists = $writer->imageExists(self::KEY);
 
         $this->assertEquals($expectedExists, $actualExists);
     }
@@ -58,13 +58,13 @@ class SourceImageWriterTest extends TestCase
     public function insert_givenKeyAndData_keyIsParsedAndSourceAccessorPutIsCalled(): void
     {
         $writer = $this->createSourceImageWriter();
-        $stream = \Phake::mock(StreamInterface::class);
+        $image = \Phake::mock(Image::class);
         $this->givenKeyParser_parse_returnsSourceKey();
 
-        $writer->insert(self::KEY, $stream);
+        $writer->insertImage(self::KEY, $image);
 
         $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertSourceAccessor_put_isCalledOnceWith($stream);
+        $this->assertSourceAccessor_put_isCalledOnceWith($image);
     }
 
     /** @test */
@@ -73,7 +73,7 @@ class SourceImageWriterTest extends TestCase
         $writer = $this->createSourceImageWriter();
         $this->givenKeyParser_parse_returnsSourceKey();
 
-        $writer->delete(self::KEY);
+        $writer->deleteImage(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
         $this->assertSourceAccessor_delete_isCalledOnce();
@@ -85,7 +85,7 @@ class SourceImageWriterTest extends TestCase
         $writer = $this->createSourceImageWriter();
         $this->givenKeyParser_parse_returnsSourceKey();
 
-        $filename = $writer->getFileNameMask(self::KEY);
+        $filename = $writer->getImageFileNameMask(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
         $this->assertEquals(self::PUBLIC_FILENAME, $filename);
@@ -110,10 +110,10 @@ class SourceImageWriterTest extends TestCase
         \Phake::verify($this->keyParser, \Phake::times(1))->parse(self::KEY);
     }
 
-    private function assertSourceAccessor_put_isCalledOnceWith(StreamInterface $stream): void
+    private function assertSourceAccessor_put_isCalledOnceWith(Image $image): void
     {
         \Phake::verify($this->sourceAccessor, \Phake::times(1))
-            ->put(self::PUBLIC_FILENAME, $stream);
+            ->put(self::PUBLIC_FILENAME, $image);
     }
 
     private function assertSourceAccessor_delete_isCalledOnce(): void

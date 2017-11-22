@@ -10,8 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Insertion;
 
-use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
@@ -33,25 +33,25 @@ class ThumbnailImageWriter implements ImageWriterInterface
         $this->sourceAccessor = $sourceAccessor;
     }
 
-    public function exists(string $key): bool
+    public function imageExists(string $key): bool
     {
         $parsedKey = $this->parseKey($key);
         return $this->sourceAccessor->exists($parsedKey->getPublicFilename());
     }
 
-    public function insert(string $key, StreamInterface $data): void
+    public function insertImage(string $key, Image $image): void
     {
         $parsedKey = $this->parseKey($key);
-        $this->sourceAccessor->put($parsedKey->getPublicFilename(), $data);
+        $this->sourceAccessor->put($parsedKey->getPublicFilename(), $image);
     }
 
-    public function delete(string $key): void
+    public function deleteImage(string $key): void
     {
         $parsedKey = $this->parseKey($key);
         $this->sourceAccessor->delete($parsedKey->getPublicFilename());
     }
 
-    public function getFileNameMask(string $key): string
+    public function getImageFileNameMask(string $key): string
     {
         $parsedKey = $this->parseKey($key);
         return $parsedKey->getThumbnailMask();

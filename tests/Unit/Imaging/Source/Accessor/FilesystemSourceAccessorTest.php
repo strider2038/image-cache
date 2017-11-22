@@ -91,11 +91,14 @@ class FilesystemSourceAccessorTest extends TestCase
     public function put_givenKeyAndStream_streamIsPuttedToSource(): void
     {
         $accessor = $this->createFilesystemSourceAccessor();
-        $stream = \Phake::mock(StreamInterface::class);
+        $image = \Phake::mock(Image::class);
+        $stream = $this->givenImage_getData_returnsStream($image);
+
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
 
-        $accessor->put(self::KEY, $stream);
+        $accessor->put(self::KEY, $image);
 
+        $this->assertImage_getData_isCalledOnce($image);
         $this->assertSource_put_isCalledOnceWith($filenameKey, $stream);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
@@ -147,5 +150,18 @@ class FilesystemSourceAccessorTest extends TestCase
     private function assertSource_delete_isCalledOnceWith(FilenameKeyInterface $filenameKey): void
     {
         \Phake::verify($this->source, \Phake::times(1))->delete($filenameKey);
+    }
+
+    private function assertImage_getData_isCalledOnce(Image $image): void
+    {
+        \Phake::verify($image, \Phake::times(1))->getData();
+    }
+
+    private function givenImage_getData_returnsStream(Image $image): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($image)->getData()->thenReturn($stream);
+
+        return $stream;
     }
 }

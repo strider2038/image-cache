@@ -56,12 +56,10 @@ class ImageStorageTest extends TestCase
     {
         $storage = $this->createImageStorage();
         $image = $this->givenImage();
-        $data = $this->givenImage_getData_returnsStream($image);
 
         $storage->putImage(self::VALID_KEY, $image);
 
-        $this->assertImage_getData_isCalledOnce($image);
-        $this->assertImageWriter_insert_isCalledOnceWith(self::VALID_KEY, $data);
+        $this->assertImageWriter_insertImage_isCalledOnceWith(self::VALID_KEY, $image);
     }
 
     /**
@@ -72,12 +70,12 @@ class ImageStorageTest extends TestCase
     public function imageExists_givenKey_existsStatusReturned(bool $expectedExists): void
     {
         $storage = $this->createImageStorage();
-        $this->givenImageWriter_exists_returns($expectedExists);
+        $this->givenImageWriter_imageExists_returns($expectedExists);
 
         $exists = $storage->imageExists(self::VALID_KEY);
 
         $this->assertEquals($expectedExists, $exists);
-        $this->assertImageWriter_exists_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageWriter_imageExists_isCalledOnceWith(self::VALID_KEY);
     }
 
     /** @test */
@@ -87,18 +85,18 @@ class ImageStorageTest extends TestCase
 
         $storage->deleteImage(self::VALID_KEY);
 
-        $this->assertImageWriter_delete_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageWriter_deleteImage_isCalledOnceWith(self::VALID_KEY);
     }
 
     /** @test */
     public function getImageFileNameMask_givenKey_fileNameMaskReturned(): void
     {
         $storage = $this->createImageStorage();
-        $this->givenImageWriter_getFileNameMask_returnsFileNameMask();
+        $this->givenImageWriter_getImageFileNameMask_returnsFileNameMask();
 
         $mask = $storage->getImageFileNameMask(self::VALID_KEY);
 
-        $this->assertImageWriter_getFileNameMask_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageWriter_getImageFileNameMask_isCalledOnceWith(self::VALID_KEY);
         $this->assertEquals(self::FILE_NAME_MASK, $mask);
     }
 
@@ -161,34 +159,34 @@ class ImageStorageTest extends TestCase
         \Phake::verify($image, \Phake::times(1))->getData();
     }
 
-    private function assertImageWriter_insert_isCalledOnceWith(string $key, StreamInterface $data): void
+    private function assertImageWriter_insertImage_isCalledOnceWith(string $key, Image $image): void
     {
-        \Phake::verify($this->imageWriter, \Phake::times(1))->insert($key, $data);
+        \Phake::verify($this->imageWriter, \Phake::times(1))->insertImage($key, $image);
     }
 
-    private function assertImageWriter_delete_isCalledOnceWith(string $key): void
+    private function assertImageWriter_deleteImage_isCalledOnceWith(string $key): void
     {
-        \Phake::verify($this->imageWriter, \Phake::times(1))->delete($key);
+        \Phake::verify($this->imageWriter, \Phake::times(1))->deleteImage($key);
     }
 
-    private function assertImageWriter_getFileNameMask_isCalledOnceWith(string $key): void
+    private function assertImageWriter_getImageFileNameMask_isCalledOnceWith(string $key): void
     {
-        \Phake::verify($this->imageWriter, \Phake::times(1))->getFileNameMask($key);
+        \Phake::verify($this->imageWriter, \Phake::times(1))->getImageFileNameMask($key);
     }
 
-    private function assertImageWriter_exists_isCalledOnceWith(string $key): void
+    private function assertImageWriter_imageExists_isCalledOnceWith(string $key): void
     {
-        \Phake::verify($this->imageWriter, \Phake::times(1))->exists($key);
+        \Phake::verify($this->imageWriter, \Phake::times(1))->imageExists($key);
     }
 
-    private function givenImageWriter_exists_returns(bool $expectedExists): void
+    private function givenImageWriter_imageExists_returns(bool $expectedExists): void
     {
-        \Phake::when($this->imageWriter)->exists(\Phake::anyParameters())->thenReturn($expectedExists);
+        \Phake::when($this->imageWriter)->imageExists(\Phake::anyParameters())->thenReturn($expectedExists);
     }
 
-    private function givenImageWriter_getFileNameMask_returnsFileNameMask(): void
+    private function givenImageWriter_getImageFileNameMask_returnsFileNameMask(): void
     {
-        \Phake::when($this->imageWriter)->getFileNameMask(\Phake::anyParameters())->thenReturn(self::FILE_NAME_MASK);
+        \Phake::when($this->imageWriter)->getImageFileNameMask(\Phake::anyParameters())->thenReturn(self::FILE_NAME_MASK);
     }
 
     private function givenImage(): Image

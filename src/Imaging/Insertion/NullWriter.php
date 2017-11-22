@@ -10,31 +10,30 @@
 
 namespace Strider2038\ImgCache\Imaging\Insertion;
 
-use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Exception\NotAllowedException;
-
+use Strider2038\ImgCache\Imaging\Image\Image;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class NullWriter implements ImageWriterInterface
 {
-    public function exists(string $key): bool
+    public function imageExists(string $key): bool
     {
         throw new NotAllowedException('Method is not allowed');
     }
 
-    public function insert(string $key, StreamInterface $data): void
+    public function insertImage(string $key, Image $image): void
     {
         throw new NotAllowedException('Method is not allowed');
     }
 
-    public function delete(string $key): void
+    public function deleteImage(string $key): void
     {
         throw new NotAllowedException('Method is not allowed');
     }
 
-    public function getFileNameMask(string $key): string
+    public function getImageFileNameMask(string $key): string
     {
         throw new NotAllowedException('Method is not allowed');
     }

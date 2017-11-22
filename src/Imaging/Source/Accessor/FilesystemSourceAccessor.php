@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
@@ -76,10 +75,11 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
         return $exists;
     }
 
-    public function put(string $key, StreamInterface $stream): void
+    public function put(string $key, Image $image): void
     {
         $filenameKey = $this->composeFilenameKey($key);
-        $this->source->put($filenameKey, $stream);
+        $data = $image->getData();
+        $this->source->put($filenameKey, $data);
 
         $this->logger->info(sprintf(
             "Image is successfully putted to source under key '%s'",
