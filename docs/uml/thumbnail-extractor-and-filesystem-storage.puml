@@ -1,0 +1,12 @@
+@startuml
+
+ImageStorage -> ThumbnailImageExtractor: getImage('/image_s100x80.jpg')
+ThumbnailImageExtractor -> FilesystemSourceAccessor: getImage('/image.jpg')
+FilesystemSourceAccessor -> FilesystemSource: getData('/filesource/image.jpg')
+FilesystemSourceAccessor <-- FilesystemSource: StreamInterface
+ThumbnailImageExtractor <-- FilesystemSourceAccessor: Image
+ThumbnailImageExtractor -> ImageProcessor: processImage(Image, [Resize(100, 80)])
+ThumbnailImageExtractor <-- ImageProcessor: Image
+ImageStorage <-- ThumbnailImageExtractor: Image
+
+@enduml
