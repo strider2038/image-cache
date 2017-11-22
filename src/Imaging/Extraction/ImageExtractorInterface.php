@@ -17,5 +17,5 @@ use Strider2038\ImgCache\Imaging\Image\Image;
  */
 interface ImageExtractorInterface
 {
-    public function extract(string $key): ? Image;
+    public function extractImage(string $key): Image;
 }

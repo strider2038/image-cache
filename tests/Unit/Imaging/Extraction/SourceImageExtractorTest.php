@@ -36,19 +36,6 @@ class SourceImageExtractorTest extends TestCase
     }
 
     /** @test */
-    public function extract_imageDoesNotExistInSource_nullIsReturned(): void
-    {
-        $extractor = $this->createSourceImageExtractor();
-        $publicFilename = self::PUBLIC_FILENAME;
-        $this->givenKeyParser_parse_returnsSourceKey();
-        $this->givenSourceAccessor_get_returnsNull($publicFilename);
-
-        $extractedImage = $extractor->extract(self::KEY);
-
-        $this->assertNull($extractedImage);
-    }
-
-    /** @test */
     public function extract_imageExistsInSource_imageIsReturned(): void
     {
         $extractor = $this->createSourceImageExtractor();
@@ -56,7 +43,7 @@ class SourceImageExtractorTest extends TestCase
         $this->givenKeyParser_parse_returnsSourceKey();
         $image = $this->givenSourceAccessor_get_returnsImage($publicFilename);
 
-        $extractedImage = $extractor->extract(self::KEY);
+        $extractedImage = $extractor->extractImage(self::KEY);
 
         $this->assertSame($image, $extractedImage);
     }

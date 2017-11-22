@@ -40,7 +40,7 @@ class YandexMapExtractorTest extends TestCase
         $parameters = $this->givenParser_parse_returnsParameters();
         $expectedImage = $this->givenAccessor_get_returnsImage($parameters);
 
-        $image = $extractor->extract(self::KEY);
+        $image = $extractor->extractImage(self::KEY);
 
         $this->assertSame($expectedImage, $image);
     }

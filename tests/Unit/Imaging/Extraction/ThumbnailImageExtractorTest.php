@@ -42,18 +42,6 @@ class ThumbnailImageExtractorTest extends TestCase
     }
 
     /** @test */
-    public function extract_imageDoesNotExistInSource_nullIsReturned(): void
-    {
-        $extractor = $this->createThumbnailImageExtractor();
-        $this->givenKeyParser_parse_returnsThumbnailKey();
-        $this->givenSourceAccessor_get_returns(null);
-
-        $extractedImage = $extractor->extract(self::KEY);
-
-        $this->assertNull($extractedImage);
-    }
-
-    /** @test */
     public function extract_imageExistsInSource_imageIsProcessedAndReturned(): void
     {
         $extractor = $this->createThumbnailImageExtractor();
@@ -63,7 +51,7 @@ class ThumbnailImageExtractorTest extends TestCase
         $this->givenSourceAccessor_get_returns($sourceImage);
         $processedImage = $this->givenImageProcessor_process_returnsProcessedImage($sourceImage, $processingConfiguration);
 
-        $extractedImage = $extractor->extract(self::KEY);
+        $extractedImage = $extractor->extractImage(self::KEY);
 
         $this->assertSame($processedImage, $extractedImage);
     }

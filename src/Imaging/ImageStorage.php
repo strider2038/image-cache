@@ -37,7 +37,7 @@ class ImageStorage implements ImageStorageInterface
     {
         $this->validateKey($key);
 
-        return $this->imageExtractor->extract($key);
+        return $this->imageExtractor->extractImage($key);
     }
 
     public function putImage(string $key, Image $image): void

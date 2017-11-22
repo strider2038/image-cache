@@ -42,12 +42,12 @@ class ImageStorageTest extends TestCase
     public function getImage_givenKeyAndExtractorReturnsImage_imageReturned(): void
     {
         $storage = $this->createImageStorage();
-        $extractedImage = $this->givenImageExtractor_extract_returnsImage();
+        $extractedImage = $this->givenImageExtractor_extractImage_returnsImage();
 
         $image = $storage->getImage(self::VALID_KEY);
 
         $this->assertInstanceOf(Image::class, $image);
-        $this->assertImageExtractor_extract_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageExtractor_extractImage_isCalledOnceWith(self::VALID_KEY);
         $this->assertSame($extractedImage, $image);
     }
 
@@ -135,15 +135,15 @@ class ImageStorageTest extends TestCase
         return new ImageStorage($this->imageExtractor, $this->imageWriter);
     }
 
-    private function assertImageExtractor_extract_isCalledOnceWith(string $key): void
+    private function assertImageExtractor_extractImage_isCalledOnceWith(string $key): void
     {
-        \Phake::verify($this->imageExtractor, \Phake::times(1))->extract($key);
+        \Phake::verify($this->imageExtractor, \Phake::times(1))->extractImage($key);
     }
 
-    private function givenImageExtractor_extract_returnsImage(): Image
+    private function givenImageExtractor_extractImage_returnsImage(): Image
     {
         $extractedImage = \Phake::mock(Image::class);
-        \Phake::when($this->imageExtractor)->extract(\Phake::anyParameters())->thenReturn($extractedImage);
+        \Phake::when($this->imageExtractor)->extractImage(\Phake::anyParameters())->thenReturn($extractedImage);
 
         return $extractedImage;
     }
@@ -154,11 +154,6 @@ class ImageStorageTest extends TestCase
         \Phake::when($image)->getData()->thenReturn($data);
 
         return $data;
-    }
-
-    private function givenImageExtractor_extract_returnsNull(): void
-    {
-        \Phake::when($this->imageExtractor)->extract(\Phake::anyParameters())->thenReturn(null);
     }
 
     private function assertImage_getData_isCalledOnce(Image $image): void
