@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Source\Accessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Imaging\Source\Mapping\FilenameKeyMapperInterface;
@@ -25,6 +26,9 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     /** @var FilesystemSourceInterface */
     private $source;
 
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
+
     /** @var FilenameKeyMapperInterface */
     private $keyMapper;
 
@@ -33,9 +37,11 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
 
     public function __construct(
         FilesystemSourceInterface $source,
+        ImageFactoryInterface $imageFactory,
         FilenameKeyMapperInterface $keyMapper
     ) {
         $this->source = $source;
+        $this->imageFactory = $imageFactory;
         $this->keyMapper = $keyMapper;
         $this->logger = new NullLogger();
     }
@@ -48,7 +54,8 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     public function getImage(string $key): Image
     {
         $filenameKey = $this->composeFilenameKey($key);
-        $image = $this->source->get($filenameKey);
+        $stream = $this->source->getFileContents($filenameKey);
+        $image = $this->imageFactory->createFromStream($stream);
 
         $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s"', $key));
 
@@ -58,7 +65,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     public function imageExists(string $key): bool
     {
         $filenameKey = $this->composeFilenameKey($key);
-        $exists = $this->source->exists($filenameKey);
+        $exists = $this->source->fileExists($filenameKey);
 
         $this->logger->info(sprintf(
             'Image with key "%s" %s in filesystem source',
@@ -73,7 +80,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     {
         $filenameKey = $this->composeFilenameKey($key);
         $data = $image->getData();
-        $this->source->put($filenameKey, $data);
+        $this->source->createFile($filenameKey, $data);
 
         $this->logger->info(sprintf(
             "Image is successfully putted to source under key '%s'",
@@ -84,7 +91,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     public function deleteImage(string $key): void
     {
         $filenameKey = $this->composeFilenameKey($key);
-        $this->source->delete($filenameKey);
+        $this->source->deleteFile($filenameKey);
 
         $this->logger->info(sprintf(
             "Image with key '%s' is successfully deleted from source",

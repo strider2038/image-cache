@@ -15,8 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSource;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
@@ -35,16 +33,11 @@ class FilesystemSourceTest extends TestCase
     private const DATA = 'data';
     private const CHUNK_SIZE = 8 * 1024 * 1024;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-
     /** @var FileOperationsInterface */
     private $fileOperations;
-    
-    public function setUp() 
+
+    public function setUp(): void
     {
-        parent::setUp();
-        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->fileOperations = $this->givenFileOperations();
     }
 
@@ -65,58 +58,65 @@ class FilesystemSourceTest extends TestCase
     public function construct_baseDirectoryDoesNotExist_exceptionThrown(): void
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, false);
-        new FilesystemSource(self::BASE_DIRECTORY, $this->fileOperations, $this->imageFactory);
+        new FilesystemSource(self::BASE_DIRECTORY, $this->fileOperations);
     }
 
-    /** @test */
-    public function get_fileDoesNotExist_nullIsReturned(): void
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* not found/
+     */
+    public function getFileContents_fileDoesNotExist_exceptionThrown(): void
     {
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_NOT_EXIST);
 
-        $image = $source->get($filenameKey);
-
-        $this->assertNull($image);
+        $source->getFileContents($filenameKey);
     }
 
     /** @test */
-    public function get_fileExists_imageIsReturned(): void
+    public function getFileContents_fileExists_fileContentsIsReturned(): void
     {
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
-        $this->givenImageFactory_createFromFile_returnsImage(self::FILENAME_EXISTS);
+        $expectedFileContents = $this->givenFileOperations_openFile_returnsStream(
+            $this->fileOperations,
+            self::FILENAME_EXISTS_FULL,
+            ResourceStreamModeEnum::READ_ONLY
+        );
 
-        $image = $source->get($filenameKey);
+        $fileContents = $source->getFileContents($filenameKey);
 
-        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($expectedFileContents, $fileContents);
     }
 
     /** @test */
-    public function exists_fileDoesNotExist_falseIsReturned(): void
+    public function fileExists_fileDoesNotExist_falseIsReturned(): void
     {
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_NOT_EXIST);
 
-        $exists = $source->exists($filenameKey);
+        $exists = $source->fileExists($filenameKey);
 
         $this->assertFalse($exists);
     }
 
     /** @test */
-    public function exists_fileExists_trueIsReturned(): void
+    public function fileExists_fileExists_trueIsReturned(): void
     {
         $source = $this->createFilesystemSource();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
 
-        $exists = $source->exists($filenameKey);
+        $exists = $source->fileExists($filenameKey);
 
         $this->assertTrue($exists);
     }
 
     /** @test */
-    public function put_givenKeyAndStream_directoryCreatedAndStreamIsWrittenToFile(): void
+    public function createFile_givenKeyAndStream_directoryCreatedAndStreamIsWrittenToFile(): void
     {
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
@@ -127,19 +127,19 @@ class FilesystemSourceTest extends TestCase
             ResourceStreamModeEnum::WRITE_AND_READ
         );
 
-        $source->put($filenameKey, $givenStream);
+        $source->createFile($filenameKey, $givenStream);
 
         $this->assertFileOperations_createDirectory_isCalledOnce($this->fileOperations, self::BASE_DIRECTORY);
         \Phake::verify($stream, \Phake::times(1))->write(self::DATA);
     }
 
     /** @test */
-    public function delete_givenKey_fileIsDeleted(): void
+    public function deleteFile_givenKey_fileIsDeleted(): void
     {
         $source = $this->createFilesystemSource();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
 
-        $source->delete($filenameKey);
+        $source->deleteFile($filenameKey);
 
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FILENAME_EXISTS_FULL);
     }
@@ -148,9 +148,7 @@ class FilesystemSourceTest extends TestCase
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
 
-        $source = new FilesystemSource($baseDirectory, $this->fileOperations, $this->imageFactory);
-
-        return $source;
+        return new FilesystemSource($baseDirectory, $this->fileOperations);
     }
 
     private function givenFilenameKey($filename): FilenameKeyInterface
@@ -160,17 +158,6 @@ class FilesystemSourceTest extends TestCase
         \Phake::when($filenameKey)->getValue()->thenReturn($filename);
 
         return $filenameKey;
-    }
-
-    private function givenImageFactory_createFromFile_returnsImage($imageFilename): Image
-    {
-        $image = \Phake::mock(Image::class);
-
-        \Phake::when($this->imageFactory)
-            ->createFromFile($imageFilename)
-            ->thenReturn($image);
-
-        return $image;
     }
 
     private function givenInputStream(): StreamInterface

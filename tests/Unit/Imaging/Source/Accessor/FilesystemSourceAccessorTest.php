@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor;
 use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
 use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
@@ -30,15 +31,19 @@ class FilesystemSourceAccessorTest extends TestCase
     /** @var FilesystemSourceInterface */
     private $source;
 
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
+
     /** @var FilenameKeyMapperInterface */
     private $keyMapper;
 
     /** @var LoggerInterface */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->source = \Phake::mock(FilesystemSourceInterface::class);
+        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->keyMapper = \Phake::mock(FilenameKeyMapperInterface::class);
         $this->logger = $this->givenLogger();
     }
@@ -48,13 +53,16 @@ class FilesystemSourceAccessorTest extends TestCase
     {
         $accessor = $this->createFilesystemSourceAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
-        $sourceImage = \Phake::mock(Image::class);
-        $this->givenSource_get_returns($filenameKey, $sourceImage);
+        $stream = $this->givenSource_getFileContents_returnsStream($filenameKey);
+        $createdImage = $this->givenImageFactory_createFromStream_returnsImage();
 
         $image = $accessor->getImage(self::KEY);
 
-        $this->assertSame($sourceImage, $image);
+        $this->assertSame($createdImage, $image);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
+        $this->assertKeyMapper_getKey_isCalledOnceWithKey(self::KEY);
+        $this->assertSource_getFileContents_isCalledOnceWithFilenameKey($filenameKey);
+        $this->assertImageFactory_createFromStream_isCalledOnceWithStream($stream);
     }
 
     /**
@@ -66,7 +74,7 @@ class FilesystemSourceAccessorTest extends TestCase
     {
         $accessor = $this->createFilesystemSourceAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
-        $this->givenSource_exists_returns($filenameKey, $expectedExists);
+        $this->givenSource_fileExists_returns($filenameKey, $expectedExists);
 
         $actualExists = $accessor->imageExists(self::KEY);
 
@@ -86,7 +94,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $accessor->putImage(self::KEY, $image);
 
         $this->assertImage_getData_isCalledOnce($image);
-        $this->assertSource_put_isCalledOnceWith($filenameKey, $stream);
+        $this->assertSource_createFile_isCalledOnceWith($filenameKey, $stream);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
@@ -98,13 +106,13 @@ class FilesystemSourceAccessorTest extends TestCase
 
         $accessor->deleteImage(self::KEY);
 
-        $this->assertSource_delete_isCalledOnceWith($filenameKey);
+        $this->assertSource_deleteFile_isCalledOnceWith($filenameKey);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
     private function createFilesystemSourceAccessor(): FilesystemSourceAccessor
     {
-        $accessor = new FilesystemSourceAccessor($this->source, $this->keyMapper);
+        $accessor = new FilesystemSourceAccessor($this->source, $this->imageFactory, $this->keyMapper);
         $accessor->setLogger($this->logger);
 
         return $accessor;
@@ -119,24 +127,27 @@ class FilesystemSourceAccessorTest extends TestCase
         return $filenameKey;
     }
 
-    private function givenSource_get_returns(FilenameKeyInterface $filenameKey, Image $image): void
+    private function givenSource_getFileContents_returnsStream(FilenameKeyInterface $filenameKey): StreamInterface
     {
-        \Phake::when($this->source)->get($filenameKey)->thenReturn($image);
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->source)->getFileContents($filenameKey)->thenReturn($stream);
+
+        return $stream;
     }
 
-    private function givenSource_exists_returns(FilenameKeyInterface $filenameKey, bool $value): void
+    private function givenSource_fileExists_returns(FilenameKeyInterface $filenameKey, bool $value): void
     {
-        \Phake::when($this->source)->exists($filenameKey)->thenReturn($value);
+        \Phake::when($this->source)->fileExists($filenameKey)->thenReturn($value);
     }
 
-    private function assertSource_put_isCalledOnceWith(FilenameKeyInterface $filenameKey, StreamInterface $stream): void
+    private function assertSource_createFile_isCalledOnceWith(FilenameKeyInterface $filenameKey, StreamInterface $stream): void
     {
-        \Phake::verify($this->source, \Phake::times(1))->put($filenameKey, $stream);
+        \Phake::verify($this->source, \Phake::times(1))->createFile($filenameKey, $stream);
     }
 
-    private function assertSource_delete_isCalledOnceWith(FilenameKeyInterface $filenameKey): void
+    private function assertSource_deleteFile_isCalledOnceWith(FilenameKeyInterface $filenameKey): void
     {
-        \Phake::verify($this->source, \Phake::times(1))->delete($filenameKey);
+        \Phake::verify($this->source, \Phake::times(1))->deleteFile($filenameKey);
     }
 
     private function assertImage_getData_isCalledOnce(Image $image): void
@@ -150,5 +161,28 @@ class FilesystemSourceAccessorTest extends TestCase
         \Phake::when($image)->getData()->thenReturn($stream);
 
         return $stream;
+    }
+
+    private function assertKeyMapper_getKey_isCalledOnceWithKey(string $key): void
+    {
+        \Phake::verify($this->keyMapper, \Phake::times(1))->getKey($key);
+    }
+
+    private function assertSource_getFileContents_isCalledOnceWithFilenameKey(FilenameKeyInterface $filenameKey): void
+    {
+        \Phake::verify($this->source, \Phake::times(1))->getFileContents($filenameKey);
+    }
+
+    private function assertImageFactory_createFromStream_isCalledOnceWithStream(StreamInterface $stream): void
+    {
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
+    }
+
+    private function givenImageFactory_createFromStream_returnsImage(): Image
+    {
+        $createdImage = \Phake::mock(Image::class);
+        \Phake::when($this->imageFactory)->createFromStream(\Phake::anyParameters())->thenReturn($createdImage);
+
+        return $createdImage;
     }
 }
