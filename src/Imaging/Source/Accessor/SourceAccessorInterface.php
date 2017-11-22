@@ -17,8 +17,8 @@ use Strider2038\ImgCache\Imaging\Image\Image;
  */
 interface SourceAccessorInterface
 {
-    public function get(string $key): ? Image;
-    public function exists(string $key): bool;
-    public function put(string $key, Image $image): void;
-    public function delete(string $key): void;
+    public function getImage(string $key): Image;
+    public function imageExists(string $key): bool;
+    public function putImage(string $key, Image $image): void;
+    public function deleteImage(string $key): void;
 }

@@ -76,7 +76,7 @@ class YandexMapAccessorTest extends TestCase
         $this->givenViolations_count_returns($violations, 1);
         \Phake::when($this->formatter)->format($violations)->thenReturn('formatted violations');
 
-        $source->get($parameters);
+        $source->getImage($parameters);
     }
 
     /** @test */
@@ -87,7 +87,7 @@ class YandexMapAccessorTest extends TestCase
         $this->givenValidator_validate_returnViolations($parameters);
         $expectedImage = $this->givenSource_get_returnsImage();
 
-        $image = $source->get($parameters);
+        $image = $source->getImage($parameters);
 
         $this->assertSame($expectedImage, $image);
         $this->assertSource_get_isCalledOnceWithQueryParameters();

@@ -37,6 +37,6 @@ class SourceImageExtractor implements ImageExtractorInterface
     {
         $sourceKey = $this->keyParser->parse($key);
 
-        return $this->sourceAccessor->get($sourceKey->getPublicFilename());
+        return $this->sourceAccessor->getImage($sourceKey->getPublicFilename());
     }
 }

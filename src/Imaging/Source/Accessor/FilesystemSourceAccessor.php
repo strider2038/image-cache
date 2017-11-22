@@ -45,25 +45,19 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
         $this->logger = $logger;
     }
 
-    public function get(string $key): ? Image
+    public function getImage(string $key): Image
     {
         $filenameKey = $this->composeFilenameKey($key);
-
         $image = $this->source->get($filenameKey);
 
-        $this->logger->info(sprintf(
-            'Image %s in filesystem source for key "%s"',
-            $image === null ? 'not found' : 'is found',
-            $key
-        ));
+        $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s"', $key));
 
         return $image;
     }
 
-    public function exists(string $key): bool
+    public function imageExists(string $key): bool
     {
         $filenameKey = $this->composeFilenameKey($key);
-
         $exists = $this->source->exists($filenameKey);
 
         $this->logger->info(sprintf(
@@ -75,7 +69,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
         return $exists;
     }
 
-    public function put(string $key, Image $image): void
+    public function putImage(string $key, Image $image): void
     {
         $filenameKey = $this->composeFilenameKey($key);
         $data = $image->getData();
@@ -87,7 +81,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
         ));
     }
 
-    public function delete(string $key): void
+    public function deleteImage(string $key): void
     {
         $filenameKey = $this->composeFilenameKey($key);
         $this->source->delete($filenameKey);

@@ -38,7 +38,7 @@ class YandexMapExtractorTest extends TestCase
     {
         $extractor = new YandexMapExtractor($this->parser, $this->accessor);
         $parameters = $this->givenParser_parse_returnsParameters();
-        $expectedImage = $this->givenAccessor_get_returnsImage($parameters);
+        $expectedImage = $this->givenAccessor_getImage_returnsImage($parameters);
 
         $image = $extractor->extractImage(self::KEY);
 
@@ -53,10 +53,10 @@ class YandexMapExtractorTest extends TestCase
         return $parameters;
     }
 
-    private function givenAccessor_get_returnsImage(YandexMapParameters $parameters): Image
+    private function givenAccessor_getImage_returnsImage(YandexMapParameters $parameters): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->accessor)->get($parameters)->thenReturn($image);
+        \Phake::when($this->accessor)->getImage($parameters)->thenReturn($image);
 
         return $image;
     }

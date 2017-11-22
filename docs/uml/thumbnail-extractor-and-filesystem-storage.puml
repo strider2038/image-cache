@@ -1,7 +1,7 @@
 @startuml
 
-ImageStorage -> ThumbnailImageExtractor: getImage('/image_s100x80.jpg')
-ThumbnailImageExtractor -> FilesystemSourceAccessor: getImage('/image.jpg')
+ImageStorage -> ThumbnailImageExtractor: extractImage('/image_s100x80.jpg')
+ThumbnailImageExtractor -> FilesystemSourceAccessor: Image('/image.jpg')
 FilesystemSourceAccessor -> FilesystemSource: getData('/filesource/image.jpg')
 FilesystemSourceAccessor <-- FilesystemSource: StreamInterface
 ThumbnailImageExtractor <-- FilesystemSourceAccessor: Image

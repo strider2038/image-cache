@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
 
@@ -29,7 +28,7 @@ class SourceImageExtractorTest extends TestCase
     /** @var SourceAccessorInterface */
     private $sourceAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->keyParser = \Phake::mock(SourceKeyParserInterface::class);
         $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
@@ -41,7 +40,7 @@ class SourceImageExtractorTest extends TestCase
         $extractor = $this->createSourceImageExtractor();
         $publicFilename = self::PUBLIC_FILENAME;
         $this->givenKeyParser_parse_returnsSourceKey();
-        $image = $this->givenSourceAccessor_get_returnsImage($publicFilename);
+        $image = $this->givenSourceAccessor_getImage_returnsImage($publicFilename);
 
         $extractedImage = $extractor->extractImage(self::KEY);
 
@@ -62,16 +61,11 @@ class SourceImageExtractorTest extends TestCase
         return $sourceKey;
     }
 
-    private function givenSourceAccessor_get_returnsImage(string $publicFilename): Image
+    private function givenSourceAccessor_getImage_returnsImage(string $publicFilename): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->sourceAccessor)->get($publicFilename)->thenReturn($image);
+        \Phake::when($this->sourceAccessor)->getImage($publicFilename)->thenReturn($image);
 
         return $image;
-    }
-
-    private function givenSourceAccessor_get_returnsNull(string $publicFilename): void
-    {
-        \Phake::when($this->sourceAccessor)->get($publicFilename)->thenReturn(null);
     }
 }

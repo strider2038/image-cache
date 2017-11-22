@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
@@ -34,7 +33,7 @@ class ThumbnailImageExtractorTest extends TestCase
     /** @var ImageProcessorInterface */
     private $imageProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
         $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
@@ -48,7 +47,7 @@ class ThumbnailImageExtractorTest extends TestCase
         $thumbnailKey = $this->givenKeyParser_parse_returnsThumbnailKey();
         $processingConfiguration = $this->givenThumbnailKey_getProcessingConfiguration_returns($thumbnailKey);
         $sourceImage = \Phake::mock(Image::class);
-        $this->givenSourceAccessor_get_returns($sourceImage);
+        $this->givenSourceAccessor_getImage_returns($sourceImage);
         $processedImage = $this->givenImageProcessor_process_returnsProcessedImage($sourceImage, $processingConfiguration);
 
         $extractedImage = $extractor->extractImage(self::KEY);
@@ -66,9 +65,9 @@ class ThumbnailImageExtractorTest extends TestCase
         return $extractor;
     }
 
-    private function givenSourceAccessor_get_returns(?Image $sourceImage): void
+    private function givenSourceAccessor_getImage_returns(Image $sourceImage): void
     {
-        \Phake::when($this->sourceAccessor)->get(self::PUBLIC_FILENAME)->thenReturn($sourceImage);
+        \Phake::when($this->sourceAccessor)->getImage(self::PUBLIC_FILENAME)->thenReturn($sourceImage);
     }
 
     private function givenKeyParser_parse_returnsThumbnailKey(): ThumbnailKey

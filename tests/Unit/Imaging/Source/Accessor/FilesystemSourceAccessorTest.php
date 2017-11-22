@@ -44,19 +44,6 @@ class FilesystemSourceAccessorTest extends TestCase
     }
 
     /** @test */
-    public function get_givenKeyAndSourceFileDoesNotExist_nullIsReturned(): void
-    {
-        $accessor = $this->createFilesystemSourceAccessor();
-        $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
-        $this->givenSource_get_returns($filenameKey, null);
-
-        $image = $accessor->get(self::KEY);
-
-        $this->assertNull($image);
-        $this->assertLogger_info_isCalledTimes($this->logger, 2);
-    }
-
-    /** @test */
     public function get_givenKeyAndSourceFileExists_imageIsReturned(): void
     {
         $accessor = $this->createFilesystemSourceAccessor();
@@ -64,7 +51,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $sourceImage = \Phake::mock(Image::class);
         $this->givenSource_get_returns($filenameKey, $sourceImage);
 
-        $image = $accessor->get(self::KEY);
+        $image = $accessor->getImage(self::KEY);
 
         $this->assertSame($sourceImage, $image);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
@@ -81,7 +68,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
         $this->givenSource_exists_returns($filenameKey, $expectedExists);
 
-        $actualExists = $accessor->exists(self::KEY);
+        $actualExists = $accessor->imageExists(self::KEY);
 
         $this->assertEquals($expectedExists, $actualExists);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
@@ -96,7 +83,7 @@ class FilesystemSourceAccessorTest extends TestCase
 
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
 
-        $accessor->put(self::KEY, $image);
+        $accessor->putImage(self::KEY, $image);
 
         $this->assertImage_getData_isCalledOnce($image);
         $this->assertSource_put_isCalledOnceWith($filenameKey, $stream);
@@ -109,7 +96,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $accessor = $this->createFilesystemSourceAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
 
-        $accessor->delete(self::KEY);
+        $accessor->deleteImage(self::KEY);
 
         $this->assertSource_delete_isCalledOnceWith($filenameKey);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
@@ -132,7 +119,7 @@ class FilesystemSourceAccessorTest extends TestCase
         return $filenameKey;
     }
 
-    private function givenSource_get_returns(FilenameKeyInterface $filenameKey, ?Image $image): void
+    private function givenSource_get_returns(FilenameKeyInterface $filenameKey, Image $image): void
     {
         \Phake::when($this->source)->get($filenameKey)->thenReturn($image);
     }

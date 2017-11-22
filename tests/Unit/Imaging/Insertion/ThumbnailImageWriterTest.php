@@ -47,7 +47,7 @@ class ThumbnailImageWriterTest extends TestCase
     {
         $writer = $this->createThumbnailImageWriter();
         $this->givenKeyParser_parse_returnsThumbnailKey();
-        $this->givenSourceAccessor_exists_returns($expectedExists);
+        $this->givenSourceAccessor_imageExists_returns($expectedExists);
 
         $actualExists = $writer->imageExists(self::KEY);
 
@@ -64,7 +64,7 @@ class ThumbnailImageWriterTest extends TestCase
         $writer->insertImage(self::KEY, $image);
 
         $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertSourceAccessor_put_isCalledOnceWith($image);
+        $this->assertSourceAccessor_putImage_isCalledOnceWith($image);
     }
 
     /** @test */
@@ -76,7 +76,7 @@ class ThumbnailImageWriterTest extends TestCase
         $writer->deleteImage(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertSourceAccessor_delete_isCalledOnce();
+        $this->assertSourceAccessor_deleteImage_isCalledOnce();
     }
 
     /** @test */
@@ -132,9 +132,9 @@ class ThumbnailImageWriterTest extends TestCase
         return $parsedKey;
     }
 
-    private function givenSourceAccessor_exists_returns(bool $value): void
+    private function givenSourceAccessor_imageExists_returns(bool $value): void
     {
-        \Phake::when($this->sourceAccessor)->exists(self::PUBLIC_FILENAME)->thenReturn($value);
+        \Phake::when($this->sourceAccessor)->imageExists(self::PUBLIC_FILENAME)->thenReturn($value);
     }
 
     private function assertKeyParser_parse_isCalledOnce(): void
@@ -142,16 +142,16 @@ class ThumbnailImageWriterTest extends TestCase
         \Phake::verify($this->keyParser, \Phake::times(1))->parse(self::KEY);
     }
 
-    private function assertSourceAccessor_put_isCalledOnceWith(Image $image): void
+    private function assertSourceAccessor_putImage_isCalledOnceWith(Image $image): void
     {
         \Phake::verify($this->sourceAccessor, \Phake::times(1))
-            ->put(self::PUBLIC_FILENAME, $image);
+            ->putImage(self::PUBLIC_FILENAME, $image);
     }
 
-    private function assertSourceAccessor_delete_isCalledOnce(): void
+    private function assertSourceAccessor_deleteImage_isCalledOnce(): void
     {
         \Phake::verify($this->sourceAccessor, \Phake::times(1))
-            ->delete(self::PUBLIC_FILENAME);
+            ->deleteImage(self::PUBLIC_FILENAME);
     }
 
     private function createThumbnailImageWriter(): ThumbnailImageWriter

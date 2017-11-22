@@ -1,6 +1,6 @@
 @startuml
 
-ImageStorage -> SourceImageExtractor: getImage('/image.jpg')
+ImageStorage -> SourceImageExtractor: extractImage('/image.jpg')
 SourceImageExtractor -> FilesystemSourceAccessor: getImage('/image.jpg')
 FilesystemSourceAccessor -> FilesystemSource: getData('/filesource/image.jpg')
 FilesystemSourceAccessor <-- FilesystemSource: StreamInterface

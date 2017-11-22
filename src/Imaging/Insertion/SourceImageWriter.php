@@ -34,19 +34,19 @@ class SourceImageWriter implements ImageWriterInterface
     public function imageExists(string $key): bool
     {
         $parsedKey = $this->keyParser->parse($key);
-        return $this->sourceAccessor->exists($parsedKey->getPublicFilename());
+        return $this->sourceAccessor->imageExists($parsedKey->getPublicFilename());
     }
 
     public function insertImage(string $key, Image $image): void
     {
         $parsedKey = $this->keyParser->parse($key);
-        $this->sourceAccessor->put($parsedKey->getPublicFilename(), $image);
+        $this->sourceAccessor->putImage($parsedKey->getPublicFilename(), $image);
     }
 
     public function deleteImage(string $key): void
     {
         $parsedKey = $this->keyParser->parse($key);
-        $this->sourceAccessor->delete($parsedKey->getPublicFilename());
+        $this->sourceAccessor->deleteImage($parsedKey->getPublicFilename());
     }
 
     public function getImageFileNameMask(string $key): string

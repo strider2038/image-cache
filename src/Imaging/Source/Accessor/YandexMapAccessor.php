@@ -54,7 +54,7 @@ class YandexMapAccessor implements YandexMapAccessorInterface
         $this->logger = $logger;
     }
 
-    public function get(YandexMapParameters $parameters): Image
+    public function getImage(YandexMapParameters $parameters): Image
     {
         $this->logger->info(sprintf('Requesting yandex static map with parameters: %s', json_encode($parameters)));
 

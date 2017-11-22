@@ -18,5 +18,5 @@ use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
  */
 interface YandexMapAccessorInterface
 {
-    public function get(YandexMapParameters $parameters): Image;
+    public function getImage(YandexMapParameters $parameters): Image;
 }
