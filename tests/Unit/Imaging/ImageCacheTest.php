@@ -59,44 +59,44 @@ class ImageCacheTest extends TestCase
      * @expectedExceptionCode 404
      * @expectedExceptionMessageRegExp /File .* does not exist/
      */
-    public function get_fileDoesNotExist_exceptionThrown(): void
+    public function getImage_fileDoesNotExist_exceptionThrown(): void
     {
         $cache = $this->createImageCache();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::CACHE_FILE_NAME, false);
 
-        $cache->get(self::FILE_NAME);
+        $cache->getImage(self::FILE_NAME);
     }
 
     /** @test */
-    public function get_fileExists_imageFileReturned(): void
+    public function getImage_fileExists_imageFileReturned(): void
     {
         $cache = $this->createImageCache();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::CACHE_FILE_NAME, true);
 
-        $image = $cache->get(self::FILE_NAME);
+        $image = $cache->getImage(self::FILE_NAME);
 
         $this->assertInstanceOf(ImageFile::class, $image);
         $this->assertEquals(self::CACHE_FILE_NAME, $image->getFilename());
     }
 
     /** @test */
-    public function put_givenFileNameAndImage_imageIsSavedInCache(): void
+    public function putImage_givenFileNameAndImage_imageIsSavedInCache(): void
     {
         $cache = $this->createImageCache();
         $image = $this->givenImage();
 
-        $cache->put(self::FILE_NAME, $image);
+        $cache->putImage(self::FILE_NAME, $image);
 
         $this->assertImageProcessor_saveToFile_isCalledOnceWith($image, self::CACHE_FILE_NAME);
     }
 
     /** @test */
-    public function deleteByMask_givenFileNameMask_allImagesDeletedFromCache(): void
+    public function deleteImagesByMask_givenFileNameMask_allImagesDeletedFromCache(): void
     {
         $cache = $this->createImageCache();
         $this->givenFileOperations_findByMask_returnsStringListWithValues($this->fileOperations, [self::FOUND_FILE_NAME]);
 
-        $cache->deleteByMask(self::FILE_NAME);
+        $cache->deleteImagesByMask(self::FILE_NAME);
 
         $this->assertFileOperations_findByMask_isCalledOnceWith($this->fileOperations, self::CACHE_FILE_NAME);
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FOUND_FILE_NAME);
@@ -121,10 +121,10 @@ class ImageCacheTest extends TestCase
     public function methodAndParametersWithInvalidKeyProvider(): array
     {
         return [
-            ['get', ['']],
-            ['get', [self::INVALID_FILE_NAME]],
-            ['put', [self::INVALID_FILE_NAME, $this->givenImage()]],
-            ['deleteByMask', [self::INVALID_FILE_NAME]],
+            ['getImage', ['']],
+            ['getImage', [self::INVALID_FILE_NAME]],
+            ['putImage', [self::INVALID_FILE_NAME, $this->givenImage()]],
+            ['deleteImagesByMask', [self::INVALID_FILE_NAME]],
         ];
     }
 

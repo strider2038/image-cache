@@ -52,7 +52,7 @@ class ImageCache implements ImageCacheInterface
         $this->imageProcessor = $imageProcessor;
     }
 
-    public function get(string $fileName): ImageFile
+    public function getImage(string $fileName): ImageFile
     {
         $destinationFileName = $this->composeDestinationFileName($fileName);
 
@@ -63,13 +63,13 @@ class ImageCache implements ImageCacheInterface
         return new ImageFile($destinationFileName);
     }
 
-    public function put(string $fileName, Image $image): void
+    public function putImage(string $fileName, Image $image): void
     {
         $destinationFileName = $this->composeDestinationFileName($fileName);
         $this->imageProcessor->saveToFile($image, $destinationFileName);
     }
 
-    public function deleteByMask(string $fileNameMask): void
+    public function deleteImagesByMask(string $fileNameMask): void
     {
         $destinationFileNameMask = $this->composeDestinationFileName($fileNameMask);
         $cachedFileNames = $this->fileOperations->findByMask($destinationFileNameMask);

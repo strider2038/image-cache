@@ -55,15 +55,15 @@ class ReplaceAction implements ActionInterface
     {
         $location = $request->getUri()->getPath();
 
-        if ($this->imageStorage->exists($location)) {
-            $this->imageStorage->delete($location);
-            $fileNameMask = $this->imageStorage->getFileNameMask($location);
-            $this->imageCache->deleteByMask($fileNameMask);
+        if ($this->imageStorage->imageExists($location)) {
+            $this->imageStorage->deleteImage($location);
+            $fileNameMask = $this->imageStorage->getImageFileNameMask($location);
+            $this->imageCache->deleteImagesByMask($fileNameMask);
         }
 
         $stream = $request->getBody();
         $image = $this->imageFactory->createFromStream($stream);
-        $this->imageStorage->put($location, $image);
+        $this->imageStorage->putImage($location, $image);
 
         return $this->responseFactory->createMessageResponse(
             new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),

@@ -45,7 +45,7 @@ class CreateActionTest extends TestCase
     public function processRequest_imageAlreadyExistsInStorage_conflictResponseWasReturned(): void
     {
         $action = $this->createAction();
-        $this->givenImageStorage_exists_returns(true);
+        $this->givenImageStorage_imageExists_returns(true);
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CONFLICT);
         $request = $this->givenRequest();
         $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
@@ -55,7 +55,7 @@ class CreateActionTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertRequest_getUri_isCalledOnce($request);
         $this->assertUri_getPath_isCalledOnce($uri);
-        $this->assertImageStorage_exists_isCalledOnceWithLocation(self::LOCATION);
+        $this->assertImageStorage_imageExists_isCalledOnceWithLocation(self::LOCATION);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CONFLICT);
         $this->assertEquals(HttpStatusCodeEnum::CONFLICT, $response->getStatusCode()->getValue());
     }
@@ -66,7 +66,7 @@ class CreateActionTest extends TestCase
         $action = $this->createAction();
         $request = $this->givenRequest();
         $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
-        $this->givenImageStorage_exists_returns(false);
+        $this->givenImageStorage_imageExists_returns(false);
         $stream = $this->givenRequest_getBody_returnsStream($request);
         $image = $this->givenImageFactory_createFromStream_returnsImage();
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
@@ -76,10 +76,10 @@ class CreateActionTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertRequest_getUri_isCalledOnce($request);
         $this->assertUri_getPath_isCalledOnce($uri);
-        $this->assertImageStorage_exists_isCalledOnceWithLocation(self::LOCATION);
+        $this->assertImageStorage_imageExists_isCalledOnceWithLocation(self::LOCATION);
         $this->assertRequest_getBody_isCalledOnce($request);
         $this->assertImageFactory_createFromStream_isCalledOnceWith($stream);
-        $this->assertImageStorage_put_isCalledOnceWithLocationAndImage(self::LOCATION, $image);
+        $this->assertImageStorage_putImage_isCalledOnceWithLocationAndImage(self::LOCATION, $image);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
     }
@@ -111,14 +111,14 @@ class CreateActionTest extends TestCase
         return $stream;
     }
 
-    private function givenImageStorage_exists_returns(bool $value): void
+    private function givenImageStorage_imageExists_returns(bool $value): void
     {
-        \Phake::when($this->imageStorage)->exists(\Phake::anyParameters())->thenReturn($value);
+        \Phake::when($this->imageStorage)->imageExists(\Phake::anyParameters())->thenReturn($value);
     }
 
-    private function assertImageStorage_exists_isCalledOnceWithLocation(string $location): void
+    private function assertImageStorage_imageExists_isCalledOnceWithLocation(string $location): void
     {
-        \Phake::verify($this->imageStorage, \Phake::times(1))->exists($location);
+        \Phake::verify($this->imageStorage, \Phake::times(1))->imageExists($location);
     }
 
     private function assertRequest_getBody_isCalledOnce(RequestInterface $request): void
@@ -131,9 +131,9 @@ class CreateActionTest extends TestCase
         \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
     }
 
-    private function assertImageStorage_put_isCalledOnceWithLocationAndImage(string $location, Image $image): void
+    private function assertImageStorage_putImage_isCalledOnceWithLocationAndImage(string $location, Image $image): void
     {
-        \Phake::verify($this->imageStorage, \Phake::times(1))->put($location, $image);
+        \Phake::verify($this->imageStorage, \Phake::times(1))->putImage($location, $image);
     }
 
     private function givenImageFactory_createFromStream_returnsImage(): Image

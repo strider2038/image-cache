@@ -48,7 +48,7 @@ class CreateAction implements ActionInterface
     {
         $location = $request->getUri()->getPath();
 
-        if ($this->imageStorage->exists($location)) {
+        if ($this->imageStorage->imageExists($location)) {
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::CONFLICT),
                 sprintf(
@@ -59,7 +59,7 @@ class CreateAction implements ActionInterface
         } else {
             $stream = $request->getBody();
             $image = $this->imageFactory->createFromStream($stream);
-            $this->imageStorage->put($location, $image);
+            $this->imageStorage->putImage($location, $image);
 
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),

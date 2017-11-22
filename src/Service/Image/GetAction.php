@@ -48,21 +48,15 @@ class GetAction implements ActionInterface
     {
         $location = $request->getUri()->getPath();
 
-        $storedImage = $this->imageStorage->find($location);
+        $storedImage = $this->imageStorage->getImage($location);
 
-        if ($storedImage === null) {
-            $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND)
-            );
-        } else {
-            $this->imageCache->put($location, $storedImage);
-            $cachedImage = $this->imageCache->get($location);
+        $this->imageCache->putImage($location, $storedImage);
+        $cachedImage = $this->imageCache->getImage($location);
 
-            $response = $this->responseFactory->createFileResponse(
-                new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
-                $cachedImage->getFilename()
-            );
-        }
+        $response = $this->responseFactory->createFileResponse(
+            new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
+            $cachedImage->getFilename()
+        );
 
         return $response;
     }

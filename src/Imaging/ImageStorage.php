@@ -33,34 +33,34 @@ class ImageStorage implements ImageStorageInterface
         $this->imageWriter = $imageWriter ?? new NullWriter();
     }
 
-    public function find(string $key): ? Image
+    public function getImage(string $key): Image
     {
         $this->validateKey($key);
 
         return $this->imageExtractor->extract($key);
     }
 
-    public function put(string $key, Image $image): void
+    public function putImage(string $key, Image $image): void
     {
         $this->validateKey($key);
         $data = $image->getData();
         $this->imageWriter->insert($key, $data);
     }
 
-    public function exists(string $key): bool
+    public function imageExists(string $key): bool
     {
         $this->validateKey($key);
 
         return $this->imageWriter->exists($key);
     }
 
-    public function delete(string $key): void
+    public function deleteImage(string $key): void
     {
         $this->validateKey($key);
         $this->imageWriter->delete($key);
     }
 
-    public function getFileNameMask(string $key): string
+    public function getImageFileNameMask(string $key): string
     {
         $this->validateKey($key);
 

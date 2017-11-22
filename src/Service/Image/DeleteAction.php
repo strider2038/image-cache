@@ -49,10 +49,10 @@ class DeleteAction implements ActionInterface
     {
         $location = $request->getUri()->getPath();
 
-        if ($this->imageStorage->exists($location)) {
-            $this->imageStorage->delete($location);
-            $fileNameMask = $this->imageStorage->getFileNameMask($location);
-            $this->imageCache->deleteByMask($fileNameMask);
+        if ($this->imageStorage->imageExists($location)) {
+            $this->imageStorage->deleteImage($location);
+            $fileNameMask = $this->imageStorage->getImageFileNameMask($location);
+            $this->imageCache->deleteImagesByMask($fileNameMask);
 
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::OK),

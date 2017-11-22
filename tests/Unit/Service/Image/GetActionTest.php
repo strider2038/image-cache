@@ -43,32 +43,13 @@ class GetActionTest extends TestCase
     }
 
     /** @test */
-    public function processRequest_imageDoesNotExistInStorage_notFoundResponseWasReturned(): void
-    {
-        $action = $this->createAction();
-        $this->givenImageStorage_find_returns(null);
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::NOT_FOUND);
-        $request = $this->givenRequest();
-        $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
-
-        $response = $action->processRequest($request);
-
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertRequest_getUri_isCalledOnce($request);
-        $this->assertUri_getPath_isCalledOnce($uri);
-        $this->assertImageStorage_find_isCalledOnceWithLocation();
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
-        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
-    }
-
-    /** @test */
     public function processRequest_imageExistsInStorage_imageIsCachedAndFileResponseWasReturned(): void
     {
         $action = $this->createAction();
         $storedImage = $this->givenImage();
-        $this->givenImageStorage_find_returns($storedImage);
+        $this->givenImageStorage_getImage_returns($storedImage);
         $cachedImage = $this->givenImageFileWithFilename(self::IMAGE_FILENAME);
-        $this->givenImageCache_get_returns($cachedImage);
+        $this->givenImageCache_getImage_returns($cachedImage);
         $this->givenResponseFactory_createFileResponse_returnsResponse();
         $request = $this->givenRequest();
         $uri = $this->givenRequest_getUri_returnsUriWithPath($request, self::LOCATION);
@@ -78,9 +59,9 @@ class GetActionTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertRequest_getUri_isCalledOnce($request);
         $this->assertUri_getPath_isCalledOnce($uri);
-        $this->assertImageStorage_find_isCalledOnceWithLocation();
-        $this->assertImageCache_put_isCalledOnceWithLocationAnd($storedImage);
-        $this->assertImageCache_get_isCalledOnceWithLocation();
+        $this->assertImageStorage_getImage_isCalledOnceWithLocation();
+        $this->assertImageCache_putImage_isCalledOnceWithLocationAnd($storedImage);
+        $this->assertImageCache_getImage_isCalledOnceWithLocation();
         $this->assertResponseFactory_createFileResponse_isCalledOnceWith(
             HttpStatusCodeEnum::CREATED,
             self::IMAGE_FILENAME
@@ -119,29 +100,29 @@ class GetActionTest extends TestCase
         return $image;
     }
 
-    private function assertImageStorage_find_isCalledOnceWithLocation(): void
+    private function assertImageStorage_getImage_isCalledOnceWithLocation(): void
     {
-        \Phake::verify($this->imageStorage, \Phake::times(1))->find(self::LOCATION);
+        \Phake::verify($this->imageStorage, \Phake::times(1))->getImage(self::LOCATION);
     }
 
-    private function givenImageStorage_find_returns(?Image $storedImage): void
+    private function givenImageStorage_getImage_returns(Image $storedImage): void
     {
-        \Phake::when($this->imageStorage)->find(\Phake::anyParameters())->thenReturn($storedImage);
+        \Phake::when($this->imageStorage)->getImage(\Phake::anyParameters())->thenReturn($storedImage);
     }
 
-    private function assertImageCache_put_isCalledOnceWithLocationAnd(Image $storedImage): void
+    private function assertImageCache_putImage_isCalledOnceWithLocationAnd(Image $storedImage): void
     {
-        \Phake::verify($this->imageCache, \Phake::times(1))->put(self::LOCATION, $storedImage);
+        \Phake::verify($this->imageCache, \Phake::times(1))->putImage(self::LOCATION, $storedImage);
     }
 
-    private function assertImageCache_get_isCalledOnceWithLocation(): void
+    private function assertImageCache_getImage_isCalledOnceWithLocation(): void
     {
-        \Phake::verify($this->imageCache, \Phake::times(1))->get(self::LOCATION);
+        \Phake::verify($this->imageCache, \Phake::times(1))->getImage(self::LOCATION);
     }
 
-    private function givenImageCache_get_returns(ImageFile $cachedImage): void
+    private function givenImageCache_getImage_returns(ImageFile $cachedImage): void
     {
-        \Phake::when($this->imageCache)->get(\Phake::anyParameters())->thenReturn($cachedImage);
+        \Phake::when($this->imageCache)->getImage(\Phake::anyParameters())->thenReturn($cachedImage);
     }
 
     private function assertRequest_getUri_isCalledOnce(RequestInterface $request): void

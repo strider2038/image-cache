@@ -39,12 +39,12 @@ class ImageStorageTest extends TestCase
     }
 
     /** @test */
-    public function find_givenKeyAndExtractorReturnsImage_imageReturned(): void
+    public function getImage_givenKeyAndExtractorReturnsImage_imageReturned(): void
     {
         $storage = $this->createImageStorage();
         $extractedImage = $this->givenImageExtractor_extract_returnsImage();
 
-        $image = $storage->find(self::VALID_KEY);
+        $image = $storage->getImage(self::VALID_KEY);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertImageExtractor_extract_isCalledOnceWith(self::VALID_KEY);
@@ -52,25 +52,13 @@ class ImageStorageTest extends TestCase
     }
 
     /** @test */
-    public function find_givenKeyAndExtractorReturnsNull_nullReturned(): void
-    {
-        $storage = $this->createImageStorage();
-        $this->givenImageExtractor_extract_returnsNull();
-
-        $image = $storage->find(self::VALID_KEY);
-
-        $this->assertImageExtractor_extract_isCalledOnceWith(self::VALID_KEY);
-        $this->assertNull($image);
-    }
-
-    /** @test */
-    public function put_givenKeyAndImage_imageInsertedToSource(): void
+    public function putImage_givenKeyAndImage_imageInsertedToSource(): void
     {
         $storage = $this->createImageStorage();
         $image = $this->givenImage();
         $data = $this->givenImage_getData_returnsStream($image);
 
-        $storage->put(self::VALID_KEY, $image);
+        $storage->putImage(self::VALID_KEY, $image);
 
         $this->assertImage_getData_isCalledOnce($image);
         $this->assertImageWriter_insert_isCalledOnceWith(self::VALID_KEY, $data);
@@ -81,34 +69,34 @@ class ImageStorageTest extends TestCase
      * @dataProvider boolValuesProvider
      * @param bool $expectedExists
      */
-    public function exists_givenKey_existsStatusReturned(bool $expectedExists): void
+    public function imageExists_givenKey_existsStatusReturned(bool $expectedExists): void
     {
         $storage = $this->createImageStorage();
         $this->givenImageWriter_exists_returns($expectedExists);
 
-        $exists = $storage->exists(self::VALID_KEY);
+        $exists = $storage->imageExists(self::VALID_KEY);
 
         $this->assertEquals($expectedExists, $exists);
         $this->assertImageWriter_exists_isCalledOnceWith(self::VALID_KEY);
     }
 
     /** @test */
-    public function delete_givenKey_imageDeletedFromSource(): void
+    public function deleteImage_givenKey_imageDeletedFromSource(): void
     {
         $storage = $this->createImageStorage();
 
-        $storage->delete(self::VALID_KEY);
+        $storage->deleteImage(self::VALID_KEY);
 
         $this->assertImageWriter_delete_isCalledOnceWith(self::VALID_KEY);
     }
 
     /** @test */
-    public function getFileNameMask_givenKey_fileNameMaskReturned(): void
+    public function getImageFileNameMask_givenKey_fileNameMaskReturned(): void
     {
         $storage = $this->createImageStorage();
         $this->givenImageWriter_getFileNameMask_returnsFileNameMask();
 
-        $mask = $storage->getFileNameMask(self::VALID_KEY);
+        $mask = $storage->getImageFileNameMask(self::VALID_KEY);
 
         $this->assertImageWriter_getFileNameMask_isCalledOnceWith(self::VALID_KEY);
         $this->assertEquals(self::FILE_NAME_MASK, $mask);
@@ -133,12 +121,12 @@ class ImageStorageTest extends TestCase
     public function methodAndParametersWithInvalidKeyProvider(): array
     {
         return [
-            ['find', ['']],
-            ['find', [self::INVALID_KEY]],
-            ['put', [self::INVALID_KEY, $this->givenImage()]],
-            ['delete', [self::INVALID_KEY]],
-            ['exists', [self::INVALID_KEY]],
-            ['getFileNameMask', [self::INVALID_KEY]],
+            ['getImage', ['']],
+            ['getImage', [self::INVALID_KEY]],
+            ['putImage', [self::INVALID_KEY, $this->givenImage()]],
+            ['deleteImage', [self::INVALID_KEY]],
+            ['imageExists', [self::INVALID_KEY]],
+            ['getImageFileNameMask', [self::INVALID_KEY]],
         ];
     }
 
