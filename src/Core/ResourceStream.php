@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+use Strider2038\ImgCache\Exception\InvalidValueException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -23,10 +24,21 @@ class ResourceStream implements StreamInterface
     /** @var ResourceStreamModeEnum */
     private $mode;
 
-    public function __construct(string $stream, ResourceStreamModeEnum $mode)
+    public function __construct($resource)
     {
-        $this->resource = fopen($stream, $mode);
-        $this->mode = $mode;
+        if (!is_resource($resource)) {
+            throw new InvalidValueException('Invalid resource descriptor');
+        }
+
+        $meta = stream_get_meta_data($resource);
+
+        if (ResourceStreamModeEnum::isValid($meta['mode'])) {
+            $this->mode = new ResourceStreamModeEnum($meta['mode']);
+        } else {
+            throw new InvalidValueException('Unsupported resource mode');
+        }
+
+        $this->resource = $resource;
     }
 
     public function __destruct()
@@ -70,7 +82,11 @@ class ResourceStream implements StreamInterface
 
     public function write(string $string): int
     {
-        return fwrite($this->resource, $string);
+        if ($this->mode->isWritable()) {
+            return fwrite($this->resource, $string);
+        }
+
+        throw new \RuntimeException('Resource is read only');
     }
 
     public function isReadable(): bool
@@ -80,6 +96,10 @@ class ResourceStream implements StreamInterface
 
     public function read(int $length): string
     {
-        return fread($this->resource, $length);
+        if ($this->mode->isReadable()) {
+            return fread($this->resource, $length);
+        }
+
+        throw new \RuntimeException('Resource is write only');
     }
 }

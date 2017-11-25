@@ -31,6 +31,30 @@ class ResourceStreamTest extends FileTestCase
 
     /**
      * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Invalid resource descriptor
+     */
+    public function construct_givenInvalidResource_exceptionThrown(): void
+    {
+        new ResourceStream('');
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessage Unsupported resource mode
+     */
+    public function construct_givenResourceWithUnsupportedMode_exceptionThrown(): void
+    {
+        $resource = fopen($this->givenFile(), 'r');
+
+        new ResourceStream($resource);
+    }
+
+    /**
+     * @test
      * @param string $filename
      * @param string $mode
      * @param bool $isReadable
@@ -140,7 +164,7 @@ class ResourceStreamTest extends FileTestCase
         $count = $stream->write(self::CONTENTS);
         $stream->close();
 
-        $this->assertEquals(self::CONTENTS, file_get_contents(self::FILENAME_WRITE));
+        $this->assertStringEqualsFile(self::FILENAME_WRITE, self::CONTENTS);
         $this->assertEquals(8, $count);
     }
 
@@ -154,12 +178,37 @@ class ResourceStreamTest extends FileTestCase
         $this->assertEquals(substr(self::FILE_JSON_CONTENTS, 0, 4), $contents);
     }
 
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Resource is write only
+     */
+    public function read_givenWriteOnlyStream_exceptionThrown(): void
+    {
+        $stream = $this->createResourceStream(self::FILENAME_WRITE, self::MODE_WRITE_ONLY);
+
+        $stream->read(1);
+    }
+
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Resource is read only
+     */
+    public function write_givenReadOnlyStream_exceptionThrown(): void
+    {
+        $stream = $this->createResourceStream($this->givenFile(), self::MODE_READ_ONLY);
+
+        $stream->write(self::CONTENTS);
+    }
+
     private function createResourceStream(
         string $filename = null,
         string $mode = self::MODE_READ_AND_WRITE
     ): ResourceStream {
         $filename = $filename ?? $this->givenFile();
+        $resource = fopen($filename, $mode);
 
-        return new ResourceStream($filename, new ResourceStreamModeEnum($mode));
+        return new ResourceStream($resource);
     }
 }
