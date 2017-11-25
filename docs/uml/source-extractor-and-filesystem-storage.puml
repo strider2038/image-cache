@@ -1,10 +1,10 @@
 @startuml
 
 ImageStorage -> SourceImageExtractor: extractImage('/image.jpg')
-SourceImageExtractor -> FilesystemSourceAccessor: getImage('/image.jpg')
-FilesystemSourceAccessor -> FilesystemSource: getData('/filesource/image.jpg')
-FilesystemSourceAccessor <-- FilesystemSource: StreamInterface
-SourceImageExtractor <-- FilesystemSourceAccessor: Image
+SourceImageExtractor -> FilesystemStorageAccessor: getImage('/image.jpg')
+FilesystemStorageAccessor -> FilesystemStorageDriver: getData('/filesource/image.jpg')
+FilesystemStorageAccessor <-- FilesystemStorageDriver: StreamInterface
+SourceImageExtractor <-- FilesystemStorageAccessor: Image
 ImageStorage <-- SourceImageExtractor: Image
 
 @enduml

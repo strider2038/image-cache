@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Yandex;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
@@ -22,11 +22,11 @@ use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSource;
+use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
-class YandexMapSourceTest extends TestCase
+class YandexMapStorageDriverTest extends TestCase
 {
     use LoggerTrait;
 
@@ -58,7 +58,7 @@ class YandexMapSourceTest extends TestCase
     /** @test */
     public function get_givenQueryParameters_clientSendsRequestAndImageIsReturned(): void
     {
-        $source = $this->createSource();
+        $driver = $this->createYandexMapStorageDriver();
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
@@ -66,7 +66,7 @@ class YandexMapSourceTest extends TestCase
         $this->givenResponse_getBody_returnsStreamWithImageBody($response);
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
 
-        $image = $source->get($query);
+        $image = $driver->get($query);
 
         $this->assertSame($expectedImage, $image);
         $this->assertClient_request_isCalledOnce(self::QUERY_PARAMETERS);
@@ -77,14 +77,14 @@ class YandexMapSourceTest extends TestCase
     /** @test */
     public function get_givenQueryParametersWithKey_clientSendsRequestWithKey(): void
     {
-        $source = $this->createSource(self::KEY);
+        $driver = $this->createYandexMapStorageDriver(self::KEY);
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
         $this->givenResponse_getBody_returnsStreamWithImageBody($response);
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
 
-        $source->get($query);
+        $driver->get($query);
 
         $this->assertClient_request_isCalledOnce(self::QUERY_PARAMETERS_WITH_KEY);
     }
@@ -97,12 +97,12 @@ class YandexMapSourceTest extends TestCase
      */
     public function get_givenInvalidQueryParameters_responseCodeIsNot200AndExceptionThrown(): void
     {
-        $source = $this->createSource();
+        $driver = $this->createYandexMapStorageDriver();
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::BAD_REQUEST);
 
-        $source->get($query);
+        $driver->get($query);
     }
 
     /**
@@ -113,11 +113,11 @@ class YandexMapSourceTest extends TestCase
      */
     public function get_givenInvalidQueryParameters_clientThrowsException(): void
     {
-        $source = $this->createSource();
+        $driver = $this->createYandexMapStorageDriver();
         $query = $this->givenQueryParametersCollection();
         $this->givenClient_request_throwsException();
 
-        $source->get($query);
+        $driver->get($query);
     }
 
     /**
@@ -128,22 +128,22 @@ class YandexMapSourceTest extends TestCase
      */
     public function get_givenResponseBodyHasUnsupportedMimeType_exceptionThrown(): void
     {
-        $source = $this->createSource();
+        $driver = $this->createYandexMapStorageDriver();
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
         $this->givenResponse_getBody_returnsStreamWithImageBody($response);
         $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
 
-        $source->get($query);
+        $driver->get($query);
     }
 
-    private function createSource(string $key = ''): YandexMapSource
+    private function createYandexMapStorageDriver(string $key = ''): YandexMapStorageDriver
     {
-        $source = new YandexMapSource($this->imageFactory, $this->imageValidator, $this->client, $key);
-        $source->setLogger($this->logger);
+        $driver = new YandexMapStorageDriver($this->imageFactory, $this->imageValidator, $this->client, $key);
+        $driver->setLogger($this->logger);
 
-        return $source;
+        return $driver;
     }
 
     private function givenClient_request_returnsResponse(): ResponseInterface

@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source;
+namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
-use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FilesystemSource implements FilesystemSourceInterface
+class FilesystemStorageDriver implements FilesystemStorageDriverInterface
 {
     private const CHUNK_SIZE = 8 * 1024 * 1024;
 

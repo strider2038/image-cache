@@ -1,10 +1,10 @@
 @startuml
 
 ImageStorage -> ThumbnailImageExtractor: extractImage('/image_s100x80.jpg')
-ThumbnailImageExtractor -> FilesystemSourceAccessor: Image('/image.jpg')
-FilesystemSourceAccessor -> FilesystemSource: getData('/filesource/image.jpg')
-FilesystemSourceAccessor <-- FilesystemSource: StreamInterface
-ThumbnailImageExtractor <-- FilesystemSourceAccessor: Image
+ThumbnailImageExtractor -> FilesystemStorageAccessor: Image('/image.jpg')
+FilesystemStorageAccessor -> FilesystemStorageDriver: getData('/filesource/image.jpg')
+FilesystemStorageAccessor <-- FilesystemStorageDriver: StreamInterface
+ThumbnailImageExtractor <-- FilesystemStorageAccessor: Image
 ThumbnailImageExtractor -> ImageProcessor: processImage(Image, [Resize(100, 80)])
 ThumbnailImageExtractor <-- ImageProcessor: Image
 ImageStorage <-- ThumbnailImageExtractor: Image

@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Accessor;
+namespace Strider2038\ImgCache\Imaging\Storage\Accessor;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SourceAccessorInterface
+interface StorageAccessorInterface
 {
     public function getImage(string $key): Image;
     public function imageExists(string $key): bool;

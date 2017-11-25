@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Yandex;
+namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
@@ -26,7 +26,7 @@ use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class YandexMapSource implements YandexMapSourceInterface
+class YandexMapStorageDriver implements YandexMapStorageDriverInterface
 {
     /** @var ImageFactoryInterface */
     private $imageFactory;

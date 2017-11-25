@@ -8,22 +8,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Accessor;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Accessor;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessor;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
+use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class YandexMapAccessorTest extends TestCase
+class YandexMapStorageAccessorTest extends TestCase
 {
     use LoggerTrait;
 
@@ -48,8 +48,8 @@ class YandexMapAccessorTest extends TestCase
     /** @var ViolationsFormatterInterface */
     private $formatter;
 
-    /** @var YandexMapSourceInterface */
-    private $source;
+    /** @var YandexMapStorageDriverInterface */
+    private $storageDriver;
 
     /** @var LoggerInterface */
     private $logger;
@@ -58,7 +58,7 @@ class YandexMapAccessorTest extends TestCase
     {
         $this->validator = \Phake::mock(ModelValidatorInterface::class);
         $this->formatter = \Phake::mock(ViolationsFormatterInterface::class);
-        $this->source = \Phake::mock(YandexMapSourceInterface::class);
+        $this->storageDriver = \Phake::mock(YandexMapStorageDriverInterface::class);
         $this->logger = $this->givenLogger();
     }
 
@@ -68,35 +68,35 @@ class YandexMapAccessorTest extends TestCase
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid map parameters: formatted violations
      */
-    public function get_givenInvalidParameters_exceptionThrown(): void
+    public function getImage_givenInvalidParameters_exceptionThrown(): void
     {
-        $source = $this->createAccessor();
+        $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
         $violations = $this->givenValidator_validate_returnViolations($parameters);
         $this->givenViolations_count_returns($violations, 1);
         \Phake::when($this->formatter)->format($violations)->thenReturn('formatted violations');
 
-        $source->getImage($parameters);
+        $accessor->getImage($parameters);
     }
 
     /** @test */
-    public function get_givenValidParameters_sourceGetIsCalledWithQueryParameters(): void
+    public function getImage_givenValidParameters_sourceGetIsCalledWithQueryParameters(): void
     {
-        $source = $this->createAccessor();
+        $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
         $this->givenValidator_validate_returnViolations($parameters);
-        $expectedImage = $this->givenSource_get_returnsImage();
+        $expectedImage = $this->givenStorageDriver_get_returnsImage();
 
-        $image = $source->getImage($parameters);
+        $image = $accessor->getImage($parameters);
 
         $this->assertSame($expectedImage, $image);
-        $this->assertSource_get_isCalledOnceWithQueryParameters();
+        $this->assertStorageDriver_get_isCalledOnceWithQueryParameters();
         $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
-    private function createAccessor(): YandexMapAccessor
+    private function createYandexMapStorageAccessor(): YandexMapStorageAccessor
     {
-        $accessor = new YandexMapAccessor($this->validator, $this->formatter, $this->source);
+        $accessor = new YandexMapStorageAccessor($this->validator, $this->formatter, $this->storageDriver);
         $accessor->setLogger($this->logger);
 
         return $accessor;
@@ -130,19 +130,19 @@ class YandexMapAccessorTest extends TestCase
         return $parameters;
     }
 
-    private function assertSource_get_isCalledOnceWithQueryParameters(): void
+    private function assertStorageDriver_get_isCalledOnceWithQueryParameters(): void
     {
         /** @var QueryParametersCollection $queryParameters */
-        \Phake::verify($this->source, \Phake::times(1))
+        \Phake::verify($this->storageDriver, \Phake::times(1))
             ->get(\Phake::capture($queryParameters));
 
         $this->assertEquals(self::EXPECTED_QUERY_PARAMETERS, $queryParameters->toArray());
     }
 
-    private function givenSource_get_returnsImage(): Image
+    private function givenStorageDriver_get_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->source)->get(\Phake::anyParameters())->thenReturn($image);
+        \Phake::when($this->storageDriver)->get(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
     }

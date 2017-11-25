@@ -8,15 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Yandex;
-
-use Strider2038\ImgCache\Core\QueryParametersCollection;
-use Strider2038\ImgCache\Imaging\Image\Image;
+namespace Strider2038\ImgCache\Imaging\Storage\Data;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface YandexMapSourceInterface
+interface FilenameKeyMapperInterface
 {
-    public function get(QueryParametersCollection $queryParameters): Image;
+    public function getKey(string $filename): FilenameKeyInterface;
 }

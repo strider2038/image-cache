@@ -8,28 +8,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Accessor;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Accessor;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor;
-use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
-use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
-use Strider2038\ImgCache\Imaging\Source\Mapping\FilenameKeyMapperInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\FilesystemStorageAccessor;
+use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyMapperInterface;
+use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
-class FilesystemSourceAccessorTest extends TestCase
+class FilesystemStorageAccessorTest extends TestCase
 {
     use ProviderTrait, LoggerTrait;
 
     private const KEY = 'test';
 
-    /** @var FilesystemSourceInterface */
-    private $source;
+    /** @var FilesystemStorageDriverInterface */
+    private $storageDriver;
 
     /** @var ImageFactoryInterface */
     private $imageFactory;
@@ -42,18 +42,18 @@ class FilesystemSourceAccessorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->source = \Phake::mock(FilesystemSourceInterface::class);
+        $this->storageDriver = \Phake::mock(FilesystemStorageDriverInterface::class);
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->keyMapper = \Phake::mock(FilenameKeyMapperInterface::class);
         $this->logger = $this->givenLogger();
     }
 
     /** @test */
-    public function get_givenKeyAndSourceFileExists_imageIsReturned(): void
+    public function getImage_givenKeyAndSourceFileExists_imageIsReturned(): void
     {
-        $accessor = $this->createFilesystemSourceAccessor();
+        $accessor = $this->createFilesystemStorageAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
-        $stream = $this->givenSource_getFileContents_returnsStream($filenameKey);
+        $stream = $this->givenStorageDriver_getFileContents_returnsStream($filenameKey);
         $createdImage = $this->givenImageFactory_createFromStream_returnsImage();
 
         $image = $accessor->getImage(self::KEY);
@@ -61,7 +61,7 @@ class FilesystemSourceAccessorTest extends TestCase
         $this->assertSame($createdImage, $image);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
         $this->assertKeyMapper_getKey_isCalledOnceWithKey(self::KEY);
-        $this->assertSource_getFileContents_isCalledOnceWithFilenameKey($filenameKey);
+        $this->assertStorageDriver_getFileContents_isCalledOnceWithFilenameKey($filenameKey);
         $this->assertImageFactory_createFromStream_isCalledOnceWithStream($stream);
     }
 
@@ -70,11 +70,11 @@ class FilesystemSourceAccessorTest extends TestCase
      * @param bool $expectedExists
      * @dataProvider boolValuesProvider
      */
-    public function exists_givenKeyAndSourceFileExistStatus_boolIsReturned(bool $expectedExists): void
+    public function imageExists_givenKeyAndSourceFileExistStatus_boolIsReturned(bool $expectedExists): void
     {
-        $accessor = $this->createFilesystemSourceAccessor();
+        $accessor = $this->createFilesystemStorageAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
-        $this->givenSource_fileExists_returns($filenameKey, $expectedExists);
+        $this->givenStorageDriver_fileExists_returns($filenameKey, $expectedExists);
 
         $actualExists = $accessor->imageExists(self::KEY);
 
@@ -83,9 +83,9 @@ class FilesystemSourceAccessorTest extends TestCase
     }
 
     /** @test */
-    public function put_givenKeyAndStream_streamIsPuttedToSource(): void
+    public function putImage_givenKeyAndStream_streamIsPuttedToSource(): void
     {
-        $accessor = $this->createFilesystemSourceAccessor();
+        $accessor = $this->createFilesystemStorageAccessor();
         $image = \Phake::mock(Image::class);
         $stream = $this->givenImage_getData_returnsStream($image);
 
@@ -94,25 +94,25 @@ class FilesystemSourceAccessorTest extends TestCase
         $accessor->putImage(self::KEY, $image);
 
         $this->assertImage_getData_isCalledOnce($image);
-        $this->assertSource_createFile_isCalledOnceWith($filenameKey, $stream);
+        $this->assertStorageDriver_createFile_isCalledOnceWith($filenameKey, $stream);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
     /** @test */
-    public function delete_givenKey_sourceDeleteIsCalled(): void
+    public function deleteImage_givenKey_sourceDeleteIsCalled(): void
     {
-        $accessor = $this->createFilesystemSourceAccessor();
+        $accessor = $this->createFilesystemStorageAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
 
         $accessor->deleteImage(self::KEY);
 
-        $this->assertSource_deleteFile_isCalledOnceWith($filenameKey);
+        $this->assertStorageDriver_deleteFile_isCalledOnceWith($filenameKey);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
     }
 
-    private function createFilesystemSourceAccessor(): FilesystemSourceAccessor
+    private function createFilesystemStorageAccessor(): FilesystemStorageAccessor
     {
-        $accessor = new FilesystemSourceAccessor($this->source, $this->imageFactory, $this->keyMapper);
+        $accessor = new FilesystemStorageAccessor($this->storageDriver, $this->imageFactory, $this->keyMapper);
         $accessor->setLogger($this->logger);
 
         return $accessor;
@@ -127,27 +127,27 @@ class FilesystemSourceAccessorTest extends TestCase
         return $filenameKey;
     }
 
-    private function givenSource_getFileContents_returnsStream(FilenameKeyInterface $filenameKey): StreamInterface
+    private function givenStorageDriver_getFileContents_returnsStream(FilenameKeyInterface $filenameKey): StreamInterface
     {
         $stream = \Phake::mock(StreamInterface::class);
-        \Phake::when($this->source)->getFileContents($filenameKey)->thenReturn($stream);
+        \Phake::when($this->storageDriver)->getFileContents($filenameKey)->thenReturn($stream);
 
         return $stream;
     }
 
-    private function givenSource_fileExists_returns(FilenameKeyInterface $filenameKey, bool $value): void
+    private function givenStorageDriver_fileExists_returns(FilenameKeyInterface $filenameKey, bool $value): void
     {
-        \Phake::when($this->source)->fileExists($filenameKey)->thenReturn($value);
+        \Phake::when($this->storageDriver)->fileExists($filenameKey)->thenReturn($value);
     }
 
-    private function assertSource_createFile_isCalledOnceWith(FilenameKeyInterface $filenameKey, StreamInterface $stream): void
+    private function assertStorageDriver_createFile_isCalledOnceWith(FilenameKeyInterface $filenameKey, StreamInterface $stream): void
     {
-        \Phake::verify($this->source, \Phake::times(1))->createFile($filenameKey, $stream);
+        \Phake::verify($this->storageDriver, \Phake::times(1))->createFile($filenameKey, $stream);
     }
 
-    private function assertSource_deleteFile_isCalledOnceWith(FilenameKeyInterface $filenameKey): void
+    private function assertStorageDriver_deleteFile_isCalledOnceWith(FilenameKeyInterface $filenameKey): void
     {
-        \Phake::verify($this->source, \Phake::times(1))->deleteFile($filenameKey);
+        \Phake::verify($this->storageDriver, \Phake::times(1))->deleteFile($filenameKey);
     }
 
     private function assertImage_getData_isCalledOnce(Image $image): void
@@ -168,9 +168,9 @@ class FilesystemSourceAccessorTest extends TestCase
         \Phake::verify($this->keyMapper, \Phake::times(1))->getKey($key);
     }
 
-    private function assertSource_getFileContents_isCalledOnceWithFilenameKey(FilenameKeyInterface $filenameKey): void
+    private function assertStorageDriver_getFileContents_isCalledOnceWithFilenameKey(FilenameKeyInterface $filenameKey): void
     {
-        \Phake::verify($this->source, \Phake::times(1))->getFileContents($filenameKey);
+        \Phake::verify($this->storageDriver, \Phake::times(1))->getFileContents($filenameKey);
     }
 
     private function assertImageFactory_createFromStream_isCalledOnceWithStream(StreamInterface $stream): void

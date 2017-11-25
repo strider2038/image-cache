@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Yandex;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Data;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Accessor;
+namespace Strider2038\ImgCache\Imaging\Storage\Accessor;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -16,15 +16,15 @@ use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSourceInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
+use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class YandexMapAccessor implements YandexMapAccessorInterface
+class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
 {
     /** @var ModelValidatorInterface */
     private $validator;
@@ -32,8 +32,8 @@ class YandexMapAccessor implements YandexMapAccessorInterface
     /** @var ViolationsFormatterInterface */
     private $formatter;
 
-    /** @var YandexMapSourceInterface */
-    private $source;
+    /** @var YandexMapStorageDriverInterface */
+    private $storageDriver;
 
     /** @var LoggerInterface */
     private $logger;
@@ -41,11 +41,11 @@ class YandexMapAccessor implements YandexMapAccessorInterface
     public function __construct(
         ModelValidatorInterface $validator,
         ViolationsFormatterInterface $formatter,
-        YandexMapSourceInterface $source
+        YandexMapStorageDriverInterface $storageDriver
     ) {
         $this->validator = $validator;
         $this->formatter = $formatter;
-        $this->source = $source;
+        $this->storageDriver = $storageDriver;
         $this->logger = new NullLogger();
     }
 
@@ -81,6 +81,6 @@ class YandexMapAccessor implements YandexMapAccessorInterface
             new QueryParameter('scale', $parameters->getScale())
         ]);
 
-        return $this->source->get($query);
+        return $this->storageDriver->get($query);
     }
 }

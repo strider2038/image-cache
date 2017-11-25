@@ -8,10 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Mapping;
-
-use Strider2038\ImgCache\Imaging\Source\Key\FilenameKey;
-use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
+namespace Strider2038\ImgCache\Imaging\Storage\Data;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

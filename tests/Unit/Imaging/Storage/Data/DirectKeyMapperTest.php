@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source\Mapping;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Data;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper;
+use Strider2038\ImgCache\Imaging\Storage\Data\DirectKeyMapper;
 
 class DirectKeyMapperTest extends TestCase
 {
-    const FILENAME = '/file.ext';
+    private const FILENAME = '/file.ext';
 
     public function testGetKey_GivenFilename_FilenameEqualsToReturnedFilenameKeyValue(): void
     {

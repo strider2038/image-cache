@@ -8,23 +8,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source\Accessor;
+namespace Strider2038\ImgCache\Imaging\Storage\Accessor;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Source\FilesystemSourceInterface;
-use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
-use Strider2038\ImgCache\Imaging\Source\Mapping\FilenameKeyMapperInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyMapperInterface;
+use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FilesystemSourceAccessor implements SourceAccessorInterface
+class FilesystemStorageAccessor implements StorageAccessorInterface
 {
-    /** @var FilesystemSourceInterface */
-    private $source;
+    /** @var FilesystemStorageDriverInterface */
+    private $storageDriver;
 
     /** @var ImageFactoryInterface */
     private $imageFactory;
@@ -36,11 +36,11 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     private $logger;
 
     public function __construct(
-        FilesystemSourceInterface $source,
+        FilesystemStorageDriverInterface $storageDriver,
         ImageFactoryInterface $imageFactory,
         FilenameKeyMapperInterface $keyMapper
     ) {
-        $this->source = $source;
+        $this->storageDriver = $storageDriver;
         $this->imageFactory = $imageFactory;
         $this->keyMapper = $keyMapper;
         $this->logger = new NullLogger();
@@ -54,7 +54,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     public function getImage(string $key): Image
     {
         $filenameKey = $this->composeFilenameKey($key);
-        $stream = $this->source->getFileContents($filenameKey);
+        $stream = $this->storageDriver->getFileContents($filenameKey);
         $image = $this->imageFactory->createFromStream($stream);
 
         $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s"', $key));
@@ -65,7 +65,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     public function imageExists(string $key): bool
     {
         $filenameKey = $this->composeFilenameKey($key);
-        $exists = $this->source->fileExists($filenameKey);
+        $exists = $this->storageDriver->fileExists($filenameKey);
 
         $this->logger->info(sprintf(
             'Image with key "%s" %s in filesystem source',
@@ -80,7 +80,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     {
         $filenameKey = $this->composeFilenameKey($key);
         $data = $image->getData();
-        $this->source->createFile($filenameKey, $data);
+        $this->storageDriver->createFile($filenameKey, $data);
 
         $this->logger->info(sprintf(
             "Image is successfully putted to source under key '%s'",
@@ -91,7 +91,7 @@ class FilesystemSourceAccessor implements SourceAccessorInterface
     public function deleteImage(string $key): void
     {
         $filenameKey = $this->composeFilenameKey($key);
-        $this->source->deleteFile($filenameKey);
+        $this->storageDriver->deleteFile($filenameKey);
 
         $this->logger->info(sprintf(
             "Image with key '%s' is successfully deleted from source",

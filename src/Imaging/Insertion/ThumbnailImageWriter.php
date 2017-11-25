@@ -14,7 +14,7 @@ use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
-use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -24,31 +24,31 @@ class ThumbnailImageWriter implements ImageWriterInterface
     /** @var ThumbnailKeyParserInterface */
     private $keyParser;
 
-    /** @var SourceAccessorInterface */
-    private $sourceAccessor;
+    /** @var StorageAccessorInterface */
+    private $storageAccessor;
 
-    public function __construct(ThumbnailKeyParserInterface $keyParser, SourceAccessorInterface $sourceAccessor)
+    public function __construct(ThumbnailKeyParserInterface $keyParser, StorageAccessorInterface $storageAccessor)
     {
         $this->keyParser = $keyParser;
-        $this->sourceAccessor = $sourceAccessor;
+        $this->storageAccessor = $storageAccessor;
     }
 
     public function imageExists(string $key): bool
     {
         $parsedKey = $this->parseKey($key);
-        return $this->sourceAccessor->imageExists($parsedKey->getPublicFilename());
+        return $this->storageAccessor->imageExists($parsedKey->getPublicFilename());
     }
 
     public function insertImage(string $key, Image $image): void
     {
         $parsedKey = $this->parseKey($key);
-        $this->sourceAccessor->putImage($parsedKey->getPublicFilename(), $image);
+        $this->storageAccessor->putImage($parsedKey->getPublicFilename(), $image);
     }
 
     public function deleteImage(string $key): void
     {
         $parsedKey = $this->parseKey($key);
-        $this->sourceAccessor->deleteImage($parsedKey->getPublicFilename());
+        $this->storageAccessor->deleteImage($parsedKey->getPublicFilename());
     }
 
     public function getImageFileNameMask(string $key): string

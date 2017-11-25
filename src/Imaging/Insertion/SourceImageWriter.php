@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Insertion;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
-use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -22,31 +22,31 @@ class SourceImageWriter implements ImageWriterInterface
     /** @var SourceKeyParserInterface */
     private $keyParser;
 
-    /** @var SourceAccessorInterface */
-    private $sourceAccessor;
+    /** @var StorageAccessorInterface */
+    private $storageAccessor;
 
-    public function __construct(SourceKeyParserInterface $keyParser, SourceAccessorInterface $sourceAccessor)
+    public function __construct(SourceKeyParserInterface $keyParser, StorageAccessorInterface $storageAccessor)
     {
         $this->keyParser = $keyParser;
-        $this->sourceAccessor = $sourceAccessor;
+        $this->storageAccessor = $storageAccessor;
     }
 
     public function imageExists(string $key): bool
     {
         $parsedKey = $this->keyParser->parse($key);
-        return $this->sourceAccessor->imageExists($parsedKey->getPublicFilename());
+        return $this->storageAccessor->imageExists($parsedKey->getPublicFilename());
     }
 
     public function insertImage(string $key, Image $image): void
     {
         $parsedKey = $this->keyParser->parse($key);
-        $this->sourceAccessor->putImage($parsedKey->getPublicFilename(), $image);
+        $this->storageAccessor->putImage($parsedKey->getPublicFilename(), $image);
     }
 
     public function deleteImage(string $key): void
     {
         $parsedKey = $this->keyParser->parse($key);
-        $this->sourceAccessor->deleteImage($parsedKey->getPublicFilename());
+        $this->storageAccessor->deleteImage($parsedKey->getPublicFilename());
     }
 
     public function getImageFileNameMask(string $key): string

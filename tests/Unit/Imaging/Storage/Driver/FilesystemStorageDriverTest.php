@@ -9,20 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Source;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Imaging\Source\FilesystemSource;
-use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FilesystemSourceTest extends TestCase
+class FilesystemStorageDriverTest extends TestCase
 {
     use FileOperationsTrait;
 
@@ -44,9 +44,9 @@ class FilesystemSourceTest extends TestCase
     /** @test */
     public function construct_baseDirectoryExists_baseDirectoryIsReturned(): void
     {
-        $source = $this->createFilesystemSource();
+        $driver = $this->createFilesystemStorageDriver();
 
-        $this->assertEquals(self::BASE_DIRECTORY . '/', $source->getBaseDirectory());
+        $this->assertEquals(self::BASE_DIRECTORY . '/', $driver->getBaseDirectory());
     }
 
     /**
@@ -58,7 +58,7 @@ class FilesystemSourceTest extends TestCase
     public function construct_baseDirectoryDoesNotExist_exceptionThrown(): void
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, false);
-        new FilesystemSource(self::BASE_DIRECTORY, $this->fileOperations);
+        new FilesystemStorageDriver(self::BASE_DIRECTORY, $this->fileOperations);
     }
 
     /**
@@ -69,16 +69,16 @@ class FilesystemSourceTest extends TestCase
      */
     public function getFileContents_fileDoesNotExist_exceptionThrown(): void
     {
-        $source = $this->createFilesystemSource();
+        $driver = $this->createFilesystemStorageDriver();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_NOT_EXIST);
 
-        $source->getFileContents($filenameKey);
+        $driver->getFileContents($filenameKey);
     }
 
     /** @test */
     public function getFileContents_fileExists_fileContentsIsReturned(): void
     {
-        $source = $this->createFilesystemSource();
+        $driver = $this->createFilesystemStorageDriver();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
         $expectedFileContents = $this->givenFileOperations_openFile_returnsStream(
@@ -87,7 +87,7 @@ class FilesystemSourceTest extends TestCase
             ResourceStreamModeEnum::READ_ONLY
         );
 
-        $fileContents = $source->getFileContents($filenameKey);
+        $fileContents = $driver->getFileContents($filenameKey);
 
         $this->assertSame($expectedFileContents, $fileContents);
     }
@@ -95,10 +95,10 @@ class FilesystemSourceTest extends TestCase
     /** @test */
     public function fileExists_fileDoesNotExist_falseIsReturned(): void
     {
-        $source = $this->createFilesystemSource();
+        $driver = $this->createFilesystemStorageDriver();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_NOT_EXIST);
 
-        $exists = $source->fileExists($filenameKey);
+        $exists = $driver->fileExists($filenameKey);
 
         $this->assertFalse($exists);
     }
@@ -106,11 +106,11 @@ class FilesystemSourceTest extends TestCase
     /** @test */
     public function fileExists_fileExists_trueIsReturned(): void
     {
-        $source = $this->createFilesystemSource();
+        $driver = $this->createFilesystemStorageDriver();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
 
-        $exists = $source->fileExists($filenameKey);
+        $exists = $driver->fileExists($filenameKey);
 
         $this->assertTrue($exists);
     }
@@ -118,7 +118,7 @@ class FilesystemSourceTest extends TestCase
     /** @test */
     public function createFile_givenKeyAndStream_directoryCreatedAndStreamIsWrittenToFile(): void
     {
-        $source = $this->createFilesystemSource();
+        $driver = $this->createFilesystemStorageDriver();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $givenStream = $this->givenInputStream();
         $stream = $this->givenFileOperations_openFile_returnsStream(
@@ -127,7 +127,7 @@ class FilesystemSourceTest extends TestCase
             ResourceStreamModeEnum::WRITE_AND_READ
         );
 
-        $source->createFile($filenameKey, $givenStream);
+        $driver->createFile($filenameKey, $givenStream);
 
         $this->assertFileOperations_createDirectory_isCalledOnce($this->fileOperations, self::BASE_DIRECTORY);
         \Phake::verify($stream, \Phake::times(1))->write(self::DATA);
@@ -136,19 +136,19 @@ class FilesystemSourceTest extends TestCase
     /** @test */
     public function deleteFile_givenKey_fileIsDeleted(): void
     {
-        $source = $this->createFilesystemSource();
+        $driver = $this->createFilesystemStorageDriver();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
 
-        $source->deleteFile($filenameKey);
+        $driver->deleteFile($filenameKey);
 
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FILENAME_EXISTS_FULL);
     }
 
-    private function createFilesystemSource(string $baseDirectory = self::BASE_DIRECTORY): FilesystemSource
+    private function createFilesystemStorageDriver(string $baseDirectory = self::BASE_DIRECTORY): FilesystemStorageDriver
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
 
-        return new FilesystemSource($baseDirectory, $this->fileOperations);
+        return new FilesystemStorageDriver($baseDirectory, $this->fileOperations);
     }
 
     private function givenFilenameKey($filename): FilenameKeyInterface

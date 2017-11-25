@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Source;
+namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Imaging\Source\Key\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface FilesystemSourceInterface
+interface FilesystemStorageDriverInterface
 {
     public function getFileContents(FilenameKeyInterface $key): StreamInterface;
     public function fileExists(FilenameKeyInterface $key): bool;

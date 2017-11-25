@@ -17,7 +17,7 @@ use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 class ThumbnailImageExtractorTest extends TestCase
 {
@@ -27,8 +27,8 @@ class ThumbnailImageExtractorTest extends TestCase
     /** @var ThumbnailKeyParserInterface */
     private $keyParser;
 
-    /** @var SourceAccessorInterface */
-    private $sourceAccessor;
+    /** @var StorageAccessorInterface */
+    private $storageAccessor;
 
     /** @var ImageProcessorInterface */
     private $imageProcessor;
@@ -36,7 +36,7 @@ class ThumbnailImageExtractorTest extends TestCase
     protected function setUp(): void
     {
         $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
-        $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
+        $this->storageAccessor = \Phake::mock(StorageAccessorInterface::class);
         $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
     }
 
@@ -47,7 +47,7 @@ class ThumbnailImageExtractorTest extends TestCase
         $thumbnailKey = $this->givenKeyParser_parse_returnsThumbnailKey();
         $processingConfiguration = $this->givenThumbnailKey_getProcessingConfiguration_returns($thumbnailKey);
         $sourceImage = \Phake::mock(Image::class);
-        $this->givenSourceAccessor_getImage_returns($sourceImage);
+        $this->givenStorageAccessor_getImage_returns($sourceImage);
         $processedImage = $this->givenImageProcessor_process_returnsProcessedImage($sourceImage, $processingConfiguration);
 
         $extractedImage = $extractor->extractImage(self::KEY);
@@ -59,15 +59,15 @@ class ThumbnailImageExtractorTest extends TestCase
     {
         $extractor = new ThumbnailImageExtractor(
             $this->keyParser,
-            $this->sourceAccessor,
+            $this->storageAccessor,
             $this->imageProcessor
         );
         return $extractor;
     }
 
-    private function givenSourceAccessor_getImage_returns(Image $sourceImage): void
+    private function givenStorageAccessor_getImage_returns(Image $sourceImage): void
     {
-        \Phake::when($this->sourceAccessor)->getImage(self::PUBLIC_FILENAME)->thenReturn($sourceImage);
+        \Phake::when($this->storageAccessor)->getImage(self::PUBLIC_FILENAME)->thenReturn($sourceImage);
     }
 
     private function givenKeyParser_parse_returnsThumbnailKey(): ThumbnailKey

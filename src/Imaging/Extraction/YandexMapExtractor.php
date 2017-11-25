@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParserInterface;
-use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessorInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -22,19 +22,21 @@ class YandexMapExtractor implements ImageExtractorInterface
     /** @var YandexMapParametersParserInterface */
     private $parser;
 
-    /** @var YandexMapAccessorInterface */
-    private $accessor;
+    /** @var YandexMapStorageAccessorInterface */
+    private $storageAccessor;
 
-    public function __construct(YandexMapParametersParserInterface $parser, YandexMapAccessorInterface $accessor)
-    {
+    public function __construct(
+        YandexMapParametersParserInterface $parser,
+        YandexMapStorageAccessorInterface $storageAccessor
+    ) {
         $this->parser = $parser;
-        $this->accessor = $accessor;
+        $this->storageAccessor = $storageAccessor;
     }
 
     public function extractImage(string $key): Image
     {
         $parameters = $this->parser->parse($key);
 
-        return $this->accessor->getImage($parameters);
+        return $this->storageAccessor->getImage($parameters);
     }
 }
