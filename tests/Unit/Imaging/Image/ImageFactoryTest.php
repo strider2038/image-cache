@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
@@ -38,12 +39,16 @@ class ImageFactoryTest extends TestCase
     /** @var FileOperationsInterface */
     private $fileOperations;
 
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->fileOperations = $this->givenFileOperations();
+        $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
     }
 
     /** @test */
@@ -99,20 +104,6 @@ class ImageFactoryTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessageRegExp /File .* not found/
-     */
-    public function createFromFile_givenFileDoesNotExist_exceptionThrown(): void
-    {
-        $factory = $this->createImageFactory();
-        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, false);
-
-        $factory->createFromFile(self::FILENAME);
-    }
-
-    /**
-     * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
      * @expectedExceptionCode 415
      * @expectedExceptionMessageRegExp /File .* has unsupported image extension/
@@ -148,11 +139,14 @@ class ImageFactoryTest extends TestCase
         $factory = $this->createImageFactory();
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+        $stream = $this->givenStreamFactory_createStreamFromData_returnsStream();
 
         $image = $factory->createFromData(self::DATA);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertStreamFactory_createStreamFromData_isCalledOnceWithData(self::DATA);
+        $this->assertSame($stream, $image->getData());
     }
 
     /**
@@ -205,7 +199,8 @@ class ImageFactoryTest extends TestCase
         $factory = new ImageFactory(
             $this->saveOptionsFactory,
             $this->imageValidator,
-            $this->fileOperations
+            $this->fileOperations,
+            $this->streamFactory
         );
 
         return $factory;
@@ -251,6 +246,19 @@ class ImageFactoryTest extends TestCase
     {
         $stream = \Phake::mock(StreamInterface::class);
         \Phake::when($stream)->getContents()->thenReturn(self::DATA);
+
+        return $stream;
+    }
+
+    private function assertStreamFactory_createStreamFromData_isCalledOnceWithData(string $data): void
+    {
+        \Phake::verify($this->streamFactory, \Phake::times(1))->createStreamFromData($data);
+    }
+
+    private function givenStreamFactory_createStreamFromData_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->streamFactory)->createStreamFromData(\Phake::anyParameters())->thenReturn($stream);
 
         return $stream;
     }

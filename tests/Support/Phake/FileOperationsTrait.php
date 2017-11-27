@@ -50,13 +50,23 @@ trait FileOperationsTrait
     }
 
     protected function givenFileOperations_openFile_returnsStream(
+        FileOperationsInterface $fileOperations
+    ): StreamInterface {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($fileOperations)->openFile(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
+    }
+
+    protected function assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
         FileOperationsInterface $fileOperations,
         string $filename,
         string $mode
     ): StreamInterface {
         $stream = \Phake::mock(StreamInterface::class);
-        $modeEnum = new ResourceStreamModeEnum($mode);
-        \Phake::when($fileOperations)->openFile($filename, $modeEnum)->thenReturn($stream);
+        \Phake::verify($fileOperations, \Phake::times(1))->openFile($filename, \Phake::capture($modeEnum));
+        /** @var ResourceStreamModeEnum $modeEnum */
+        $this->assertEquals($mode, $modeEnum->getValue());
 
         return $stream;
     }
@@ -104,4 +114,6 @@ trait FileOperationsTrait
     ): void {
         \Phake::when($fileOperations)->findByMask(\Phake::anyParameters())->thenReturn(new StringList($list));
     }
+
+    abstract public static function assertEquals($expected, $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false);
 }

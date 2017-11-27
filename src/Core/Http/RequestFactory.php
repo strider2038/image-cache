@@ -11,8 +11,10 @@
 namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestException;
 
 /**
@@ -20,11 +22,15 @@ use Strider2038\ImgCache\Exception\InvalidRequestException;
  */
 class RequestFactory implements RequestFactoryInterface
 {
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
     /** @var string */
     private $streamSource;
 
-    public function __construct(string $streamSource = 'php://input')
+    public function __construct(StreamFactoryInterface $streamFactory, string $streamSource = 'php://input')
     {
+        $this->streamFactory = $streamFactory;
         $this->streamSource = $streamSource;
     }
 
@@ -40,7 +46,9 @@ class RequestFactory implements RequestFactoryInterface
 
         $request = new Request($method, $uri);
 
-        $bodyStream = new ReadOnlyResourceStream($this->streamSource);
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
+        $bodyStream = $this->streamFactory->createStreamByParameters($this->streamSource, $mode);
+
         $request->setBody($bodyStream);
 
         $requestProtocol = $serverConfiguration['SERVER_PROTOCOL'] ?? '';

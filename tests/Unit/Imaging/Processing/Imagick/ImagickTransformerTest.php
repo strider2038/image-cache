@@ -11,6 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Imagick;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformer;
 use Strider2038\ImgCache\Imaging\Processing\Rectangle;
 use Strider2038\ImgCache\Imaging\Processing\Size;
@@ -31,11 +33,15 @@ class ImagickTransformerTest extends FileTestCase
     /** @var FileOperationsInterface */
     private $fileOperations;
 
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->imagick = new \Imagick($this->givenAssetFile(self::IMAGE_BOX_JPG));
         $this->fileOperations = \Phake::mock(FileOperationsInterface::class);
+        $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
     }
 
     /** @test */
@@ -71,10 +77,12 @@ class ImagickTransformerTest extends FileTestCase
     {
         $transformer = $this->createTransformer();
         $expectedData = $this->imagick->getImageBlob();
+        $expectedStream = $this->givenStreamFactory_createStreamFromData_returnsStream();
 
         $data = $transformer->getData();
 
-        $this->assertSame($expectedData, $data->getContents());
+        $this->assertStreamFactory_createStreamFromData_isCalledOnceWithData($expectedData);
+        $this->assertSame($expectedStream, $data);
     }
 
     /** @test */
@@ -102,11 +110,24 @@ class ImagickTransformerTest extends FileTestCase
 
     private function createTransformer(): ImagickTransformer
     {
-        return new ImagickTransformer($this->imagick, $this->fileOperations);
+        return new ImagickTransformer($this->imagick, $this->fileOperations, $this->streamFactory);
     }
 
     private function assertFileOperations_createDirectory_isCalledOnce(): void
     {
         \Phake::verify($this->fileOperations, \Phake::times(1))->createDirectory(self::TEST_CACHE_DIR);
+    }
+
+    private function assertStreamFactory_createStreamFromData_isCalledOnceWithData(string $data): void
+    {
+        \Phake::verify($this->streamFactory, \Phake::times(1))->createStreamFromData($data);
+    }
+
+    private function givenStreamFactory_createStreamFromData_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->streamFactory)->createStreamFromData(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
     }
 }

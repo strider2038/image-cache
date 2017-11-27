@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Processing\Imagick;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerFactoryInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
@@ -23,9 +24,13 @@ class ImagickTransformerFactory implements ImageTransformerFactoryInterface
     /** @var FileOperationsInterface */
     private $fileOperations;
 
-    public function __construct(FileOperationsInterface $fileOperations)
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
+    public function __construct(FileOperationsInterface $fileOperations, StreamFactoryInterface $streamFactory)
     {
         $this->fileOperations = $fileOperations;
+        $this->streamFactory = $streamFactory;
     }
 
     public function createTransformer(StreamInterface $stream): ImageTransformerInterface
@@ -33,6 +38,6 @@ class ImagickTransformerFactory implements ImageTransformerFactoryInterface
         $imagick = new \Imagick();
         $imagick->readImageBlob($stream->getContents());
 
-        return new ImagickTransformer($imagick, $this->fileOperations);
+        return new ImagickTransformer($imagick, $this->fileOperations, $this->streamFactory);
     }
 }

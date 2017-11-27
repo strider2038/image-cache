@@ -10,11 +10,12 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
+use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
-use Strider2038\ImgCache\Core\StringStream;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Exception\FileNotFoundException;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -24,19 +25,32 @@ class ResponseFactory implements ResponseFactoryInterface
     /** @var RequestInterface */
     private $request;
 
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
+    /** @var FileOperationsInterface */
+    private $fileOperations;
+
     /** @var bool */
     private $isDebugged;
 
-    public function __construct(RequestInterface $request, bool $isDebugged = false)
-    {
+    public function __construct(
+        RequestInterface $request,
+        StreamFactoryInterface $streamFactory,
+        FileOperationsInterface $fileOperations,
+        bool $isDebugged = false
+    ) {
         $this->request = $request;
+        $this->streamFactory = $streamFactory;
+        $this->fileOperations = $fileOperations;
         $this->isDebugged = $isDebugged;
     }
 
     public function createMessageResponse(HttpStatusCodeEnum $code, string $message = ''): ResponseInterface
     {
         $response = new Response($code);
-        $response->setBody(new StringStream($message));
+        $bodyStream = $this->streamFactory->createStreamFromData($message);
+        $response->setBody($bodyStream);
         $response->setProtocolVersion($this->request->getProtocolVersion());
 
         return $response;
@@ -70,12 +84,10 @@ class ResponseFactory implements ResponseFactoryInterface
 
     public function createFileResponse(HttpStatusCodeEnum $code, string $filename): ResponseInterface
     {
-        if (!file_exists($filename)) {
-            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
-        }
-
         $response = new Response($code);
-        $response->setBody(new ReadOnlyResourceStream($filename));
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::WRITE_AND_READ);
+        $bodyStream = $this->fileOperations->openFile($filename, $mode);
+        $response->setBody($bodyStream);
         $response->setProtocolVersion($this->request->getProtocolVersion());
 
         $headers = new HeaderCollection();

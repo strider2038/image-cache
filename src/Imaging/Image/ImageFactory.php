@@ -11,10 +11,9 @@
 namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Core\StringStream;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
@@ -34,14 +33,19 @@ class ImageFactory implements ImageFactoryInterface
     /** @var FileOperationsInterface */
     private $fileOperations;
 
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
     public function __construct(
         SaveOptionsFactoryInterface $saveOptionsFactory,
         ImageValidatorInterface $imageValidator,
-        FileOperationsInterface $fileOperations
+        FileOperationsInterface $fileOperations,
+        StreamFactoryInterface $streamFactory
     ) {
         $this->saveOptionsFactory = $saveOptionsFactory;
         $this->imageValidator = $imageValidator;
         $this->fileOperations = $fileOperations;
+        $this->streamFactory = $streamFactory;
     }
 
     public function create(StreamInterface $data, SaveOptions $saveOptions): Image
@@ -55,9 +59,6 @@ class ImageFactory implements ImageFactoryInterface
 
     public function createFromFile(string $filename): Image
     {
-        if (!$this->fileOperations->isFile($filename)) {
-            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
-        }
         if (!$this->imageValidator->hasValidImageExtension($filename)) {
             throw new InvalidMediaTypeException(sprintf('File "%s" has unsupported image extension', $filename));
         }
@@ -77,7 +78,9 @@ class ImageFactory implements ImageFactoryInterface
             throw new InvalidMediaTypeException('Image has unsupported mime type');
         }
 
-        return new Image($this->createSaveOptions(), new StringStream($data));
+        $stream = $this->streamFactory->createStreamFromData($data);
+
+        return new Image($this->createSaveOptions(), $stream);
     }
 
     public function createFromStream(StreamInterface $stream): Image

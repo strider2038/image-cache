@@ -12,7 +12,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\FileOperations;
-use Strider2038\ImgCache\Core\ResourceStream;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
@@ -36,13 +37,17 @@ class FileOperationsTest extends FileTestCase
     /** @var Filesystem */
     private $filesystem;
 
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
     /** @var LoggerInterface */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->filesystem = \Phake::mock(Filesystem::class);
+        $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
         $this->logger = $this->givenLogger();
     }
 
@@ -287,10 +292,13 @@ class FileOperationsTest extends FileTestCase
         $fileOperations = $this->createFileOperations();
         $filename = $this->givenFile();
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
+        $expectedStream = $this->givenStreamFactory_createStreamByParameters_returnsStream();
 
         $stream = $fileOperations->openFile($filename, $mode);
 
-        $this->assertInstanceOf(ResourceStream::class, $stream);
+        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertStreamFactory_createStreamByParameters_isCalledOnceWithFilenameAndMode($filename, $mode);
+        $this->assertSame($expectedStream, $stream);
     }
 
     /**
@@ -302,6 +310,22 @@ class FileOperationsTest extends FileTestCase
     public function openFile_givenNotExistingFileAndReadOnlyMode_exceptionThrown(): void
     {
         $fileOperations = $this->createFileOperations();
+        $filename = $this->givenFile();
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
+        $this->givenStreamFactory_createStreamByParameters_throwsException();
+
+        $fileOperations->openFile($filename, $mode);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileOperationException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessageRegExp /Invalid file .* or file does not exist/
+     */
+    public function openFile_givenNotAFile_exceptionThrown(): void
+    {
+        $fileOperations = $this->createFileOperations();
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
 
         $fileOperations->openFile(self::FILENAME_NOT_EXIST, $mode);
@@ -309,9 +333,31 @@ class FileOperationsTest extends FileTestCase
 
     private function createFileOperations(): FileOperations
     {
-        $fileOperations = new FileOperations($this->filesystem);
+        $fileOperations = new FileOperations($this->filesystem, $this->streamFactory);
         $fileOperations->setLogger($this->logger);
 
         return $fileOperations;
+    }
+
+    private function assertStreamFactory_createStreamByParameters_isCalledOnceWithFilenameAndMode(
+        string $filename,
+        ResourceStreamModeEnum $mode
+    ): void {
+        \Phake::verify($this->streamFactory, \Phake::times(1))->createStreamByParameters($filename, $mode);
+    }
+
+    private function givenStreamFactory_createStreamByParameters_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->streamFactory)->createStreamByParameters(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
+    }
+
+    private function givenStreamFactory_createStreamByParameters_throwsException(): void
+    {
+        \Phake::when($this->streamFactory)
+            ->createStreamByParameters(\Phake::anyParameters())
+            ->thenThrow(new \Exception());
     }
 }
