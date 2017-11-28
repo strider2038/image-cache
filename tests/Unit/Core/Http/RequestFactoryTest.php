@@ -13,7 +13,6 @@ namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestFactory;
-use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
 use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;

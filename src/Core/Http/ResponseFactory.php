@@ -11,7 +11,6 @@
 namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
 use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;

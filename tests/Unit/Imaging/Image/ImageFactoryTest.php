@@ -89,17 +89,18 @@ class ImageFactoryTest extends TestCase
         $this->givenImageValidator_hasValidImageExtension_returns(true);
         $this->givenImageValidator_hasFileValidImageMimeType_returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
-        $expectedStream = $this->givenFileOperations_openFile_returnsStream(
-            $this->fileOperations,
-            self::FILENAME,
-            ResourceStreamModeEnum::READ_ONLY
-        );
+        $expectedStream = $this->givenFileOperations_openFile_returnsStream($this->fileOperations);
 
         $image = $factory->createFromFile(self::FILENAME);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame($saveOptions, $image->getSaveOptions());
         $this->assertSame($expectedStream, $image->getData());
+        $this->assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
+            $this->fileOperations,
+            self::FILENAME,
+            ResourceStreamModeEnum::READ_ONLY
+        );
     }
 
     /**

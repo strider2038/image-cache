@@ -15,7 +15,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ViolationsFormatterInterface
+interface ViolationFormatterInterface
 {
-    public function format(ConstraintViolationListInterface $violations): string;
+    public function formatViolations(ConstraintViolationListInterface $violations): string;
 }

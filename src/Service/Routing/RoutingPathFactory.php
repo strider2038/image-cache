@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Service\Routing;
 
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
+use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -22,24 +22,24 @@ class RoutingPathFactory implements RoutingPathFactoryInterface
     /** @var ModelValidatorInterface */
     private $validator;
 
-    /** @var ViolationsFormatterInterface */
-    private $violationsFormatter;
+    /** @var ViolationFormatterInterface */
+    private $violationFormatter;
 
-    public function __construct(ModelValidatorInterface $validator, ViolationsFormatterInterface $violationsFormatter)
+    public function __construct(ModelValidatorInterface $validator, ViolationFormatterInterface $violationFormatter)
     {
         $this->validator = $validator;
-        $this->violationsFormatter = $violationsFormatter;
+        $this->violationFormatter = $violationFormatter;
     }
 
     public function createRoutingPath(string $urlPrefix, string $controllerId): RoutingPath
     {
         $path = new RoutingPath($urlPrefix, $controllerId);
-        $violations = $this->validator->validate($path);
+        $violations = $this->validator->validateModel($path);
 
         if (count($violations) > 0) {
             throw new InvalidConfigurationException(sprintf(
-                'Invalid routing map: %s',
-                $this->violationsFormatter->format($violations)
+                'Invalid routing map: %s.',
+                $this->violationFormatter->formatViolations($violations)
             ));
         }
 

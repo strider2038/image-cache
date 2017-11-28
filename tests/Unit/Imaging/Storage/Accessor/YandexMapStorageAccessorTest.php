@@ -14,12 +14,14 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatterInterface;
+use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -45,11 +47,14 @@ class YandexMapStorageAccessorTest extends TestCase
     /** @var ModelValidatorInterface */
     private $validator;
 
-    /** @var ViolationsFormatterInterface */
-    private $formatter;
+    /** @var ViolationFormatterInterface */
+    private $violationsFormatter;
 
     /** @var YandexMapStorageDriverInterface */
     private $storageDriver;
+
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
 
     /** @var LoggerInterface */
     private $logger;
@@ -57,8 +62,9 @@ class YandexMapStorageAccessorTest extends TestCase
     protected function setUp(): void
     {
         $this->validator = \Phake::mock(ModelValidatorInterface::class);
-        $this->formatter = \Phake::mock(ViolationsFormatterInterface::class);
+        $this->violationsFormatter = \Phake::mock(ViolationFormatterInterface::class);
         $this->storageDriver = \Phake::mock(YandexMapStorageDriverInterface::class);
+        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->logger = $this->givenLogger();
     }
 
@@ -72,9 +78,9 @@ class YandexMapStorageAccessorTest extends TestCase
     {
         $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
-        $violations = $this->givenValidator_validate_returnViolations($parameters);
-        $this->givenViolations_count_returns($violations, 1);
-        \Phake::when($this->formatter)->format($violations)->thenReturn('formatted violations');
+        $violations = $this->givenValidator_validateModel_returnViolations($parameters);
+        $this->givenViolations_count_returnsCount($violations, 1);
+        $this->givenViolationFormatter_formatViolations_returnsString($violations, 'formatted violations');
 
         $accessor->getImage($parameters);
     }
@@ -84,34 +90,42 @@ class YandexMapStorageAccessorTest extends TestCase
     {
         $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
-        $this->givenValidator_validate_returnViolations($parameters);
-        $expectedImage = $this->givenStorageDriver_get_returnsImage();
+        $this->givenValidator_validateModel_returnViolations($parameters);
+        $stream = $this->givenStorageDriver_getMapContents_returnsStream();
+        $expectedImage = $this->givenImageFactory_createFromStream_returnsImage();
 
         $image = $accessor->getImage($parameters);
 
-        $this->assertSame($expectedImage, $image);
-        $this->assertStorageDriver_get_isCalledOnceWithQueryParameters();
+        $this->assertStorageDriver_getMapContents_isCalledOnceWithQueryParameters(self::EXPECTED_QUERY_PARAMETERS);
+        $this->assertImageFactory_createFromStream_isCalledOnceWithStream($stream);
         $this->assertLogger_info_isCalledOnce($this->logger);
+        $this->assertSame($expectedImage, $image);
     }
 
     private function createYandexMapStorageAccessor(): YandexMapStorageAccessor
     {
-        $accessor = new YandexMapStorageAccessor($this->validator, $this->formatter, $this->storageDriver);
+        $accessor = new YandexMapStorageAccessor(
+            $this->validator,
+            $this->violationsFormatter,
+            $this->storageDriver,
+            $this->imageFactory
+        );
+
         $accessor->setLogger($this->logger);
 
         return $accessor;
     }
 
-    private function givenValidator_validate_returnViolations(
+    private function givenValidator_validateModel_returnViolations(
         YandexMapParameters $parameters
     ): ConstraintViolationListInterface {
         $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validate($parameters)->thenReturn($violations);
+        \Phake::when($this->validator)->validateModel($parameters)->thenReturn($violations);
 
         return $violations;
     }
 
-    private function givenViolations_count_returns(ConstraintViolationListInterface $violations, int $count): void
+    private function givenViolations_count_returnsCount(ConstraintViolationListInterface $violations, int $count): void
     {
         \Phake::when($violations)->count()->thenReturn($count);
     }
@@ -130,19 +144,40 @@ class YandexMapStorageAccessorTest extends TestCase
         return $parameters;
     }
 
-    private function assertStorageDriver_get_isCalledOnceWithQueryParameters(): void
-    {
+    private function assertStorageDriver_getMapContents_isCalledOnceWithQueryParameters(
+        array $expectedQueryParameters
+    ): void {
         /** @var QueryParametersCollection $queryParameters */
         \Phake::verify($this->storageDriver, \Phake::times(1))
-            ->get(\Phake::capture($queryParameters));
+            ->getMapContents(\Phake::capture($queryParameters));
 
-        $this->assertEquals(self::EXPECTED_QUERY_PARAMETERS, $queryParameters->toArray());
+        $this->assertEquals($expectedQueryParameters, $queryParameters->toArray());
     }
 
-    private function givenStorageDriver_get_returnsImage(): Image
+    private function givenStorageDriver_getMapContents_returnsStream(): StreamInterface
+    {
+        $image = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->storageDriver)->getMapContents(\Phake::anyParameters())->thenReturn($image);
+
+        return $image;
+    }
+
+    private function givenViolationFormatter_formatViolations_returnsString(
+        ConstraintViolationListInterface $violationList,
+        string $violations
+    ): void {
+        \Phake::when($this->violationsFormatter)->formatViolations($violationList)->thenReturn($violations);
+    }
+
+    private function assertImageFactory_createFromStream_isCalledOnceWithStream(StreamInterface $stream): void
+    {
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
+    }
+
+    private function givenImageFactory_createFromStream_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->storageDriver)->get(\Phake::anyParameters())->thenReturn($image);
+        \Phake::when($this->imageFactory)->createFromStream(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
     }

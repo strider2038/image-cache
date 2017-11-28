@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Validation;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Validation\ViolationsFormatter;
+use Strider2038\ImgCache\Imaging\Validation\ViolationFormatter;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -24,9 +24,9 @@ class ViolationsFormatterTest extends TestCase
             $this->createViolation('message1', 'property1'),
             $this->createViolation('message2', 'property2'),
         ]);
-        $formatter = new ViolationsFormatter();
+        $formatter = new ViolationFormatter();
 
-        $report = $formatter->format($violations);
+        $report = $formatter->formatViolations($violations);
 
         $this->assertEquals('property1: message1; property2: message2', $report);
     }

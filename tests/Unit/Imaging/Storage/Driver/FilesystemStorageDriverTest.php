@@ -81,14 +81,15 @@ class FilesystemStorageDriverTest extends TestCase
         $driver = $this->createFilesystemStorageDriver();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME_EXISTS_FULL, true);
-        $expectedFileContents = $this->givenFileOperations_openFile_returnsStream(
+        $expectedFileContents = $this->givenFileOperations_openFile_returnsStream($this->fileOperations);
+
+        $fileContents = $driver->getFileContents($filenameKey);
+
+        $this->assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
             $this->fileOperations,
             self::FILENAME_EXISTS_FULL,
             ResourceStreamModeEnum::READ_ONLY
         );
-
-        $fileContents = $driver->getFileContents($filenameKey);
-
         $this->assertSame($expectedFileContents, $fileContents);
     }
 
@@ -121,15 +122,16 @@ class FilesystemStorageDriverTest extends TestCase
         $driver = $this->createFilesystemStorageDriver();
         $filenameKey = $this->givenFilenameKey(self::FILENAME_EXISTS);
         $givenStream = $this->givenInputStream();
-        $stream = $this->givenFileOperations_openFile_returnsStream(
-            $this->fileOperations,
-            self::FILENAME_EXISTS_FULL,
-            ResourceStreamModeEnum::WRITE_AND_READ
-        );
+        $stream = $this->givenFileOperations_openFile_returnsStream($this->fileOperations);
 
         $driver->createFile($filenameKey, $givenStream);
 
         $this->assertFileOperations_createDirectory_isCalledOnce($this->fileOperations, self::BASE_DIRECTORY);
+        $this->assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
+            $this->fileOperations,
+            self::FILENAME_EXISTS_FULL,
+            ResourceStreamModeEnum::WRITE_AND_READ
+        );
         \Phake::verify($stream, \Phake::times(1))->write(self::DATA);
     }
 

@@ -74,7 +74,7 @@ class YandexMapParametersTest extends TestCase
         $model->setHeight($height);
         $model->setScale($scale);
 
-        $violations = $this->validator->validate($model);
+        $violations = $this->validator->validateModel($model);
 
         $this->assertEquals($violationsCount, $violations->count());
     }

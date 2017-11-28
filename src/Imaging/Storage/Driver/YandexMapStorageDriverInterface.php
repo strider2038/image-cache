@@ -11,12 +11,12 @@
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 use Strider2038\ImgCache\Core\QueryParametersCollection;
-use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Core\StreamInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface YandexMapStorageDriverInterface
 {
-    public function get(QueryParametersCollection $queryParameters): Image;
+    public function getMapContents(QueryParametersCollection $queryParameters): StreamInterface;
 }

@@ -14,16 +14,15 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\StreamInterface as PsrStreamInterface;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 class YandexMapStorageDriverTest extends TestCase
@@ -33,58 +32,57 @@ class YandexMapStorageDriverTest extends TestCase
     private const KEY = 'key';
     private const QUERY_PARAMETERS = ['parameter' => 'value'];
     private const QUERY_PARAMETERS_WITH_KEY = ['parameter' => 'value', 'key' => 'key'];
-    private const IMAGE_BODY = 'image_body';
-
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
+    private const RESOURCE = 'resource';
 
     /** @var ClientInterface */
     private $client;
+
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
 
     /** @var LoggerInterface */
     private $logger;
 
     protected function setUp(): void
     {
-        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
-        $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->client = \Phake::mock(ClientInterface::class);
+        $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
         $this->logger = $this->givenLogger();
     }
 
     /** @test */
-    public function get_givenQueryParameters_clientSendsRequestAndImageIsReturned(): void
+    public function getMapContents_givenQueryParameters_clientSendsRequestAndStreamReturned(): void
     {
         $driver = $this->createYandexMapStorageDriver();
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
-        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
-        $expectedImage = $this->givenImageFactory_createFromData_returnsImage();
-        $this->givenResponse_getBody_returnsStreamWithImageBody($response);
-        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
+        $this->givenResponse_getStatusCode_returnsStatusCode($response, HttpStatusCodeEnum::OK);
+        $responseBody = $this->givenResponse_getBody_returnsStream($response);
+        $this->givenStream_detach_returnsResource($responseBody, self::RESOURCE);
+        $expectedStream = $this->givenStreamFactory_createStreamFromResource_returnsStream();
 
-        $image = $driver->get($query);
+        $stream = $driver->getMapContents($query);
 
-        $this->assertSame($expectedImage, $image);
         $this->assertClient_request_isCalledOnce(self::QUERY_PARAMETERS);
         $this->assertResponse_getBody_isCalledOnce($response);
+        $this->assertResponse_detach_isCalledOnce($responseBody);
+        $this->assertStreamFactory_createStreamFromResource_isCalledOnceWithResource(self::RESOURCE);
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
+        $this->assertSame($expectedStream, $stream);
     }
 
     /** @test */
-    public function get_givenQueryParametersWithKey_clientSendsRequestWithKey(): void
+    public function getMapContents_givenQueryParametersWithKey_clientSendsRequestWithKey(): void
     {
         $driver = $this->createYandexMapStorageDriver(self::KEY);
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
-        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
-        $this->givenResponse_getBody_returnsStreamWithImageBody($response);
-        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
+        $this->givenResponse_getStatusCode_returnsStatusCode($response, HttpStatusCodeEnum::OK);
+        $responseBody = $this->givenResponse_getBody_returnsStream($response);
+        $this->givenStream_detach_returnsResource($responseBody, self::RESOURCE);
+        $this->givenStreamFactory_createStreamFromResource_returnsStream();
 
-        $driver->get($query);
+        $driver->getMapContents($query);
 
         $this->assertClient_request_isCalledOnce(self::QUERY_PARAMETERS_WITH_KEY);
     }
@@ -93,16 +91,18 @@ class YandexMapStorageDriverTest extends TestCase
      * @test
      * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
      * @expectedExceptionCode 502
-     * @expectedExceptionMessage Unexpected response from API
+     * @expectedExceptionMessage Response has empty body
      */
-    public function get_givenInvalidQueryParameters_responseCodeIsNot200AndExceptionThrown(): void
+    public function getMapContents_givenQueryParametersAndResponseHasEmptyBody_exceptionThrown(): void
     {
-        $driver = $this->createYandexMapStorageDriver();
+        $driver = $this->createYandexMapStorageDriver(self::KEY);
         $query = $this->givenQueryParametersCollection();
         $response = $this->givenClient_request_returnsResponse();
-        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::BAD_REQUEST);
+        $this->givenResponse_getStatusCode_returnsStatusCode($response, HttpStatusCodeEnum::OK);
+        $responseBody = $this->givenResponse_getBody_returnsStream($response);
+        $this->givenStream_detach_returnsNull($responseBody);
 
-        $driver->get($query);
+        $driver->getMapContents($query);
     }
 
     /**
@@ -111,36 +111,34 @@ class YandexMapStorageDriverTest extends TestCase
      * @expectedExceptionCode 502
      * @expectedExceptionMessage Unexpected response from API
      */
-    public function get_givenInvalidQueryParameters_clientThrowsException(): void
+    public function getMapContents_givenInvalidQueryParameters_responseCodeIsNot200AndExceptionThrown(): void
+    {
+        $driver = $this->createYandexMapStorageDriver();
+        $query = $this->givenQueryParametersCollection();
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsStatusCode($response, HttpStatusCodeEnum::BAD_REQUEST);
+
+        $driver->getMapContents($query);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Unexpected response from API
+     */
+    public function getMapContents_givenInvalidQueryParameters_clientThrowsException(): void
     {
         $driver = $this->createYandexMapStorageDriver();
         $query = $this->givenQueryParametersCollection();
         $this->givenClient_request_throwsException();
 
-        $driver->get($query);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
-     * @expectedExceptionCode 502
-     * @expectedExceptionMessage Unsupported mime type in response from API
-     */
-    public function get_givenResponseBodyHasUnsupportedMimeType_exceptionThrown(): void
-    {
-        $driver = $this->createYandexMapStorageDriver();
-        $query = $this->givenQueryParametersCollection();
-        $response = $this->givenClient_request_returnsResponse();
-        $this->givenResponse_getStatusCode_returns($response, HttpStatusCodeEnum::OK);
-        $this->givenResponse_getBody_returnsStreamWithImageBody($response);
-        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
-
-        $driver->get($query);
+        $driver->getMapContents($query);
     }
 
     private function createYandexMapStorageDriver(string $key = ''): YandexMapStorageDriver
     {
-        $driver = new YandexMapStorageDriver($this->imageFactory, $this->imageValidator, $this->client, $key);
+        $driver = new YandexMapStorageDriver($this->client, $this->streamFactory, $key);
         $driver->setLogger($this->logger);
 
         return $driver;
@@ -182,24 +180,17 @@ class YandexMapStorageDriverTest extends TestCase
         return $query;
     }
 
-    private function givenResponse_getStatusCode_returns(ResponseInterface $response, int $code): void
+    private function givenResponse_getStatusCode_returnsStatusCode(ResponseInterface $response, int $code): void
     {
         \Phake::when($response)->getStatusCode()->thenReturn($code);
     }
 
-    private function givenImageFactory_createFromData_returnsImage(): Image
+    private function givenResponse_getBody_returnsStream(ResponseInterface $response): PsrStreamInterface
     {
-        $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromData(self::IMAGE_BODY)->thenReturn($image);
-
-        return $image;
-    }
-
-    private function givenResponse_getBody_returnsStreamWithImageBody(ResponseInterface $response): void
-    {
-        $body = \Phake::mock(StreamInterface::class);
-        \Phake::when($body)->getContents()->thenReturn(self::IMAGE_BODY);
+        $body = \Phake::mock(PsrStreamInterface::class);
         \Phake::when($response)->getBody(\Phake::anyParameters())->thenReturn($body);
+
+        return $body;
     }
 
     private function assertResponse_getBody_isCalledOnce(ResponseInterface $response): void
@@ -207,8 +198,31 @@ class YandexMapStorageDriverTest extends TestCase
         \Phake::verify($response, \Phake::times(1))->getBody();
     }
 
-    private function givenImageValidator_hasDataValidImageMimeType_returns(bool $value): void
+    private function assertResponse_detach_isCalledOnce(PsrStreamInterface $stream): void
     {
-        \Phake::when($this->imageValidator)->hasDataValidImageMimeType(self::IMAGE_BODY)->thenReturn($value);
+        \Phake::verify($stream, \Phake::times(1))->detach();
+    }
+
+    private function givenStream_detach_returnsResource(PsrStreamInterface $stream, string $resource): void
+    {
+        \Phake::when($stream)->detach()->thenReturn($resource);
+    }
+
+    private function givenStream_detach_returnsNull(PsrStreamInterface $stream): void
+    {
+        \Phake::when($stream)->detach()->thenReturn(null);
+    }
+
+    private function assertStreamFactory_createStreamFromResource_isCalledOnceWithResource(string $resource): void
+    {
+        \Phake::verify($this->streamFactory, \Phake::times(1))->createStreamFromResource($resource);
+    }
+
+    private function givenStreamFactory_createStreamFromResource_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->streamFactory)->createStreamFromResource(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
     }
 }

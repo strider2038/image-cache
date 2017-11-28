@@ -16,26 +16,22 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\BadApiResponse;
-use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class YandexMapStorageDriver implements YandexMapStorageDriverInterface
 {
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
-
     /** @var ClientInterface */
     private $client;
+
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
 
     /** @var string */
     private $key;
@@ -43,15 +39,10 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(
-        ImageFactoryInterface $imageFactory,
-        ImageValidatorInterface $imageValidator,
-        ClientInterface $client,
-        string $key = ''
-    ) {
-        $this->imageFactory = $imageFactory;
-        $this->imageValidator = $imageValidator;
+    public function __construct(ClientInterface $client, StreamFactoryInterface $streamFactory, string $key = '')
+    {
         $this->client = $client;
+        $this->streamFactory = $streamFactory;
         $this->key = $key;
         $this->logger = new NullLogger();
     }
@@ -61,10 +52,10 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
         $this->logger = $logger;
     }
 
-    public function get(QueryParametersCollection $queryParameters): Image
+    public function getMapContents(QueryParametersCollection $queryParameters): StreamInterface
     {
         $this->logger->info(sprintf(
-            'Sending request to "%s" with parameters: %s',
+            'Sending request to "%s" with parameters: %s.',
             $this->client->getConfig('base_uri'),
             json_encode($queryParameters->toArray())
         ));
@@ -84,24 +75,30 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
             );
         } catch (\Exception $exception) {
             throw new BadApiResponse(
-                'Unexpected response from API',
+                'Unexpected response from API.',
                 HttpStatusCodeEnum::BAD_GATEWAY,
                 $exception
             );
         }
 
         if ($response->getStatusCode() !== HttpStatusCodeEnum::OK) {
-            throw new BadApiResponse('Unexpected response from API');
+            throw new BadApiResponse(
+                sprintf(
+                    'Unexpected response from API: %d %s.',
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase()
+                )
+            );
         }
 
-        $data = $response->getBody()->getContents();
+        $responseResource = $response->getBody()->detach();
 
-        if (!$this->imageValidator->hasDataValidImageMimeType($data)) {
-            throw new BadApiResponse('Unsupported mime type in response from API');
+        if ($responseResource === null) {
+            throw new BadApiResponse('Response has empty body.');
         }
 
-        $this->logger->info('Successful response is received and response body validation has passed.');
+        $this->logger->info('Successful response is received and response body returned.');
 
-        return $this->imageFactory->createFromData($data);
+        return $this->streamFactory->createStreamFromResource($responseResource);
     }
 }
