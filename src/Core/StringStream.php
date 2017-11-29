@@ -73,4 +73,8 @@ class StringStream implements StreamInterface
 
         return $string;
     }
+
+    public function rewind(): void
+    {
+    }
 }

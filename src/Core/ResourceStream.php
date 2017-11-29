@@ -102,4 +102,9 @@ class ResourceStream implements StreamInterface
 
         throw new \RuntimeException('Resource is write only');
     }
+
+    public function rewind(): void
+    {
+        rewind($this->resource);
+    }
 }

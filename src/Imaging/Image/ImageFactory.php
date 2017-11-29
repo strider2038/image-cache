@@ -89,6 +89,8 @@ class ImageFactory implements ImageFactoryInterface
             throw new InvalidMediaTypeException('Image has unsupported mime type');
         }
 
+        $stream->rewind();
+
         return new Image($this->createSaveOptions(), $stream);
     }
 

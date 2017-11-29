@@ -14,7 +14,6 @@ namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
 
@@ -34,11 +33,12 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
     public function __construct(string $baseDirectory, FileOperationsInterface $fileOperations)
     {
         $this->fileOperations = $fileOperations;
-
         $this->baseDirectory = rtrim($baseDirectory, '/');
+
         if (!$this->fileOperations->isDirectory($this->baseDirectory)) {
             throw new InvalidConfigurationException(sprintf('Directory "%s" does not exist', $baseDirectory));
         }
+
         $this->baseDirectory .= '/';
     }
     
@@ -50,10 +50,6 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
     public function getFileContents(FilenameKeyInterface $key): StreamInterface
     {
         $sourceFilename = $this->composeSourceFilename($key);
-        
-        if (!$this->fileOperations->isFile($sourceFilename)) {
-            throw new FileNotFoundException(sprintf('File "%s" not found', $sourceFilename));
-        }
 
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
         return $this->fileOperations->openFile($sourceFilename, $mode);

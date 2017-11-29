@@ -202,6 +202,18 @@ class ResourceStreamTest extends FileTestCase
         $stream->write(self::CONTENTS);
     }
 
+    /** @test */
+    public function rewind_givenReadJsonFile_jsonFileContentsReturned(): void
+    {
+        $stream = $this->createResourceStream();
+        $stream->getContents();
+
+        $stream->rewind();
+
+        $contents = $stream->getContents();
+        $this->assertEquals(self::FILE_JSON_CONTENTS, $contents);
+    }
+
     private function createResourceStream(
         string $filename = null,
         string $mode = self::MODE_READ_AND_WRITE

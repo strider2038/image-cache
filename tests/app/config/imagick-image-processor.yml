@@ -1,12 +1,16 @@
 services:
   # external
   filesystem:
-    class: \Symfony\Component\Filesystem\Filesystem
+    class: Symfony\Component\Filesystem\Filesystem
 
   # core components
+  stream_factory:
+    class: Strider2038\ImgCache\Core\StreamFactory
   file_operations:
-    class: \Strider2038\ImgCache\Core\FileOperations
-    arguments: ['@filesystem']
+    class: Strider2038\ImgCache\Core\FileOperations
+    arguments:
+      - '@filesystem'
+      - '@stream_factory'
 
   # imaging/processing
   image_processor:
@@ -20,13 +24,15 @@ services:
       - '@save_options_factory'
       - '@image_validator'
       - '@file_operations'
+      - '@stream_factory'
   save_options_factory:
-    class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+    class: Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
   imagick_transformer_factory:
     class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
     arguments:
       - '@file_operations'
+      - '@stream_factory'
 
   # imaging/validation
   image_validator:
-    class: \Strider2038\ImgCache\Imaging\Validation\ImageValidator
+    class: Strider2038\ImgCache\Imaging\Validation\ImageValidator

@@ -24,4 +24,5 @@ interface StreamInterface
     public function write(string $string): int;
     public function isReadable(): bool;
     public function read(int $length): string;
+    public function rewind(): void;
 }

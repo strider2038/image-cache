@@ -49,6 +49,16 @@ class StringStreamTest extends TestCase
     }
 
     /** @test */
+    public function rewind_givenString_nop(): void
+    {
+        $stream = new StringStream(self::CONTENTS);
+
+        $stream->rewind();
+
+        $this->assertEquals(self::CONTENTS, $stream);
+    }
+
+    /** @test */
     public function getSize_givenString_sizeIsReturned(): void
     {
         $stream = new StringStream(self::CONTENTS);

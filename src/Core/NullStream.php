@@ -59,4 +59,7 @@ class NullStream implements StreamInterface
         throw new \RuntimeException('Not implemented');
     }
 
+    public function rewind(): void
+    {
+    }
 }

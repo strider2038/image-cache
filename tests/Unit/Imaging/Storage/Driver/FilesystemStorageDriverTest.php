@@ -61,20 +61,6 @@ class FilesystemStorageDriverTest extends TestCase
         new FilesystemStorageDriver(self::BASE_DIRECTORY, $this->fileOperations);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessageRegExp /File .* not found/
-     */
-    public function getFileContents_fileDoesNotExist_exceptionThrown(): void
-    {
-        $driver = $this->createFilesystemStorageDriver();
-        $filenameKey = $this->givenFilenameKey(self::FILENAME_NOT_EXIST);
-
-        $driver->getFileContents($filenameKey);
-    }
-
     /** @test */
     public function getFileContents_fileExists_fileContentsIsReturned(): void
     {

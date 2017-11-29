@@ -1,24 +1,30 @@
 parameters:
   image_cache.base_directory: '%test.web_directory%'
-  filesystem_source.base_directory: '%test.filesource_directory%'
+  filesystem_storage_driver.base_directory: '%test.filesource_directory%'
 
 services:
   # external
   filesystem:
-    class: \Symfony\Component\Filesystem\Filesystem
+    class: Symfony\Component\Filesystem\Filesystem
 
   # core components
+  stream_factory:
+    class: Strider2038\ImgCache\Core\StreamFactory
   file_operations:
-    class: \Strider2038\ImgCache\Core\FileOperations
-    arguments: ['@filesystem']
+    class: Strider2038\ImgCache\Core\FileOperations
+    arguments: 
+      - '@filesystem'
+      - '@stream_factory'
   response_factory:
     class: Strider2038\ImgCache\Core\Http\ResponseFactory
     arguments:
       - '@request'
+      - '@stream_factory'
+      - '@file_operations'
 
   # service
   image_controller:
-    class: \Strider2038\ImgCache\Service\ImageController
+    class: Strider2038\ImgCache\Service\ImageController
     arguments:
       - '@response_factory'
       - '@image_action_factory'
@@ -57,12 +63,12 @@ services:
 
   # imaging
   image_storage:
-    class: \Strider2038\ImgCache\Imaging\ImageStorage
+    class: Strider2038\ImgCache\Imaging\ImageStorage
     arguments:
       - '@original_image_extractor'
       - '@original_image_writer'
   image_cache:
-    class: \Strider2038\ImgCache\Imaging\ImageCache
+    class: Strider2038\ImgCache\Imaging\ImageCache
     arguments:
       - '%image_cache.base_directory%'
       - '@file_operations'
@@ -70,39 +76,40 @@ services:
 
   # imaging/image
   image_factory:
-    class: \Strider2038\ImgCache\Imaging\Image\ImageFactory
+    class: Strider2038\ImgCache\Imaging\Image\ImageFactory
     arguments:
       - '@save_options_factory'
       - '@image_validator'
       - '@file_operations'
+      - '@stream_factory'
 
   # imaging/extraction
   original_image_extractor:
-    class: \Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor
+    class: Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor
     arguments:
       - '@original_key_parser'
-      - '@filesystem_source_accessor'
+      - '@filesystem_storage_accessor'
       - '@image_processor'
 
   # imaging/insertion
   original_image_writer:
-    class: \Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter
+    class: Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter
     arguments:
       - '@original_key_parser'
-      - '@filesystem_source_accessor'
+      - '@filesystem_storage_accessor'
 
   # imaging/parsing
   original_key_parser:
-    class: \Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParser
+    class: Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParser
     arguments:
       - '@key_validator'
       - '@image_validator'
 
   # imaging/processing
   save_options_factory:
-    class: \Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+    class: Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
   image_processor:
-    class: \Strider2038\ImgCache\Imaging\Processing\ImageProcessor
+    class: Strider2038\ImgCache\Imaging\Processing\ImageProcessor
     arguments:
       - '@imagick_transformer_factory'
       - '@image_factory'
@@ -110,24 +117,25 @@ services:
     class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
     arguments:
       - '@file_operations'
+      - '@stream_factory'
 
   # imaging/source
-  filesystem_source_accessor:
-    class: \Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor
+  filesystem_storage_accessor:
+    class: Strider2038\ImgCache\Imaging\Storage\Accessor\FilesystemStorageAccessor
     arguments:
-      - '@filesystem_source'
-      - '@direct_key_mapper'
-  filesystem_source:
-    class: \Strider2038\ImgCache\Imaging\Source\FilesystemSource
-    arguments:
-      - '%filesystem_source.base_directory%'
-      - '@file_operations'
+      - '@filesystem_storage_driver'
       - '@image_factory'
+      - '@direct_key_mapper'
+  filesystem_storage_driver:
+    class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver
+    arguments:
+      - '%filesystem_storage_driver.base_directory%'
+      - '@file_operations'
   direct_key_mapper:
-    class: \Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper
+    class: Strider2038\ImgCache\Imaging\Storage\Data\DirectKeyMapper
 
   # imaging/validation
   image_validator:
-    class: \Strider2038\ImgCache\Imaging\Validation\ImageValidator
+    class: Strider2038\ImgCache\Imaging\Validation\ImageValidator
   key_validator:
-    class: \Strider2038\ImgCache\Imaging\Validation\KeyValidator
+    class: Strider2038\ImgCache\Imaging\Validation\KeyValidator

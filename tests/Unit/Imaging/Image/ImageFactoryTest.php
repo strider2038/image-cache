@@ -175,6 +175,7 @@ class ImageFactoryTest extends TestCase
         $image = $factory->createFromStream($stream);
 
         $this->assertInstanceOf(Image::class, $image);
+        $this->assertStream_rewind_isCalledOnce($stream);
         $this->assertSame($saveOptions, $image->getSaveOptions());
         $this->assertSame($stream, $image->getData());
         $this->assertImageValidator_hasDataValidImageMimeType_isCalledOnceWith(self::DATA);
@@ -262,5 +263,10 @@ class ImageFactoryTest extends TestCase
         \Phake::when($this->streamFactory)->createStreamFromData(\Phake::anyParameters())->thenReturn($stream);
 
         return $stream;
+    }
+
+    private function assertStream_rewind_isCalledOnce(StreamInterface $stream): void
+    {
+        \Phake::verify($stream, \Phake::times(1))->rewind();
     }
 }

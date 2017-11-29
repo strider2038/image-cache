@@ -319,9 +319,9 @@ class FileOperationsTest extends FileTestCase
 
     /**
      * @test
-     * @expectedException \Strider2038\ImgCache\Exception\FileOperationException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessageRegExp /Invalid file .* or file does not exist/
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* does not exist/
      */
     public function openFile_givenNotAFile_exceptionThrown(): void
     {

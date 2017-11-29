@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
+use Strider2038\ImgCache\Core\ResourceStream;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Service\ImageController;
@@ -43,14 +44,16 @@ class OriginalImageCacheTest extends FunctionalTestCase
         $this->controller = $container->get('image_controller');
     }
 
-    /** @test */
-    public function get_givenImageNotExistInSource_notFoundResponseReturned(): void
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     */
+    public function get_givenImageNotExistInSource_notFoundExceptionThrown(): void
     {
         $this->givenRequest_getUri_getPath_returnsPath(self::FILE_NOT_EXIST);
 
-        $response = $this->controller->runAction('get', $this->request);
-
-        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
+        $this->controller->runAction('get', $this->request);
     }
 
     /** @test */
@@ -77,8 +80,12 @@ class OriginalImageCacheTest extends FunctionalTestCase
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
     }
 
-    /** @test */
-    public function get_imageDoesNotExistInSource_notFoundResponseReturned(): void
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     */
+    public function get_imageDoesNotExistInSource_notFoundExceptionThrown(): void
     {
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
 
@@ -91,7 +98,7 @@ class OriginalImageCacheTest extends FunctionalTestCase
     public function replace_givenStream_imageIsCreated(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
-        $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 
@@ -105,7 +112,7 @@ class OriginalImageCacheTest extends FunctionalTestCase
     public function replace_givenStream_imageIsCreatedInSubdirectory(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
-        $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 
@@ -139,5 +146,10 @@ class OriginalImageCacheTest extends FunctionalTestCase
     private function givenRequest_getBody_returns(StreamInterface $stream): void
     {
         \Phake::when($this->request)->getBody()->thenReturn($stream);
+    }
+
+    private function givenStream($filename): StreamInterface
+    {
+        return new ResourceStream(fopen($filename, 'rb+'));
     }
 }

@@ -36,7 +36,8 @@ class ImagickTransformerFactory implements ImageTransformerFactoryInterface
     public function createTransformer(StreamInterface $stream): ImageTransformerInterface
     {
         $imagick = new \Imagick();
-        $imagick->readImageBlob($stream->getContents());
+        $contents = $stream->getContents();
+        $imagick->readImageBlob($contents);
 
         return new ImagickTransformer($imagick, $this->fileOperations, $this->streamFactory);
     }
