@@ -30,8 +30,9 @@ class FunctionalTestCase extends TestCase
     protected const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
 
     private const ASSETS_DIRECTORY = __DIR__ . '/../assets/';
-    private const IMAGE_JPEG_FILENAME = self::ASSETS_DIRECTORY . 'sample/cat300.jpg';
-    private const IMAGE_PNG_FILENAME = self::ASSETS_DIRECTORY . 'sample/rider.png';
+    private const FILENAME_IMAGE_JPEG = self::ASSETS_DIRECTORY . 'sample/cat300.jpg';
+    private const FILENAME_IMAGE_PNG = self::ASSETS_DIRECTORY . 'sample/rider.png';
+    private const FILENAME_JSON = self::ASSETS_DIRECTORY . 'file.json';
 
     protected function setUp(): void
     {
@@ -81,12 +82,17 @@ class FunctionalTestCase extends TestCase
 
     protected function givenImageJpeg(string $filename): void
     {
-        $this->givenAssetFile(self::IMAGE_JPEG_FILENAME, $filename);
+        $this->givenAssetFile(self::FILENAME_IMAGE_JPEG, $filename);
     }
 
     protected function givenImagePng(string $filename): void
     {
-        $this->givenAssetFile(self::IMAGE_PNG_FILENAME, $filename);
+        $this->givenAssetFile(self::FILENAME_IMAGE_PNG, $filename);
+    }
+
+    protected function givenJsonFile(string $filename): void
+    {
+        $this->givenAssetFile(self::FILENAME_JSON, $filename);
     }
 
     protected function assertFileHasMimeType(string $filename, string $expectedMime): void

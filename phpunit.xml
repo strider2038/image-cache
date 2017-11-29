@@ -27,6 +27,7 @@
 
     <testsuite name="functional">
         <directory suffix=".php">./tests/Functional</directory>
+        <exclude>./tests/Functional/YandexDiskStorageDriverTest.php</exclude>
     </testsuite>
 
     <testsuite name="acceptance">

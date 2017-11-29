@@ -24,7 +24,7 @@ class NullStreamTest extends TestCase
     public function givenMethod_givenParameters_expectedResult(string $method, $expectedResult): void {
         $stream = new NullStream();
 
-        $result = call_user_func([$stream, $method]);
+        $result = $stream->$method();
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -39,6 +39,7 @@ class NullStreamTest extends TestCase
             ['isWritable', false],
             ['isReadable', false],
             ['rewind', null],
+            ['detach', null],
         ];
     }
     /**
