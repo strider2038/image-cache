@@ -4,7 +4,7 @@ parameters:
 services:
   # external
   filesystem:
-    class: \Symfony\Component\Filesystem\Filesystem
+    class: Symfony\Component\Filesystem\Filesystem
 
   # core components
   stream_factory:
@@ -111,9 +111,8 @@ services:
   yandex_map_storage_driver:
     class: Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver
     arguments:
-      - '@image_factory'
-      - '@stream_factory'
       - '@client_mock'
+      - '@stream_factory'
 
   # imaging/processing
   save_options_factory:

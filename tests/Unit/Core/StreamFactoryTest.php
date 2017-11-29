@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Tests\Support\FileTestCase;
 
 class StreamFactoryTest extends FileTestCase
 {
-    private const MODE_READ_AND_WRITE = 'rb+';
+    private const MODE_READ_AND_WRITE = 'r+b';
     private const DATA = 'data';
 
     /** @test */

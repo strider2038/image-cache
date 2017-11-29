@@ -7,7 +7,7 @@ parameters:
   save_options.quality: 90
   filesystem_image_cache.base_directory: '%app.directory%/web/i'
   yandex_map_image_cache.base_directory: '%app.directory%/web/yandex_map'
-  filesystem_source.base_directory: '%app.directory%/tests/assets'
+  filesystem_storage_driver.base_directory: '%app.directory%/tests/assets'
   yandex_map_client.parameters:
     base_uri: 'https://static-maps.yandex.ru/1.x/'
     handler: '@guzzle_logger_handler_stack'
@@ -18,15 +18,33 @@ parameters:
 services:
   # external
   filesystem:
-    class: \Symfony\Component\Filesystem\Filesystem
+    class: Symfony\Component\Filesystem\Filesystem
   yandex_map_client:
     class: GuzzleHttp\Client
     arguments:
       - '%yandex_map_client.parameters%'
 
   # core components
+  stream_factory:
+    class: Strider2038\ImgCache\Core\StreamFactory
+  file_operations:
+    class: Strider2038\ImgCache\Core\FileOperations
+    arguments:
+      - '@filesystem'
+      - '@stream_factory'
+    calls:
+      - [setLogger, ['@logger']]
+  security:
+    class: Strider2038\ImgCache\Core\Security
+    arguments:
+      - '@request'
+      - '%security.access_token%'
+
+  # core http components
   request_factory:
     class: Strider2038\ImgCache\Core\Http\RequestFactory
+    arguments:
+      - '@stream_factory'
   request:
     factory:
       - '@request_factory'
@@ -39,18 +57,9 @@ services:
     class: Strider2038\ImgCache\Core\Http\ResponseFactory
     arguments:
       - '@request'
+      - '@stream_factory'
+      - '@file_operations'
       - '%app.debug%'
-  security:
-    class: Strider2038\ImgCache\Core\Security
-    arguments:
-      - '@request'
-      - '%security.access_token%'
-  file_operations:
-    class: Strider2038\ImgCache\Core\FileOperations
-    arguments:
-      - '@filesystem'
-    calls:
-      - [setLogger, ['@logger']]
 
   # utilities
   logger_factory:
@@ -211,19 +220,20 @@ services:
       - '@save_options_factory'
       - '@image_validator'
       - '@file_operations'
+      - '@stream_factory'
 
   # imaging/extraction
   thumbnail_image_extractor:
     class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
     arguments:
       - '@thumbnail_key_parser'
-      - '@filesystem_source_accessor'
+      - '@filesystem_storage_accessor'
       - '@image_processor'
   yandex_map_image_extractor:
     class: Strider2038\ImgCache\Imaging\Extraction\YandexMapExtractor
     arguments:
       - '@yandex_map_parameters_parser'
-      - '@yandex_map_accessor'
+      - '@yandex_map_storage_accessor'
 
   # imaging/parsing
   thumbnail_key_parser:
@@ -265,6 +275,7 @@ services:
     class: Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformerFactory
     arguments:
       - '@file_operations'
+      - '@stream_factory'
 
   # imaging/transformation
   transformations_creator:
@@ -274,37 +285,37 @@ services:
     class: Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight
 
   # imaging/source
-  filesystem_source_accessor:
-    class: Strider2038\ImgCache\Imaging\Source\Accessor\FilesystemSourceAccessor
+  filesystem_storage_accessor:
+    class: Strider2038\ImgCache\Imaging\Storage\Accessor\FilesystemStorageAccessor
     arguments:
-      - '@filesystem_source'
+      - '@filesystem_storage_driver'
+      - '@image_factory'
       - '@direct_key_mapper'
     calls:
       - [setLogger, ['@logger']]
-  filesystem_source:
-    class: Strider2038\ImgCache\Imaging\Source\FilesystemSource
+  filesystem_storage_driver:
+    class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver
     arguments:
-      - '%filesystem_source.base_directory%'
+      - '%filesystem_storage_driver.base_directory%'
       - '@file_operations'
-      - '@image_factory'
   direct_key_mapper:
-    class: Strider2038\ImgCache\Imaging\Source\Mapping\DirectKeyMapper
+    class: Strider2038\ImgCache\Imaging\Storage\Data\DirectKeyMapper
   yandex_map_parameters_factory:
-    class: Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersFactory
-  yandex_map_accessor:
-    class: Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessor
+    class: Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParametersFactory
+  yandex_map_storage_accessor:
+    class: Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor
     arguments:
       - '@model_validator'
       - '@violations_formatter'
-      - '@yandex_map_source'
+      - '@yandex_map_storage_driver'
+      - '@image_factory'
     calls:
       - [setLogger, ['@logger']]
-  yandex_map_source:
-    class: Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapSource
+  yandex_map_storage_driver:
+    class: Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver
     arguments:
-      - '@image_factory'
-      - '@image_validator'
       - '@yandex_map_client'
+      - '@stream_factory'
     calls:
       - [setLogger, ['@logger']]
 
@@ -316,4 +327,4 @@ services:
   model_validator:
     class: Strider2038\ImgCache\Imaging\Validation\ModelValidator
   violations_formatter:
-    class: Strider2038\ImgCache\Imaging\Validation\ViolationsFormatter
+    class: Strider2038\ImgCache\Imaging\Validation\ViolationFormatter

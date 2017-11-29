@@ -115,6 +115,7 @@ class ResponseFactoryTest extends FileTestCase
         $factory = $this->createResponseFactory();
         $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED);
         $filename = $this->givenAssetFile(self::IMAGE_BOX_JPG);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, $filename, true);
         $stream = $this->givenFileOperations_openFile_returnsStream($this->fileOperations);
 
         $response = $factory->createFileResponse($statusCode, $filename);
@@ -125,12 +126,27 @@ class ResponseFactoryTest extends FileTestCase
         $this->assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
             $this->fileOperations,
             $filename,
-            ResourceStreamModeEnum::WRITE_AND_READ
+            ResourceStreamModeEnum::READ_ONLY
         );
         $this->assertEquals(
             self::CONTENT_TYPE_IMAGE_JPEG,
             $response->getHeaderLine(new HttpHeaderEnum(HttpHeaderEnum::CONTENT_TYPE))
         );
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* not found/
+     */
+    public function createFileResponse_fileNotExist_exceptionThrown(): void
+    {
+        $factory = $this->createResponseFactory();
+        $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::OK);
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME_NOT_EXIST, false);
+
+        $factory->createFileResponse($statusCode, self::FILENAME_NOT_EXIST);
     }
 
     private function createResponseFactory(bool $isDebugged = false): ResponseFactory

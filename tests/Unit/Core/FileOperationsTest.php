@@ -317,20 +317,6 @@ class FileOperationsTest extends FileTestCase
         $fileOperations->openFile($filename, $mode);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessageRegExp /File .* does not exist/
-     */
-    public function openFile_givenNotAFile_exceptionThrown(): void
-    {
-        $fileOperations = $this->createFileOperations();
-        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
-
-        $fileOperations->openFile(self::FILENAME_NOT_EXIST, $mode);
-    }
-
     private function createFileOperations(): FileOperations
     {
         $fileOperations = new FileOperations($this->filesystem, $this->streamFactory);

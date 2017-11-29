@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+use Strider2038\ImgCache\Exception\FileNotFoundException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -83,8 +84,12 @@ class ResponseFactory implements ResponseFactoryInterface
 
     public function createFileResponse(HttpStatusCodeEnum $code, string $filename): ResponseInterface
     {
+        if (!$this->fileOperations->isFile($filename)) {
+            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
+        }
+
         $response = new Response($code);
-        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::WRITE_AND_READ);
+        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
         $bodyStream = $this->fileOperations->openFile($filename, $mode);
         $response->setBody($bodyStream);
         $response->setProtocolVersion($this->request->getProtocolVersion());

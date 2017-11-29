@@ -6,7 +6,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\FileOperationException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -128,10 +127,6 @@ class FileOperations implements FileOperationsInterface
 
     public function openFile(string $filename, ResourceStreamModeEnum $mode): StreamInterface
     {
-        if (!$this->isFile($filename)) {
-            throw new FileNotFoundException(sprintf('File "%s" does not exist', $filename));
-        }
-
         try {
             $stream = $this->streamFactory->createStreamByParameters($filename, $mode);
 

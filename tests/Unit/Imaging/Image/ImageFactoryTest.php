@@ -105,6 +105,20 @@ class ImageFactoryTest extends TestCase
 
     /**
      * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* not found/
+     */
+    public function createFromFile_givenFileDoesNotExist_exceptionThrown(): void
+    {
+        $factory = $this->createImageFactory();
+        $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, false);
+
+        $factory->createFromFile(self::FILENAME);
+    }
+
+    /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
      * @expectedExceptionCode 415
      * @expectedExceptionMessageRegExp /File .* has unsupported image extension/
