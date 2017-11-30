@@ -48,7 +48,7 @@ class ResourceStreamTest extends FileTestCase
      */
     public function construct_givenResourceWithUnsupportedMode_exceptionThrown(): void
     {
-        $resource = fopen($this->givenFile(), self::MODE_READ_ONLY);
+        $resource = fopen($this->givenFile(), 'r');
 
         new ResourceStream($resource);
     }
