@@ -39,7 +39,6 @@ class NullStreamTest extends TestCase
             ['isWritable', false],
             ['isReadable', false],
             ['rewind', null],
-            ['detach', null],
         ];
     }
     /**

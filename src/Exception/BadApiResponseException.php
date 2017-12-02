@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class BadApiResponse extends ApplicationException
+class BadApiResponseException extends ApplicationException
 {
     public function __construct(
         $message = '',

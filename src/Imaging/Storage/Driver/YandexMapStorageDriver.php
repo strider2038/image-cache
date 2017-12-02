@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Exception\BadApiResponse;
+use Strider2038\ImgCache\Exception\BadApiResponseException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -74,7 +74,7 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
                 ]
             );
         } catch (\Exception $exception) {
-            throw new BadApiResponse(
+            throw new BadApiResponseException(
                 'Unexpected response from API.',
                 HttpStatusCodeEnum::BAD_GATEWAY,
                 $exception
@@ -82,7 +82,7 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
         }
 
         if ($response->getStatusCode() !== HttpStatusCodeEnum::OK) {
-            throw new BadApiResponse(
+            throw new BadApiResponseException(
                 sprintf(
                     'Unexpected response from API: %d %s.',
                     $response->getStatusCode(),
@@ -94,7 +94,7 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
         $responseResource = $response->getBody()->detach();
 
         if ($responseResource === null) {
-            throw new BadApiResponse('Response has empty body.');
+            throw new BadApiResponseException('Response has empty body.');
         }
 
         $this->logger->info('Successful response is received and response body returned.');

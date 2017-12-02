@@ -73,7 +73,7 @@ class YandexDiskStorageDriverTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
      * @expectedExceptionCode 502
      * @expectedExceptionMessage Bad api response
      */
@@ -82,6 +82,22 @@ class YandexDiskStorageDriverTest extends TestCase
         $driver = $this->createYandexDiskStorageDriver();
         $key = $this->givenFilenameKey();
         $this->givenDiskClient_getFile_throwsException(new DiskRequestException());
+
+        $driver->getFileContents($key);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Api response has empty body
+     */
+    public function getFileContents_givenFilenameKeyAndResponseHasEmptyBody_exceptionThrown(): void
+    {
+        $driver = $this->createYandexDiskStorageDriver();
+        $key = $this->givenFilenameKey();
+        $responseStream = $this->givenDiskClient_getFile_returnsArrayWithStream();
+        $this->givenStream_detach_returnsNull($responseStream);
 
         $driver->getFileContents($key);
     }

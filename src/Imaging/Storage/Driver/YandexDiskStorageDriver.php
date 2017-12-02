@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Exception\BadApiResponse;
+use Strider2038\ImgCache\Exception\BadApiResponseException;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
 use Yandex\Disk\DiskClient;
@@ -55,7 +55,7 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
                 );
             }
 
-            throw new BadApiResponse(
+            throw new BadApiResponseException(
                 sprintf('Bad api response for filename "%s".', $storageFilename),
                 HttpStatusCodeEnum::BAD_GATEWAY,
                 $exception
@@ -65,6 +65,10 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
         /** @var \Psr\Http\Message\StreamInterface $responseBody */
         $responseBody = $response['body'];
         $responseResource = $responseBody->detach();
+
+        if ($responseResource === null) {
+            throw new BadApiResponseException('Api response has empty body.');
+        }
 
         return $this->streamFactory->createStreamFromResource($responseResource);
     }

@@ -89,7 +89,7 @@ class YandexMapStorageDriverTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
      * @expectedExceptionCode 502
      * @expectedExceptionMessage Response has empty body
      */
@@ -107,7 +107,7 @@ class YandexMapStorageDriverTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
      * @expectedExceptionCode 502
      * @expectedExceptionMessage Unexpected response from API
      */
@@ -123,7 +123,7 @@ class YandexMapStorageDriverTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponse
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
      * @expectedExceptionCode 502
      * @expectedExceptionMessage Unexpected response from API
      */
