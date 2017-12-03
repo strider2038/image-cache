@@ -75,6 +75,26 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
 
     public function fileExists(FilenameKeyInterface $key): bool
     {
+        $storageFilename = $this->baseDirectory . $key->getValue();
+        $exists = false;
+
+        try {
+            $response = $this->diskClient->directoryContents($storageFilename);
+
+            $exists = \count($response) === 1
+                && array_key_exists('href', $response[0])
+                && $response[0]['href'] === $storageFilename;
+        } catch (DiskRequestException $exception) {
+            if ($exception->getCode() !== HttpStatusCodeEnum::NOT_FOUND) {
+                throw new BadApiResponseException(
+                    sprintf('Bad api response for filename "%s".', $storageFilename),
+                    HttpStatusCodeEnum::BAD_GATEWAY,
+                    $exception
+                );
+            }
+        }
+
+        return $exists;
     }
 
     public function createFile(FilenameKeyInterface $key, StreamInterface $data): void

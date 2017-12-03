@@ -23,9 +23,8 @@ use Yandex\Disk\DiskClient;
 class YandexDiskStorageDriverTest extends FunctionalTestCase
 {
     private const BASE_DIRECTORY = '/imgcache/';
-    private const FILENAME_EXISTS = 'file.json';
-    private const FILENAME_NOT_EXISTS = 'not.exist';
-    private const JSON_TEMPORARY_FILENAME = self::RUNTIME_DIRECTORY . '/' . self::FILENAME_EXISTS;
+    private const FILENAME = 'file.json';
+    private const JSON_TEMPORARY_FILENAME = self::RUNTIME_DIRECTORY . '/' . self::FILENAME;
 
     /** @var DiskClient */
     private $diskClient;
@@ -39,6 +38,8 @@ class YandexDiskStorageDriverTest extends FunctionalTestCase
 
         $token = getenv('YANDEX_DISK_ACCESS_TOKEN');
         $this->diskClient = new DiskClient($token);
+        $this->diskClient->delete(self::BASE_DIRECTORY);
+        $this->diskClient->createDirectory(self::BASE_DIRECTORY);
 
         $this->driver = new YandexDiskStorageDriver(
             self::BASE_DIRECTORY,
@@ -53,10 +54,10 @@ class YandexDiskStorageDriverTest extends FunctionalTestCase
         $this->givenJsonFile(self::JSON_TEMPORARY_FILENAME);
         $this->diskClient->uploadFile(self::BASE_DIRECTORY, [
             'path' => self::JSON_TEMPORARY_FILENAME,
-            'name' => self::FILENAME_EXISTS,
+            'name' => self::FILENAME,
             'size' => filesize(self::JSON_TEMPORARY_FILENAME),
         ]);
-        $key = new FilenameKey(self::FILENAME_EXISTS);
+        $key = new FilenameKey(self::FILENAME);
 
         $stream = $this->driver->getFileContents($key);
 
@@ -71,8 +72,34 @@ class YandexDiskStorageDriverTest extends FunctionalTestCase
      */
     public function getFileContents_givenNotExistingFilename_exceptionThrown(): void
     {
-        $key = new FilenameKey(self::FILENAME_NOT_EXISTS);
+        $key = new FilenameKey(self::FILENAME);
 
         $this->driver->getFileContents($key);
+    }
+
+    /** @test */
+    public function fileExists_givenExistingFilename_trueReturned(): void
+    {
+        $this->givenJsonFile(self::JSON_TEMPORARY_FILENAME);
+        $this->diskClient->uploadFile(self::BASE_DIRECTORY, [
+            'path' => self::JSON_TEMPORARY_FILENAME,
+            'name' => self::FILENAME,
+            'size' => filesize(self::JSON_TEMPORARY_FILENAME),
+        ]);
+        $key = new FilenameKey(self::FILENAME);
+
+        $fileExists = $this->driver->fileExists($key);
+
+        $this->assertTrue($fileExists);
+    }
+
+    /** @test */
+    public function fileExists_givenNotExistingFilename_falseReturned(): void
+    {
+        $key = new FilenameKey(self::FILENAME);
+
+        $fileExists = $this->driver->fileExists($key);
+
+        $this->assertFalse($fileExists);
     }
 }

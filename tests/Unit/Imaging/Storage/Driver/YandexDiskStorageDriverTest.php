@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface as PsrStreamInterface;
 use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexDiskStorageDriver;
 use Yandex\Disk\DiskClient;
@@ -102,6 +103,75 @@ class YandexDiskStorageDriverTest extends TestCase
         $driver->getFileContents($key);
     }
 
+    /**
+     * @test
+     * @dataProvider directoryContentsProvider
+     * @param array $givenResponseArray
+     * @param bool $expectedFileExists
+     */
+    public function fileExists_givenFilenameKeyAndResponseHasArrayWithFilename_expectedBoolReturned(
+        array $givenResponseArray,
+        bool $expectedFileExists
+    ): void {
+        $driver = $this->createYandexDiskStorageDriver();
+        $key = $this->givenFilenameKey();
+        $this->givenDiskClient_directoryContents_returnsArray($givenResponseArray);
+
+        $fileExists = $driver->fileExists($key);
+
+        $this->assertDiskClient_directoryContents_isCalledOnceWithFilename(self::FILENAME_FULL);
+        $this->assertEquals($expectedFileExists, $fileExists);
+    }
+    public function directoryContentsProvider(): array
+    {
+        return [
+            [
+                [],
+                false,
+            ],
+            [
+                [[]],
+                false,
+            ],
+            [
+                [['href' => self::FILENAME_FULL]],
+                true,
+            ],
+        ];
+    }
+
+    /** @test */
+    public function fileExists_givenFilenameKeyAndResponseThrowsExceptionWithCode404_falseReturned(): void
+    {
+        $driver = $this->createYandexDiskStorageDriver();
+        $key = $this->givenFilenameKey();
+        $this->givenDiskClient_directoryContents_throwsException(
+            new DiskRequestException('Not found', HttpStatusCodeEnum::NOT_FOUND)
+        );
+
+        $fileExists = $driver->fileExists($key);
+
+        $this->assertDiskClient_directoryContents_isCalledOnceWithFilename(self::FILENAME_FULL);
+        $this->assertFalse($fileExists);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Bad api response
+     */
+    public function fileExists_givenFilenameKeyAndResponseThrowsExceptionWithNot404Code_exceptionThrown(): void
+    {
+        $driver = $this->createYandexDiskStorageDriver();
+        $key = $this->givenFilenameKey();
+        $this->givenDiskClient_directoryContents_throwsException(
+            new DiskRequestException('Not found', HttpStatusCodeEnum::FORBIDDEN)
+        );
+
+        $driver->fileExists($key);
+    }
+
     private function createYandexDiskStorageDriver(): YandexDiskStorageDriver
     {
         return new YandexDiskStorageDriver(self::BASE_DIRECTORY, $this->diskClient, $this->streamFactory);
@@ -159,5 +229,20 @@ class YandexDiskStorageDriverTest extends TestCase
         \Phake::when($this->streamFactory)->createStreamFromResource(\Phake::anyParameters())->thenReturn($stream);
 
         return $stream;
+    }
+
+    private function assertDiskClient_directoryContents_isCalledOnceWithFilename(string $filename): void
+    {
+        \Phake::verify($this->diskClient, \Phake::times(1))->directoryContents($filename);
+    }
+
+    private function givenDiskClient_directoryContents_returnsArray(array $array): void
+    {
+        \Phake::when($this->diskClient)->directoryContents(\Phake::anyParameters())->thenReturn($array);
+    }
+
+    private function givenDiskClient_directoryContents_throwsException(\Throwable $exception): void
+    {
+        \Phake::when($this->diskClient)->directoryContents(\Phake::anyParameters())->thenThrow($exception);
     }
 }
