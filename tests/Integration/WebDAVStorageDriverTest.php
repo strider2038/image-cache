@@ -15,7 +15,7 @@ use GuzzleHttp\ClientInterface;
 use Strider2038\ImgCache\Core\StreamFactory;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKey;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
 use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
 
@@ -67,7 +67,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
             self::BASE_DIRECTORY . self::FILENAME,
             self::JSON_TEMPORARY_FILENAME
         );
-        $key = new FilenameKey(self::FILENAME);
+        $key = new StorageFilename(self::FILENAME);
 
         $stream = $this->driver->getFileContents($key);
 
@@ -82,7 +82,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
      */
     public function getFileContents_givenNotExistingFilename_exceptionThrown(): void
     {
-        $key = new FilenameKey(self::FILENAME);
+        $key = new StorageFilename(self::FILENAME);
 
         $this->driver->getFileContents($key);
     }

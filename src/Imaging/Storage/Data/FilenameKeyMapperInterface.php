@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Imaging\Storage\Data;
  */
 interface FilenameKeyMapperInterface
 {
-    public function getKey(string $filename): FilenameKeyInterface;
+    public function getKey(string $filename): StorageFilenameInterface;
 }

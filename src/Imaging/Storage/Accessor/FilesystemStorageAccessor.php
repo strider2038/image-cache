@@ -14,8 +14,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyMapperInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverInterface;
 
 /**
@@ -99,7 +99,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         ));
     }
 
-    private function composeFilenameKey(string $key): FilenameKeyInterface
+    private function composeFilenameKey(string $key): StorageFilenameInterface
     {
         $filenameKey = $this->keyMapper->getKey($key);
 

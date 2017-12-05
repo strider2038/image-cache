@@ -13,7 +13,18 @@ namespace Strider2038\ImgCache\Imaging\Storage\Data;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface FilenameKeyInterface
+class StorageFilename implements StorageFilenameInterface
 {
-    public function getValue(): string;
+    /** @var string */
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
 }

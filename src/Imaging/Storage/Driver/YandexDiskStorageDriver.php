@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\BadApiResponseException;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Yandex\Disk\DiskClient;
 use Yandex\Disk\Exception\DiskRequestException;
 
@@ -40,7 +40,7 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
         $this->streamFactory = $streamFactory;
     }
 
-    public function getFileContents(FilenameKeyInterface $key): StreamInterface
+    public function getFileContents(StorageFilenameInterface $key): StreamInterface
     {
         $storageFilename = $this->baseDirectory . $key->getValue();
 
@@ -73,7 +73,7 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
         return $this->streamFactory->createStreamFromResource($responseResource);
     }
 
-    public function fileExists(FilenameKeyInterface $key): bool
+    public function fileExists(StorageFilenameInterface $key): bool
     {
         $storageFilename = $this->baseDirectory . $key->getValue();
         $exists = false;
@@ -97,11 +97,11 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
         return $exists;
     }
 
-    public function createFile(FilenameKeyInterface $key, StreamInterface $data): void
+    public function createFile(StorageFilenameInterface $key, StreamInterface $data): void
     {
     }
 
-    public function deleteFile(FilenameKeyInterface $key): void
+    public function deleteFile(StorageFilenameInterface $key): void
     {
     }
 }

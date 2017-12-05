@@ -16,7 +16,7 @@ use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -48,7 +48,7 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
         return $this->baseDirectory;
     }
     
-    public function getFileContents(FilenameKeyInterface $key): StreamInterface
+    public function getFileContents(StorageFilenameInterface $key): StreamInterface
     {
         $sourceFilename = $this->composeSourceFilename($key);
 
@@ -60,14 +60,14 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
         return $this->fileOperations->openFile($sourceFilename, $mode);
     }
 
-    public function fileExists(FilenameKeyInterface $key): bool
+    public function fileExists(StorageFilenameInterface $key): bool
     {
         $sourceFilename = $this->composeSourceFilename($key);
 
         return $this->fileOperations->isFile($sourceFilename);
     }
 
-    public function createFile(FilenameKeyInterface $key, StreamInterface $data): void
+    public function createFile(StorageFilenameInterface $key, StreamInterface $data): void
     {
         $sourceFilename = $this->composeSourceFilename($key);
         $this->fileOperations->createDirectory(dirname($sourceFilename));
@@ -79,13 +79,13 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
         }
     }
 
-    public function deleteFile(FilenameKeyInterface $key): void
+    public function deleteFile(StorageFilenameInterface $key): void
     {
         $sourceFilename = $this->composeSourceFilename($key);
         $this->fileOperations->deleteFile($sourceFilename);
     }
 
-    private function composeSourceFilename(FilenameKeyInterface $key): string
+    private function composeSourceFilename(StorageFilenameInterface $key): string
     {
         return $this->baseDirectory . $key->getValue();
     }

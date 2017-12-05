@@ -11,15 +11,15 @@
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface FilesystemStorageDriverInterface
 {
-    public function getFileContents(FilenameKeyInterface $key): StreamInterface;
-    public function fileExists(FilenameKeyInterface $key): bool;
-    public function createFile(FilenameKeyInterface $key, StreamInterface $data): void;
-    public function deleteFile(FilenameKeyInterface $key): void;
+    public function getFileContents(StorageFilenameInterface $key): StreamInterface;
+    public function fileExists(StorageFilenameInterface $key): bool;
+    public function createFile(StorageFilenameInterface $key, StreamInterface $data): void;
+    public function deleteFile(StorageFilenameInterface $key): void;
 }

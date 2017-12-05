@@ -15,7 +15,7 @@ use Psr\Http\Message\StreamInterface as PsrStreamInterface;
 use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexDiskStorageDriver;
 use Yandex\Disk\DiskClient;
 use Yandex\Disk\Exception\DiskRequestException;
@@ -177,9 +177,9 @@ class YandexDiskStorageDriverTest extends TestCase
         return new YandexDiskStorageDriver(self::BASE_DIRECTORY, $this->diskClient, $this->streamFactory);
     }
 
-    private function givenFilenameKey(): FilenameKeyInterface
+    private function givenFilenameKey(): StorageFilenameInterface
     {
-        $key = \Phake::mock(FilenameKeyInterface::class);
+        $key = \Phake::mock(StorageFilenameInterface::class);
         \Phake::when($key)->getValue()->thenReturn(self::FILENAME);
 
         return $key;

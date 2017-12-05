@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Core\StreamFactory;
 use Strider2038\ImgCache\Core\StreamInterface;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKey;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexDiskStorageDriver;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 use Yandex\Disk\DiskClient;
@@ -57,7 +57,7 @@ class YandexDiskStorageDriverTest extends FunctionalTestCase
             'name' => self::FILENAME,
             'size' => filesize(self::JSON_TEMPORARY_FILENAME),
         ]);
-        $key = new FilenameKey(self::FILENAME);
+        $key = new StorageFilename(self::FILENAME);
 
         $stream = $this->driver->getFileContents($key);
 
@@ -72,7 +72,7 @@ class YandexDiskStorageDriverTest extends FunctionalTestCase
      */
     public function getFileContents_givenNotExistingFilename_exceptionThrown(): void
     {
-        $key = new FilenameKey(self::FILENAME);
+        $key = new StorageFilename(self::FILENAME);
 
         $this->driver->getFileContents($key);
     }
@@ -86,7 +86,7 @@ class YandexDiskStorageDriverTest extends FunctionalTestCase
             'name' => self::FILENAME,
             'size' => filesize(self::JSON_TEMPORARY_FILENAME),
         ]);
-        $key = new FilenameKey(self::FILENAME);
+        $key = new StorageFilename(self::FILENAME);
 
         $fileExists = $this->driver->fileExists($key);
 
@@ -96,7 +96,7 @@ class YandexDiskStorageDriverTest extends FunctionalTestCase
     /** @test */
     public function fileExists_givenNotExistingFilename_falseReturned(): void
     {
-        $key = new FilenameKey(self::FILENAME);
+        $key = new StorageFilename(self::FILENAME);
 
         $fileExists = $this->driver->fileExists($key);
 

@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface as PsrStreamInterface;
@@ -18,7 +19,7 @@ use Strider2038\ImgCache\Core\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
 
 class WebDAVStorageDriverTest extends TestCase
@@ -41,17 +42,17 @@ class WebDAVStorageDriverTest extends TestCase
     }
 
     /** @test */
-    public function getFileContents_givenExistingFilenameKey_streamReturned(): void
+    public function getFileContents_givenExistingStorageFilename_streamReturned(): void
     {
         $driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->client, $this->streamFactory);
-        $key = $this->givenFilenameKey();
+        $storageFilename = $this->givenStorageFilename();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::OK);
         $responseBody = $this->givenResponse_getBody_returnsStream($response);
         $this->givenStream_detach_returnsResource($responseBody, self::RESOURCE);
         $expectedStream = $this->givenStreamFactory_createStreamFromResource_returnsStream();
 
-        $fileContents = $driver->getFileContents($key);
+        $fileContents = $driver->getFileContents($storageFilename);
 
         $this->assertInstanceOf(StreamInterface::class, $fileContents);
         $this->assertClient_request_isCalledOnceWithMethodAndPath(WebDAVMethodEnum::GET, self::FILENAME_FULL);
@@ -64,23 +65,73 @@ class WebDAVStorageDriverTest extends TestCase
 
     /**
      * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessageRegExp /File .* not found in storage/
+     */
+    public function getFileContents_givenStorageFilenameAndClientThrows404_exceptionThrown(): void
+    {
+        $driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->client, $this->streamFactory);
+        $storageFilename = $this->givenStorageFilename();
+        $exception = new class ('', HttpStatusCodeEnum::NOT_FOUND) extends \Exception implements GuzzleException {};
+        $this->givenClient_request_throwsException($exception);
+
+        $driver->getFileContents($storageFilename);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Bad api response for filename
+     */
+    public function getFileContents_givenStorageFilenameAndClientThrows400_exceptionThrown(): void
+    {
+        $driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->client, $this->streamFactory);
+        $storageFilename = $this->givenStorageFilename();
+        $exception = new class ('', HttpStatusCodeEnum::BAD_REQUEST) extends \Exception implements GuzzleException {};
+        $this->givenClient_request_throwsException($exception);
+
+        $driver->getFileContents($storageFilename);
+    }
+
+    /**
+     * @test
      * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
      * @expectedExceptionCode 502
      * @expectedExceptionMessage Unexpected response from API
      */
-    public function getFileContents_givenFilenameKeyAndResponseHasCode400_exceptionThrown(): void
+    public function getFileContents_givenStorageFilenameAndResponseHasCode400_exceptionThrown(): void
     {
         $driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->client, $this->streamFactory);
-        $key = $this->givenFilenameKey();
+        $storageFilename = $this->givenStorageFilename();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::NOT_FOUND);
 
-        $driver->getFileContents($key);
+        $driver->getFileContents($storageFilename);
     }
 
-    private function givenFilenameKey(): FilenameKeyInterface
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Api response has empty body
+     */
+    public function getFileContents_givenStorageFilenameAndResponseHasEmptyBody_exceptionThrown(): void
     {
-        $key = \Phake::mock(FilenameKeyInterface::class);
+        $driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->client, $this->streamFactory);
+        $storageFilename = $this->givenStorageFilename();
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::OK);
+        $responseBody = $this->givenResponse_getBody_returnsStream($response);
+        $this->givenStream_detach_returnsNull($responseBody);
+
+        $driver->getFileContents($storageFilename);
+    }
+
+    private function givenStorageFilename(): StorageFilenameInterface
+    {
+        $key = \Phake::mock(StorageFilenameInterface::class);
         \Phake::when($key)->getValue()->thenReturn(self::FILENAME);
 
         return $key;
@@ -102,6 +153,13 @@ class WebDAVStorageDriverTest extends TestCase
         \Phake::when($this->client)->request(\Phake::anyParameters())->thenReturn($response);
 
         return $response;
+    }
+
+    private function givenClient_request_throwsException(\Throwable $exception): void
+    {
+        \Phake::when($this->client)
+            ->request(\Phake::anyParameters())
+            ->thenThrow($exception);
     }
 
     private function givenResponse_getStatusCode_returnsCode(ResponseInterface $response, int $code): void

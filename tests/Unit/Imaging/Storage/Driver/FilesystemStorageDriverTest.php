@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 
@@ -154,9 +154,9 @@ class FilesystemStorageDriverTest extends TestCase
         return new FilesystemStorageDriver($baseDirectory, $this->fileOperations);
     }
 
-    private function givenFilenameKey($filename): FilenameKeyInterface
+    private function givenFilenameKey($filename): StorageFilenameInterface
     {
-        $filenameKey = \Phake::mock(FilenameKeyInterface::class);
+        $filenameKey = \Phake::mock(StorageFilenameInterface::class);
 
         \Phake::when($filenameKey)->getValue()->thenReturn($filename);
 
