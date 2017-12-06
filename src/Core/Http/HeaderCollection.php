@@ -11,7 +11,6 @@
 namespace Strider2038\ImgCache\Core\Http;
 
 use Strider2038\ImgCache\Collection\IterableCollection;
-use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -21,23 +20,23 @@ class HeaderCollection extends IterableCollection
     /** @param HeaderValueCollection[] $elements */
     public function __construct(array $elements = [])
     {
-        foreach ($elements as $key => $value) {
-            $this->set(new HttpHeaderEnum($key), $value);
+        foreach ($elements as $headerName => $values) {
+            $this->set($headerName, $values);
         }
     }
 
-    public function set(HttpHeaderEnum $name, HeaderValueCollection $values): void
+    public function set(string $name, HeaderValueCollection $values): void
     {
-        $this->elements[$name->getValue()] = $values;
+        $this->elements[$name] = $values;
     }
 
-    public function get(HttpHeaderEnum $name): HeaderValueCollection
+    public function get(string $name): HeaderValueCollection
     {
-        return $this->elements[$name->getValue()] ?? new HeaderValueCollection();
+        return $this->elements[$name] ?? new HeaderValueCollection();
     }
 
-    public function containsKey(HttpHeaderEnum $name): bool
+    public function containsKey(string $name): bool
     {
-        return array_key_exists($name->getValue(), $this->elements);
+        return array_key_exists($name, $this->elements);
     }
 }

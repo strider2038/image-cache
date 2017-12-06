@@ -24,7 +24,7 @@ class HeaderCollectionTest extends TestCase
 
         $collection = new HeaderCollection($elements);
 
-        $values = $collection->get(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
+        $values = $collection->get(HttpHeaderEnum::AUTHORIZATION);
         $this->assertInstanceOf(HeaderValueCollection::class, $values);
     }
 
@@ -34,7 +34,7 @@ class HeaderCollectionTest extends TestCase
         $elements = $this->givenElements();
         $collection = new HeaderCollection($elements);
 
-        $result = $collection->containsKey(new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION));
+        $result = $collection->containsKey(HttpHeaderEnum::AUTHORIZATION);
 
         $this->assertTrue($result);
     }
