@@ -19,7 +19,6 @@ use Strider2038\ImgCache\Core\Http\Response;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\BadApiResponseException;
 
@@ -90,8 +89,7 @@ class GuzzleClientAdapter
                 $headerValueCollection->add($value);
             }
 
-            $header = new HttpHeaderEnum($headerName);
-            $headerCollection->set($header, $headerValueCollection);
+            $headerCollection->set($headerName, $headerValueCollection);
         }
 
         return $headerCollection;
