@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver;

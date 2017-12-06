@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Support\Phake;
 
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 
 /**

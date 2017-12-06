@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor;

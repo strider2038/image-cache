@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Core;
+namespace Strider2038\ImgCache\Tests\Unit\Core\Streaming;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\NullStream;
+use Strider2038\ImgCache\Core\Streaming\NullStream;
 
 class NullStreamTest extends TestCase
 {

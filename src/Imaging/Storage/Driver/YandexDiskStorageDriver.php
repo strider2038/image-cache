@@ -10,8 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
-use Strider2038\ImgCache\Core\StreamFactoryInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\BadApiResponseException;
 use Strider2038\ImgCache\Exception\FileNotFoundException;

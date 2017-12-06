@@ -11,9 +11,9 @@
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
-use Strider2038\ImgCache\Core\StreamFactoryInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use GuzzleHttp\Exception\ClientException;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Exception\BadApiResponseException;
@@ -47,27 +47,21 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
 
         try {
             $response = $this->client->request(WebDAVMethodEnum::GET, $storageFilename);
-        } catch (GuzzleException $exception) {
-            if ($exception->getCode() === HttpStatusCodeEnum::NOT_FOUND) {
-                throw new FileNotFoundException(
-                    sprintf('File "%s" not found in storage.', $storageFilename),
-                    HttpStatusCodeEnum::NOT_FOUND,
-                    $exception
-                );
-            }
-
-            throw new BadApiResponseException(
-                sprintf('Bad api response for filename "%s".', $storageFilename),
-                HttpStatusCodeEnum::BAD_GATEWAY,
-                $exception
-            );
+        } catch (ClientException $exception) {
+            $response = $exception->getResponse();
         }
 
-        if ($response->getStatusCode() !== HttpStatusCodeEnum::OK) {
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode === HttpStatusCodeEnum::NOT_FOUND) {
+            throw new FileNotFoundException(sprintf('File "%s" not found in storage.', $storageFilename));
+        }
+
+        if ($statusCode !== HttpStatusCodeEnum::OK) {
             throw new BadApiResponseException(
                 sprintf(
                     'Unexpected response from API: %d %s.',
-                    $response->getStatusCode(),
+                    $statusCode,
                     $response->getReasonPhrase()
                 )
             );

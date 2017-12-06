@@ -11,12 +11,13 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface as PsrStreamInterface;
-use Strider2038\ImgCache\Core\StreamFactoryInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
@@ -73,7 +74,8 @@ class WebDAVStorageDriverTest extends TestCase
     {
         $driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->client, $this->streamFactory);
         $storageFilename = $this->givenStorageFilename();
-        $exception = new class ('', HttpStatusCodeEnum::NOT_FOUND) extends \Exception implements GuzzleException {};
+        $exception = \Phake::mock(ClientException::class);
+        \Phake::when($exception)->getResponse();
         $this->givenClient_request_throwsException($exception);
 
         $driver->getFileContents($storageFilename);

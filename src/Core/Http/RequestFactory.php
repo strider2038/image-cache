@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
-use Strider2038\ImgCache\Core\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;

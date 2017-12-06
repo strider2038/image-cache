@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Core;
+namespace Strider2038\ImgCache\Tests\Unit\Core\Streaming;
 
-use Strider2038\ImgCache\Core\ResourceStream;
+use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 

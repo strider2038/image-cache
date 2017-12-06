@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\FileOperations;
-use Strider2038\ImgCache\Core\StreamFactoryInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;

@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface as PsrStreamInterface;
-use Strider2038\ImgCache\Core\StreamFactoryInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexDiskStorageDriver;

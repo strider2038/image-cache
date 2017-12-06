@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 
 /**

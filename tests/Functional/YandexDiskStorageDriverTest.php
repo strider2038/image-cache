@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Core\StreamFactory;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexDiskStorageDriver;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
