@@ -58,7 +58,6 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
         }
 
         return $response->getBody();
-
     }
 
     public function fileExists(StorageFilenameInterface $key): bool

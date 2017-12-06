@@ -37,7 +37,6 @@ class HttpStatusCodeEnum extends Enum
     public const UNUSED = 306;
     public const TEMPORARY_REDIRECT = 307;
 
-    public const CodesBeginAt = 400;
     public const BAD_REQUEST = 400;
     public const UNAUTHORIZED = 401;
     public const PAYMENT_REQUIRED = 402;
