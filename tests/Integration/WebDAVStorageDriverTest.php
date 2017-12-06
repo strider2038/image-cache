@@ -12,7 +12,8 @@ namespace Strider2038\ImgCache\Tests\Integration;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use Strider2038\ImgCache\Core\StreamFactory;
+use Strider2038\ImgCache\Core\GuzzleClientAdapter;
+use Strider2038\ImgCache\Core\Streaming\StreamFactory;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
@@ -52,11 +53,9 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
         $this->client->request(WebDAVMethodEnum::DELETE, self::BASE_DIRECTORY);
         $this->client->request(WebDAVMethodEnum::MKCOL, self::BASE_DIRECTORY);
 
-        $this->driver = new WebDAVStorageDriver(
-            self::BASE_DIRECTORY,
-            $this->client,
-            new StreamFactory()
-        );
+        $clientAdapter = new GuzzleClientAdapter($this->client, new StreamFactory());
+
+        $this->driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $clientAdapter);
     }
 
     /** @test */

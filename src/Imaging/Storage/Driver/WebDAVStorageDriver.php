@@ -10,9 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\ClientException;
-use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\GuzzleClientAdapter;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
@@ -28,30 +26,22 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
     /** @var string */
     private $baseDirectory;
 
-    /** @var ClientInterface */
-    private $client;
+    /** @var GuzzleClientAdapter */
+    private $clientAdapter;
 
-    /** @var StreamFactoryInterface */
-    private $streamFactory;
-
-    public function __construct(string $baseDirectory, ClientInterface $client, StreamFactoryInterface $streamFactory)
+    public function __construct(string $baseDirectory, GuzzleClientAdapter $clientAdapter)
     {
         $this->baseDirectory = rtrim($baseDirectory, '/') . '/';
-        $this->client = $client;
-        $this->streamFactory = $streamFactory;
+        $this->clientAdapter = $clientAdapter;
     }
 
     public function getFileContents(StorageFilenameInterface $key): StreamInterface
     {
         $storageFilename = $this->baseDirectory . $key->getValue();
 
-        try {
-            $response = $this->client->request(WebDAVMethodEnum::GET, $storageFilename);
-        } catch (ClientException $exception) {
-            $response = $exception->getResponse();
-        }
+        $response = $this->clientAdapter->request(WebDAVMethodEnum::GET, $storageFilename);
 
-        $statusCode = $response->getStatusCode();
+        $statusCode = $response->getStatusCode()->getValue();
 
         if ($statusCode === HttpStatusCodeEnum::NOT_FOUND) {
             throw new FileNotFoundException(sprintf('File "%s" not found in storage.', $storageFilename));
@@ -67,13 +57,8 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
             );
         }
 
-        $responseResource = $response->getBody()->detach();
+        return $response->getBody();
 
-        if ($responseResource === null) {
-            throw new BadApiResponseException('Api response has empty body.');
-        }
-
-        return $this->streamFactory->createStreamFromResource($responseResource);
     }
 
     public function fileExists(StorageFilenameInterface $key): bool
