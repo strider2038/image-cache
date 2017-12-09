@@ -18,8 +18,8 @@ use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
  */
 interface FilesystemStorageDriverInterface
 {
-    public function getFileContents(StorageFilenameInterface $key): StreamInterface;
-    public function fileExists(StorageFilenameInterface $key): bool;
-    public function createFile(StorageFilenameInterface $key, StreamInterface $data): void;
-    public function deleteFile(StorageFilenameInterface $key): void;
+    public function getFileContents(StorageFilenameInterface $filename): StreamInterface;
+    public function fileExists(StorageFilenameInterface $filename): bool;
+    public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void;
+    public function deleteFile(StorageFilenameInterface $filename): void;
 }

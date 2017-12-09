@@ -40,9 +40,9 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
         $this->streamFactory = $streamFactory;
     }
 
-    public function getFileContents(StorageFilenameInterface $key): StreamInterface
+    public function getFileContents(StorageFilenameInterface $filename): StreamInterface
     {
-        $storageFilename = $this->baseDirectory . $key->getValue();
+        $storageFilename = $this->baseDirectory . $filename->getValue();
 
         try {
             $response = $this->diskClient->getFile($storageFilename);
@@ -73,9 +73,9 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
         return $this->streamFactory->createStreamFromResource($responseResource);
     }
 
-    public function fileExists(StorageFilenameInterface $key): bool
+    public function fileExists(StorageFilenameInterface $filename): bool
     {
-        $storageFilename = $this->baseDirectory . $key->getValue();
+        $storageFilename = $this->baseDirectory . $filename->getValue();
         $exists = false;
 
         try {
@@ -97,11 +97,11 @@ class YandexDiskStorageDriver implements FilesystemStorageDriverInterface
         return $exists;
     }
 
-    public function createFile(StorageFilenameInterface $key, StreamInterface $data): void
+    public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void
     {
     }
 
-    public function deleteFile(StorageFilenameInterface $key): void
+    public function deleteFile(StorageFilenameInterface $filename): void
     {
     }
 }

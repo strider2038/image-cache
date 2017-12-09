@@ -86,6 +86,31 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
         $this->driver->getFileContents($key);
     }
 
+    /** @test */
+    public function fileExists_givenExistingFilename_trueReturned(): void
+    {
+        $this->givenJsonFile(self::JSON_TEMPORARY_FILENAME);
+        $this->givenUploadedFile(
+            self::BASE_DIRECTORY . self::FILENAME,
+            self::JSON_TEMPORARY_FILENAME
+        );
+        $key = new StorageFilename(self::FILENAME);
+
+        $fileExists = $this->driver->fileExists($key);
+
+        $this->assertTrue($fileExists);
+    }
+
+    /** @test */
+    public function fileExists_givenNotExistingFilename_false(): void
+    {
+        $key = new StorageFilename(self::FILENAME);
+
+        $fileExists = $this->driver->fileExists($key);
+
+        $this->assertFalse($fileExists);
+    }
+
     private function givenUploadedFile(string $remoteFilename, string $localFilename): void
     {
         $finfo = finfo_open(FILEINFO_MIME);

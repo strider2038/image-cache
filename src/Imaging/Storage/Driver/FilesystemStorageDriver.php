@@ -48,9 +48,9 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
         return $this->baseDirectory;
     }
     
-    public function getFileContents(StorageFilenameInterface $key): StreamInterface
+    public function getFileContents(StorageFilenameInterface $filename): StreamInterface
     {
-        $sourceFilename = $this->composeSourceFilename($key);
+        $sourceFilename = $this->composeSourceFilename($filename);
 
         if (!$this->fileOperations->isFile($sourceFilename)) {
             throw new FileNotFoundException(sprintf('File "%s" not found', $sourceFilename));
@@ -60,16 +60,16 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
         return $this->fileOperations->openFile($sourceFilename, $mode);
     }
 
-    public function fileExists(StorageFilenameInterface $key): bool
+    public function fileExists(StorageFilenameInterface $filename): bool
     {
-        $sourceFilename = $this->composeSourceFilename($key);
+        $sourceFilename = $this->composeSourceFilename($filename);
 
         return $this->fileOperations->isFile($sourceFilename);
     }
 
-    public function createFile(StorageFilenameInterface $key, StreamInterface $data): void
+    public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void
     {
-        $sourceFilename = $this->composeSourceFilename($key);
+        $sourceFilename = $this->composeSourceFilename($filename);
         $this->fileOperations->createDirectory(dirname($sourceFilename));
 
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::WRITE_AND_READ);
@@ -79,9 +79,9 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
         }
     }
 
-    public function deleteFile(StorageFilenameInterface $key): void
+    public function deleteFile(StorageFilenameInterface $filename): void
     {
-        $sourceFilename = $this->composeSourceFilename($key);
+        $sourceFilename = $this->composeSourceFilename($filename);
         $this->fileOperations->deleteFile($sourceFilename);
     }
 

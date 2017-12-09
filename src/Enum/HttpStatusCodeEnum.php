@@ -27,6 +27,7 @@ class HttpStatusCodeEnum extends Enum
     public const NO_CONTENT = 204;
     public const RESET_CONTENT = 205;
     public const PARTIAL_CONTENT = 206;
+    public const MULTI_STATUS = 207;
 
     public const MULTIPLE_CHOICES = 300;
     public const MOVED_PERMANENTLY = 301;
