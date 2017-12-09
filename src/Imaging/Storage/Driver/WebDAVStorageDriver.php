@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
-use Strider2038\ImgCache\Core\GuzzleClientAdapter;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
@@ -18,6 +17,7 @@ use Strider2038\ImgCache\Exception\BadApiResponseException;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResponseParserInterface;
+use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

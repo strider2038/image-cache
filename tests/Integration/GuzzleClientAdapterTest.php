@@ -11,11 +11,11 @@
 namespace Strider2038\ImgCache\Tests\Integration;
 
 use GuzzleHttp\Client;
-use Strider2038\ImgCache\Core\GuzzleClientAdapter;
 use Strider2038\ImgCache\Core\Http\Response;
 use Strider2038\ImgCache\Core\Streaming\StreamFactory;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
+use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

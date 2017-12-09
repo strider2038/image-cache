@@ -8,28 +8,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Core;
+namespace Strider2038\ImgCache\Tests\Unit\Utility;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Psr\Http\Message\StreamInterface as PsrStreamInterface;
-use Strider2038\ImgCache\Core\GuzzleClientAdapter;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
+use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 class GuzzleClientAdapterTest extends TestCase
 {
     private const METHOD = 'method';
     private const URI = 'uri';
     private const OPTIONS = ['options'];
-    const RESOURCE = 'resource';
-    const APPLICATION_JSON = 'application/json';
+    private const RESOURCE = 'resource';
+    private const APPLICATION_JSON = 'application/json';
 
     /** @var ClientInterface */
     private $client;

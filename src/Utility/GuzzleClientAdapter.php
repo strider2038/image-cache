@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
+namespace Strider2038\ImgCache\Utility;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
@@ -25,7 +25,7 @@ use Strider2038\ImgCache\Exception\BadApiResponseException;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class GuzzleClientAdapter
+class GuzzleClientAdapter implements HttpClientInterface
 {
     /** @var ClientInterface */
     private $client;

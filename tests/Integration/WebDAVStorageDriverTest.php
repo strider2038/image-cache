@@ -12,13 +12,13 @@ namespace Strider2038\ImgCache\Tests\Integration;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use Strider2038\ImgCache\Core\GuzzleClientAdapter;
 use Strider2038\ImgCache\Core\Streaming\StreamFactory;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
 use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
+use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

@@ -11,7 +11,6 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\GuzzleClientAdapter;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -21,14 +20,14 @@ use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceProperties;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourcePropertiesCollection;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResponseParserInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
+use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 class WebDAVStorageDriverTest extends TestCase
 {
     private const BASE_DIRECTORY = 'base_directory';
     private const FILENAME = 'filename.jpg';
     private const FILENAME_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME;
-    private const RESOURCE = 'resource';
-    const CONTENTS = 'contents';
+    private const CONTENTS = 'contents';
 
     /** @var GuzzleClientAdapter */
     private $clientAdapter;
