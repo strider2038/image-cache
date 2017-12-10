@@ -10,15 +10,12 @@
 
 namespace Strider2038\ImgCache\Tests\Integration;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use Strider2038\ImgCache\Core\Streaming\StreamFactory;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
 use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
-use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -39,23 +36,16 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $token = getenv('YANDEX_DISK_ACCESS_TOKEN');
-        $this->client = new Client([
-            'base_uri' => 'https://webdav.yandex.ru/v1',
-            'headers' => [
-                'Authorization' => 'OAuth ' . $token,
-                'Host' => 'webdav.yandex.ru',
-                'User-Agent' => 'Image Caching Microservice',
-                'Accept' => '*/*'
-            ],
-        ]);
+        $container = $this->loadContainer('webdav-storage-driver.yml');
+        $tokenHeader = 'OAuth ' . getenv('YANDEX_DISK_ACCESS_TOKEN');
+        $container->setParameter('token', $tokenHeader);
+        $container->setParameter('storage.directory', self::BASE_DIRECTORY);
 
+        $this->driver = $container->get('webdav_storage_driver');
+
+        $this->client = $container->get('client');
         $this->client->request(WebDAVMethodEnum::DELETE, self::BASE_DIRECTORY);
         $this->client->request(WebDAVMethodEnum::MKCOL, self::BASE_DIRECTORY);
-
-        $clientAdapter = new GuzzleClientAdapter($this->client, new StreamFactory());
-
-        $this->driver = new WebDAVStorageDriver(self::BASE_DIRECTORY, $clientAdapter);
     }
 
     /** @test */
