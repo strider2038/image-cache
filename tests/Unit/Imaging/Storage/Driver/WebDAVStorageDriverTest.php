@@ -70,6 +70,21 @@ class WebDAVStorageDriverTest extends TestCase
         $this->assertEquals($expectedFileExists, $fileExists);
     }
 
+    /** @test */
+    public function createFile_givenStorageFilenameAndFileContents_fileInStorageCreated(): void
+    {
+        $driver = $this->createWebDAVStorageDriver();
+        $storageFilename = $this->givenStorageFilename();
+        $fileContents = \Phake::mock(StreamInterface::class);
+
+        $driver->createFile($storageFilename, $fileContents);
+
+        $this->assertResourceManipulator_putResource_isCalledOnceWithResourceUriAndStream(
+            self::FILENAME_FULL,
+            $fileContents
+        );
+    }
+
     private function createWebDAVStorageDriver(): WebDAVStorageDriver
     {
         return new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->resourceManipulator, $this->resourceChecker);
@@ -104,5 +119,12 @@ class WebDAVStorageDriverTest extends TestCase
         \Phake::when($this->resourceManipulator)->getResource(\Phake::anyParameters())->thenReturn($stream);
 
         return $stream;
+    }
+
+    private function assertResourceManipulator_putResource_isCalledOnceWithResourceUriAndStream(
+        string $resourceUri,
+        StreamInterface $fileContents
+    ): void {
+        \Phake::verify($this->resourceManipulator, \Phake::times(1))->putResource($resourceUri, $fileContents);
     }
 }

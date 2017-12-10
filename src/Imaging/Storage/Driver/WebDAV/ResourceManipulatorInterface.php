@@ -18,4 +18,5 @@ use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 interface ResourceManipulatorInterface
 {
     public function getResource(string $resourceUri): StreamInterface;
+    public function putResource(string $resourceUri, StreamInterface $contents): void;
 }
