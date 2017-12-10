@@ -31,9 +31,13 @@ services:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceChecker
         arguments:
             - '@resource_properties_getter'
+    resource_manipulator:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceManipulator
+        arguments:
+            - '@client_adapter'
     webdav_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver
         arguments:
             - '%storage.directory%'
-            - '@client_adapter'
+            - '@resource_manipulator'
             - '@resource_checker'

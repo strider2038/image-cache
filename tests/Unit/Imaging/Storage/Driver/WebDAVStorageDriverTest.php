@@ -11,15 +11,12 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Driver;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceCheckerInterface;
+use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceManipulatorInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
-use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 class WebDAVStorageDriverTest extends TestCase
 {
@@ -29,15 +26,15 @@ class WebDAVStorageDriverTest extends TestCase
     private const FILENAME = 'filename.jpg';
     private const FILENAME_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME;
 
-    /** @var GuzzleClientAdapter */
-    private $clientAdapter;
+    /** @var ResourceManipulatorInterface */
+    private $resourceManipulator;
 
-    /** @var ResourceCheckerInterface */
+    /** @var ResourceManipulatorInterface */
     private $resourceChecker;
 
     protected function setUp(): void
     {
-        $this->clientAdapter = \Phake::mock(GuzzleClientAdapter::class);
+        $this->resourceManipulator = \Phake::mock(ResourceManipulatorInterface::class);
         $this->resourceChecker = \Phake::mock(ResourceCheckerInterface::class);
     }
 
@@ -46,49 +43,13 @@ class WebDAVStorageDriverTest extends TestCase
     {
         $driver = $this->createWebDAVStorageDriver();
         $storageFilename = $this->givenStorageFilename();
-        $response = $this->givenClientAdapter_request_returnsResponse();
-        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::OK);
-        $responseBody = $this->givenResponse_getBody_returnsStream($response);
+        $stream = $this->givenResourceManipulator_getResource_returnsStream();
 
         $fileContents = $driver->getFileContents($storageFilename);
 
+        $this->assertResourceManipulator_getResource_isCalledOnceWithResourceUri(self::FILENAME_FULL);
         $this->assertInstanceOf(StreamInterface::class, $fileContents);
-        $this->assertClientAdapter_request_isCalledOnceWithMethodAndPath(WebDAVMethodEnum::GET, self::FILENAME_FULL);
-        $this->assertResponse_getStatusCode_isCalledOnce($response);
-        $this->assertResponse_getBody_isCalledOnce($response);
-        $this->assertSame($responseBody, $fileContents);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessageRegExp /File .* not found in storage/
-     */
-    public function getFileContents_givenStorageFilenameAndResponseIs404_notFoundExceptionThrown(): void
-    {
-        $driver = $this->createWebDAVStorageDriver();
-        $storageFilename = $this->givenStorageFilename();
-        $response = $this->givenClientAdapter_request_returnsResponse();
-        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::NOT_FOUND);
-
-        $driver->getFileContents($storageFilename);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
-     * @expectedExceptionCode 502
-     * @expectedExceptionMessage Unexpected response from API
-     */
-    public function getFileContents_givenStorageFilenameAndResponseHasCode403_badApiResponseExceptionThrown(): void
-    {
-        $driver = $this->createWebDAVStorageDriver();
-        $storageFilename = $this->givenStorageFilename();
-        $response = $this->givenClientAdapter_request_returnsResponse();
-        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::FORBIDDEN);
-
-        $driver->getFileContents($storageFilename);
+        $this->assertSame($stream, $fileContents);
     }
 
     /**
@@ -111,7 +72,7 @@ class WebDAVStorageDriverTest extends TestCase
 
     private function createWebDAVStorageDriver(): WebDAVStorageDriver
     {
-        return new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->clientAdapter, $this->resourceChecker);
+        return new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->resourceManipulator, $this->resourceChecker);
     }
 
     private function givenStorageFilename(): StorageFilenameInterface
@@ -122,42 +83,6 @@ class WebDAVStorageDriverTest extends TestCase
         return $key;
     }
 
-    private function assertClientAdapter_request_isCalledOnceWithMethodAndPath(string $method, string $path): void
-    {
-        \Phake::verify($this->clientAdapter, \Phake::times(1))->request($method, $path);
-    }
-
-    private function assertResponse_getStatusCode_isCalledOnce(ResponseInterface $response): void
-    {
-        \Phake::verify($response, \Phake::times(1))->getStatusCode();
-    }
-
-    private function givenClientAdapter_request_returnsResponse(): ResponseInterface
-    {
-        $response = \Phake::mock(ResponseInterface::class);
-        \Phake::when($this->clientAdapter)->request(\Phake::anyParameters())->thenReturn($response);
-
-        return $response;
-    }
-
-    private function givenResponse_getStatusCode_returnsCode(ResponseInterface $response, int $code): void
-    {
-        \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCodeEnum($code));
-    }
-
-    private function givenResponse_getBody_returnsStream(ResponseInterface $response): StreamInterface
-    {
-        $body = \Phake::mock(StreamInterface::class);
-        \Phake::when($response)->getBody(\Phake::anyParameters())->thenReturn($body);
-
-        return $body;
-    }
-
-    private function assertResponse_getBody_isCalledOnce(ResponseInterface $response): void
-    {
-        \Phake::verify($response, \Phake::times(1))->getBody();
-    }
-
     private function assertResourceChecker_isFile_isCalledOnceWithResourceUri(string $storageFilename): void
     {
         \Phake::verify($this->resourceChecker, \Phake::times(1))->isFile($storageFilename);
@@ -166,5 +91,18 @@ class WebDAVStorageDriverTest extends TestCase
     private function givenResourceChecker_isFile_returnsBool(bool $isFile): void
     {
         \Phake::when($this->resourceChecker)->isFile(\Phake::anyParameters())->thenReturn($isFile);
+    }
+
+    private function assertResourceManipulator_getResource_isCalledOnceWithResourceUri(string $resourceUri): void
+    {
+        \Phake::verify($this->resourceManipulator, \Phake::times(1))->getResource($resourceUri);
+    }
+
+    private function givenResourceManipulator_getResource_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->resourceManipulator)->getResource(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
     }
 }
