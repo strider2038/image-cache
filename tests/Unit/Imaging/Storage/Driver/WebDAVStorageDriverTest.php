@@ -28,7 +28,6 @@ class WebDAVStorageDriverTest extends TestCase
     private const BASE_DIRECTORY = 'base_directory';
     private const FILENAME = 'filename.jpg';
     private const FILENAME_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME;
-    private const CONTENTS = 'contents';
 
     /** @var GuzzleClientAdapter */
     private $clientAdapter;
@@ -115,14 +114,14 @@ class WebDAVStorageDriverTest extends TestCase
     public function resourcePropertiesAndFileExistsProvider(): array
     {
         return [
-//            [
-//                new ResourcePropertiesCollection(),
-//                false,
-//            ],
-//            [
-//                $this->givenResourcePropertiesCollectionForDirectory(),
-//                false,
-//            ],
+            [
+                new ResourcePropertiesCollection(),
+                false,
+            ],
+            [
+                $this->givenResourcePropertiesCollectionForDirectory(),
+                false,
+            ],
             [
                 $this->givenResourcePropertiesCollectionForFile(),
                 true,
