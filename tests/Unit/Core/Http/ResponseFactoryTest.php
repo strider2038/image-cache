@@ -114,7 +114,7 @@ class ResponseFactoryTest extends FileTestCase
     {
         $factory = $this->createResponseFactory();
         $statusCode = new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED);
-        $filename = $this->givenAssetFile(self::IMAGE_BOX_JPG);
+        $filename = $this->givenAssetFilename(self::IMAGE_BOX_JPG);
         $this->givenFileOperations_isFile_returns($this->fileOperations, $filename, true);
         $stream = $this->givenFileOperations_openFile_returnsStream($this->fileOperations);
 

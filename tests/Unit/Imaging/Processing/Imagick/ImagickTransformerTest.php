@@ -39,7 +39,7 @@ class ImagickTransformerTest extends FileTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->imagick = new \Imagick($this->givenAssetFile(self::IMAGE_BOX_JPG));
+        $this->imagick = new \Imagick($this->givenAssetFilename(self::IMAGE_BOX_JPG));
         $this->fileOperations = \Phake::mock(FileOperationsInterface::class);
         $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
     }

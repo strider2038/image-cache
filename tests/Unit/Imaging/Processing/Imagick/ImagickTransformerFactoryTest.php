@@ -45,7 +45,7 @@ class ImagickTransformerFactoryTest extends FileTestCase
     private function givenStream(): StreamInterface
     {
         $stream = \Phake::mock(StreamInterface::class);
-        $imageContents = file_get_contents($this->givenAssetFile(self::IMAGE_BOX_PNG));
+        $imageContents = file_get_contents($this->givenAssetFilename(self::IMAGE_BOX_PNG));
         \Phake::when($stream)->getContents()->thenReturn($imageContents);
 
         return $stream;

@@ -118,8 +118,8 @@ class FileOperationsTest extends FileTestCase
     /** @test */
     public function findByMask_givenFiles_filesInList(): void
     {
-        $this->givenAssetFile(self::FILE_JSON,self::FILE_LIST_FILENAME1);
-        $this->givenAssetFile(self::FILE_JSON,self::FILE_LIST_FILENAME2);
+        $this->givenAssetFilename(self::FILE_JSON,self::FILE_LIST_FILENAME1);
+        $this->givenAssetFilename(self::FILE_JSON,self::FILE_LIST_FILENAME2);
         $fileOperations = $this->createFileOperations();
 
         $list = $fileOperations->findByMask(self::FILE_LIST_MASK);
