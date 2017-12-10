@@ -15,19 +15,25 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
+use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\RequestOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceManipulator;
 use Strider2038\ImgCache\Utility\HttpClientInterface;
 
 class ResourceManipulatorTest extends TestCase
 {
     private const RESOURCE_URI = 'resource_uri';
+    private const REQUEST_OPTIONS = ['request_options'];
 
     /** @var HttpClientInterface */
     private $client;
 
+    /** @var RequestOptionsFactoryInterface */
+    private $requestOptionsFactory;
+
     protected function setUp(): void
     {
         $this->client = \Phake::mock(HttpClientInterface::class);
+        $this->requestOptionsFactory = \Phake::mock(RequestOptionsFactoryInterface::class);
     }
 
     /** @test */
@@ -77,9 +83,46 @@ class ResourceManipulatorTest extends TestCase
         $manipulator->getResource(self::RESOURCE_URI);
     }
 
+    /** @test */
+    public function putResource_givenResourceUriAndContents_contentsSentToServerViaHttpClient(): void
+    {
+        $manipulator = $this->createResourceManipulator();
+        $stream = $this->givenStream();
+        $this->givenRequestOptionsFactory_createPutOptions_returnsArray(self::REQUEST_OPTIONS);
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::CREATED);
+
+        $manipulator->putResource(self::RESOURCE_URI, $stream);
+
+        $this->assertRequestOptionsFactory_createPutOptions_isCalledOnceWithStream($stream);
+        $this->assertClient_request_isCalledWithMethodAndUriAndOptions(
+            WebDAVMethodEnum::PUT,
+            self::RESOURCE_URI,
+            self::REQUEST_OPTIONS
+        );
+        $this->assertResponse_getStatusCode_isCalledOnce($response);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Unexpected response from API
+     */
+    public function putResource_givenResourceUriAndContentsAndResponseHasErrorCode_badApiResponseExceptionThrown(): void
+    {
+        $manipulator = $this->createResourceManipulator();
+        $stream = $this->givenStream();
+        $this->givenRequestOptionsFactory_createPutOptions_returnsArray(self::REQUEST_OPTIONS);
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::FORBIDDEN);
+
+        $manipulator->putResource(self::RESOURCE_URI, $stream);
+    }
+
     private function createResourceManipulator(): ResourceManipulator
     {
-        return new ResourceManipulator($this->client);
+        return new ResourceManipulator($this->client, $this->requestOptionsFactory);
     }
 
     private function assertClient_request_isCalledOnceWithMethodAndPath(string $method, string $path): void
@@ -116,5 +159,28 @@ class ResourceManipulatorTest extends TestCase
     private function assertResponse_getBody_isCalledOnce(ResponseInterface $response): void
     {
         \Phake::verify($response, \Phake::times(1))->getBody();
+    }
+
+    private function assertClient_request_isCalledWithMethodAndUriAndOptions(
+        string $method,
+        string $uri,
+        array $options
+    ): void {
+        \Phake::verify($this->client, \Phake::times(1))->request($method, $uri, $options);
+    }
+
+    private function assertRequestOptionsFactory_createPutOptions_isCalledOnceWithStream(StreamInterface $stream): void
+    {
+        \Phake::verify($this->requestOptionsFactory, \Phake::times(1))->createPutOptions($stream);
+    }
+
+    private function givenRequestOptionsFactory_createPutOptions_returnsArray(array $options): void
+    {
+        \Phake::when($this->requestOptionsFactory)->createPutOptions(\Phake::anyParameters())->thenReturn($options);
+    }
+
+    private function givenStream(): StreamInterface
+    {
+        return \Phake::mock(StreamInterface::class);
     }
 }

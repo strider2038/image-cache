@@ -25,9 +25,13 @@ class ResourceManipulator implements ResourceManipulatorInterface
     /** @var HttpClientInterface */
     private $client;
 
-    public function __construct(HttpClientInterface $client)
+    /** @var RequestOptionsFactoryInterface */
+    private $requestOptionsFactory;
+
+    public function __construct(HttpClientInterface $client, RequestOptionsFactoryInterface $requestOptionsFactory)
     {
         $this->client = $client;
+        $this->requestOptionsFactory = $requestOptionsFactory;
     }
 
     public function getResource(string $resourceUri): StreamInterface
@@ -51,5 +55,22 @@ class ResourceManipulator implements ResourceManipulatorInterface
         }
 
         return $response->getBody();
+    }
+
+    public function putResource(string $resourceUri, StreamInterface $contents): void
+    {
+        $requestOptions = $this->requestOptionsFactory->createPutOptions($contents);
+        $response = $this->client->request(WebDAVMethodEnum::PUT, $resourceUri, $requestOptions);
+        $statusCode = $response->getStatusCode()->getValue();
+
+        if ($statusCode !== HttpStatusCodeEnum::CREATED) {
+            throw new BadApiResponseException(
+                sprintf(
+                    'Unexpected response from API: %d %s.',
+                    $statusCode,
+                    $response->getReasonPhrase()
+                )
+            );
+        }
     }
 }
