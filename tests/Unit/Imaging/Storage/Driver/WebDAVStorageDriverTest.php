@@ -15,16 +15,16 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
-use Strider2038\ImgCache\Enum\WebDAVResourceTypeEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
-use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceProperties;
-use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourcePropertiesCollection;
-use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourcePropertiesGetterInterface;
+use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceCheckerInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
+use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 class WebDAVStorageDriverTest extends TestCase
 {
+    use ProviderTrait;
+
     private const BASE_DIRECTORY = 'base_directory';
     private const FILENAME = 'filename.jpg';
     private const FILENAME_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME;
@@ -32,13 +32,13 @@ class WebDAVStorageDriverTest extends TestCase
     /** @var GuzzleClientAdapter */
     private $clientAdapter;
 
-    /** @var ResourcePropertiesGetterInterface */
-    private $propertiesGetter;
+    /** @var ResourceCheckerInterface */
+    private $resourceChecker;
 
     protected function setUp(): void
     {
         $this->clientAdapter = \Phake::mock(GuzzleClientAdapter::class);
-        $this->propertiesGetter = \Phake::mock(ResourcePropertiesGetterInterface::class);
+        $this->resourceChecker = \Phake::mock(ResourceCheckerInterface::class);
     }
 
     /** @test */
@@ -93,45 +93,25 @@ class WebDAVStorageDriverTest extends TestCase
 
     /**
      * @test
-     * @dataProvider resourcePropertiesAndFileExistsProvider
-     * @param ResourcePropertiesCollection $propertiesCollection
+     * @dataProvider boolValuesProvider
      * @param bool $expectedFileExists
      */
     public function fileExists_givenStorageFilenameAndResourcePropertiesCollection_boolReturned(
-        ResourcePropertiesCollection $propertiesCollection,
         bool $expectedFileExists
     ): void {
         $driver = $this->createWebDAVStorageDriver();
         $storageFilename = $this->givenStorageFilename();
-        $this->givenResourcePropertiesGetter_getResourcePropertiesCollection_returnsResourcePropertiesCollection($propertiesCollection);
+        $this->givenResourceChecker_isFile_returnsBool($expectedFileExists);
 
         $fileExists = $driver->fileExists($storageFilename);
 
-        $this->assertResourcePropertiesGetter_getResourcePropertiesCollection_isCalledOnceWithRequestUri(self::FILENAME_FULL);
+        $this->assertResourceChecker_isFile_isCalledOnceWithResourceUri(self::FILENAME_FULL);
         $this->assertEquals($expectedFileExists, $fileExists);
-    }
-
-    public function resourcePropertiesAndFileExistsProvider(): array
-    {
-        return [
-            [
-                new ResourcePropertiesCollection(),
-                false,
-            ],
-            [
-                $this->givenResourcePropertiesCollectionForDirectory(),
-                false,
-            ],
-            [
-                $this->givenResourcePropertiesCollectionForFile(),
-                true,
-            ],
-        ];
     }
 
     private function createWebDAVStorageDriver(): WebDAVStorageDriver
     {
-        return new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->clientAdapter, $this->propertiesGetter);
+        return new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->clientAdapter, $this->resourceChecker);
     }
 
     private function givenStorageFilename(): StorageFilenameInterface
@@ -178,35 +158,13 @@ class WebDAVStorageDriverTest extends TestCase
         \Phake::verify($response, \Phake::times(1))->getBody();
     }
 
-    private function assertResourcePropertiesGetter_getResourcePropertiesCollection_isCalledOnceWithRequestUri(
-        string $resourceUri
-    ): void {
-        \Phake::verify($this->propertiesGetter, \Phake::times(1))->getResourcePropertiesCollection($resourceUri);
-    }
-
-    private function givenResourcePropertiesGetter_getResourcePropertiesCollection_returnsResourcePropertiesCollection(
-        ResourcePropertiesCollection $resourcePropertiesCollection
-    ): void {
-        \Phake::when($this->propertiesGetter)
-            ->getResourcePropertiesCollection(\Phake::anyParameters())
-            ->thenReturn($resourcePropertiesCollection);
-    }
-
-    private function givenResourcePropertiesCollectionForDirectory(): ResourcePropertiesCollection
+    private function assertResourceChecker_isFile_isCalledOnceWithResourceUri(string $storageFilename): void
     {
-        $properties = \Phake::mock(ResourceProperties::class);
-        $resourceType = new WebDAVResourceTypeEnum(WebDAVResourceTypeEnum::DIRECTORY);
-        \Phake::when($properties)->getResourceType()->thenReturn($resourceType);
-
-        return new ResourcePropertiesCollection([$properties]);
+        \Phake::verify($this->resourceChecker, \Phake::times(1))->isFile($storageFilename);
     }
 
-    private function givenResourcePropertiesCollectionForFile(): ResourcePropertiesCollection
+    private function givenResourceChecker_isFile_returnsBool(bool $isFile): void
     {
-        $properties = \Phake::mock(ResourceProperties::class);
-        $resourceType = new WebDAVResourceTypeEnum(WebDAVResourceTypeEnum::FILE);
-        \Phake::when($properties)->getResourceType()->thenReturn($resourceType);
-
-        return new ResourcePropertiesCollection([$properties]);
+        \Phake::when($this->resourceChecker)->isFile(\Phake::anyParameters())->thenReturn($isFile);
     }
 }
