@@ -11,7 +11,10 @@
 namespace Strider2038\ImgCache\Tests\Integration;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
+use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
+use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
@@ -56,9 +59,9 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
             self::BASE_DIRECTORY . self::FILENAME,
             self::JSON_TEMPORARY_FILENAME
         );
-        $key = new StorageFilename(self::FILENAME);
+        $storageFilename = new StorageFilename(self::FILENAME);
 
-        $stream = $this->driver->getFileContents($key);
+        $stream = $this->driver->getFileContents($storageFilename);
 
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertStringEqualsFile(self::JSON_TEMPORARY_FILENAME, $stream->getContents());
@@ -71,9 +74,9 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
      */
     public function getFileContents_givenNotExistingFilename_exceptionThrown(): void
     {
-        $key = new StorageFilename(self::FILENAME);
+        $storageFilename = new StorageFilename(self::FILENAME);
 
-        $this->driver->getFileContents($key);
+        $this->driver->getFileContents($storageFilename);
     }
 
     /** @test */
@@ -84,21 +87,32 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
             self::BASE_DIRECTORY . self::FILENAME,
             self::JSON_TEMPORARY_FILENAME
         );
-        $key = new StorageFilename(self::FILENAME);
+        $storageFilename = new StorageFilename(self::FILENAME);
 
-        $fileExists = $this->driver->fileExists($key);
+        $fileExists = $this->driver->fileExists($storageFilename);
 
         $this->assertTrue($fileExists);
     }
 
     /** @test */
-    public function fileExists_givenNotExistingFilename_false(): void
+    public function fileExists_givenNotExistingFilename_falseReturned(): void
     {
-        $key = new StorageFilename(self::FILENAME);
+        $storageFilename = new StorageFilename(self::FILENAME);
 
-        $fileExists = $this->driver->fileExists($key);
+        $fileExists = $this->driver->fileExists($storageFilename);
 
         $this->assertFalse($fileExists);
+    }
+    
+    /** @test */
+    public function createFile_givenFilenameAndContents_fileCreatedInStorage(): void
+    {
+        $storageFilename = new StorageFilename(self::FILENAME);
+        $stream = $this->givenFileContents();
+        
+        $this->driver->createFile($storageFilename, $stream);
+
+        $this->assertStorageFileExists(self::FILENAME);
     }
 
     private function givenUploadedFile(string $remoteFilename, string $localFilename): void
@@ -121,5 +135,32 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
                 'expect' => true,
             ]
         );
+    }
+
+    private function givenFileContents(): StreamInterface
+    {
+        $this->givenJsonFile(self::JSON_TEMPORARY_FILENAME);
+        $resource = fopen(self::JSON_TEMPORARY_FILENAME, 'rb');
+
+        return new ResourceStream($resource);
+    }
+
+    private function assertStorageFileExists(string $filename): void
+    {
+        try {
+            $response = $this->client->request(
+                WebDAVMethodEnum::PROPFIND,
+                $filename,
+                [
+                    'headers' => [
+                        'Depth' => '0',
+                    ],
+                ]
+            );
+        } catch (ClientException $exception) {
+            $response = $exception->getResponse();
+        }
+
+        $this->assertEquals(HttpStatusCodeEnum::MULTI_STATUS, $response->getStatusCode());
     }
 }
