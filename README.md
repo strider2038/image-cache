@@ -27,8 +27,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Logging guzzle requests
 - [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
 - [ ] Yandex.Disk source
-  - YandexDiskSource
-  - YandexDiskSourceAccessor
+  - logging
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
   - storage and cache key as data object
@@ -49,6 +48,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Performance optimization (lazy services, validation cache)
 - [ ] Support for phpDocumentor
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
+- [ ] Refactor HttpClientInterface to use object-based options
 
 ## Ideas
 - Google map source (inspect licensing problems)

@@ -86,6 +86,11 @@ services:
     factory:
       - '@guzzle_handler_stack_factory'
       - 'createLoggerStack'
+  yandex_map_client_adapter:
+    class: Strider2038\ImgCache\Utility\GuzzleClientAdapter
+    arguments:
+      - '@yandex_map_client'
+      - '@stream_factory'
 
   # routing components
   router:
@@ -314,8 +319,7 @@ services:
   yandex_map_storage_driver:
     class: Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver
     arguments:
-      - '@yandex_map_client'
-      - '@stream_factory'
+      - '@yandex_map_client_adapter'
     calls:
       - [setLogger, ['@logger']]
 

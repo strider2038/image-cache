@@ -104,6 +104,7 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     {
         $response = \Phake::mock(ResponseInterface::class);
         \Phake::when($this->client)->request(\Phake::anyParameters())->thenReturn($response);
+        \Phake::when($response)->getHeaders()->thenReturn([]);
         \Phake::when($response)->getStatusCode()->thenReturn(HttpStatusCodeEnum::OK);
 
         return $response;

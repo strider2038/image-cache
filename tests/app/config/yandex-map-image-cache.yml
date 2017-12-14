@@ -21,6 +21,13 @@ services:
       - '@stream_factory'
       - '@file_operations'
 
+  # utility
+  guzzle_client_adapter:
+    class: Strider2038\ImgCache\Utility\GuzzleClientAdapter
+    arguments:
+      - '@client_mock'
+      - '@stream_factory'
+
   # service
   image_controller:
     class: Strider2038\ImgCache\Service\ImageController
@@ -111,8 +118,7 @@ services:
   yandex_map_storage_driver:
     class: Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver
     arguments:
-      - '@client_mock'
-      - '@stream_factory'
+      - '@guzzle_client_adapter'
 
   # imaging/processing
   save_options_factory:

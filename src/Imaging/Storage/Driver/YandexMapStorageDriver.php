@@ -10,28 +10,24 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
-use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\BadApiResponseException;
+use Strider2038\ImgCache\Utility\HttpClientInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class YandexMapStorageDriver implements YandexMapStorageDriverInterface
 {
-    /** @var ClientInterface */
+    /** @var HttpClientInterface */
     private $client;
-
-    /** @var StreamFactoryInterface */
-    private $streamFactory;
 
     /** @var string */
     private $key;
@@ -39,10 +35,9 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(ClientInterface $client, StreamFactoryInterface $streamFactory, string $key = '')
+    public function __construct(HttpClientInterface $client, string $key = '')
     {
         $this->client = $client;
-        $this->streamFactory = $streamFactory;
         $this->key = $key;
         $this->logger = new NullLogger();
     }
@@ -55,8 +50,7 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
     public function getMapContents(QueryParametersCollection $queryParameters): StreamInterface
     {
         $this->logger->info(sprintf(
-            'Sending request to "%s" with parameters: %s.',
-            $this->client->getConfig('base_uri'),
+            'Sending request for map image with parameters: %s.',
             json_encode($queryParameters->toArray())
         ));
 
@@ -65,40 +59,30 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
             $queryParameters->add(new QueryParameter('key', $this->key));
         }
 
-        try {
-            $response = $this->client->request(
-                HttpMethodEnum::GET,
-                '',
-                [
-                    RequestOptions::QUERY => $queryParameters->toArray()
-                ]
-            );
-        } catch (\Exception $exception) {
-            throw new BadApiResponseException(
-                'Unexpected response from API.',
-                HttpStatusCodeEnum::BAD_GATEWAY,
-                $exception
-            );
-        }
+        $response = $this->client->request(
+            HttpMethodEnum::GET,
+            '',
+            [
+                RequestOptions::QUERY => $queryParameters->toArray()
+            ]
+        );
 
-        if ($response->getStatusCode() !== HttpStatusCodeEnum::OK) {
+        $statusCode = $response->getStatusCode()->getValue();
+
+        if ($statusCode !== HttpStatusCodeEnum::OK) {
             throw new BadApiResponseException(
                 sprintf(
                     'Unexpected response from API: %d %s.',
-                    $response->getStatusCode(),
+                    $statusCode,
                     $response->getReasonPhrase()
                 )
             );
         }
 
-        $responseResource = $response->getBody()->detach();
-
-        if ($responseResource === null) {
-            throw new BadApiResponseException('Response has empty body.');
-        }
+        $body = $response->getBody();
 
         $this->logger->info('Successful response is received and response body returned.');
 
-        return $this->streamFactory->createStreamFromResource($responseResource);
+        return $body;
     }
 }
