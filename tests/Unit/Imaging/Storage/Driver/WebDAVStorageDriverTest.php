@@ -62,7 +62,7 @@ class WebDAVStorageDriverTest extends TestCase
      * @dataProvider boolValuesProvider
      * @param bool $expectedFileExists
      */
-    public function fileExists_givenStorageFilenameAndResourcePropertiesCollection_boolReturned(
+    public function fileExists_givenStorageFilenameAndResourceCheckerReturnsIsFile_boolReturned(
         bool $expectedFileExists
     ): void {
         $driver = $this->createWebDAVStorageDriver();
@@ -111,6 +111,17 @@ class WebDAVStorageDriverTest extends TestCase
             self::FILENAME_IN_SUBDIRECTORY_FULL,
             $fileContents
         );
+    }
+
+    /** @test */
+    public function deleteFile_givenStorageFilename_resourceManipulatorDeleteResourceIsCalled(): void
+    {
+        $driver = $this->createWebDAVStorageDriver();
+        $storageFilename = $this->givenStorageFilename();
+
+        $driver->deleteFile($storageFilename);
+
+        $this->assertResourceManipulator_deleteResource_isCalledOnceWithResourceUri(self::FILENAME_FULL);
     }
 
     private function createWebDAVStorageDriver(): WebDAVStorageDriver
@@ -165,6 +176,16 @@ class WebDAVStorageDriverTest extends TestCase
         \Phake::verify($this->resourceManipulator, \Phake::times(1))->putResource($resourceUri, $fileContents);
     }
 
+    private function assertResourceManipulator_deleteResource_isCalledOnceWithResourceUri(string $resourceUri): void
+    {
+        \Phake::verify($this->resourceManipulator, \Phake::times(1))->deleteResource($resourceUri);
+    }
+
+    private function assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(string $directoryUri): void
+    {
+        \Phake::verify($this->resourceManipulator, \Phake::times(1))->createDirectory($directoryUri);
+    }
+
     private function assertResourceChecker_isDirectory_isCalledOnceWithDirectoryName(string $directoryName): void
     {
         \Phake::verify($this->resourceChecker, \Phake::times(1))->isDirectory($directoryName);
@@ -178,10 +199,5 @@ class WebDAVStorageDriverTest extends TestCase
     private function givenResourceChecker_isDirectory_returnsBool(bool $isDirectory): void
     {
         \Phake::when($this->resourceChecker)->isDirectory(\Phake::anyParameters())->thenReturn($isDirectory);
-    }
-
-    private function assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(string $directoryUri): void
-    {
-        \Phake::verify($this->resourceManipulator, \Phake::times(1))->createDirectory($directoryUri);
     }
 }

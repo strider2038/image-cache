@@ -19,5 +19,6 @@ interface ResourceManipulatorInterface
 {
     public function getResource(string $resourceUri): StreamInterface;
     public function putResource(string $resourceUri, StreamInterface $contents): void;
+    public function deleteResource(string $resourceUri): void;
     public function createDirectory(string $directoryUri): void;
 }
