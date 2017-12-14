@@ -22,6 +22,12 @@ services:
             - '@stream_factory'
     xml_response_parser:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\XmlResponseParser
+    metadata_reader:
+        class: Strider2038\ImgCache\Utility\MetadataReader
+    request_options_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\RequestOptionsFactory
+        arguments:
+            - '@metadata_reader'
     resource_properties_getter:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourcePropertiesGetter
         arguments:
@@ -35,6 +41,7 @@ services:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceManipulator
         arguments:
             - '@client_adapter'
+            - '@request_options_factory'
     webdav_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver
         arguments:
