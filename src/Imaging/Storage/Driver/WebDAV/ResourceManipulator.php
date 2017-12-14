@@ -61,6 +61,12 @@ class ResourceManipulator implements ResourceManipulatorInterface
         $this->checkResponseIsValid($response, HttpStatusCodeEnum::CREATED);
     }
 
+    public function deleteResource(string $resourceUri): void
+    {
+        $response = $this->client->request(WebDAVMethodEnum::DELETE, $resourceUri);
+        $this->checkResponseIsValid($response, HttpStatusCodeEnum::NO_CONTENT);
+    }
+
     private function checkResponseIsValid(ResponseInterface $response, int $expectedStatusCode): void
     {
         $statusCode = $response->getStatusCode()->getValue();

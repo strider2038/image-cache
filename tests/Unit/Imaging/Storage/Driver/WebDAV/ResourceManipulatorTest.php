@@ -148,6 +148,34 @@ class ResourceManipulatorTest extends TestCase
         $manipulator->createDirectory(self::RESOURCE_URI);
     }
 
+    /** @test */
+    public function deleteResource_givenResourceUri_clientReturnsNoContentResponse(): void
+    {
+        $manipulator = $this->createResourceManipulator();
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::NO_CONTENT);
+
+        $manipulator->deleteResource(self::RESOURCE_URI);
+
+        $this->assertClient_request_isCalledOnceWithMethodAndPath(WebDAVMethodEnum::DELETE, self::RESOURCE_URI);
+        $this->assertResponse_getStatusCode_isCalledOnce($response);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Unexpected response from API
+     */
+    public function deleteResource_givenInvalidDirectoryUri_badApiResponseExceptionThrown(): void
+    {
+        $manipulator = $this->createResourceManipulator();
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::BAD_REQUEST);
+
+        $manipulator->deleteResource(self::RESOURCE_URI);
+    }
+
     private function createResourceManipulator(): ResourceManipulator
     {
         return new ResourceManipulator($this->client, $this->requestOptionsFactory);
