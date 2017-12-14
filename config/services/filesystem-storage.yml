@@ -1,0 +1,73 @@
+services:
+    # controller
+    filesystem_cache_image_controller:
+        class: Strider2038\ImgCache\Service\ImageController
+        arguments:
+            - '@response_factory'
+            - '@filesystem_cache_action_factory'
+            - '@security'
+    filesystem_cache_action_factory:
+        class: Strider2038\ImgCache\Service\Image\ImageActionFactory
+        arguments:
+            - '@filesystem_cache_action_get'
+            - '@filesystem_cache_action_create'
+            - '@filesystem_cache_action_replace'
+            - '@filesystem_cache_action_delete'
+    filesystem_cache_action_get:
+        class: Strider2038\ImgCache\Service\Image\GetAction
+        arguments:
+            - '@response_factory'
+            - '@filesystem_image_storage'
+            - '@filesystem_image_cache'
+    filesystem_cache_action_create:
+        class: Strider2038\ImgCache\Service\Image\CreateAction
+        arguments:
+            - '@response_factory'
+            - '@filesystem_image_storage'
+            - '@image_factory'
+    filesystem_cache_action_replace:
+        class: Strider2038\ImgCache\Service\Image\ReplaceAction
+        arguments:
+            - '@response_factory'
+            - '@filesystem_image_storage'
+            - '@filesystem_image_cache'
+            - '@image_factory'
+    filesystem_cache_action_delete:
+        class: Strider2038\ImgCache\Service\Image\DeleteAction
+        arguments:
+            - '@response_factory'
+            - '@filesystem_image_storage'
+            - '@filesystem_image_cache'
+
+    filesystem_image_storage:
+        class: Strider2038\ImgCache\Imaging\ImageStorage
+        arguments:
+            - '@filesystem_image_extractor'
+
+    filesystem_image_cache:
+        class: Strider2038\ImgCache\Imaging\ImageCache
+        arguments:
+            - '%filesystem_image_cache.base_directory%'
+            - '@file_operations'
+            - '@image_processor'
+
+    filesystem_image_extractor:
+        class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
+        arguments:
+            - '@thumbnail_key_parser'
+            - '@filesystem_storage_accessor'
+            - '@image_processor'
+
+    filesystem_storage_accessor:
+        class: Strider2038\ImgCache\Imaging\Storage\Accessor\FilesystemStorageAccessor
+        arguments:
+            - '@filesystem_storage_driver'
+            - '@image_factory'
+            - '@direct_key_mapper'
+        calls:
+            - [setLogger, ['@logger']]
+    filesystem_storage_driver:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver
+        arguments:
+            - '%filesystem_storage_driver.base_directory%'
+            - '@file_operations'
