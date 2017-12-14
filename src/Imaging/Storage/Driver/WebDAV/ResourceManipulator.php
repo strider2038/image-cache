@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV;
 
+use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
@@ -38,21 +39,11 @@ class ResourceManipulator implements ResourceManipulatorInterface
     {
         $response = $this->client->request(WebDAVMethodEnum::GET, $resourceUri);
 
-        $statusCode = $response->getStatusCode()->getValue();
-
-        if ($statusCode === HttpStatusCodeEnum::NOT_FOUND) {
+        if ($response->getStatusCode()->getValue() === HttpStatusCodeEnum::NOT_FOUND) {
             throw new FileNotFoundException(sprintf('File "%s" not found in storage.', $resourceUri));
         }
 
-        if ($statusCode !== HttpStatusCodeEnum::OK) {
-            throw new BadApiResponseException(
-                sprintf(
-                    'Unexpected response from API: %d %s.',
-                    $statusCode,
-                    $response->getReasonPhrase()
-                )
-            );
-        }
+        $this->checkResponseIsValid($response,HttpStatusCodeEnum::OK);
 
         return $response->getBody();
     }
@@ -61,9 +52,20 @@ class ResourceManipulator implements ResourceManipulatorInterface
     {
         $requestOptions = $this->requestOptionsFactory->createPutOptions($contents);
         $response = $this->client->request(WebDAVMethodEnum::PUT, $resourceUri, $requestOptions);
+        $this->checkResponseIsValid($response, HttpStatusCodeEnum::CREATED);
+    }
+
+    public function createDirectory(string $directoryUri): void
+    {
+        $response = $this->client->request(WebDAVMethodEnum::MKCOL, $directoryUri);
+        $this->checkResponseIsValid($response, HttpStatusCodeEnum::CREATED);
+    }
+
+    private function checkResponseIsValid(ResponseInterface $response, int $expectedStatusCode): void
+    {
         $statusCode = $response->getStatusCode()->getValue();
 
-        if ($statusCode !== HttpStatusCodeEnum::CREATED) {
+        if ($statusCode !== $expectedStatusCode) {
             throw new BadApiResponseException(
                 sprintf(
                     'Unexpected response from API: %d %s.',

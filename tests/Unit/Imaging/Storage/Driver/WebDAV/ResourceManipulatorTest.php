@@ -48,7 +48,7 @@ class ResourceManipulatorTest extends TestCase
 
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertClient_request_isCalledOnceWithMethodAndPath(WebDAVMethodEnum::GET, self::RESOURCE_URI);
-        $this->assertResponse_getStatusCode_isCalledOnce($response);
+        $this->assertResponse_getStatusCode_isCalledTwice($response);
         $this->assertResponse_getBody_isCalledOnce($response);
         $this->assertSame($responseBody, $stream);
     }
@@ -120,6 +120,34 @@ class ResourceManipulatorTest extends TestCase
         $manipulator->putResource(self::RESOURCE_URI, $stream);
     }
 
+    /** @test */
+    public function createDirectory_givenDirectoryUri_clientReturnsCreatedResponse(): void
+    {
+        $manipulator = $this->createResourceManipulator();
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::CREATED);
+
+        $manipulator->createDirectory(self::RESOURCE_URI);
+
+        $this->assertClient_request_isCalledOnceWithMethodAndPath(WebDAVMethodEnum::MKCOL, self::RESOURCE_URI);
+        $this->assertResponse_getStatusCode_isCalledOnce($response);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\BadApiResponseException
+     * @expectedExceptionCode 502
+     * @expectedExceptionMessage Unexpected response from API
+     */
+    public function createDirectory_givenInvalidDirectoryUri_badApiResponseExceptionThrown(): void
+    {
+        $manipulator = $this->createResourceManipulator();
+        $response = $this->givenClient_request_returnsResponse();
+        $this->givenResponse_getStatusCode_returnsCode($response, HttpStatusCodeEnum::CONFLICT);
+
+        $manipulator->createDirectory(self::RESOURCE_URI);
+    }
+
     private function createResourceManipulator(): ResourceManipulator
     {
         return new ResourceManipulator($this->client, $this->requestOptionsFactory);
@@ -133,6 +161,11 @@ class ResourceManipulatorTest extends TestCase
     private function assertResponse_getStatusCode_isCalledOnce(ResponseInterface $response): void
     {
         \Phake::verify($response, \Phake::times(1))->getStatusCode();
+    }
+
+    private function assertResponse_getStatusCode_isCalledTwice(ResponseInterface $response): void
+    {
+        \Phake::verify($response, \Phake::times(2))->getStatusCode();
     }
 
     private function givenClient_request_returnsResponse(): ResponseInterface
