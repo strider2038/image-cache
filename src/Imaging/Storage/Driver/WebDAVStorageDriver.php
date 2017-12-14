@@ -55,13 +55,31 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
 
     public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void
     {
-        $storageFilename = $this->baseDirectory . $filename->getValue();
+        $filenameString = $filename->getValue();
+        $directories = explode('/', pathinfo($filenameString, PATHINFO_DIRNAME));
 
+        if (count($directories) > 0 && $directories[0] !== '.') {
+            $this->createDirectoriesRecursively($directories);
+        }
+
+        $storageFilename = $this->baseDirectory . $filenameString;
         $this->resourceManipulator->putResource($storageFilename, $data);
     }
 
     public function deleteFile(StorageFilenameInterface $filename): void
     {
         // TODO: Implement deleteFile() method.
+    }
+
+    private function createDirectoriesRecursively(array $directories): void
+    {
+        $directoryName = rtrim($this->baseDirectory, '/');
+
+        foreach ($directories as $directory) {
+            $directoryName .= '/' . $directory;
+            if (!$this->resourceChecker->isDirectory($directoryName)) {
+                $this->resourceManipulator->createDirectory($directoryName);
+            }
+        }
     }
 }

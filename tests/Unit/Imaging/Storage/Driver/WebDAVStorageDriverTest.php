@@ -25,11 +25,16 @@ class WebDAVStorageDriverTest extends TestCase
     private const BASE_DIRECTORY = 'base_directory';
     private const FILENAME = 'filename.jpg';
     private const FILENAME_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME;
+    private const FILENAME_IN_SUBDIRECTORY = 'a/b/c/' . self::FILENAME;
+    private const FILENAME_IN_SUBDIRECTORY_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME_IN_SUBDIRECTORY;
+    private const SUBDIRECTORY_A = self::BASE_DIRECTORY . '/a';
+    private const SUBDIRECTORY_B = self::BASE_DIRECTORY . '/a/b';
+    private const SUBDIRECTORY_C = self::BASE_DIRECTORY . '/a/b/c';
 
     /** @var ResourceManipulatorInterface */
     private $resourceManipulator;
 
-    /** @var ResourceManipulatorInterface */
+    /** @var ResourceCheckerInterface */
     private $resourceChecker;
 
     protected function setUp(): void
@@ -75,7 +80,7 @@ class WebDAVStorageDriverTest extends TestCase
     {
         $driver = $this->createWebDAVStorageDriver();
         $storageFilename = $this->givenStorageFilename();
-        $fileContents = \Phake::mock(StreamInterface::class);
+        $fileContents = $this->givenStream();
 
         $driver->createFile($storageFilename, $fileContents);
 
@@ -83,19 +88,51 @@ class WebDAVStorageDriverTest extends TestCase
             self::FILENAME_FULL,
             $fileContents
         );
+        $this->assertResourceChecker_isDirectory_isNeverCalled();
+    }
+
+    /** @test */
+    public function createFile_givenStorageFilenameInSubDirectoryAndFileContents_directoriesCreatedRecursively(): void
+    {
+        $driver = $this->createWebDAVStorageDriver();
+        $storageFilename = $this->givenStorageFilename(self::FILENAME_IN_SUBDIRECTORY);
+        $fileContents = $this->givenStream();
+        $this->givenResourceChecker_isDirectory_returnsBool(false);
+
+        $driver->createFile($storageFilename, $fileContents);
+
+        $this->assertResourceChecker_isDirectory_isCalledOnceWithDirectoryName(self::SUBDIRECTORY_A);
+        $this->assertResourceChecker_isDirectory_isCalledOnceWithDirectoryName(self::SUBDIRECTORY_B);
+        $this->assertResourceChecker_isDirectory_isCalledOnceWithDirectoryName(self::SUBDIRECTORY_C);
+        $this->assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(self::SUBDIRECTORY_A);
+        $this->assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(self::SUBDIRECTORY_B);
+        $this->assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(self::SUBDIRECTORY_C);
+        $this->assertResourceManipulator_putResource_isCalledOnceWithResourceUriAndStream(
+            self::FILENAME_IN_SUBDIRECTORY_FULL,
+            $fileContents
+        );
     }
 
     private function createWebDAVStorageDriver(): WebDAVStorageDriver
     {
-        return new WebDAVStorageDriver(self::BASE_DIRECTORY, $this->resourceManipulator, $this->resourceChecker);
+        return new WebDAVStorageDriver(
+            self::BASE_DIRECTORY,
+            $this->resourceManipulator,
+            $this->resourceChecker
+        );
     }
 
-    private function givenStorageFilename(): StorageFilenameInterface
+    private function givenStorageFilename(string $filename = self::FILENAME): StorageFilenameInterface
     {
         $key = \Phake::mock(StorageFilenameInterface::class);
-        \Phake::when($key)->getValue()->thenReturn(self::FILENAME);
+        \Phake::when($key)->getValue()->thenReturn($filename);
 
         return $key;
+    }
+
+    private function givenStream(): StreamInterface
+    {
+        return \Phake::mock(StreamInterface::class);
     }
 
     private function assertResourceChecker_isFile_isCalledOnceWithResourceUri(string $storageFilename): void
@@ -126,5 +163,25 @@ class WebDAVStorageDriverTest extends TestCase
         StreamInterface $fileContents
     ): void {
         \Phake::verify($this->resourceManipulator, \Phake::times(1))->putResource($resourceUri, $fileContents);
+    }
+
+    private function assertResourceChecker_isDirectory_isCalledOnceWithDirectoryName(string $directoryName): void
+    {
+        \Phake::verify($this->resourceChecker, \Phake::times(1))->isDirectory($directoryName);
+    }
+
+    private function assertResourceChecker_isDirectory_isNeverCalled(): void
+    {
+        \Phake::verify($this->resourceChecker, \Phake::times(0))->isDirectory(\Phake::anyParameters());
+    }
+
+    private function givenResourceChecker_isDirectory_returnsBool(bool $isDirectory): void
+    {
+        \Phake::when($this->resourceChecker)->isDirectory(\Phake::anyParameters())->thenReturn($isDirectory);
+    }
+
+    private function assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(string $directoryUri): void
+    {
+        \Phake::verify($this->resourceManipulator, \Phake::times(1))->createDirectory($directoryUri);
     }
 }
