@@ -28,6 +28,8 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
     private const BASE_DIRECTORY = '/imgcache/';
     private const FILENAME = 'file.json';
     private const FILENAME_FULL = self::BASE_DIRECTORY . self::FILENAME;
+    private const FILENAME_IN_SUBDIRECTORY = 'a/b/c/file.json';
+    private const FILENAME_IN_SUBDIRECTORY_FULL = self::BASE_DIRECTORY . self::FILENAME_IN_SUBDIRECTORY;
     private const JSON_TEMPORARY_FILENAME = self::RUNTIME_DIRECTORY . '/' . self::FILENAME;
 
     /** @var ClientInterface */
@@ -114,6 +116,17 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
         $this->driver->createFile($storageFilename, $stream);
 
         $this->assertStorageFileExists(self::FILENAME_FULL);
+    }
+
+    /** @test */
+    public function createFile_givenFilenameInSubdirectoryAndContents_fileCreatedInStorage(): void
+    {
+        $storageFilename = new StorageFilename(self::FILENAME_IN_SUBDIRECTORY);
+        $stream = $this->givenFileContents();
+
+        $this->driver->createFile($storageFilename, $stream);
+
+        $this->assertStorageFileExists(self::FILENAME_IN_SUBDIRECTORY_FULL);
     }
 
     /** @todo test for createFile if another file with different content exists */
