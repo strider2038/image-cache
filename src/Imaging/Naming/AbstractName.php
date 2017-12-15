@@ -13,7 +13,23 @@ namespace Strider2038\ImgCache\Imaging\Naming;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageFilename extends AbstractName implements ImageFilenameInterface
+abstract class AbstractName
 {
+    /** @var string */
+    private $value;
 
+    public function __construct(string $value)
+    {
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+
+    public function __toString()
+    {
+        return $this->value;
+    }
 }

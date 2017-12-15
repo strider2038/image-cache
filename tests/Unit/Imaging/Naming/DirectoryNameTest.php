@@ -11,30 +11,18 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 
-class ImageFilenameTest extends TestCase
+class DirectoryNameTest extends TestCase
 {
-    private const VALUE = 'value';
-
     /** @var ModelValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
         $this->validator = new ModelValidator();
-    }
-
-    /** @test */
-    public function toString_givenImageFilename_valueReturned(): void
-    {
-        $imageFilename = new ImageFilename(self::VALUE);
-
-        $stringValue = (string) $imageFilename;
-
-        $this->assertEquals(self::VALUE, $stringValue);
     }
 
     /**
@@ -45,9 +33,9 @@ class ImageFilenameTest extends TestCase
      */
     public function validate_givenImageFilename_violationsReturned(string $value, int $violationsCount): void
     {
-        $imageFilename = new ImageFilename($value);
+        $directoryName = new DirectoryName($value);
 
-        $violations = $this->validator->validateModel($imageFilename);
+        $violations = $this->validator->validateModel($directoryName);
 
         $this->assertCount($violationsCount, $violations);
     }
@@ -56,15 +44,10 @@ class ImageFilenameTest extends TestCase
     {
         return [
             ['', 1],
-            ['/', 2],
-            ['*image.jpg', 1],
-            ['/image.jpg', 1],
-            ['image.dat', 1],
-            ['image.jpeg', 0],
-            ['Image_Jpeg-1=0+.jpg', 0],
-            ['dir/name/file.png', 0],
-            ['dir/name/file..png', 1],
-            ['dir//name//file.png', 1],
+            ['/', 1],
+            ['/directory//name', 1],
+            ['/$directory', 1],
+            ['/Directory_Name/sub.a-b', 0],
         ];
     }
 }

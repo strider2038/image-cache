@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Naming;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageFilename extends AbstractName implements ImageFilenameInterface
+class DirectoryName extends AbstractName implements DirectoryNameInterface
 {
 
 }
