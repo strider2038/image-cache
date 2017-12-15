@@ -1,5 +1,6 @@
 parameters:
     image_cache.base_directory: '%test.web_directory%'
+    storage_driver.base_directory: 'imgcache'
 
 services:
     # external
@@ -153,7 +154,7 @@ services:
     filesystem_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver
         arguments:
-            - '%filesystem_storage_driver.base_directory%'
+            - '%storage_driver.base_directory%'
             - '@webdav_resource_manipulator'
             - '@webdav_resource_checker'
     direct_key_mapper:
