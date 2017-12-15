@@ -26,6 +26,10 @@ interface DirectoryNameInterface extends ModelInterface
      *     message="Directory name can contain only latin symbols, digits, dots, slashes and '_', '-'"
      * )
      * @Assert\Regex(
+     *     pattern="/.*\/$/i",
+     *     message="Directory name must end with slash"
+     * )
+     * @Assert\Regex(
      *     pattern="/\/{2,}/",
      *     match=false,
      *     message="Directory name cannot contain duplicating slashes"

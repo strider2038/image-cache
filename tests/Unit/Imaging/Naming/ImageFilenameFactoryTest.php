@@ -76,7 +76,7 @@ class ImageFilenameFactoryTest extends TestCase
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Given invalid image filename
      */
-    public function createImageFilenameFromRequest_givenInvalidRequest_invalidConfigurationExceptionThrown(): void
+    public function createImageFilenameFromRequest_givenInvalidRequest_invalidRequestValueExceptionThrown(): void
     {
         $factory = new ImageFilenameFactory($this->validator, $this->violationFormatter);
         $request = $this->givenRequest();

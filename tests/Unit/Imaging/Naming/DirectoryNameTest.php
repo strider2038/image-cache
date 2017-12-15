@@ -45,9 +45,10 @@ class DirectoryNameTest extends TestCase
         return [
             ['', 1],
             ['/', 1],
-            ['/directory//name', 1],
-            ['/$directory', 1],
-            ['/Directory_Name/sub.a-b', 0],
+            ['/directory//name/', 1],
+            ['/$directory/', 1],
+            ['directory', 1],
+            ['/Directory_Name/sub.a-b/', 0],
         ];
     }
 }
