@@ -20,30 +20,8 @@ services:
         class: Strider2038\ImgCache\Service\Image\ImageActionFactory
         arguments:
             - '@yandex_map_cache_action_get'
-            - '@yandex_map_cache_action_create'
-            - '@yandex_map_cache_action_replace'
-            - '@yandex_map_cache_action_delete'
     yandex_map_cache_action_get:
         class: Strider2038\ImgCache\Service\Image\GetAction
-        arguments:
-            - '@response_factory'
-            - '@yandex_map_image_storage'
-            - '@yandex_map_image_cache'
-    yandex_map_cache_action_create:
-        class: Strider2038\ImgCache\Service\Image\CreateAction
-        arguments:
-            - '@response_factory'
-            - '@yandex_map_image_storage'
-            - '@image_factory'
-    yandex_map_cache_action_replace:
-        class: Strider2038\ImgCache\Service\Image\ReplaceAction
-        arguments:
-            - '@response_factory'
-            - '@yandex_map_image_storage'
-            - '@yandex_map_image_cache'
-            - '@image_factory'
-    yandex_map_cache_action_delete:
-        class: Strider2038\ImgCache\Service\Image\DeleteAction
         arguments:
             - '@response_factory'
             - '@yandex_map_image_storage'
