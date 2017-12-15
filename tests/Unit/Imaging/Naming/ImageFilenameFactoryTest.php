@@ -8,13 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
-use Strider2038\ImgCache\Imaging\ImageFilename;
-use Strider2038\ImgCache\Imaging\ImageFilenameFactory;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactory;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;

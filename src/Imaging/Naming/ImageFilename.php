@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging;
+namespace Strider2038\ImgCache\Imaging\Naming;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

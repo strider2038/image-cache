@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging;
+namespace Strider2038\ImgCache\Imaging\Naming;
 
 use Strider2038\ImgCache\Core\ModelInterface;
 use Symfony\Component\Validator\Constraints as Assert;

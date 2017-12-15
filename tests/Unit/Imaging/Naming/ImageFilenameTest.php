@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\ImageFilename;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
 use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 
