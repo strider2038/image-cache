@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Exception\InvalidConfigurationException;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 
 /**
@@ -25,22 +25,16 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
 {
     private const CHUNK_SIZE = 8 * 1024 * 1024;
 
-    /** @var string */
+    /** @var DirectoryNameInterface */
     private $baseDirectory;
 
     /** @var FileOperationsInterface */
     private $fileOperations;
     
-    public function __construct(string $baseDirectory, FileOperationsInterface $fileOperations)
+    public function __construct(DirectoryNameInterface $baseDirectory, FileOperationsInterface $fileOperations)
     {
         $this->fileOperations = $fileOperations;
-        $this->baseDirectory = rtrim($baseDirectory, '/');
-
-        if (!$this->fileOperations->isDirectory($this->baseDirectory)) {
-            throw new InvalidConfigurationException(sprintf('Directory "%s" does not exist', $baseDirectory));
-        }
-
-        $this->baseDirectory .= '/';
+        $this->baseDirectory = $baseDirectory;
     }
     
     public function getBaseDirectory(): string
@@ -70,7 +64,7 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
     public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void
     {
         $sourceFilename = $this->composeSourceFilename($filename);
-        $this->fileOperations->createDirectory(dirname($sourceFilename));
+        $this->fileOperations->createDirectory(\dirname($sourceFilename));
 
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::WRITE_AND_READ);
         $outputStream = $this->fileOperations->openFile($sourceFilename, $mode);

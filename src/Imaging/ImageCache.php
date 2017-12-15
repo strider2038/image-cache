@@ -12,9 +12,9 @@ namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 
@@ -25,7 +25,7 @@ class ImageCache implements ImageCacheInterface
 {
     /**
      * Web directory that contains image files
-     * @var string
+     * @var DirectoryNameInterface
      */
     private $webDirectory;
 
@@ -36,17 +36,10 @@ class ImageCache implements ImageCacheInterface
     private $imageProcessor;
 
     public function __construct(
-        string $webDirectory,
+        DirectoryNameInterface $webDirectory,
         FileOperationsInterface $fileOperations,
         ImageProcessorInterface $imageProcessor
     ) {
-        if (!$fileOperations->isDirectory($webDirectory)) {
-            throw new InvalidConfigurationException(sprintf(
-                'Directory "%s" does not exist',
-                $webDirectory
-            ));
-        }
-
         $this->webDirectory = $webDirectory;
         $this->fileOperations = $fileOperations;
         $this->imageProcessor = $imageProcessor;
@@ -73,6 +66,7 @@ class ImageCache implements ImageCacheInterface
     {
         $destinationFileNameMask = $this->composeDestinationFileName($fileNameMask);
         $cachedFileNames = $this->fileOperations->findByMask($destinationFileNameMask);
+
         foreach ($cachedFileNames as $cachedFileName) {
             $this->fileOperations->deleteFile($cachedFileName);
         }

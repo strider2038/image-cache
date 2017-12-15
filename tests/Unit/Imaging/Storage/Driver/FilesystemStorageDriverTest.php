@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
@@ -26,39 +27,24 @@ class FilesystemStorageDriverTest extends TestCase
 {
     use FileOperationsTrait;
 
-    private const BASE_DIRECTORY = '/base';
+    private const BASE_DIRECTORY = '/base/';
+    private const BASE_DIRECTORY_WITHOUT_TRAILING_SLASH = '/base';
     private const FILENAME_NOT_EXIST = 'not.exist';
-    private const FILENAME_EXISTS_FULL = self::BASE_DIRECTORY . '/cat.jpg';
+    private const FILENAME_EXISTS_FULL = self::BASE_DIRECTORY . 'cat.jpg';
     private const FILENAME_EXISTS = 'cat.jpg';
     private const DATA = 'data';
     private const CHUNK_SIZE = 8 * 1024 * 1024;
+
+    /** @var DirectoryNameInterface */
+    private $baseDirectory;
 
     /** @var FileOperationsInterface */
     private $fileOperations;
 
     public function setUp(): void
     {
+        $this->baseDirectory = $this->givenDirectoryName();
         $this->fileOperations = $this->givenFileOperations();
-    }
-
-    /** @test */
-    public function construct_baseDirectoryExists_baseDirectoryIsReturned(): void
-    {
-        $driver = $this->createFilesystemStorageDriver();
-
-        $this->assertEquals(self::BASE_DIRECTORY . '/', $driver->getBaseDirectory());
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessageRegExp /Directory .* does not exist/
-     */
-    public function construct_baseDirectoryDoesNotExist_exceptionThrown(): void
-    {
-        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, false);
-        new FilesystemStorageDriver(self::BASE_DIRECTORY, $this->fileOperations);
     }
 
     /** @test */
@@ -127,7 +113,10 @@ class FilesystemStorageDriverTest extends TestCase
 
         $driver->createFile($filenameKey, $givenStream);
 
-        $this->assertFileOperations_createDirectory_isCalledOnce($this->fileOperations, self::BASE_DIRECTORY);
+        $this->assertFileOperations_createDirectory_isCalledOnce(
+            $this->fileOperations,
+            self::BASE_DIRECTORY_WITHOUT_TRAILING_SLASH
+        );
         $this->assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
             $this->fileOperations,
             self::FILENAME_EXISTS_FULL,
@@ -147,11 +136,19 @@ class FilesystemStorageDriverTest extends TestCase
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FILENAME_EXISTS_FULL);
     }
 
-    private function createFilesystemStorageDriver(string $baseDirectory = self::BASE_DIRECTORY): FilesystemStorageDriver
+    private function createFilesystemStorageDriver(): FilesystemStorageDriver
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);
 
-        return new FilesystemStorageDriver($baseDirectory, $this->fileOperations);
+        return new FilesystemStorageDriver($this->baseDirectory, $this->fileOperations);
+    }
+
+    private function givenDirectoryName(): DirectoryNameInterface
+    {
+        $directoryName = \Phake::mock(DirectoryNameInterface::class);
+        \Phake::when($directoryName)->__toString()->thenReturn(self::BASE_DIRECTORY);
+
+        return $directoryName;
     }
 
     private function givenFilenameKey($filename): StorageFilenameInterface

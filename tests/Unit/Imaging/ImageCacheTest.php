@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCache;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
@@ -28,6 +29,9 @@ class ImageCacheTest extends TestCase
     private const CACHE_FILE_NAME = self::WEB_DIRECTORY . self::FILE_NAME;
     private const FOUND_FILE_NAME = self::WEB_DIRECTORY . '/found';
 
+    /** @var DirectoryNameInterface */
+    private $webDirectory;
+
     /** @var FileOperationsInterface */
     private $fileOperations;
 
@@ -36,21 +40,9 @@ class ImageCacheTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->webDirectory = $this->givenDirectoryName();
         $this->fileOperations = \Phake::mock(FileOperationsInterface::class);
         $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessageRegExp /Directory .* does not exist/
-     */
-    public function construct_cacheDirectoryIsInvalid_exceptionThrown(): void
-    {
-        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::WEB_DIRECTORY, false);
-
-        new ImageCache(self::WEB_DIRECTORY, $this->fileOperations, $this->imageProcessor);
     }
 
     /**
@@ -105,11 +97,19 @@ class ImageCacheTest extends TestCase
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FOUND_FILE_NAME);
     }
 
+    private function givenDirectoryName(): DirectoryNameInterface
+    {
+        $directoryName = \Phake::mock(DirectoryNameInterface::class);
+        \Phake::when($directoryName)->__toString()->thenReturn(self::WEB_DIRECTORY);
+
+        return $directoryName;
+    }
+
     private function createImageCache(): ImageCache
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::WEB_DIRECTORY, true);
 
-        return new ImageCache(self::WEB_DIRECTORY, $this->fileOperations, $this->imageProcessor);
+        return new ImageCache($this->webDirectory, $this->fileOperations, $this->imageProcessor);
     }
 
     private function givenImage(): Image
