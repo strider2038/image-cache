@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\NullAction;
 use Strider2038\ImgCache\Service\Image\CreateAction;
 use Strider2038\ImgCache\Service\Image\DeleteAction;
 use Strider2038\ImgCache\Service\Image\GetAction;
@@ -47,13 +48,27 @@ class ImageActionFactoryTest extends TestCase
      * @param string $actionId
      * @param string $actionClass
      */
-    public function createAction_givenActionIdAndLocation_actionIsCreated(string $actionId, string $actionClass): void
+    public function createAction_givenActionId_actionReturned(string $actionId, string $actionClass): void
     {
         $factory = $this->createFactory();
 
         $action = $factory->createAction($actionId);
 
         $this->assertInstanceOf($actionClass, $action);
+    }
+
+    /**
+     * @test
+     * @dataProvider actionIdForNullAction
+     * @param string $actionId
+     */
+    public function createAction_givenActionId_nullActionReturned(string $actionId): void
+    {
+        $factory = new ImageActionFactory($this->getAction);
+
+        $action = $factory->createAction($actionId);
+
+        $this->assertInstanceOf(NullAction::class, $action);
     }
 
     /**
@@ -76,6 +91,15 @@ class ImageActionFactoryTest extends TestCase
             ['create', CreateAction::class],
             ['replace', ReplaceAction::class],
             ['delete', DeleteAction::class],
+        ];
+    }
+
+    public function actionIdForNullAction(): array
+    {
+        return [
+            ['create'],
+            ['replace'],
+            ['delete'],
         ];
     }
 

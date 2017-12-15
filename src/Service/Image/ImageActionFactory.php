@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Service\Image;
 
 use Strider2038\ImgCache\Core\ActionFactoryInterface;
 use Strider2038\ImgCache\Core\ActionInterface;
+use Strider2038\ImgCache\Core\NullAction;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
 
 /**
@@ -38,14 +39,14 @@ class ImageActionFactory implements ActionFactoryInterface
 
     public function __construct(
         GetAction $getAction,
-        CreateAction $createAction,
-        ReplaceAction $replaceAction,
-        DeleteAction $deleteAction
+        CreateAction $createAction = null,
+        ReplaceAction $replaceAction = null,
+        DeleteAction $deleteAction = null
     ) {
         $this->getAction = $getAction;
-        $this->createAction = $createAction;
-        $this->replaceAction = $replaceAction;
-        $this->deleteAction = $deleteAction;
+        $this->createAction = $createAction ?? new NullAction();
+        $this->replaceAction = $replaceAction ?? new NullAction();
+        $this->deleteAction = $deleteAction ?? new NullAction();
     }
 
     public function createAction(string $actionId): ActionInterface
