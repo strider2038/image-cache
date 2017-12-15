@@ -80,9 +80,19 @@ class FunctionalTestCase extends TestCase
         }
     }
 
+    private function givenAssetFileContents(string $assetFilename): string
+    {
+        return file_get_contents($assetFilename);
+    }
+
     protected function givenImageJpeg(string $filename): void
     {
         $this->givenAssetFile(self::FILENAME_IMAGE_JPEG, $filename);
+    }
+
+    protected function givenImageJpegContents(): string
+    {
+        return $this->givenAssetFileContents(self::FILENAME_IMAGE_JPEG);
     }
 
     protected function givenImagePng(string $filename): void

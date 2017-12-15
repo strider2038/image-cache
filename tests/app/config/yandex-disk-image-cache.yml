@@ -1,6 +1,6 @@
 parameters:
     image_cache.base_directory: '%test.web_directory%'
-    storage_driver.base_directory: 'imgcache'
+    storage_driver.base_directory: '/imgcache-test'
 
 services:
     # external
