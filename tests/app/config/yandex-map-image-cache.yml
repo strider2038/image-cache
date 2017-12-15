@@ -21,7 +21,7 @@ services:
       - '@stream_factory'
       - '@file_operations'
 
-  # utility
+  # utilities
   guzzle_client_adapter:
     class: Strider2038\ImgCache\Utility\GuzzleClientAdapter
     arguments:
