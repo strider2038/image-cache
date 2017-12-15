@@ -36,7 +36,7 @@ class RoutingPathFactory implements RoutingPathFactoryInterface
         $path = new RoutingPath($urlPrefix, $controllerId);
         $violations = $this->validator->validateModel($path);
 
-        if (count($violations) > 0) {
+        if (\count($violations) > 0) {
             throw new InvalidConfigurationException(sprintf(
                 'Invalid routing map: %s.',
                 $this->violationFormatter->formatViolations($violations)
