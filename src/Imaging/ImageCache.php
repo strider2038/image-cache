@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 
 /**
@@ -52,9 +53,9 @@ class ImageCache implements ImageCacheInterface
         $this->imageProcessor = $imageProcessor;
     }
 
-    public function getImage(string $fileName): ImageFile
+    public function getImage(ImageFilenameInterface $filename): ImageFile
     {
-        $destinationFileName = $this->composeDestinationFileName($fileName);
+        $destinationFileName = $this->composeDestinationFileName($filename);
 
         if (!$this->fileOperations->isFile($destinationFileName)) {
             throw new FileNotFoundException(sprintf('File "%s" does not exist', $destinationFileName));
@@ -63,9 +64,9 @@ class ImageCache implements ImageCacheInterface
         return new ImageFile($destinationFileName);
     }
 
-    public function putImage(string $fileName, Image $image): void
+    public function putImage(ImageFilenameInterface $filename, Image $image): void
     {
-        $destinationFileName = $this->composeDestinationFileName($fileName);
+        $destinationFileName = $this->composeDestinationFileName($filename);
         $this->imageProcessor->saveToFile($image, $destinationFileName);
     }
 

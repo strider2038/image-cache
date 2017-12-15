@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -33,37 +34,37 @@ class ImageStorage implements ImageStorageInterface
         $this->imageWriter = $imageWriter ?? new NullWriter();
     }
 
-    public function getImage(string $key): Image
+    public function getImage(ImageFilenameInterface $filename): Image
     {
-        $this->validateKey($key);
+        $this->validateKey($filename);
 
-        return $this->imageExtractor->extractImage($key);
+        return $this->imageExtractor->extractImage($filename);
     }
 
-    public function putImage(string $key, Image $image): void
+    public function putImage(ImageFilenameInterface $filename, Image $image): void
     {
-        $this->validateKey($key);
-        $this->imageWriter->insertImage($key, $image);
+        $this->validateKey($filename);
+        $this->imageWriter->insertImage($filename, $image);
     }
 
-    public function imageExists(string $key): bool
+    public function imageExists(ImageFilenameInterface $filename): bool
     {
-        $this->validateKey($key);
+        $this->validateKey($filename);
 
-        return $this->imageWriter->imageExists($key);
+        return $this->imageWriter->imageExists($filename);
     }
 
-    public function deleteImage(string $key): void
+    public function deleteImage(ImageFilenameInterface $filename): void
     {
-        $this->validateKey($key);
-        $this->imageWriter->deleteImage($key);
+        $this->validateKey($filename);
+        $this->imageWriter->deleteImage($filename);
     }
 
-    public function getImageFileNameMask(string $key): string
+    public function getImageFileNameMask(ImageFilenameInterface $filename): string
     {
-        $this->validateKey($key);
+        $this->validateKey($filename);
 
-        return $this->imageWriter->getImageFileNameMask($key);
+        return $this->imageWriter->getImageFileNameMask($filename);
     }
 
     private function validateKey(string $key): void
