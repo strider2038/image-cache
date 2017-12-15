@@ -41,4 +41,6 @@ interface ImageFilenameInterface extends ModelInterface
      * @return string
      */
     public function getValue(): string;
+
+    public function __toString();
 }

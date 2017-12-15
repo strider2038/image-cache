@@ -17,12 +17,24 @@ use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 
 class ImageFilenameTest extends TestCase
 {
+    private const VALUE = 'value';
+
     /** @var ModelValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
         $this->validator = new ModelValidator();
+    }
+
+    /** @test */
+    public function toString_givenImageFilename_valueReturned(): void
+    {
+        $imageFilename = new ImageFilename(self::VALUE);
+
+        $stringValue = (string) $imageFilename;
+
+        $this->assertEquals(self::VALUE, $stringValue);
     }
 
     /**
