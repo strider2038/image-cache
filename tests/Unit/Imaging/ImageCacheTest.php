@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\ImageCache;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 
@@ -22,11 +23,10 @@ class ImageCacheTest extends TestCase
 {
     use FileOperationsTrait;
 
-    private const WEB_DIRECTORY = 'web_directory';
-    private const FILE_NAME = '/file_name';
+    private const WEB_DIRECTORY = 'web_directory/';
+    private const FILE_NAME = 'file_name';
     private const CACHE_FILE_NAME = self::WEB_DIRECTORY . self::FILE_NAME;
     private const FOUND_FILE_NAME = self::WEB_DIRECTORY . '/found';
-    private const INVALID_FILE_NAME = 'file_name';
 
     /** @var FileOperationsInterface */
     private $fileOperations;
@@ -63,8 +63,9 @@ class ImageCacheTest extends TestCase
     {
         $cache = $this->createImageCache();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::CACHE_FILE_NAME, false);
+        $filename = $this->givenImageFilename(self::FILE_NAME);
 
-        $cache->getImage(self::FILE_NAME);
+        $cache->getImage($filename);
     }
 
     /** @test */
@@ -72,8 +73,9 @@ class ImageCacheTest extends TestCase
     {
         $cache = $this->createImageCache();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::CACHE_FILE_NAME, true);
+        $filename = $this->givenImageFilename(self::FILE_NAME);
 
-        $image = $cache->getImage(self::FILE_NAME);
+        $image = $cache->getImage($filename);
 
         $this->assertInstanceOf(ImageFile::class, $image);
         $this->assertEquals(self::CACHE_FILE_NAME, $image->getFilename());
@@ -84,8 +86,9 @@ class ImageCacheTest extends TestCase
     {
         $cache = $this->createImageCache();
         $image = $this->givenImage();
+        $filename = $this->givenImageFilename(self::FILE_NAME);
 
-        $cache->putImage(self::FILE_NAME, $image);
+        $cache->putImage($filename, $image);
 
         $this->assertImageProcessor_saveToFile_isCalledOnceWith($image, self::CACHE_FILE_NAME);
     }
@@ -102,30 +105,11 @@ class ImageCacheTest extends TestCase
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FOUND_FILE_NAME);
     }
 
-    /**
-     * @test
-     * @param string $method
-     * @param array $parameters
-     * @dataProvider methodAndParametersWithInvalidKeyProvider
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage Filename must start with slash
-     */
-    public function givenMethod_givenInvalidKey_exceptionThrown(string $method, array $parameters): void
+    private function createImageCache(): ImageCache
     {
-        $cache = $this->createImageCache();
+        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::WEB_DIRECTORY, true);
 
-        \call_user_func_array([$cache, $method], $parameters);
-    }
-
-    public function methodAndParametersWithInvalidKeyProvider(): array
-    {
-        return [
-            ['getImage', ['']],
-            ['getImage', [self::INVALID_FILE_NAME]],
-            ['putImage', [self::INVALID_FILE_NAME, $this->givenImage()]],
-            ['deleteImagesByMask', [self::INVALID_FILE_NAME]],
-        ];
+        return new ImageCache(self::WEB_DIRECTORY, $this->fileOperations, $this->imageProcessor);
     }
 
     private function givenImage(): Image
@@ -133,11 +117,12 @@ class ImageCacheTest extends TestCase
         return \Phake::mock(Image::class);
     }
 
-    private function createImageCache(): ImageCache
+    private function givenImageFilename(string $value): ImageFilenameInterface
     {
-        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::WEB_DIRECTORY, true);
+        $filename = \Phake::mock(ImageFilenameInterface::class);
+        \Phake::when($filename)->__toString()->thenReturn($value);
 
-        return new ImageCache(self::WEB_DIRECTORY, $this->fileOperations, $this->imageProcessor);
+        return $filename;
     }
 
     private function assertImageProcessor_saveToFile_isCalledOnceWith(Image $image, string $fileName): void

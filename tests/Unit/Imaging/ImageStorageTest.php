@@ -11,19 +11,18 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\ImageStorage;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ImageStorageTest extends TestCase
 {
     use ProviderTrait;
 
-    private const VALID_KEY = '/valid_key.jpg';
-    private const INVALID_KEY = 'invalid_key.jpg';
+    private const IMAGE_FILENAME_VALUE = 'image_filename.jpg';
     private const FILE_NAME_MASK = 'file_name_mask';
 
     /** @var ImageExtractorInterface */
@@ -43,11 +42,12 @@ class ImageStorageTest extends TestCase
     {
         $storage = $this->createImageStorage();
         $extractedImage = $this->givenImageExtractor_extractImage_returnsImage();
+        $filename = $this->givenImageFilename(self::IMAGE_FILENAME_VALUE);
 
-        $image = $storage->getImage(self::VALID_KEY);
+        $image = $storage->getImage($filename);
 
         $this->assertInstanceOf(Image::class, $image);
-        $this->assertImageExtractor_extractImage_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageExtractor_extractImage_isCalledOnceWith(self::IMAGE_FILENAME_VALUE);
         $this->assertSame($extractedImage, $image);
     }
 
@@ -56,10 +56,11 @@ class ImageStorageTest extends TestCase
     {
         $storage = $this->createImageStorage();
         $image = $this->givenImage();
+        $filename = $this->givenImageFilename(self::IMAGE_FILENAME_VALUE);
 
-        $storage->putImage(self::VALID_KEY, $image);
+        $storage->putImage($filename, $image);
 
-        $this->assertImageWriter_insertImage_isCalledOnceWith(self::VALID_KEY, $image);
+        $this->assertImageWriter_insertImage_isCalledOnceWith(self::IMAGE_FILENAME_VALUE, $image);
     }
 
     /**
@@ -71,21 +72,23 @@ class ImageStorageTest extends TestCase
     {
         $storage = $this->createImageStorage();
         $this->givenImageWriter_imageExists_returns($expectedExists);
+        $filename = $this->givenImageFilename(self::IMAGE_FILENAME_VALUE);
 
-        $exists = $storage->imageExists(self::VALID_KEY);
+        $exists = $storage->imageExists($filename);
 
         $this->assertEquals($expectedExists, $exists);
-        $this->assertImageWriter_imageExists_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageWriter_imageExists_isCalledOnceWith(self::IMAGE_FILENAME_VALUE);
     }
 
     /** @test */
     public function deleteImage_givenKey_imageDeletedFromSource(): void
     {
         $storage = $this->createImageStorage();
+        $filename = $this->givenImageFilename(self::IMAGE_FILENAME_VALUE);
 
-        $storage->deleteImage(self::VALID_KEY);
+        $storage->deleteImage($filename);
 
-        $this->assertImageWriter_deleteImage_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageWriter_deleteImage_isCalledOnceWith(self::IMAGE_FILENAME_VALUE);
     }
 
     /** @test */
@@ -93,44 +96,25 @@ class ImageStorageTest extends TestCase
     {
         $storage = $this->createImageStorage();
         $this->givenImageWriter_getImageFileNameMask_returnsFileNameMask();
+        $filename = $this->givenImageFilename(self::IMAGE_FILENAME_VALUE);
 
-        $mask = $storage->getImageFileNameMask(self::VALID_KEY);
+        $mask = $storage->getImageFileNameMask($filename);
 
-        $this->assertImageWriter_getImageFileNameMask_isCalledOnceWith(self::VALID_KEY);
+        $this->assertImageWriter_getImageFileNameMask_isCalledOnceWith(self::IMAGE_FILENAME_VALUE);
         $this->assertEquals(self::FILE_NAME_MASK, $mask);
-    }
-
-    /**
-     * @test
-     * @param string $method
-     * @param array $parameters
-     * @dataProvider methodAndParametersWithInvalidKeyProvider
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage Key must start with slash
-     */
-    public function givenMethod_givenInvalidKey_exceptionThrown(string $method, array $parameters): void
-    {
-        $storage = $this->createImageStorage();
-
-        \call_user_func_array([$storage, $method], $parameters);
-    }
-
-    public function methodAndParametersWithInvalidKeyProvider(): array
-    {
-        return [
-            ['getImage', ['']],
-            ['getImage', [self::INVALID_KEY]],
-            ['putImage', [self::INVALID_KEY, $this->givenImage()]],
-            ['deleteImage', [self::INVALID_KEY]],
-            ['imageExists', [self::INVALID_KEY]],
-            ['getImageFileNameMask', [self::INVALID_KEY]],
-        ];
     }
 
     private function createImageStorage(): ImageStorage
     {
         return new ImageStorage($this->imageExtractor, $this->imageWriter);
+    }
+
+    private function givenImageFilename(string $value): ImageFilenameInterface
+    {
+        $filename = \Phake::mock(ImageFilenameInterface::class);
+        \Phake::when($filename)->__toString()->thenReturn($value);
+
+        return $filename;
     }
 
     private function assertImageExtractor_extractImage_isCalledOnceWith(string $key): void
@@ -144,19 +128,6 @@ class ImageStorageTest extends TestCase
         \Phake::when($this->imageExtractor)->extractImage(\Phake::anyParameters())->thenReturn($extractedImage);
 
         return $extractedImage;
-    }
-
-    private function givenImage_getData_returnsStream(Image $image): StreamInterface
-    {
-        $data = \Phake::mock(StreamInterface::class);
-        \Phake::when($image)->getData()->thenReturn($data);
-
-        return $data;
-    }
-
-    private function assertImage_getData_isCalledOnce(Image $image): void
-    {
-        \Phake::verify($image, \Phake::times(1))->getData();
     }
 
     private function assertImageWriter_insertImage_isCalledOnceWith(string $key, Image $image): void

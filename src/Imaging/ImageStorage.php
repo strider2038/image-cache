@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
@@ -36,41 +35,26 @@ class ImageStorage implements ImageStorageInterface
 
     public function getImage(ImageFilenameInterface $filename): Image
     {
-        $this->validateKey($filename);
-
         return $this->imageExtractor->extractImage($filename);
     }
 
     public function putImage(ImageFilenameInterface $filename, Image $image): void
     {
-        $this->validateKey($filename);
         $this->imageWriter->insertImage($filename, $image);
     }
 
     public function imageExists(ImageFilenameInterface $filename): bool
     {
-        $this->validateKey($filename);
-
         return $this->imageWriter->imageExists($filename);
     }
 
     public function deleteImage(ImageFilenameInterface $filename): void
     {
-        $this->validateKey($filename);
         $this->imageWriter->deleteImage($filename);
     }
 
     public function getImageFileNameMask(ImageFilenameInterface $filename): string
     {
-        $this->validateKey($filename);
-
         return $this->imageWriter->getImageFileNameMask($filename);
-    }
-
-    private function validateKey(string $key): void
-    {
-        if (\strlen($key) <= 0 || $key[0] !== '/') {
-            throw new InvalidValueException('Key must start with slash');
-        }
     }
 }

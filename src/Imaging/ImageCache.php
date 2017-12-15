@@ -13,7 +13,6 @@ namespace Strider2038\ImgCache\Imaging;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
-use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
@@ -81,10 +80,6 @@ class ImageCache implements ImageCacheInterface
 
     private function composeDestinationFileName(string $fileName): string
     {
-        if (\strlen($fileName) <= 0 || $fileName[0] !== '/') {
-            throw new InvalidValueException('Filename must start with slash');
-        }
-
         return $this->webDirectory . $fileName;
     }
 }
