@@ -19,4 +19,7 @@ class HttpHeaderEnum extends Enum
 {
     public const AUTHORIZATION = 'Authorization';
     public const CONTENT_TYPE = 'Content-Type';
+    public const CONTENT_LENGTH = 'Content-Length';
+    public const ETAG = 'Etag';
+    public const SHA256 = 'Sha256';
 }

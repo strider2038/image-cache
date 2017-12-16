@@ -1,0 +1,7 @@
+imports:
+    - { resource: 'services/core.yml' }
+    - { resource: 'services/imaging.yml' }
+
+services:
+    logger:
+        class: Psr\Log\NullLogger

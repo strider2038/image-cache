@@ -18,6 +18,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 
 /**
  * Handles PUT request for creating new resource or replacing old one. If resource is already
@@ -30,6 +31,9 @@ class ReplaceAction implements ActionInterface
     /** @var ResponseFactoryInterface */
     private $responseFactory;
 
+    /** @var ImageFilenameFactoryInterface */
+    private $filenameFactory;
+
     /** @var ImageStorageInterface */
     private $imageStorage;
 
@@ -41,11 +45,13 @@ class ReplaceAction implements ActionInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
+        ImageFilenameFactoryInterface $filenameFactory,
         ImageStorageInterface $imageStorage,
         ImageCacheInterface $imageCache,
         ImageFactoryInterface $imageFactory
     ) {
         $this->responseFactory = $responseFactory;
+        $this->filenameFactory = $filenameFactory;
         $this->imageStorage = $imageStorage;
         $this->imageCache = $imageCache;
         $this->imageFactory = $imageFactory;
@@ -53,21 +59,21 @@ class ReplaceAction implements ActionInterface
 
     public function processRequest(RequestInterface $request): ResponseInterface
     {
-        $location = $request->getUri()->getPath();
+        $filename = $this->filenameFactory->createImageFilenameFromRequest($request);
 
-        if ($this->imageStorage->exists($location)) {
-            $this->imageStorage->delete($location);
-            $fileNameMask = $this->imageStorage->getFileNameMask($location);
-            $this->imageCache->deleteByMask($fileNameMask);
+        if ($this->imageStorage->imageExists($filename)) {
+            $this->imageStorage->deleteImage($filename);
+            $fileNameMask = $this->imageStorage->getImageFileNameMask($filename);
+            $this->imageCache->deleteImagesByMask($fileNameMask);
         }
 
         $stream = $request->getBody();
         $image = $this->imageFactory->createFromStream($stream);
-        $this->imageStorage->put($location, $image);
+        $this->imageStorage->putImage($filename, $image);
 
         return $this->responseFactory->createMessageResponse(
             new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
-            sprintf('Image "%s" successfully put to storage.', $location)
+            sprintf('Image "%s" successfully put to storage.', $filename)
         );
     }
 }

@@ -24,8 +24,8 @@ use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
  */
 class YandexMapImageCacheTest extends FunctionalTestCase
 {
-    private const PNG_FILENAME = self::RUNTIME_DIRECTORY . '/image.png';
-    private const JPEG_FILENAME = self::RUNTIME_DIRECTORY . '/image.jpg';
+    private const PNG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.png';
+    private const JPEG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.jpg';
     private const IMAGE_WITH_INVALID_PARAMETERS = '/size=0,0.jpg';
     private const IMAGE_JPEG_CACHE_KEY = '/ll=60.715799,28.729073_size=150,100.jpg';
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . '/ll=60.715799,28.729073_size=150,100.jpg';
@@ -46,10 +46,10 @@ class YandexMapImageCacheTest extends FunctionalTestCase
         parent::setUp();
         $container = $this->loadContainer('yandex-map-image-cache.yml');
         $this->client = \Phake::mock(ClientInterface::class);
-        $container->set('client_mock', $this->client);
+        $container->set('yandex_map_client', $this->client);
         $this->request = \Phake::mock(RequestInterface::class);
         $container->set('request', $this->request);
-        $this->controller = $container->get('image_controller');
+        $this->controller = $container->get('yandex_map_cache_image_controller');
     }
 
     /**
@@ -70,7 +70,7 @@ class YandexMapImageCacheTest extends FunctionalTestCase
         $response = $this->givenClient_request_returnsResponseWithStatus200();
         $this->givenImagePng(self::PNG_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
-        $this->givenResponse_getBody_getContents_returns($response, file_get_contents(self::PNG_FILENAME));
+        $this->givenResponse_getBody_detach_returnsResourceOfFile($response, self::PNG_FILENAME);
 
         $response = $this->controller->runAction('get', $this->request);
 
@@ -83,7 +83,7 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     {
         $response = $this->givenClient_request_returnsResponseWithStatus200();
         $this->givenImageJpeg(self::JPEG_FILENAME);
-        $this->givenResponse_getBody_getContents_returns($response, file_get_contents(self::JPEG_FILENAME));
+        $this->givenResponse_getBody_detach_returnsResourceOfFile($response, self::JPEG_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_PNG_CACHE_KEY);
 
         $response = $this->controller->runAction('get', $this->request);
@@ -104,15 +104,17 @@ class YandexMapImageCacheTest extends FunctionalTestCase
     {
         $response = \Phake::mock(ResponseInterface::class);
         \Phake::when($this->client)->request(\Phake::anyParameters())->thenReturn($response);
+        \Phake::when($response)->getHeaders()->thenReturn([]);
         \Phake::when($response)->getStatusCode()->thenReturn(HttpStatusCodeEnum::OK);
 
         return $response;
     }
 
-    private function givenResponse_getBody_getContents_returns(ResponseInterface $response, string $imageContents): void
+    private function givenResponse_getBody_detach_returnsResourceOfFile(ResponseInterface $response, string $filename): void
     {
         $stream = \Phake::mock(StreamInterface::class);
         \Phake::when($response)->getBody()->thenReturn($stream);
-        \Phake::when($stream)->getContents()->thenReturn($imageContents);
+        $resource = fopen($filename, 'rb');
+        \Phake::when($stream)->detach()->thenReturn($resource);
     }
 }

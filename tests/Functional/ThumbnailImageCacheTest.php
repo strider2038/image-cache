@@ -12,9 +12,10 @@ namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
-use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\ResourceStream;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
@@ -24,7 +25,7 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
     private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    private const IMAGE_JPEG_RUNTIME_FILENAME = self::RUNTIME_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
     private const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
     private const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
@@ -45,21 +46,23 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
         $container = $this->loadContainer('thumbnail-image-cache.yml');
         $this->request = \Phake::mock(RequestInterface::class);
         $container->set('request', $this->request);
-        $this->controller = $container->get('image_controller');
+        $this->controller = $container->get('filesystem_cache_image_controller');
     }
 
-    /** @test */
-    public function get_givenImageNotExistInSource_notFoundResponseReturned(): void
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
+     * @expectedExceptionCode 404
+     */
+    public function get_givenImageNotExistInStorage_notFoundExceptionThrown(): void
     {
         $this->givenRequest_getUri_getPath_returnsPath(self::FILE_NOT_EXIST);
 
-        $response = $this->controller->runAction('get', $this->request);
-
-        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
+        $this->controller->runAction('get', $this->request);
     }
 
     /** @test */
-    public function get_givenImageInRootOfSource_imageCreatedInCacheAndCreatedResponseReturned(): void
+    public function get_givenImageInRootOfStorage_imageCreatedInCacheAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
@@ -71,7 +74,7 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     }
 
     /** @test */
-    public function get_givenImageInRootOfSourceAndThumbnailRequested_thumbnailCreatedAndCreatedResponseReturned(): void
+    public function get_givenImageInRootOfStorageAndThumbnailRequested_thumbnailCreatedAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
@@ -101,8 +104,8 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     /** @test */
     public function replace_givenStream_imageIsCreatedAndCreatedResponseReturned(): void
     {
-        $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
-        $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 
@@ -115,8 +118,8 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     /** @test */
     public function replace_givenStream_imageIsCreatedInCacheSubdirectoryAndCreatedResponseReturned(): void
     {
-        $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
-        $stream = new ReadOnlyResourceStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 
@@ -127,7 +130,7 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     }
 
     /** @test */
-    public function delete_imageExistsInSourceAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
+    public function delete_imageExistsInStorageAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
@@ -152,5 +155,10 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     private function givenRequest_getBody_returns(StreamInterface $stream): void
     {
         \Phake::when($this->request)->getBody()->thenReturn($stream);
+    }
+
+    private function givenStream(string $filename): StreamInterface
+    {
+        return new ResourceStream(fopen($filename, ResourceStreamModeEnum::READ_AND_WRITE));
     }
 }

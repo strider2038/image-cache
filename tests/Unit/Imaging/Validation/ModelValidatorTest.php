@@ -23,7 +23,7 @@ class ModelValidatorTest extends TestCase
         $validator = new ModelValidator();
         $model = new AnnotatedModelMock();
 
-        $violations = $validator->validate($model);
+        $violations = $validator->validateModel($model);
 
         $this->assertCount(1, $violations);
         /** @var ConstraintViolationInterface $violation */

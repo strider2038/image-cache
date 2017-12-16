@@ -10,8 +10,8 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
-use Strider2038\ImgCache\Core\NullStream;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\NullStream;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
 

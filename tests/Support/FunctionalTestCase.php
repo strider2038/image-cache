@@ -24,41 +24,50 @@ class FunctionalTestCase extends TestCase
     protected const MIME_TYPE_JPEG = 'image/jpeg';
     protected const MIME_TYPE_PNG = 'image/png';
 
-    protected const APPLICATION_DIRECTORY = __DIR__ . '/../app';
-    protected const FILESOURCE_DIRECTORY = self::APPLICATION_DIRECTORY . '/filesource';
-    protected const WEB_DIRECTORY = self::APPLICATION_DIRECTORY . '/web';
-    protected const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
+    private const APPLICATION_DIRECTORY = __DIR__ . '/../..';
+    private const CONFIGURATION_DIRECTORY = self::APPLICATION_DIRECTORY . '/config';
+    private const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
+
+    protected const FILESOURCE_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/filesource';
+    protected const WEB_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/web';
+    protected const TEMPORARY_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/tmp';
 
     private const ASSETS_DIRECTORY = __DIR__ . '/../assets/';
-    private const IMAGE_JPEG_FILENAME = self::ASSETS_DIRECTORY . 'sample/cat300.jpg';
-    private const IMAGE_PNG_FILENAME = self::ASSETS_DIRECTORY . 'sample/rider.png';
+    private const FILENAME_IMAGE_JPEG = self::ASSETS_DIRECTORY . 'sample/cat300.jpg';
+    private const FILENAME_IMAGE_PNG = self::ASSETS_DIRECTORY . 'sample/rider.png';
+    private const FILENAME_JSON = self::ASSETS_DIRECTORY . 'file.json';
 
     protected function setUp(): void
     {
         parent::setUp();
+
         exec('rm -rf ' . self::FILESOURCE_DIRECTORY);
-        if (!mkdir(self::FILESOURCE_DIRECTORY)) {
+        if (!mkdir(self::FILESOURCE_DIRECTORY, 0777, true)) {
             throw new \Exception('Cannot create test filesource directory');
         }
+
         exec('rm -rf ' . self::WEB_DIRECTORY);
-        if (!mkdir(self::WEB_DIRECTORY)) {
+        if (!mkdir(self::WEB_DIRECTORY, 0777, true)) {
             throw new \Exception('Cannot create test web directory');
         }
-        exec('rm -rf ' . self::RUNTIME_DIRECTORY);
-        if (!mkdir(self::RUNTIME_DIRECTORY)) {
-            throw new \Exception('Cannot create test runtime directory');
+
+        exec('rm -rf ' . self::TEMPORARY_DIRECTORY);
+        if (!mkdir(self::TEMPORARY_DIRECTORY, 0777, true)) {
+            throw new \Exception('Cannot create test web directory');
         }
     }
 
     protected function loadContainer(string $filename): ContainerInterface
     {
         $container = new ContainerBuilder();
-        $fileLocator = new FileLocator(self::APPLICATION_DIRECTORY);
+        $fileLocator = new FileLocator(self::CONFIGURATION_DIRECTORY);
+
         $loader = new YamlFileLoader($container, $fileLocator);
-        $loader->load('config/' . $filename);
+        $loader->load('testing/' . $filename);
+
+        $container->setParameter('configuration_directory', self::CONFIGURATION_DIRECTORY);
         $container->setParameter('test.web_directory', self::WEB_DIRECTORY);
         $container->setParameter('test.filesource_directory', self::FILESOURCE_DIRECTORY);
-        $container->setParameter('test.runtime_directory', self::RUNTIME_DIRECTORY);
 
         return $container;
     }
@@ -68,10 +77,12 @@ class FunctionalTestCase extends TestCase
         if (file_exists($copyFilename)) {
             throw new \Exception(sprintf('File "%s" already exists', $copyFilename));
         }
+
         $dirname = dirname($copyFilename);
         if (!is_dir($dirname)) {
             mkdir($dirname, 0777, true);
         }
+
         if (!copy($assetFilename, $copyFilename)) {
             throw new \Exception(
                 sprintf('Cannot copy "%s" to "%s"', $assetFilename, $copyFilename)
@@ -79,14 +90,29 @@ class FunctionalTestCase extends TestCase
         }
     }
 
+    private function givenAssetFileContents(string $assetFilename): string
+    {
+        return file_get_contents($assetFilename);
+    }
+
     protected function givenImageJpeg(string $filename): void
     {
-        $this->givenAssetFile(self::IMAGE_JPEG_FILENAME, $filename);
+        $this->givenAssetFile(self::FILENAME_IMAGE_JPEG, $filename);
+    }
+
+    protected function givenImageJpegContents(): string
+    {
+        return $this->givenAssetFileContents(self::FILENAME_IMAGE_JPEG);
     }
 
     protected function givenImagePng(string $filename): void
     {
-        $this->givenAssetFile(self::IMAGE_PNG_FILENAME, $filename);
+        $this->givenAssetFile(self::FILENAME_IMAGE_PNG, $filename);
+    }
+
+    protected function givenJsonFile(string $filename): void
+    {
+        $this->givenAssetFile(self::FILENAME_JSON, $filename);
     }
 
     protected function assertFileHasMimeType(string $filename, string $expectedMime): void

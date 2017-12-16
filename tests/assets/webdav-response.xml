@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<d:multistatus xmlns:d="DAV:">
+    <d:response>
+        <d:href>/imgcache/</d:href>
+        <d:propstat>
+            <d:status>HTTP/1.1 200 OK</d:status>
+            <d:prop>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+                <d:getlastmodified>Sun, 10 Dec 2017 09:38:59 GMT</d:getlastmodified>
+                <d:displayname>imgcache</d:displayname>
+                <d:creationdate>2017-12-06T20:27:38Z</d:creationdate>
+            </d:prop>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/imgcache/file.json</d:href>
+        <d:propstat>
+            <d:status>HTTP/1.1 200 OK</d:status>
+            <d:prop>
+                <d:resourcetype/>
+                <d:getlastmodified>Sun, 10 Dec 2017 09:38:59 GMT</d:getlastmodified>
+                <d:getetag>1ee34575f7486b713ceb14145d21ac99</d:getetag>
+                <d:getcontenttype>text/plain</d:getcontenttype>
+                <d:getcontentlength>16</d:getcontentlength>
+                <d:displayname>file.json</d:displayname>
+                <d:creationdate>2017-12-06T20:27:38Z</d:creationdate>
+            </d:prop>
+        </d:propstat>
+    </d:response>
+</d:multistatus>

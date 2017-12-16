@@ -33,7 +33,7 @@ class ModelValidator implements ModelValidatorInterface
             ->getValidator();
     }
 
-    public function validate(ModelInterface $model): ConstraintViolationListInterface
+    public function validateModel(ModelInterface $model): ConstraintViolationListInterface
     {
         return $this->validator->validate($model);
     }

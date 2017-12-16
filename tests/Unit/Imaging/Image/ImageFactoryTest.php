@@ -13,7 +13,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactory;
@@ -38,12 +39,16 @@ class ImageFactoryTest extends TestCase
     /** @var FileOperationsInterface */
     private $fileOperations;
 
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->fileOperations = $this->givenFileOperations();
+        $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
     }
 
     /** @test */
@@ -84,17 +89,18 @@ class ImageFactoryTest extends TestCase
         $this->givenImageValidator_hasValidImageExtension_returns(true);
         $this->givenImageValidator_hasFileValidImageMimeType_returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
-        $expectedStream = $this->givenFileOperations_openFile_returnsStream(
-            $this->fileOperations,
-            self::FILENAME,
-            ResourceStreamModeEnum::READ_ONLY
-        );
+        $expectedStream = $this->givenFileOperations_openFile_returnsStream($this->fileOperations);
 
         $image = $factory->createFromFile(self::FILENAME);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame($saveOptions, $image->getSaveOptions());
         $this->assertSame($expectedStream, $image->getData());
+        $this->assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
+            $this->fileOperations,
+            self::FILENAME,
+            ResourceStreamModeEnum::READ_ONLY
+        );
     }
 
     /**
@@ -148,11 +154,14 @@ class ImageFactoryTest extends TestCase
         $factory = $this->createImageFactory();
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
         $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+        $stream = $this->givenStreamFactory_createStreamFromData_returnsStream();
 
         $image = $factory->createFromData(self::DATA);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertStreamFactory_createStreamFromData_isCalledOnceWithData(self::DATA);
+        $this->assertSame($stream, $image->getData());
     }
 
     /**
@@ -180,6 +189,7 @@ class ImageFactoryTest extends TestCase
         $image = $factory->createFromStream($stream);
 
         $this->assertInstanceOf(Image::class, $image);
+        $this->assertStream_rewind_isCalledOnce($stream);
         $this->assertSame($saveOptions, $image->getSaveOptions());
         $this->assertSame($stream, $image->getData());
         $this->assertImageValidator_hasDataValidImageMimeType_isCalledOnceWith(self::DATA);
@@ -205,7 +215,8 @@ class ImageFactoryTest extends TestCase
         $factory = new ImageFactory(
             $this->saveOptionsFactory,
             $this->imageValidator,
-            $this->fileOperations
+            $this->fileOperations,
+            $this->streamFactory
         );
 
         return $factory;
@@ -253,5 +264,23 @@ class ImageFactoryTest extends TestCase
         \Phake::when($stream)->getContents()->thenReturn(self::DATA);
 
         return $stream;
+    }
+
+    private function assertStreamFactory_createStreamFromData_isCalledOnceWithData(string $data): void
+    {
+        \Phake::verify($this->streamFactory, \Phake::times(1))->createStreamFromData($data);
+    }
+
+    private function givenStreamFactory_createStreamFromData_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->streamFactory)->createStreamFromData(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
+    }
+
+    private function assertStream_rewind_isCalledOnce(StreamInterface $stream): void
+    {
+        \Phake::verify($stream, \Phake::times(1))->rewind();
     }
 }

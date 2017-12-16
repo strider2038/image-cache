@@ -13,13 +13,24 @@ namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestFactory;
-use Strider2038\ImgCache\Core\ReadOnlyResourceStream;
+use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
+use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 
 class RequestFactoryTest extends TestCase
 {
+    private const PHP_INPUT = 'php://input';
     private const REQUEST_URI_VALUE = 'http://example.org';
+
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
+
+    protected function setUp(): void
+    {
+        $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
+    }
 
     /** @test */
     public function createRequest_givenServerConfiguration_requestIsCreatedAndReturned(): void
@@ -28,14 +39,19 @@ class RequestFactoryTest extends TestCase
             'REQUEST_METHOD' => HttpMethodEnum::GET,
             'REQUEST_URI' => self::REQUEST_URI_VALUE,
         ];
-        $factory = new RequestFactory();
+        $factory = $this->createRequestFactory();
+        $stream = $this->givenStreamFactory_createStreamByParameters_returnsStream();
 
         $request = $factory->createRequest($serverConfiguration);
 
         $this->assertInstanceOf(Request::class, $request);
         $this->assertEquals(HttpMethodEnum::GET, $request->getMethod());
         $this->assertEquals(self::REQUEST_URI_VALUE, $request->getUri());
-        $this->assertInstanceOf(ReadOnlyResourceStream::class, $request->getBody());
+        $this->assertStreamFactory_createStreamByParameters_isCalledOnceWithDescriptorAndMode(
+            self::PHP_INPUT,
+            new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY)
+        );
+        $this->assertSame($stream, $request->getBody());
         $this->assertEquals(HttpProtocolVersionEnum::V1_1, $request->getProtocolVersion()->getValue());
     }
 
@@ -54,7 +70,8 @@ class RequestFactoryTest extends TestCase
             'REQUEST_URI' => self::REQUEST_URI_VALUE,
             'SERVER_PROTOCOL' => $givenServerProtocol
         ];
-        $factory = new RequestFactory();
+        $factory = $this->createRequestFactory();
+        $this->givenStreamFactory_createStreamByParameters_returnsStream();
 
         $request = $factory->createRequest($serverConfiguration);
 
@@ -79,8 +96,31 @@ class RequestFactoryTest extends TestCase
     public function createRequest_givenInvalidHttpMethod_exceptionThrown(): void
     {
         $serverConfiguration = ['REQUEST_METHOD' => 'Unknown'];
-        $factory = new RequestFactory();
+        $factory = $this->createRequestFactory();
 
         $factory->createRequest($serverConfiguration);
+    }
+
+    private function createRequestFactory(): RequestFactory
+    {
+        return new RequestFactory($this->streamFactory);
+    }
+
+    private function assertStreamFactory_createStreamByParameters_isCalledOnceWithDescriptorAndMode(
+        string $expectedDescriptor,
+        ResourceStreamModeEnum $expectedMode
+    ): void {
+        \Phake::verify($this->streamFactory, \Phake::times(1))
+            ->createStreamByParameters($expectedDescriptor, \Phake::capture($mode));
+        /** @var ResourceStreamModeEnum $mode */
+        $this->assertEquals($expectedMode->getValue(), $mode->getValue());
+    }
+
+    private function givenStreamFactory_createStreamByParameters_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->streamFactory)->createStreamByParameters(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
     }
 }

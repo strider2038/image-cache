@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Yandex\Map;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\WidthAndHeightConfigurator;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 
 class WidthAndHeightConfiguratorTest extends TestCase
 {

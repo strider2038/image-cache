@@ -1,4 +1,4 @@
-# Image Cache microservice
+# Image caching microservice
 
 [![Build Status](https://travis-ci.org/strider2038/imgcache-service.svg?branch=master)](https://travis-ci.org/strider2038/imgcache-service) [![Coverage Status](https://coveralls.io/repos/github/strider2038/imgcache-service/badge.svg?branch=master)](https://coveralls.io/github/strider2038/imgcache-service?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/strider2038/imgcache-service/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/strider2038/imgcache-service/?branch=master)
 
@@ -26,7 +26,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Router rewrites Request URI, eliminate location in controllers
 - [x] Logging guzzle requests
 - [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
-- [ ] Yandex.Disk source
+- [x] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
   - storage and cache key as data object
@@ -34,21 +34,26 @@ Image caching microservice with connection to cloud hostings
 - [ ] Rotate transformation
 - [ ] Flip transformation
 - [ ] Migrate from supervisor to systemd daemons
+- [ ] Automatically create cache directories
+- [ ] Make root nginx directory web/cache
 - [ ] Support for building docker containers in Travis
 - [ ] Fix tests codestyle
 - [ ] Acceptance testing
 - [ ] Move all todos to github issues
 - [ ] Rename project to "Image caching microservice"
 - [ ] Refactor SaveOptions to be ignored while saving
+- [ ] Write project description in README.md
 
 ## Goals for version v1.1
 - [ ] Cache mechanism for source accessor
 - [ ] Performance optimization (lazy services, validation cache)
 - [ ] Support for phpDocumentor
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
+- [ ] Refactor HttpClientInterface to use object-based options
 
 ## Ideas
 - Google map source (inspect licensing problems)
 - Yandex map marker
 - Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php
 - Add referrer control to Security component
+- Facade ImageCachingSystem for ImageCache and ImageStorage

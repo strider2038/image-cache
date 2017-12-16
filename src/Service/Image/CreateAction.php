@@ -17,6 +17,7 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 
 /**
  * Handles POST request for creating resource. If resource already exists then response with
@@ -28,6 +29,9 @@ class CreateAction implements ActionInterface
     /** @var ResponseFactoryInterface */
     private $responseFactory;
 
+    /** @var ImageFilenameFactoryInterface */
+    private $filenameFactory;
+
     /** @var ImageStorageInterface */
     private $imageStorage;
 
@@ -36,34 +40,36 @@ class CreateAction implements ActionInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
+        ImageFilenameFactoryInterface $filenameFactory,
         ImageStorageInterface $imageStorage,
         ImageFactoryInterface $imageFactory
     ) {
         $this->responseFactory = $responseFactory;
+        $this->filenameFactory = $filenameFactory;
         $this->imageStorage = $imageStorage;
         $this->imageFactory = $imageFactory;
     }
 
     public function processRequest(RequestInterface $request): ResponseInterface
     {
-        $location = $request->getUri()->getPath();
+        $filename = $this->filenameFactory->createImageFilenameFromRequest($request);
 
-        if ($this->imageStorage->exists($location)) {
+        if ($this->imageStorage->imageExists($filename)) {
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::CONFLICT),
                 sprintf(
                     'File "%s" already exists in image storage. Use PUT method to replace image there.',
-                    $location
+                    $filename
                 )
             );
         } else {
             $stream = $request->getBody();
             $image = $this->imageFactory->createFromStream($stream);
-            $this->imageStorage->put($location, $image);
+            $this->imageStorage->putImage($filename, $image);
 
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
-                sprintf('File "%s" was successfully put to storage.', $location)
+                sprintf('File "%s" was successfully put to storage.', $filename)
             );
         }
 

@@ -33,4 +33,8 @@
         <directory suffix=".php">./tests/Acceptance</directory>
     </testsuite>
 
+    <testsuite name="integration">
+        <directory suffix=".php">./tests/Integration</directory>
+    </testsuite>
+
 </phpunit>

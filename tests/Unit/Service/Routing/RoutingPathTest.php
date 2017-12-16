@@ -40,7 +40,7 @@ class RoutingPathTest extends TestCase
     ): void {
         $path = new RoutingPath($urlPrefix, $controllerId);
 
-        $violations = $this->validator->validate($path);
+        $violations = $this->validator->validateModel($path);
 
         $this->assertGreaterThan(0, $violations->count());
         foreach ($violations as $violation) {

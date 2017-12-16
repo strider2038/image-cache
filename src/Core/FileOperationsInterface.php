@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Collection\StringList;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 
 /**

@@ -14,8 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\YandexMapExtractor;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParserInterface;
-use Strider2038\ImgCache\Imaging\Source\Accessor\YandexMapAccessorInterface;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessorInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 
 class YandexMapExtractorTest extends TestCase
 {
@@ -24,23 +24,23 @@ class YandexMapExtractorTest extends TestCase
     /** @var YandexMapParametersParserInterface */
     private $parser;
 
-    /** @var YandexMapAccessorInterface */
-    private $accessor;
+    /** @var YandexMapStorageAccessorInterface */
+    private $storageAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = \Phake::mock(YandexMapParametersParserInterface::class);
-        $this->accessor = \Phake::mock(YandexMapAccessorInterface::class);
+        $this->storageAccessor = \Phake::mock(YandexMapStorageAccessorInterface::class);
     }
 
     /** @test */
     public function extract_givenKey_keyIsParsedAndImageIsReturned(): void
     {
-        $extractor = new YandexMapExtractor($this->parser, $this->accessor);
+        $extractor = new YandexMapExtractor($this->parser, $this->storageAccessor);
         $parameters = $this->givenParser_parse_returnsParameters();
-        $expectedImage = $this->givenAccessor_get_returnsImage($parameters);
+        $expectedImage = $this->givenStorageAccessor_getImage_returnsImage($parameters);
 
-        $image = $extractor->extract(self::KEY);
+        $image = $extractor->extractImage(self::KEY);
 
         $this->assertSame($expectedImage, $image);
     }
@@ -53,10 +53,10 @@ class YandexMapExtractorTest extends TestCase
         return $parameters;
     }
 
-    private function givenAccessor_get_returnsImage(YandexMapParameters $parameters): Image
+    private function givenStorageAccessor_getImage_returnsImage(YandexMapParameters $parameters): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->accessor)->get($parameters)->thenReturn($image);
+        \Phake::when($this->storageAccessor)->getImage($parameters)->thenReturn($image);
 
         return $image;
     }

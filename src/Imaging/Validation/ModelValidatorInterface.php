@@ -18,5 +18,5 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 interface ModelValidatorInterface
 {
-    public function validate(ModelInterface $model): ConstraintViolationListInterface;
+    public function validateModel(ModelInterface $model): ConstraintViolationListInterface;
 }

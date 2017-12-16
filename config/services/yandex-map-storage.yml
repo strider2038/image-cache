@@ -1,0 +1,86 @@
+parameters:
+    yandex_map_client.parameters:
+        base_uri: 'https://static-maps.yandex.ru/1.x/'
+
+services:
+    yandex_map_client:
+        class: GuzzleHttp\Client
+        arguments:
+            - '%yandex_map_client.parameters%'
+    yandex_map_client_adapter:
+        class: Strider2038\ImgCache\Utility\GuzzleClientAdapter
+        arguments:
+            - '@yandex_map_client'
+            - '@stream_factory'
+
+    # yandex map cache controller
+    yandex_map_cache_image_controller:
+        class: Strider2038\ImgCache\Service\ImageController
+        arguments:
+            - '@response_factory'
+            - '@yandex_map_cache_action_factory'
+            - '@security'
+    yandex_map_cache_action_factory:
+        class: Strider2038\ImgCache\Service\Image\ImageActionFactory
+        arguments:
+            - '@yandex_map_cache_action_get'
+    yandex_map_cache_action_get:
+        class: Strider2038\ImgCache\Service\Image\GetAction
+        arguments:
+            - '@response_factory'
+            - '@image_filename_factory'
+            - '@yandex_map_image_storage'
+            - '@yandex_map_image_cache'
+
+    yandex_map_image_storage:
+        class: Strider2038\ImgCache\Imaging\ImageStorage
+        arguments:
+            - '@yandex_map_image_extractor'
+
+    yandex_map_image_cache_web_directory:
+        factory:
+            - '@directory_name_factory'
+            - 'createDirectoryName'
+        arguments:
+            - '%yandex_map_image_cache.base_directory%'
+            - 'true'
+
+    yandex_map_image_cache:
+        class: Strider2038\ImgCache\Imaging\ImageCache
+        arguments:
+            - '@yandex_map_image_cache_web_directory'
+            - '@file_operations'
+            - '@image_processor'
+
+    yandex_map_image_extractor:
+        class: Strider2038\ImgCache\Imaging\Extraction\YandexMapExtractor
+        arguments:
+            - '@yandex_map_parameters_parser'
+            - '@yandex_map_storage_accessor'
+
+    yandex_map_parameters_parser:
+        class: Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser
+        arguments:
+            - '@image_validator'
+            - '@yandex_map_value_configurator_factory'
+            - '@yandex_map_parameters_factory'
+    yandex_map_value_configurator_factory:
+        class: Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorFactory
+
+    yandex_map_parameters_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParametersFactory
+    yandex_map_storage_accessor:
+        class: Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor
+        arguments:
+            - '@model_validator'
+            - '@violations_formatter'
+            - '@yandex_map_storage_driver'
+            - '@image_factory'
+        calls:
+            - [setLogger, ['@logger']]
+    yandex_map_storage_driver:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver
+        arguments:
+            - '@yandex_map_client_adapter'
+        calls:
+            - [setLogger, ['@logger']]

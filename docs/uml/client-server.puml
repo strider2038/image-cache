@@ -1,0 +1,11 @@
+@startuml
+
+Client -> Application: GET /image.jpg
+Application -> ImageStorage: getImage('/image.jpg')
+Application <-- ImageStorage: Image
+Application -> ImageCache: putImage('/image.jpg', Image)
+Application -> ImageCache: getImage('/image.jpg')
+Application <-- ImageCache: ImageFile
+Client <-- Application: 201 image/jpeg /image.jpg
+
+@enduml

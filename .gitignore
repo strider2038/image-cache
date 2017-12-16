@@ -1,6 +1,9 @@
 # composer vendor dir
 /vendor
 
+# local configuration
+/config/*-local.yml
+
 # build logs
 /build/logs/
 !/build/logs/.gitkeep
@@ -14,6 +17,3 @@
 
 # test directories
 /tests/report/
-/tests/app/filesource/
-/tests/app/runtime/
-/tests/app/web/

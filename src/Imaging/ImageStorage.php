@@ -10,11 +10,11 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Exception\InvalidValueException;
 use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -33,44 +33,28 @@ class ImageStorage implements ImageStorageInterface
         $this->imageWriter = $imageWriter ?? new NullWriter();
     }
 
-    public function find(string $key): ? Image
+    public function getImage(ImageFilenameInterface $filename): Image
     {
-        $this->validateKey($key);
-
-        return $this->imageExtractor->extract($key);
+        return $this->imageExtractor->extractImage($filename);
     }
 
-    public function put(string $key, Image $image): void
+    public function putImage(ImageFilenameInterface $filename, Image $image): void
     {
-        $this->validateKey($key);
-        $data = $image->getData();
-        $this->imageWriter->insert($key, $data);
+        $this->imageWriter->insertImage($filename, $image);
     }
 
-    public function exists(string $key): bool
+    public function imageExists(ImageFilenameInterface $filename): bool
     {
-        $this->validateKey($key);
-
-        return $this->imageWriter->exists($key);
+        return $this->imageWriter->imageExists($filename);
     }
 
-    public function delete(string $key): void
+    public function deleteImage(ImageFilenameInterface $filename): void
     {
-        $this->validateKey($key);
-        $this->imageWriter->delete($key);
+        $this->imageWriter->deleteImage($filename);
     }
 
-    public function getFileNameMask(string $key): string
+    public function getImageFileNameMask(ImageFilenameInterface $filename): string
     {
-        $this->validateKey($key);
-
-        return $this->imageWriter->getFileNameMask($key);
-    }
-
-    private function validateKey(string $key): void
-    {
-        if (\strlen($key) <= 0 || $key[0] !== '/') {
-            throw new InvalidValueException('Key must start with slash');
-        }
+        return $this->imageWriter->getImageFileNameMask($filename);
     }
 }

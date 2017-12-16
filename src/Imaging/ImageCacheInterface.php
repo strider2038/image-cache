@@ -12,13 +12,14 @@ namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFile;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageCacheInterface
 {
-    public function get(string $fileName): ImageFile;
-    public function put(string $fileName, Image $image): void;
-    public function deleteByMask(string $fileNameMask): void;
+    public function getImage(ImageFilenameInterface $filename): ImageFile;
+    public function putImage(ImageFilenameInterface $filename, Image $image): void;
+    public function deleteImagesByMask(string $fileNameMask): void;
 }

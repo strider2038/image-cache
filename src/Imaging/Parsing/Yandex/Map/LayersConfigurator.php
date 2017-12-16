@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Parsing\Yandex\Map;
 
 use Strider2038\ImgCache\Collection\StringList;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

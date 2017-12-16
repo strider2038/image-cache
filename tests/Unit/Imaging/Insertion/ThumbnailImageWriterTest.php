@@ -11,11 +11,11 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Insertion;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
-use Strider2038\ImgCache\Imaging\Source\Accessor\SourceAccessorInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ThumbnailImageWriterTest extends TestCase
@@ -29,13 +29,13 @@ class ThumbnailImageWriterTest extends TestCase
     /** @var ThumbnailKeyParserInterface */
     private $keyParser;
 
-    /** @var SourceAccessorInterface */
-    private $sourceAccessor;
+    /** @var StorageAccessorInterface */
+    private $storageAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
-        $this->sourceAccessor = \Phake::mock(SourceAccessorInterface::class);
+        $this->storageAccessor = \Phake::mock(StorageAccessorInterface::class);
     }
 
     /**
@@ -43,49 +43,49 @@ class ThumbnailImageWriterTest extends TestCase
      * @param bool $expectedExists
      * @dataProvider boolValuesProvider
      */
-    public function exists_sourceImageExtractorExistsReturnsBool_boolIsReturned(bool $expectedExists): void
+    public function imageExists_sourceImageExtractorExistsReturnsBool_boolIsReturned(bool $expectedExists): void
     {
         $writer = $this->createThumbnailImageWriter();
         $this->givenKeyParser_parse_returnsThumbnailKey();
-        $this->givenSourceAccessor_exists_returns($expectedExists);
+        $this->givenStorageAccessor_imageExists_returns($expectedExists);
 
-        $actualExists = $writer->exists(self::KEY);
+        $actualExists = $writer->imageExists(self::KEY);
 
         $this->assertEquals($expectedExists, $actualExists);
     }
 
     /** @test */
-    public function insert_givenKeyAndData_keyIsParsedAndSourceAccessorPutIsCalled(): void
+    public function insertImage_givenKeyAndData_keyIsParsedAndSourceAccessorPutIsCalled(): void
     {
         $writer = $this->createThumbnailImageWriter();
-        $stream = \Phake::mock(StreamInterface::class);
+        $image = \Phake::mock(Image::class);
         $this->givenKeyParser_parse_returnsThumbnailKey();
 
-        $writer->insert(self::KEY, $stream);
+        $writer->insertImage(self::KEY, $image);
 
         $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertSourceAccessor_put_isCalledOnceWith($stream);
+        $this->assertStorageAccessor_putImage_isCalledOnceWith($image);
     }
 
     /** @test */
-    public function delete_givenKey_keyIsParsedAndSourceAccessorDeleteIsCalled(): void
+    public function deleteImage_givenKey_keyIsParsedAndSourceAccessorDeleteIsCalled(): void
     {
         $writer = $this->createThumbnailImageWriter();
         $this->givenKeyParser_parse_returnsThumbnailKey();
 
-        $writer->delete(self::KEY);
+        $writer->deleteImage(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertSourceAccessor_delete_isCalledOnce();
+        $this->assertStorageAccessor_deleteImage_isCalledOnce();
     }
 
     /** @test */
-    public function getFileMask_givenKey_keyIsParsedAndThumbnailMaskIsReturned(): void
+    public function getImageFileNameMask_givenKey_keyIsParsedAndThumbnailMaskIsReturned(): void
     {
         $writer = $this->createThumbnailImageWriter();
         $this->givenKeyParser_parse_returnsThumbnailKey();
 
-        $filename = $writer->getFileNameMask(self::KEY);
+        $filename = $writer->getImageFileNameMask(self::KEY);
 
         $this->assertKeyParser_parse_isCalledOnce();
         $this->assertEquals(self::THUMBNAIL_MASK, $filename);
@@ -113,10 +113,10 @@ class ThumbnailImageWriterTest extends TestCase
     public function methodAndParametersProvider(): array
     {
         return [
-            ['exists', [self::KEY]],
-            ['insert', [self::KEY, \Phake::mock(StreamInterface::class)]],
-            ['delete', [self::KEY]],
-            ['getFileNameMask', [self::KEY]],
+            ['imageExists', [self::KEY]],
+            ['insertImage', [self::KEY, \Phake::mock(Image::class)]],
+            ['deleteImage', [self::KEY]],
+            ['getImageFileNameMask', [self::KEY]],
         ];
     }
 
@@ -132,9 +132,9 @@ class ThumbnailImageWriterTest extends TestCase
         return $parsedKey;
     }
 
-    private function givenSourceAccessor_exists_returns(bool $value): void
+    private function givenStorageAccessor_imageExists_returns(bool $value): void
     {
-        \Phake::when($this->sourceAccessor)->exists(self::PUBLIC_FILENAME)->thenReturn($value);
+        \Phake::when($this->storageAccessor)->imageExists(self::PUBLIC_FILENAME)->thenReturn($value);
     }
 
     private function assertKeyParser_parse_isCalledOnce(): void
@@ -142,20 +142,20 @@ class ThumbnailImageWriterTest extends TestCase
         \Phake::verify($this->keyParser, \Phake::times(1))->parse(self::KEY);
     }
 
-    private function assertSourceAccessor_put_isCalledOnceWith(StreamInterface $stream): void
+    private function assertStorageAccessor_putImage_isCalledOnceWith(Image $image): void
     {
-        \Phake::verify($this->sourceAccessor, \Phake::times(1))
-            ->put(self::PUBLIC_FILENAME, $stream);
+        \Phake::verify($this->storageAccessor, \Phake::times(1))
+            ->putImage(self::PUBLIC_FILENAME, $image);
     }
 
-    private function assertSourceAccessor_delete_isCalledOnce(): void
+    private function assertStorageAccessor_deleteImage_isCalledOnce(): void
     {
-        \Phake::verify($this->sourceAccessor, \Phake::times(1))
-            ->delete(self::PUBLIC_FILENAME);
+        \Phake::verify($this->storageAccessor, \Phake::times(1))
+            ->deleteImage(self::PUBLIC_FILENAME);
     }
 
     private function createThumbnailImageWriter(): ThumbnailImageWriter
     {
-        return new ThumbnailImageWriter($this->keyParser, $this->sourceAccessor);
+        return new ThumbnailImageWriter($this->keyParser, $this->storageAccessor);
     }
 }

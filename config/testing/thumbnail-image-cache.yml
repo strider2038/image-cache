@@ -1,0 +1,14 @@
+imports:
+    - { resource: 'services/core.yml' }
+    - { resource: 'services/imaging.yml' }
+    - { resource: 'services/filesystem-storage.yml' }
+
+parameters:
+    filesystem_image_cache.base_directory: '%test.web_directory%'
+    filesystem_storage_driver.base_directory: '%test.filesource_directory%'
+
+services:
+    logger:
+        class: Psr\Log\NullLogger
+    security:
+        class: Strider2038\ImgCache\Core\NullSecurity

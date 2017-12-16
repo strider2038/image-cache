@@ -1,0 +1,50 @@
+parameters:
+    client.parameters:
+        base_uri: 'https://webdav.yandex.ru/v1'
+        headers:
+            Authorization: '%token%'
+            Host: 'webdav.yandex.ru'
+            User-Agent: 'Image Caching Microservice'
+            Accept: '*/*'
+
+services:
+    client:
+        class: GuzzleHttp\Client
+        arguments:
+            - '%client.parameters%'
+
+    stream_factory:
+        class: Strider2038\ImgCache\Core\Streaming\StreamFactory
+    client_adapter:
+        class: Strider2038\ImgCache\Utility\GuzzleClientAdapter
+        arguments:
+            - '@client'
+            - '@stream_factory'
+    xml_response_parser:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\XmlResponseParser
+    metadata_reader:
+        class: Strider2038\ImgCache\Utility\MetadataReader
+    request_options_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\RequestOptionsFactory
+        arguments:
+            - '@metadata_reader'
+    resource_properties_getter:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourcePropertiesGetter
+        arguments:
+            - '@client_adapter'
+            - '@xml_response_parser'
+    resource_checker:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceChecker
+        arguments:
+            - '@resource_properties_getter'
+    resource_manipulator:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceManipulator
+        arguments:
+            - '@client_adapter'
+            - '@request_options_factory'
+    webdav_storage_driver:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver
+        arguments:
+            - '%storage.directory%'
+            - '@resource_manipulator'
+            - '@resource_checker'

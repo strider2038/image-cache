@@ -82,9 +82,9 @@ class ImageValidatorTest extends FileTestCase
     public function mimeFileProvider(): array
     {
         return [
-            [$this->givenAssetFile(self::FILE_JSON), false],
-            [$this->givenAssetFile(self::IMAGE_CAT300), true],
-            [$this->givenAssetFile(self::IMAGE_RIDER_PNG), true],
+            [$this->givenAssetFilename(self::FILE_JSON), false],
+            [$this->givenAssetFilename(self::IMAGE_CAT300), true],
+            [$this->givenAssetFilename(self::IMAGE_RIDER_PNG), true],
         ];
     }
 

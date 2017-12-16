@@ -10,15 +10,15 @@
 
 namespace Strider2038\ImgCache\Imaging\Insertion;
 
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageWriterInterface
 {
-    public function exists(string $key): bool;
-    public function insert(string $key, StreamInterface $data): void;
-    public function delete(string $key): void;
-    public function getFileNameMask(string $key): string;
+    public function imageExists(string $key): bool;
+    public function insertImage(string $key, Image $image): void;
+    public function deleteImage(string $key): void;
+    public function getImageFileNameMask(string $key): string;
 }

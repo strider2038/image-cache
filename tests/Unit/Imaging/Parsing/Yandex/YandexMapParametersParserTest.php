@@ -14,8 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParameters;
-use Strider2038\ImgCache\Imaging\Source\Yandex\YandexMapParametersFactoryInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
+use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 class YandexMapParametersParserTest extends TestCase

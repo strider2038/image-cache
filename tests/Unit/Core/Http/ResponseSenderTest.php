@@ -15,8 +15,8 @@ use Strider2038\ImgCache\Core\Http\HeaderCollection;
 use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSender;
-use Strider2038\ImgCache\Core\NullStream;
-use Strider2038\ImgCache\Core\StringStream;
+use Strider2038\ImgCache\Core\Streaming\NullStream;
+use Strider2038\ImgCache\Core\Streaming\StringStream;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 

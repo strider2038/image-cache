@@ -11,15 +11,16 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageStorageInterface
 {
-    public function find(string $key): ? Image;
-    public function put(string $key, Image $image): void;
-    public function exists(string $key): bool;
-    public function delete(string $key): void;
-    public function getFileNameMask(string $key): string;
+    public function getImage(ImageFilenameInterface $filename): Image;
+    public function putImage(ImageFilenameInterface $filename, Image $image): void;
+    public function imageExists(ImageFilenameInterface $filename): bool;
+    public function deleteImage(ImageFilenameInterface $filename): void;
+    public function getImageFileNameMask(ImageFilenameInterface $filename): string;
 }

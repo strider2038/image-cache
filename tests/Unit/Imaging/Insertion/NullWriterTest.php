@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Insertion;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Core\StreamInterface;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
 
 class NullWriterTest extends TestCase
@@ -37,10 +37,10 @@ class NullWriterTest extends TestCase
     public function methodAndParametersProvider(): array
     {
         return [
-            ['exists', [self::KEY]],
-            ['insert', [self::KEY, \Phake::mock(StreamInterface::class)]],
-            ['delete', [self::KEY]],
-            ['getFileNameMask', [self::KEY]],
+            ['imageExists', [self::KEY]],
+            ['insertImage', [self::KEY, \Phake::mock(Image::class)]],
+            ['deleteImage', [self::KEY]],
+            ['getImageFileNameMask', [self::KEY]],
         ];
     }
 }

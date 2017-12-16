@@ -1,0 +1,43 @@
+parameters:
+    app.debug: false
+
+services:
+    # external
+    filesystem:
+        class: Symfony\Component\Filesystem\Filesystem
+
+    # core components
+    stream_factory:
+        class: Strider2038\ImgCache\Core\Streaming\StreamFactory
+
+    file_operations:
+        class: Strider2038\ImgCache\Core\FileOperations
+        arguments:
+            - '@filesystem'
+            - '@stream_factory'
+        calls:
+            - [setLogger, ['@logger']]
+
+    # core http components
+    request_factory:
+        class: Strider2038\ImgCache\Core\Http\RequestFactory
+        arguments:
+            - '@stream_factory'
+
+    request:
+        factory:
+            - '@request_factory'
+            - 'createRequest'
+        arguments:
+            - '%server_configuration%'
+
+    response_sender:
+        class: Strider2038\ImgCache\Core\Http\ResponseSender
+
+    response_factory:
+        class: Strider2038\ImgCache\Core\Http\ResponseFactory
+        arguments:
+            - '@request'
+            - '@stream_factory'
+            - '@file_operations'
+            - '%app.debug%'
