@@ -17,6 +17,7 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 
 /**
  * Handles GET request for resource. Returns response with status code 201 and image body
@@ -28,6 +29,9 @@ class GetAction implements ActionInterface
     /** @var ResponseFactoryInterface */
     private $responseFactory;
 
+    /** @var ImageFilenameFactoryInterface */
+    private $filenameFactory;
+
     /** @var ImageStorageInterface */
     private $imageStorage;
 
@@ -36,22 +40,24 @@ class GetAction implements ActionInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
+        ImageFilenameFactoryInterface $filenameFactory,
         ImageStorageInterface $imageStorage,
         ImageCacheInterface $imageCache
     ) {
         $this->responseFactory = $responseFactory;
+        $this->filenameFactory = $filenameFactory;
         $this->imageStorage = $imageStorage;
         $this->imageCache = $imageCache;
     }
 
     public function processRequest(RequestInterface $request): ResponseInterface
     {
-        $location = $request->getUri()->getPath();
+        $filename = $this->filenameFactory->createImageFilenameFromRequest($request);
 
-        $storedImage = $this->imageStorage->getImage($location);
+        $storedImage = $this->imageStorage->getImage($filename);
 
-        $this->imageCache->putImage($location, $storedImage);
-        $cachedImage = $this->imageCache->getImage($location);
+        $this->imageCache->putImage($filename, $storedImage);
+        $cachedImage = $this->imageCache->getImage($filename);
 
         $response = $this->responseFactory->createFileResponse(
             new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),

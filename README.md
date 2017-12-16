@@ -55,3 +55,4 @@ Image caching microservice with connection to cloud hostings
 - Yandex map marker
 - Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php
 - Add referrer control to Security component
+- Facade ImageCachingSystem for ImageCache and ImageStorage

@@ -17,6 +17,7 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 
 /**
  * Handles DELETE request for deleting resource from cache source and all it's cached
@@ -29,6 +30,9 @@ class DeleteAction implements ActionInterface
     /** @var ResponseFactoryInterface */
     private $responseFactory;
 
+    /** @var ImageFilenameFactoryInterface */
+    private $filenameFactory;
+
     /** @var ImageStorageInterface */
     private $imageStorage;
 
@@ -37,21 +41,23 @@ class DeleteAction implements ActionInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
+        ImageFilenameFactoryInterface $filenameFactory,
         ImageStorageInterface $imageStorage,
         ImageCacheInterface $imageCache
     ) {
         $this->responseFactory = $responseFactory;
+        $this->filenameFactory = $filenameFactory;
         $this->imageStorage = $imageStorage;
         $this->imageCache = $imageCache;
     }
 
     public function processRequest(RequestInterface $request): ResponseInterface
     {
-        $location = $request->getUri()->getPath();
+        $filename = $this->filenameFactory->createImageFilenameFromRequest($request);
 
-        if ($this->imageStorage->imageExists($location)) {
-            $this->imageStorage->deleteImage($location);
-            $fileNameMask = $this->imageStorage->getImageFileNameMask($location);
+        if ($this->imageStorage->imageExists($filename)) {
+            $this->imageStorage->deleteImage($filename);
+            $fileNameMask = $this->imageStorage->getImageFileNameMask($filename);
             $this->imageCache->deleteImagesByMask($fileNameMask);
 
             $response = $this->responseFactory->createMessageResponse(
@@ -59,13 +65,13 @@ class DeleteAction implements ActionInterface
                 sprintf(
                     'File "%s" was successfully deleted from'
                     . ' image storage and all thumbnails were deleted from cache.',
-                    $location
+                    $filename
                 )
             );
         } else {
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::NOT_FOUND),
-                sprintf('File "%s" does not exist.', $location)
+                sprintf('File "%s" does not exist.', $filename)
             );
         }
 
