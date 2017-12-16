@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
-use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 use Strider2038\ImgCache\Core\Http\Message;
 use Strider2038\ImgCache\Core\Streaming\NullStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
@@ -63,7 +63,7 @@ class MessageTest extends TestCase
     {
         $message = new Message();
         $headers = \Phake::mock(HeaderCollection::class);
-        $headerValues = \Phake::mock(HeaderValueCollection::class);
+        $headerValues = \Phake::mock(StringList::class);
         \Phake::when($headers)->get(\Phake::anyParameters())->thenReturn($headerValues);
         $message->setHeaders($headers);
 
@@ -76,7 +76,7 @@ class MessageTest extends TestCase
     public function getHeaderLine_givenHeaderCollection_concatenatedHeaderValuesReturned(): void
     {
         $message = new Message();
-        $headerValues = new HeaderValueCollection(self::HEADER_VALUES);
+        $headerValues = new StringList(self::HEADER_VALUES);
         $headers = new HeaderCollection([HttpHeaderEnum::AUTHORIZATION => $headerValues]);
         $message->setHeaders($headers);
 

@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Streaming\NullStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
@@ -61,7 +62,7 @@ class Message implements MessageInterface
         return $this->headers->containsKey($name);
     }
 
-    public function getHeader(HttpHeaderEnum $name): HeaderValueCollection
+    public function getHeader(HttpHeaderEnum $name): StringList
     {
         return $this->headers->get($name);
     }
@@ -70,7 +71,7 @@ class Message implements MessageInterface
     {
         $values = $this->headers->get($name->getValue());
 
-        return implode(',', $values->toArray());
+        return $values->implode();
     }
 
     public function getBody(): StreamInterface

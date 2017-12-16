@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Utility;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\StreamInterface as PsrStreamInterface;
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
-use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 use Strider2038\ImgCache\Core\Http\Response;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
@@ -83,7 +83,7 @@ class GuzzleClientAdapter implements HttpClientInterface
         foreach ($headers as $headerName => $values) {
             /** @var string[] $values */
 
-            $headerValueCollection = new HeaderValueCollection();
+            $headerValueCollection = new StringList();
 
             foreach ($values as $value) {
                 $headerValueCollection->add($value);
