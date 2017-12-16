@@ -26,8 +26,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Router rewrites Request URI, eliminate location in controllers
 - [x] Logging guzzle requests
 - [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
-- [ ] Yandex.Disk source
-  - logging
+- [x] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
   - storage and cache key as data object
@@ -35,6 +34,8 @@ Image caching microservice with connection to cloud hostings
 - [ ] Rotate transformation
 - [ ] Flip transformation
 - [ ] Migrate from supervisor to systemd daemons
+- [ ] Automatically create cache directories
+- [ ] Make root nginx directory web/cache
 - [ ] Support for building docker containers in Travis
 - [ ] Fix tests codestyle
 - [ ] Acceptance testing

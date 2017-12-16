@@ -113,7 +113,7 @@ class Application
         }
 
         $this->logger->debug(sprintf(
-            'Application ended. Response %d %s is sent.',
+            'Application ended. Response %d %s was sent.',
             $response->getStatusCode()->getValue(),
             $response->getReasonPhrase()
         ));

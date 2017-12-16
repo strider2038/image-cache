@@ -1,5 +1,4 @@
 imports:
-  - { resource: 'parameters.yml' }
   - { resource: 'services/core.yml' }
   - { resource: 'services/security.yml' }
   - { resource: 'services/utilities.yml' }
@@ -7,3 +6,6 @@ imports:
   - { resource: 'services/imaging.yml' }
   - { resource: 'services/filesystem-storage.yml' }
   - { resource: 'services/yandex-map-storage.yml' }
+  - { resource: 'services/yandex-disk-storage.yml' }
+  - { resource: 'parameters.yml' }
+  - { resource: 'parameters-local.yml', ignore_errors: true }

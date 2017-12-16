@@ -1,6 +1,9 @@
 # composer vendor dir
 /vendor
 
+# local configuration
+/config/*-local.yml
+
 # build logs
 /build/logs/
 !/build/logs/.gitkeep
