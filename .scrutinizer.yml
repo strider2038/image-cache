@@ -1,7 +1,7 @@
 build:
   environment:
     php:
-      version: 7.1.0
+      version: 7.1
   dependencies:
     before:
       - sudo apt-get install -y libmagickwand-dev libmagickcore-dev
