@@ -10,9 +10,9 @@
 
 namespace Strider2038\ImgCache\Tests\Integration;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
+use Psr\Http\Message\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Core\Streaming\ResourceStream;
@@ -32,15 +32,16 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     private const FILE_NOT_EXIST = '/not-exist.jpg';
     private const IMAGE_JPEG_FILENAME = '/image.jpg';
     private const IMAGE_JPEG_STORAGE_FILENAME = self::STORAGE_ROOT . self::IMAGE_JPEG_FILENAME;
-
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_FILENAME;
     private const IMAGE_JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . self::IMAGE_JPEG_FILENAME;
-    private const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
+    private const IMAGE_JPEG_THUMBNAIL_CACHE_FILENAME = '/image_s50x75.jpg';
     private const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
     private const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
-    private const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY;
+    private const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_FILENAME;
+    private const SUBDIRECTORY_LEVEL1_NAME = '/sub';
+    private const SUBDIRECTORY_LEVEL2_NAME = '/sub/dir';
     private const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
-    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_STORAGE_FILENAME = self::STORAGE_ROOT . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
 
     /** @var ClientInterface */
@@ -55,34 +56,21 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $token = getenv('YANDEX_DISK_ACCESS_TOKEN') ?? '';
+
         $container = $this->loadContainer('yandex-disk-image-cache.yml');
+        $container->setParameter('test.storage_root_directory', self::STORAGE_ROOT);
+        $container->setParameter('yandex_disk_client.token', $token);
 
-        $tokenHeader = 'OAuth ' . getenv('YANDEX_DISK_ACCESS_TOKEN');
-        $this->client = new Client([
-            'base_uri' => 'https://webdav.yandex.ru/v1',
-            'headers' => [
-                'Authorization' => $tokenHeader,
-                'Host' => 'webdav.yandex.ru',
-                'User-Agent' => 'Image Caching Microservice',
-                'Accept' => '*/*',
-            ]
-        ]);
-        $container->set('client_mock', $this->client);
-
-        try {
-            $this->client->request(WebDAVMethodEnum::DELETE, self::STORAGE_ROOT);
-        } catch (ClientException $exception) {
-            if ($exception->getResponse()->getStatusCode() !== HttpStatusCodeEnum::NOT_FOUND) {
-                throw $exception;
-            }
-        }
-
-        $this->client->request(WebDAVMethodEnum::MKCOL, self::STORAGE_ROOT);
-
+        $this->client = $container->get('yandex_disk_client');
         $this->request = \Phake::mock(RequestInterface::class);
         $container->set('request', $this->request);
 
-        $this->controller = $container->get('image_controller');
+        $this->controller = $container->get('yandex_disk_cache_image_controller');
+
+        $this->deleteStorageDirectory(self::STORAGE_ROOT);
+        $this->givenStorageDirectory(self::STORAGE_ROOT);
     }
 
     /**
@@ -100,7 +88,7 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     /** @test */
     public function get_givenImageInRootOfStorage_imageCreatedInCacheAndCreatedResponseReturned(): void
     {
-        $this->givenStorageJpegImage(self::IMAGE_JPEG_STORAGE_FILENAME);
+        $this->givenJpegImageInStorage(self::IMAGE_JPEG_STORAGE_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_FILENAME);
 
         $response = $this->controller->runAction('get', $this->request);
@@ -112,9 +100,8 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     /** @test */
     public function get_givenImageInRootOfStorageAndThumbnailRequested_thumbnailCreatedAndCreatedResponseReturned(): void
     {
-        $this->markTestSkipped();
-        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY);
+        $this->givenJpegImageInStorage(self::IMAGE_JPEG_STORAGE_FILENAME);
+        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_THUMBNAIL_CACHE_FILENAME);
 
         $response = $this->controller->runAction('get', $this->request);
 
@@ -129,8 +116,9 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     /** @test */
     public function get_givenImageInSubdirectoryRequested_imageCreatedAndCreatedResponseReturned(): void
     {
-        $this->markTestSkipped();
-        $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
+        $this->givenStorageDirectory(self::STORAGE_ROOT . '/' . self::SUBDIRECTORY_LEVEL1_NAME);
+        $this->givenStorageDirectory(self::STORAGE_ROOT . '/' . self::SUBDIRECTORY_LEVEL2_NAME);
+        $this->givenJpegImageInStorage(self::IMAGE_JPEG_IN_SUBDIRECTORY_STORAGE_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
         $response = $this->controller->runAction('get', $this->request);
@@ -142,7 +130,6 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     /** @test */
     public function replace_givenStream_imageIsCreatedAndCreatedResponseReturned(): void
     {
-        $this->markTestSkipped();
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_FILENAME);
@@ -151,13 +138,12 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
         $response = $this->controller->runAction('replace', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
-        $this->assertFileExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->assertStorageFileExists(self::IMAGE_JPEG_STORAGE_FILENAME);
     }
 
     /** @test */
     public function replace_givenStream_imageIsCreatedInCacheSubdirectoryAndCreatedResponseReturned(): void
     {
-        $this->markTestSkipped();
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
@@ -166,14 +152,13 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
         $response = $this->controller->runAction('replace', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
-        $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
+        $this->assertStorageFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_STORAGE_FILENAME);
     }
 
     /** @test */
     public function delete_imageExistsInStorageAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
     {
-        $this->markTestSkipped();
-        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->givenJpegImageInStorage(self::IMAGE_JPEG_STORAGE_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_FILENAME);
@@ -181,7 +166,7 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
         $response = $this->controller->runAction('delete', $this->request);
 
         $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
-        $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->assertStorageFileNotExists(self::IMAGE_JPEG_STORAGE_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
     }
@@ -203,7 +188,23 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
         return new ResourceStream(fopen($filename, ResourceStreamModeEnum::READ_AND_WRITE));
     }
 
-    private function givenStorageJpegImage(string $filename): void
+    private function deleteStorageDirectory(string $directory): void
+    {
+        try {
+            $this->client->request(WebDAVMethodEnum::DELETE, $directory);
+        } catch (ClientException $exception) {
+            if ($exception->getResponse()->getStatusCode() !== HttpStatusCodeEnum::NOT_FOUND) {
+                throw $exception;
+            }
+        }
+    }
+
+    private function givenStorageDirectory(string $directory): void
+    {
+        $this->client->request(WebDAVMethodEnum::MKCOL, $directory);
+    }
+
+    private function givenJpegImageInStorage(string $filename): void
     {
         $contents = $this->givenImageJpegContents();
 
@@ -225,5 +226,36 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
                 'expect' => true,
             ]
         );
+    }
+
+    private function assertStorageFileExists(string $filename): void
+    {
+        $response = $this->requestProperties($filename);
+        $this->assertEquals(HttpStatusCodeEnum::MULTI_STATUS, $response->getStatusCode());
+    }
+
+    private function assertStorageFileNotExists(string $filename): void
+    {
+        $response = $this->requestProperties($filename);
+        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode());
+    }
+
+    private function requestProperties(string $filename): ResponseInterface
+    {
+        try {
+            $response = $this->client->request(
+                WebDAVMethodEnum::PROPFIND,
+                $filename,
+                [
+                    'headers' => [
+                        'Depth' => '0',
+                    ],
+                ]
+            );
+        } catch (ClientException $exception) {
+            $response = $exception->getResponse();
+        }
+
+        return $response;
     }
 }

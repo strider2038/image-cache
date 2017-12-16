@@ -27,3 +27,6 @@ services:
         factory:
             - '@guzzle_handler_stack_factory'
             - 'createLoggerStack'
+
+    metadata_reader:
+        class: Strider2038\ImgCache\Utility\MetadataReader

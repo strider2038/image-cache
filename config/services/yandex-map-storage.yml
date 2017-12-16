@@ -1,3 +1,7 @@
+parameters:
+    yandex_map_client.parameters:
+        base_uri: 'https://static-maps.yandex.ru/1.x/'
+
 services:
     yandex_map_client:
         class: GuzzleHttp\Client
