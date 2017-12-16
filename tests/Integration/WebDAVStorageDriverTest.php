@@ -26,13 +26,13 @@ use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
  */
 class WebDAVStorageDriverTest extends IntegrationTestCase
 {
-    private const BASE_DIRECTORY = '/imgcache/';
+    private const BASE_DIRECTORY = '/imgcache-test/';
     private const FILENAME = 'file.json';
     private const FILENAME_FULL = self::BASE_DIRECTORY . self::FILENAME;
     private const FILENAME_IN_SUBDIRECTORY = 'a/b/c/file.json';
     private const FILENAME_IN_SUBDIRECTORY_FULL = self::BASE_DIRECTORY . self::FILENAME_IN_SUBDIRECTORY;
-    private const JSON_TEMPORARY_FILENAME = self::RUNTIME_DIRECTORY . '/' . self::FILENAME;
-    private const JPEG_TEMPORARY_FILENAME = self::RUNTIME_DIRECTORY . '/img.jpeg';
+    private const JSON_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . '/' . self::FILENAME;
+    private const JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . '/img.jpeg';
 
     /** @var ClientInterface */
     private $client;

@@ -24,6 +24,7 @@ services:
         class: Strider2038\ImgCache\Service\Image\GetAction
         arguments:
             - '@response_factory'
+            - '@image_filename_factory'
             - '@yandex_map_image_storage'
             - '@yandex_map_image_cache'
 
@@ -31,10 +32,19 @@ services:
         class: Strider2038\ImgCache\Imaging\ImageStorage
         arguments:
             - '@yandex_map_image_extractor'
+
+    yandex_map_image_cache_web_directory:
+        factory:
+            - '@directory_name_factory'
+            - 'createDirectoryName'
+        arguments:
+            - '%yandex_map_image_cache.base_directory%'
+            - 'true'
+
     yandex_map_image_cache:
         class: Strider2038\ImgCache\Imaging\ImageCache
         arguments:
-            - '%yandex_map_image_cache.base_directory%'
+            - '@yandex_map_image_cache_web_directory'
             - '@file_operations'
             - '@image_processor'
 

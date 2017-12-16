@@ -14,6 +14,3 @@
 
 # test directories
 /tests/report/
-/tests/app/filesource/
-/tests/app/runtime/
-/tests/app/web/

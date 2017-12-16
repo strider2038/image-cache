@@ -1,4 +1,20 @@
+parameters:
+    save_options.quality: 90
+
 services:
+    # imaging/naming
+    directory_name_factory:
+        class: Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactory
+        arguments:
+            - '@model_validator'
+            - '@violations_formatter'
+            - '@file_operations'
+    image_filename_factory:
+        class: Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactory
+        arguments:
+            - '@model_validator'
+            - '@violations_formatter'
+
     # imaging/image
     image_factory:
         class: Strider2038\ImgCache\Imaging\Image\ImageFactory

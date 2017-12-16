@@ -26,8 +26,8 @@ interface ImageFilenameInterface extends ModelInterface
      *     message="Filename cannot start from slash"
      * )
      * @Assert\Regex(
-     *     pattern="/^[a-z0-9_=\+\-\.\/]+$/i",
-     *     message="Filename can contain only latin symbols, digits, dots, slashes and '_', '+', '-', '='"
+     *     pattern="/^[a-z0-9_=\+\-\.,\/]+$/i",
+     *     message="Filename can contain only latin symbols, digits, dots, commas, slashes and '_', '+', '-', '='"
      * )
      * @Assert\Regex(
      *     pattern="/\/{2,}|\.{2,}/",

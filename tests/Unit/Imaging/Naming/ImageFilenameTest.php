@@ -61,7 +61,7 @@ class ImageFilenameTest extends TestCase
             ['/image.jpg', 1],
             ['image.dat', 1],
             ['image.jpeg', 0],
-            ['Image_Jpeg-1=0+.jpg', 0],
+            ['Image_Jpeg-1=0,1+.jpg', 0],
             ['dir/name/file.png', 0],
             ['dir/name/file..png', 1],
             ['dir//name//file.png', 1],

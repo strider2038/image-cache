@@ -19,11 +19,11 @@ use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
  */
 class ImagickImageProcessorTest extends FunctionalTestCase
 {
-    private const RUNTIME_SUBDIRECTORY = self::RUNTIME_DIRECTORY . '/subdirectory';
-    private const PNG_ORIGINAL_FILENAME = self::RUNTIME_DIRECTORY . '/original.png';
-    private const JPEG_ORIGINAL_FILENAME = self::RUNTIME_DIRECTORY . '/original.jpg';
-    private const PNG_FILENAME = self::RUNTIME_DIRECTORY . '/image.png';
-    private const JPEG_FILENAME = self::RUNTIME_DIRECTORY . '/image.jpg';
+    private const RUNTIME_SUBDIRECTORY = self::TEMPORARY_DIRECTORY . '/subdirectory';
+    private const PNG_ORIGINAL_FILENAME = self::TEMPORARY_DIRECTORY . '/original.png';
+    private const JPEG_ORIGINAL_FILENAME = self::TEMPORARY_DIRECTORY . '/original.jpg';
+    private const PNG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.png';
+    private const JPEG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.jpg';
     private const JPEG_FILENAME_IN_SUBDIRECTORY = self::RUNTIME_SUBDIRECTORY . '/image.jpg';
 
     /** @var ImageProcessor */

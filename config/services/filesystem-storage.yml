@@ -17,18 +17,21 @@ services:
         class: Strider2038\ImgCache\Service\Image\GetAction
         arguments:
             - '@response_factory'
+            - '@image_filename_factory'
             - '@filesystem_image_storage'
             - '@filesystem_image_cache'
     filesystem_cache_action_create:
         class: Strider2038\ImgCache\Service\Image\CreateAction
         arguments:
             - '@response_factory'
+            - '@image_filename_factory'
             - '@filesystem_image_storage'
             - '@image_factory'
     filesystem_cache_action_replace:
         class: Strider2038\ImgCache\Service\Image\ReplaceAction
         arguments:
             - '@response_factory'
+            - '@image_filename_factory'
             - '@filesystem_image_storage'
             - '@filesystem_image_cache'
             - '@image_factory'
@@ -36,6 +39,7 @@ services:
         class: Strider2038\ImgCache\Service\Image\DeleteAction
         arguments:
             - '@response_factory'
+            - '@image_filename_factory'
             - '@filesystem_image_storage'
             - '@filesystem_image_cache'
 
@@ -43,11 +47,20 @@ services:
         class: Strider2038\ImgCache\Imaging\ImageStorage
         arguments:
             - '@filesystem_image_extractor'
+            - '@filesystem_image_writer'
+
+    filesystem_image_cache_web_directory:
+        factory:
+            - '@directory_name_factory'
+            - 'createDirectoryName'
+        arguments:
+            - '%filesystem_image_cache.base_directory%'
+            - 'true'
 
     filesystem_image_cache:
         class: Strider2038\ImgCache\Imaging\ImageCache
         arguments:
-            - '%filesystem_image_cache.base_directory%'
+            - '@filesystem_image_cache_web_directory'
             - '@file_operations'
             - '@image_processor'
 
@@ -58,6 +71,12 @@ services:
             - '@filesystem_storage_accessor'
             - '@image_processor'
 
+    filesystem_image_writer:
+        class: Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
+        arguments:
+            - '@thumbnail_key_parser'
+            - '@filesystem_storage_accessor'
+
     filesystem_storage_accessor:
         class: Strider2038\ImgCache\Imaging\Storage\Accessor\FilesystemStorageAccessor
         arguments:
@@ -66,8 +85,17 @@ services:
             - '@direct_key_mapper'
         calls:
             - [setLogger, ['@logger']]
+
+    filesystem_storage_driver_directory:
+        factory:
+            - '@directory_name_factory'
+            - 'createDirectoryName'
+        arguments:
+            - '%filesystem_storage_driver.base_directory%'
+            - 'true'
+
     filesystem_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver
         arguments:
-            - '%filesystem_storage_driver.base_directory%'
+            - '@filesystem_storage_driver_directory'
             - '@file_operations'

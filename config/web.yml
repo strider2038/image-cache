@@ -1,24 +1,9 @@
 imports:
+  - { resource: 'parameters.yml' }
   - { resource: 'services/core.yml' }
+  - { resource: 'services/security.yml' }
   - { resource: 'services/utilities.yml' }
   - { resource: 'services/routing.yml' }
   - { resource: 'services/imaging.yml' }
   - { resource: 'services/filesystem-storage.yml' }
   - { resource: 'services/yandex-map-storage.yml' }
-
-parameters:
-    app.debug: true
-    security.access_token: 'sample-security-token-must-be-replaced-with-real'
-    log.directory: '%app.directory%/runtime'
-    log.name: 'app.log'
-    log.level: 100
-    save_options.quality: 90
-    filesystem_image_cache.base_directory: '%app.directory%/web/i'
-    yandex_map_image_cache.base_directory: '%app.directory%/web/yandex_map'
-    filesystem_storage_driver.base_directory: '%app.directory%/tests/assets'
-    yandex_map_client.parameters:
-        base_uri: 'https://static-maps.yandex.ru/1.x/'
-        handler: '@guzzle_logger_handler_stack'
-    routing_map:
-        /i: 'filesystem_cache_image_controller'
-        /yandex_map: 'yandex_map_cache_image_controller'

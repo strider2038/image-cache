@@ -25,7 +25,7 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
     private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    private const IMAGE_JPEG_RUNTIME_FILENAME = self::RUNTIME_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
     private const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
     private const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
@@ -46,7 +46,7 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
         $container = $this->loadContainer('thumbnail-image-cache.yml');
         $this->request = \Phake::mock(RequestInterface::class);
         $container->set('request', $this->request);
-        $this->controller = $container->get('image_controller');
+        $this->controller = $container->get('filesystem_cache_image_controller');
     }
 
     /**
@@ -104,8 +104,8 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     /** @test */
     public function replace_givenStream_imageIsCreatedAndCreatedResponseReturned(): void
     {
-        $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
-        $stream = $this->givenStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 
@@ -118,8 +118,8 @@ class ThumbnailImageCacheTest extends FunctionalTestCase
     /** @test */
     public function replace_givenStream_imageIsCreatedInCacheSubdirectoryAndCreatedResponseReturned(): void
     {
-        $this->givenImageJpeg(self::IMAGE_JPEG_RUNTIME_FILENAME);
-        $stream = $this->givenStream(self::IMAGE_JPEG_RUNTIME_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
         $this->givenRequest_getBody_returns($stream);
 

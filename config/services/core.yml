@@ -1,3 +1,6 @@
+parameters:
+    app.debug: false
+
 services:
     # external
     filesystem:
@@ -14,12 +17,6 @@ services:
             - '@stream_factory'
         calls:
             - [setLogger, ['@logger']]
-
-    security:
-        class: Strider2038\ImgCache\Core\Security
-        arguments:
-            - '@request'
-            - '%security.access_token%'
 
     # core http components
     request_factory:

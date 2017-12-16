@@ -24,8 +24,8 @@ use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
  */
 class YandexMapImageCacheTest extends FunctionalTestCase
 {
-    private const PNG_FILENAME = self::RUNTIME_DIRECTORY . '/image.png';
-    private const JPEG_FILENAME = self::RUNTIME_DIRECTORY . '/image.jpg';
+    private const PNG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.png';
+    private const JPEG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.jpg';
     private const IMAGE_WITH_INVALID_PARAMETERS = '/size=0,0.jpg';
     private const IMAGE_JPEG_CACHE_KEY = '/ll=60.715799,28.729073_size=150,100.jpg';
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . '/ll=60.715799,28.729073_size=150,100.jpg';
@@ -46,10 +46,10 @@ class YandexMapImageCacheTest extends FunctionalTestCase
         parent::setUp();
         $container = $this->loadContainer('yandex-map-image-cache.yml');
         $this->client = \Phake::mock(ClientInterface::class);
-        $container->set('client_mock', $this->client);
+        $container->set('yandex_map_client', $this->client);
         $this->request = \Phake::mock(RequestInterface::class);
         $container->set('request', $this->request);
-        $this->controller = $container->get('image_controller');
+        $this->controller = $container->get('yandex_map_cache_image_controller');
     }
 
     /**
