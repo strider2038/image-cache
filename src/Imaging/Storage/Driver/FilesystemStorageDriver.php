@@ -37,11 +37,6 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
         $this->baseDirectory = $baseDirectory;
     }
     
-    public function getBaseDirectory(): string
-    {
-        return $this->baseDirectory;
-    }
-    
     public function getFileContents(StorageFilenameInterface $filename): StreamInterface
     {
         $sourceFilename = $this->composeSourceFilename($filename);
