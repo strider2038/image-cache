@@ -25,16 +25,16 @@ class ImageActionFactory implements ActionFactoryInterface
     private const ACTION_ID_REPLACE = 'replace';
     private const ACTION_ID_DELETE = 'delete';
 
-    /** @var GetAction */
+    /** @var ActionInterface */
     private $getAction;
 
-    /** @var CreateAction */
+    /** @var ActionInterface */
     private $createAction;
 
-    /** @var ReplaceAction */
+    /** @var ActionInterface */
     private $replaceAction;
 
-    /** @var DeleteAction */
+    /** @var ActionInterface */
     private $deleteAction;
 
     public function __construct(
