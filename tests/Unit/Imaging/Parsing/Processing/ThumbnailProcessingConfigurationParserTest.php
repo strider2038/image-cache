@@ -54,11 +54,11 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $this->givenTransformationsFactory_create_returnsTransformation();
         $defaultSaveOptions = $this->givenSaveOptionsFactory_create_returns_saveOptions();
 
-        $parsedConfiguration = $parser->parse($configuration);
+        $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertSaveOptionsConfigurator_configure_isCalled(0);
+        $this->assertSaveOptionsConfigurator_updateSaveOptionsByConfiguration_isCalled(0);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
     }
 
@@ -78,11 +78,11 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $this->givenTransformationsFactory_create_returnsNull();
         $defaultSaveOptions = $this->givenSaveOptionsFactory_create_returns_saveOptions();
 
-        $parsedConfiguration = $parser->parse($configuration);
+        $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertSaveOptionsConfigurator_configure_isCalled($count);
+        $this->assertSaveOptionsConfigurator_updateSaveOptionsByConfiguration_isCalled($count);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
     }
 
@@ -139,10 +139,10 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
             ->create(\Phake::anyParameters());
     }
 
-    private function assertSaveOptionsConfigurator_configure_isCalled(int $times): void
+    private function assertSaveOptionsConfigurator_updateSaveOptionsByConfiguration_isCalled(int $times): void
     {
         \Phake::verify($this->saveOptionsConfigurator, \Phake::times($times))
-            ->configure(\Phake::anyParameters());
+            ->updateSaveOptionsByConfiguration(\Phake::anyParameters());
     }
 
     private function givenTransformationsFactory_create_returnsNull(): void

@@ -86,14 +86,14 @@ class ThumbnailKeyParserTest extends TestCase
         $parser = $this->createThumbnailKeyParser();
         $this->givenKeyValidator_isValidPublicFilename_returns($key,true);
         $this->givenImageValidator_hasValidImageExtension_returns($key, true);
-        $processingConfiguration = $this->givenProcessingConfigurationParser_parse_returns($processingConfigurationString);
+        $processingConfiguration = $this->givenProcessingConfigurationParser_parseConfiguration_returns($processingConfigurationString);
 
         $thumbnailKey = $parser->parse($key);
 
         $this->assertInstanceOf(ThumbnailKey::class, $thumbnailKey);
         $this->assertEquals($publicFilename, $thumbnailKey->getPublicFilename());
         $this->assertEquals($thumbnailMask, $thumbnailKey->getThumbnailMask());
-        $this->assertProcessingConfigurationParser_parse_isCalledOnceWith($processingConfigurationString);
+        $this->assertProcessingConfigurationParser_parseConfiguration_isCalledOnceWith($processingConfigurationString);
         $this->assertSame($processingConfiguration, $thumbnailKey->getProcessingConfiguration());
     }
 
@@ -149,21 +149,21 @@ class ThumbnailKeyParserTest extends TestCase
         \Phake::when($this->imageValidator)->hasValidImageExtension($filename)->thenReturn($value);
     }
 
-    private function givenProcessingConfigurationParser_parse_returns(
+    private function givenProcessingConfigurationParser_parseConfiguration_returns(
         string $processingConfigurationString
     ): ProcessingConfiguration {
         $processingConfiguration = \Phake::mock(ProcessingConfiguration::class);
         \Phake::when($this->processingConfigurationParser)
-            ->parse($processingConfigurationString)
+            ->parseConfiguration($processingConfigurationString)
             ->thenReturn($processingConfiguration);
 
         return $processingConfiguration;
     }
 
-    private function assertProcessingConfigurationParser_parse_isCalledOnceWith(
+    private function assertProcessingConfigurationParser_parseConfiguration_isCalledOnceWith(
         string $processingConfigurationString
     ): void {
         \Phake::verify($this->processingConfigurationParser, \Phake::times(1))
-            ->parse($processingConfigurationString);
+            ->parseConfiguration($processingConfigurationString);
     }
 }

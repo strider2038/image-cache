@@ -60,9 +60,10 @@ class ThumbnailImageWriter implements ImageWriterInterface
     private function parseKey(string $key): ThumbnailKey
     {
         $parsedKey = $this->keyParser->parse($key);
+
         if ($parsedKey->hasProcessingConfiguration()) {
             throw new InvalidRequestValueException(sprintf(
-                'Image name "%s" for source image cannot have process configuration',
+                'Image name "%s" for source image cannot have process configuration.',
                 $key
             ));
         }

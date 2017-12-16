@@ -49,7 +49,7 @@ class YandexMapParametersParser implements YandexMapParametersParserInterface
             throw new InvalidRequestValueException(sprintf('Unsupported image extension for filename "%s".', $key));
         }
 
-        $parameters = $this->parametersFactory->create();
+        $parameters = $this->parametersFactory->createYandexMapParameters();
 
         $filename = pathinfo($key, PATHINFO_FILENAME);
         $rawParameters = explode(self::PARAMETERS_DELIMITER, $filename);

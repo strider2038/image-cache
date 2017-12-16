@@ -27,8 +27,14 @@ Image caching microservice with connection to cloud hostings
 - [x] Logging guzzle requests
 - [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
 - [x] Yandex.Disk source
-- [ ] Migrate to collections based on Doctrine ArrayCollection
+- [x] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
+    - SourceKeyParser
+    - ThumbnailKeyParser
+    - YandexMapParametersParser ?
+    - SaveOptions ?
+    - FilenameKeyMapperInterface to factory
+- [ ] ViolationsChecker service
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation

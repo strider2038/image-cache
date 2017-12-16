@@ -22,12 +22,12 @@ class SaveOptionsConfiguratorTest extends TestCase
     private const VALID_CONFIGURATION = 'q51';
 
     /** @test */
-    public function configure_configurationIsNotSupported_saveOptionsValueNotModified(): void
+    public function updateSaveOptionsByConfiguration_configurationIsNotSupported_saveOptionsValueNotModified(): void
     {
         $saveOptions = $this->givenSaveOptions();
         $configurator = new SaveOptionsConfigurator();
 
-        $configurator->configure($saveOptions, self::NOT_SUPPORTED_CONFIGURATION);
+        $configurator->updateSaveOptionsByConfiguration($saveOptions, self::NOT_SUPPORTED_CONFIGURATION);
 
         \Phake::verifyNoInteraction($saveOptions);
     }
@@ -43,21 +43,21 @@ class SaveOptionsConfiguratorTest extends TestCase
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid configuration for quality transformation
      */
-    public function configure_configurationIsInvalid_exceptionThrown(): void
+    public function updateSaveOptionsByConfiguration_configurationIsInvalid_exceptionThrown(): void
     {
         $saveOptions = $this->givenSaveOptions();
         $configurator = new SaveOptionsConfigurator();
 
-        $configurator->configure($saveOptions, self::INVALID_CONFIGURATION);
+        $configurator->updateSaveOptionsByConfiguration($saveOptions, self::INVALID_CONFIGURATION);
     }
 
     /** @test */
-    public function configure_configurationIsValid_valueIsSetToSaveOptions(): void
+    public function updateSaveOptionsByConfiguration_configurationIsValid_valueIsSetToSaveOptions(): void
     {
         $saveOptions = $this->givenSaveOptions();
         $configurator = new SaveOptionsConfigurator();
 
-        $configurator->configure($saveOptions, self::VALID_CONFIGURATION);
+        $configurator->updateSaveOptionsByConfiguration($saveOptions, self::VALID_CONFIGURATION);
 
         \Phake::verify($saveOptions, \Phake::times(1))->setQuality(self::SAVE_OPTIONS_QUALITY);
     }

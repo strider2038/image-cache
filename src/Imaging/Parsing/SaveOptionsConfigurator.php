@@ -18,9 +18,9 @@ use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
  */
 class SaveOptionsConfigurator implements SaveOptionsConfiguratorInterface
 {
-    public function configure(SaveOptions $saveOptions, string $configuration): void
+    public function updateSaveOptionsByConfiguration(SaveOptions $saveOptions, string $configuration): void
     {
-        if (strlen($configuration) <= 0 || $configuration[0] !== 'q') {
+        if (\strlen($configuration) <= 0 || $configuration[0] !== 'q') {
             return;
         }
 

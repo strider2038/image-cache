@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Imaging\Storage\Data;
  */
 interface YandexMapParametersFactoryInterface
 {
-    public function create(): YandexMapParameters;
+    public function createYandexMapParameters(): YandexMapParameters;
 }

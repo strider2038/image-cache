@@ -36,7 +36,7 @@ class YandexMapParametersFactoryTest extends TestCase
     {
         $factory = new YandexMapParametersFactory();
 
-        $parameters = $factory->create();
+        $parameters = $factory->createYandexMapParameters();
 
         $this->assertEquals(self::DEFAULT_LAYERS, $parameters->getLayers()->toArray());
         $this->assertEquals(self::DEFAULT_LONGITUDE, $parameters->getLongitude());
@@ -59,7 +59,7 @@ class YandexMapParametersFactoryTest extends TestCase
         $factory->setHeight(self::HEIGHT);
         $factory->setScale(self::SCALE);
 
-        $parameters = $factory->create();
+        $parameters = $factory->createYandexMapParameters();
 
         $this->assertEquals(self::LAYERS, $parameters->getLayers()->toArray());
         $this->assertEquals(self::LONGITUDE, $parameters->getLongitude());

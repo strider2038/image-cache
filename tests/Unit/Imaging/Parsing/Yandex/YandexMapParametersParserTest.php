@@ -65,7 +65,7 @@ class YandexMapParametersParserTest extends TestCase
         string $parameterValue
     ): void {
         $parser = $this->createParser();
-        $expectedParameters = $this->givenParametersFactory_create_returnsParameters();
+        $expectedParameters = $this->givenParametersFactory_createYandexMapParameters_returnsParameters();
         $configurator = $this->givenValueConfiguratorFactory_create_returnsValueConfigurator($parameterName);
         $this->givenImageValidator_hasValidImageExtension_returns($key, true);
 
@@ -97,7 +97,7 @@ class YandexMapParametersParserTest extends TestCase
         int $expectedTimes
     ): void {
         $parser = $this->createParser();
-        $expectedParameters = $this->givenParametersFactory_create_returnsParameters();
+        $expectedParameters = $this->givenParametersFactory_createYandexMapParameters_returnsParameters();
         $this->givenValueConfiguratorFactory_create_returnsValueConfigurator(\Phake::anyParameters());
         $this->givenImageValidator_hasValidImageExtension_returns($key, true);
 
@@ -125,10 +125,10 @@ class YandexMapParametersParserTest extends TestCase
         );
     }
 
-    private function givenParametersFactory_create_returnsParameters(): YandexMapParameters
+    private function givenParametersFactory_createYandexMapParameters_returnsParameters(): YandexMapParameters
     {
         $parameters = \Phake::mock(YandexMapParameters::class);
-        \Phake::when($this->parametersFactory)->create()->thenReturn($parameters);
+        \Phake::when($this->parametersFactory)->createYandexMapParameters()->thenReturn($parameters);
 
         return $parameters;
     }

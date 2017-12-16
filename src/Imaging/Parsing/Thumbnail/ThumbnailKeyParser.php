@@ -64,7 +64,7 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         $thumbnailMask = sprintf('%s%s*.%s', $directory, $baseFilename, $extension);
 
         $processingConfigurationString = implode('_', $filenameParts);
-        $processingConfiguration = $this->processingConfigurationParser->parse($processingConfigurationString);
+        $processingConfiguration = $this->processingConfigurationParser->parseConfiguration($processingConfigurationString);
 
         return new ThumbnailKey($sourceFilename, $thumbnailMask, $processingConfiguration);
     }
