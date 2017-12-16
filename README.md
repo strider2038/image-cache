@@ -29,7 +29,6 @@ Image caching microservice with connection to cloud hostings
 - [x] Yandex.Disk source
 - [ ] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
-  - storage and cache key as data object
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation

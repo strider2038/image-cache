@@ -10,33 +10,31 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
-use Strider2038\ImgCache\Collection\IterableCollection;
+use Strider2038\ImgCache\Collection\AbstractClassCollection;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HeaderCollection extends IterableCollection
+class HeaderCollection extends AbstractClassCollection
 {
     /** @param HeaderValueCollection[] $elements */
     public function __construct(array $elements = [])
     {
-        foreach ($elements as $headerName => $values) {
-            $this->set($headerName, $values);
-        }
+        parent::__construct($elements, HeaderValueCollection::class);
     }
 
-    public function set(string $name, HeaderValueCollection $values): void
+    /** {@inheritDoc} */
+    public function get($key): HeaderValueCollection
     {
-        $this->elements[$name] = $values;
+        return parent::get($key) ?? new HeaderValueCollection();
     }
 
-    public function get(string $name): HeaderValueCollection
+    /**
+     * @inheritdoc
+     * @throws \DomainException
+     */
+    public function add($element): bool
     {
-        return $this->elements[$name] ?? new HeaderValueCollection();
-    }
-
-    public function containsKey(string $name): bool
-    {
-        return array_key_exists($name, $this->elements);
+        throw new \DomainException('Not implemented');
     }
 }

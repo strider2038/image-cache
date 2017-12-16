@@ -29,14 +29,26 @@ class HeaderCollectionTest extends TestCase
     }
 
     /** @test */
-    public function containsKey_givenArrayWithHeader_returnsTrue(): void
+    public function get_givenKeyAndNoElements_emptyHeaderValueCollectionReturned(): void
     {
-        $elements = $this->givenElements();
-        $collection = new HeaderCollection($elements);
+        $collection = new HeaderCollection();
 
-        $result = $collection->containsKey(HttpHeaderEnum::AUTHORIZATION);
+        $values = $collection->get(HttpHeaderEnum::AUTHORIZATION);
 
-        $this->assertTrue($result);
+        $this->assertInstanceOf(HeaderValueCollection::class, $values);
+        $this->assertCount(0, $values);
+    }
+
+    /**
+     * @test
+     * @expectedException \DomainException
+     * @expectedExceptionMessage Not implemented
+     */
+    public function add_givenElement_domainExceptionThrown(): void
+    {
+        $collection = new HeaderCollection();
+
+        $collection->add(new HeaderValueCollection());
     }
 
     private function givenElements(): array

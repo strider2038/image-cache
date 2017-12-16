@@ -95,9 +95,14 @@ class ResponseFactory implements ResponseFactoryInterface
         $response->setProtocolVersion($this->request->getProtocolVersion());
 
         $headers = new HeaderCollection();
-        $headers->set(new HttpHeaderEnum(HttpHeaderEnum::CONTENT_TYPE), new HeaderValueCollection([
-            mime_content_type($filename)
-        ]));
+        $headers->set(
+            HttpHeaderEnum::CONTENT_TYPE,
+            new HeaderValueCollection(
+                [
+                    mime_content_type($filename)
+                ]
+            )
+        );
 
         $response->setHeaders($headers);
 

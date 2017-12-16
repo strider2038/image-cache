@@ -68,7 +68,7 @@ class Message implements MessageInterface
 
     public function getHeaderLine(HttpHeaderEnum $name): string
     {
-        $values = $this->headers->get($name);
+        $values = $this->headers->get($name->getValue());
 
         return implode(',', $values->toArray());
     }
