@@ -1,4 +1,4 @@
-FROM php:fpm-alpine
+FROM php:7.1-fpm-alpine
 MAINTAINER Igor Lazarev <strider2038@rambler.ru>
 
 RUN apk --no-cache add --update \
