@@ -7,30 +7,33 @@ for i in $@; do
     fi
 done
 
-echo "Cleaning old images..."
+container_name="imgcache"
+container_tag="strider2038:imgcache-service-dev"
+
+echo "Cleaning old images $container_name..."
 echo "========================================================================="
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
+docker stop "$container_name"
+docker rm "$container_name"
 
 if [ ${build_prod} -eq 1 ]; then
     ./build.sh
 fi
 
-echo "Building development image..."
+echo "Building development image $container_tag..."
 echo "========================================================================="
 
 docker build \
     --file Dockerfile.dev \
-    --tag strider2038:imgcache-service-dev \
+    --tag "$container_tag" \
     .
 
-echo "Starting container..."
+echo "Starting container $container_name..."
 echo "========================================================================="
 
 docker run \
     -p 80:80 -p 9002:9001 \
     --detach \
-    --name imgcache \
+    --name "$container_name" \
     --stop-signal SIGKILL \
     --volume $PWD:/imgcache \
-    strider2038:imgcache-service-dev
+    "$container_tag"

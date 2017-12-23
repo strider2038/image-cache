@@ -7,24 +7,27 @@ for i in $@; do
    fi
 done
 
-echo "Starting to build image..."
+container_name="imgcache"
+container_tag="strider2038:imgcache-service"
+
+echo "Starting to build image $container_tag..."
 echo "========================================================================="
 
-docker build --pull --tag strider2038:imgcache-service .
+docker build --pull --tag "$container_tag" .
 
 echo "========================================================================="
-echo "Image created"
+echo "Image $container_tag created"
 
 
-if [ $docker_run -eq 1 ]; then
-    echo "Running image..."
-    docker stop $(docker ps -a -q)
-    docker rm $(docker ps -a -q)
+if [ ${docker_run} -eq 1 ]; then
+    echo "Starting container $container_name for image $container_tag..."
+    docker stop "$container_name"
+    docker rm "$container_name"
 
     docker run \
         -p 80:80 \
         --detach \
-        --name imgcache \
+        --name "$container_name" \
         --stop-signal SIGKILL \
-        strider2038:imgcache-service
+        "$container_tag"
 fi
