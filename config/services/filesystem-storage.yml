@@ -67,14 +67,14 @@ services:
     filesystem_image_extractor:
         class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@filesystem_storage_accessor'
             - '@image_processor'
 
     filesystem_image_writer:
         class: Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@filesystem_storage_accessor'
 
     filesystem_storage_accessor:

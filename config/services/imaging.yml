@@ -25,8 +25,8 @@ services:
             - '@stream_factory'
 
     # imaging/parsing
-    thumbnail_key_parser:
-        class: Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser
+    thumbnail_filename_parser:
+        class: Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParser
         arguments:
             - '@key_validator'
             - '@image_validator'

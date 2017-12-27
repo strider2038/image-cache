@@ -24,7 +24,7 @@ services:
     original_image_extractor:
         class: Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor
         arguments:
-            - '@original_key_parser'
+            - '@plain_filename_parser'
             - '@filesystem_storage_accessor'
             - '@image_processor'
 
@@ -32,12 +32,12 @@ services:
     original_image_writer:
         class: Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter
         arguments:
-            - '@original_key_parser'
+            - '@plain_filename_parser'
             - '@filesystem_storage_accessor'
 
     # imaging/parsing
-    original_key_parser:
-        class: Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParser
+    plain_filename_parser:
+        class: Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser
         arguments:
             - '@key_validator'
             - '@image_validator'

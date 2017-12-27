@@ -87,14 +87,14 @@ services:
     yandex_disk_image_extractor:
         class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@yandex_disk_storage_accessor'
             - '@image_processor'
 
     yandex_disk_image_writer:
         class: Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@yandex_disk_storage_accessor'
 
     yandex_disk_storage_accessor:
