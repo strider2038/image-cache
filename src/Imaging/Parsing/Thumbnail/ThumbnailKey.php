@@ -10,13 +10,13 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
 
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ThumbnailKey extends SourceKey
+class ThumbnailKey extends PlainFilename
 {
     /** @var ProcessingConfiguration */
     private $processingConfiguration;
@@ -25,11 +25,11 @@ class ThumbnailKey extends SourceKey
     private $thumbnailMask;
 
     public function __construct(
-        string $publicFilename,
+        string $value,
         string $thumbnailMask,
         ProcessingConfiguration $processingConfiguration
     ) {
-        parent::__construct($publicFilename);
+        parent::__construct($value);
         $this->thumbnailMask = $thumbnailMask;
         $this->processingConfiguration = $processingConfiguration;
     }

@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Source;
+namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
+
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SourceKeyParserInterface
+interface PlainFilenameParserInterface
 {
-    public function parse(string $key): SourceKey;
+    public function getParsedFilename(string $filename): PlainFilename;
 }

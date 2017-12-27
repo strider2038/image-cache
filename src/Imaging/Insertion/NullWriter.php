@@ -18,22 +18,22 @@ use Strider2038\ImgCache\Imaging\Image\Image;
  */
 class NullWriter implements ImageWriterInterface
 {
-    public function imageExists(string $key): bool
+    public function imageExists(string $filename): bool
     {
         throw new NotAllowedException('Method is not allowed');
     }
 
-    public function insertImage(string $key, Image $image): void
+    public function insertImage(string $filename, Image $image): void
     {
         throw new NotAllowedException('Method is not allowed');
     }
 
-    public function deleteImage(string $key): void
+    public function deleteImage(string $filename): void
     {
         throw new NotAllowedException('Method is not allowed');
     }
 
-    public function getImageFileNameMask(string $key): string
+    public function getImageFileNameMask(string $filename): string
     {
         throw new NotAllowedException('Method is not allowed');
     }

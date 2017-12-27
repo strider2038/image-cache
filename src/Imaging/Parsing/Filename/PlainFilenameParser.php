@@ -8,16 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Source;
+namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class SourceKeyParser implements SourceKeyParserInterface
+class PlainFilenameParser implements PlainFilenameParserInterface
 {
     /** @var KeyValidatorInterface */
     private $keyValidator;
@@ -33,15 +35,15 @@ class SourceKeyParser implements SourceKeyParserInterface
         $this->imageValidator = $imageValidator;
     }
 
-    public function parse(string $key): SourceKey
+    public function getParsedFilename(string $filename): PlainFilename
     {
-        if (!$this->keyValidator->isValidPublicFilename($key)) {
-            throw new InvalidRequestValueException("Invalid filename '{$key}' in request");
+        if (!$this->keyValidator->isValidPublicFilename($filename)) {
+            throw new InvalidRequestValueException("Invalid filename '{$filename}' in request");
         }
-        if (!$this->imageValidator->hasValidImageExtension($key)) {
-            throw new InvalidRequestValueException("Unsupported image extension for '{$key}'");
+        if (!$this->imageValidator->hasValidImageExtension($filename)) {
+            throw new InvalidRequestValueException("Unsupported image extension for '{$filename}'");
         }
 
-        return new SourceKey($key);
+        return new PlainFilename($filename);
     }
 }

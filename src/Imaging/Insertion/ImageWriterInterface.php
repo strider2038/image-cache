@@ -17,8 +17,8 @@ use Strider2038\ImgCache\Imaging\Image\Image;
  */
 interface ImageWriterInterface
 {
-    public function imageExists(string $key): bool;
-    public function insertImage(string $key, Image $image): void;
-    public function deleteImage(string $key): void;
-    public function getImageFileNameMask(string $key): string;
+    public function imageExists(string $filename): bool;
+    public function insertImage(string $filename, Image $image): void;
+    public function deleteImage(string $filename): void;
+    public function getImageFileNameMask(string $filename): string;
 }

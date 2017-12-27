@@ -35,7 +35,7 @@ class ThumbnailKeyTest extends TestCase
     {
         $key = $this->createThumbnailKey();
 
-        $this->assertEquals(self::PUBLIC_FILENAME, $key->getPublicFilename());
+        $this->assertEquals(self::PUBLIC_FILENAME, $key->getValue());
         $this->assertEquals(self::THUMBNAIL_MASK, $key->getThumbnailMask());
         $this->assertSame($this->processingConfiguration, $key->getProcessingConfiguration());
     }

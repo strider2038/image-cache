@@ -15,7 +15,6 @@ use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParse
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
 use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Processing\ProcessingConfigurationInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
@@ -91,7 +90,7 @@ class ThumbnailKeyParserTest extends TestCase
         $thumbnailKey = $parser->parse($key);
 
         $this->assertInstanceOf(ThumbnailKey::class, $thumbnailKey);
-        $this->assertEquals($publicFilename, $thumbnailKey->getPublicFilename());
+        $this->assertEquals($publicFilename, $thumbnailKey->getValue());
         $this->assertEquals($thumbnailMask, $thumbnailKey->getThumbnailMask());
         $this->assertProcessingConfigurationParser_parseConfiguration_isCalledOnceWith($processingConfigurationString);
         $this->assertSame($processingConfiguration, $thumbnailKey->getProcessingConfiguration());

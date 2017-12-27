@@ -33,27 +33,27 @@ class ThumbnailImageWriter implements ImageWriterInterface
         $this->storageAccessor = $storageAccessor;
     }
 
-    public function imageExists(string $key): bool
+    public function imageExists(string $filename): bool
     {
-        $parsedKey = $this->parseKey($key);
-        return $this->storageAccessor->imageExists($parsedKey->getPublicFilename());
+        $parsedKey = $this->parseKey($filename);
+        return $this->storageAccessor->imageExists($parsedKey->getValue());
     }
 
-    public function insertImage(string $key, Image $image): void
+    public function insertImage(string $filename, Image $image): void
     {
-        $parsedKey = $this->parseKey($key);
-        $this->storageAccessor->putImage($parsedKey->getPublicFilename(), $image);
+        $parsedKey = $this->parseKey($filename);
+        $this->storageAccessor->putImage($parsedKey->getValue(), $image);
     }
 
-    public function deleteImage(string $key): void
+    public function deleteImage(string $filename): void
     {
-        $parsedKey = $this->parseKey($key);
-        $this->storageAccessor->deleteImage($parsedKey->getPublicFilename());
+        $parsedKey = $this->parseKey($filename);
+        $this->storageAccessor->deleteImage($parsedKey->getValue());
     }
 
-    public function getImageFileNameMask(string $key): string
+    public function getImageFileNameMask(string $filename): string
     {
-        $parsedKey = $this->parseKey($key);
+        $parsedKey = $this->parseKey($filename);
         return $parsedKey->getThumbnailMask();
     }
 

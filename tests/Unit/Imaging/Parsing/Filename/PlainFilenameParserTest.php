@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Source;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Filename;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParser;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
-class SourceKeyParserTest extends TestCase
+class PlainFilenameParserTest extends TestCase
 {
     private const INVALID_KEY = 'a';
 
@@ -38,12 +38,12 @@ class SourceKeyParserTest extends TestCase
      * @expectedExceptionCode 400
      * @expectedExceptionMessageRegExp  /Invalid filename .* in request/
      */
-    public function parse_givenInvalidKey_exceptionThrown(): void
+    public function getParsedFilename_givenInvalidFilename_exceptionThrown(): void
     {
         $parser = $this->createSourceKeyParser();
         $this->givenKeyValidator_isValidPublicFilename_returns(self::INVALID_KEY,false);
 
-        $parser->parse(self::INVALID_KEY);
+        $parser->getParsedFilename(self::INVALID_KEY);
     }
 
     /**
@@ -52,13 +52,13 @@ class SourceKeyParserTest extends TestCase
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Unsupported image extension
      */
-    public function parse_givenKeyHasInvalidExtension_exceptionThrown(): void
+    public function getParsedFilename_givenFilenameHasInvalidExtension_exceptionThrown(): void
     {
         $parser = $this->createSourceKeyParser();
         $this->givenKeyValidator_isValidPublicFilename_returns(self::INVALID_KEY,true);
         $this->givenImageValidator_hasValidImageExtension_returns(self::INVALID_KEY, false);
 
-        $parser->parse(self::INVALID_KEY);
+        $parser->getParsedFilename(self::INVALID_KEY);
     }
 
     /**
@@ -67,16 +67,16 @@ class SourceKeyParserTest extends TestCase
      * @param string $publicFilename
      * @dataProvider validKeyProvider
      */
-    public function parse_givenKey_keyParsedToThumbnailKey(string $key, string $publicFilename): void
+    public function getParsedFilename_givenFilename_keyParsedToThumbnailKey(string $key, string $publicFilename): void
     {
         $parser = $this->createSourceKeyParser();
         $this->givenKeyValidator_isValidPublicFilename_returns($key,true);
         $this->givenImageValidator_hasValidImageExtension_returns($key, true);
 
-        $thumbnailKey = $parser->parse($key);
+        $plainFilename = $parser->getParsedFilename($key);
 
-        $this->assertInstanceOf(SourceKey::class, $thumbnailKey);
-        $this->assertEquals($publicFilename, $thumbnailKey->getPublicFilename());
+        $this->assertInstanceOf(PlainFilename::class, $plainFilename);
+        $this->assertEquals($publicFilename, $plainFilename->getValue());
     }
 
     public function validKeyProvider(): array
@@ -89,9 +89,9 @@ class SourceKeyParserTest extends TestCase
         ];
     }
 
-    private function createSourceKeyParser(): SourceKeyParser
+    private function createSourceKeyParser(): PlainFilenameParser
     {
-        return new SourceKeyParser($this->keyValidator, $this->imageValidator);
+        return new PlainFilenameParser($this->keyValidator, $this->imageValidator);
     }
 
     private function givenKeyValidator_isValidPublicFilename_returns(string $filename, bool $value): void

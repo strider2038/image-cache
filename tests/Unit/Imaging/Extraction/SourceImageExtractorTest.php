@@ -13,24 +13,24 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\SourceImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 class SourceImageExtractorTest extends TestCase
 {
-    private const KEY = 'a';
-    private const PUBLIC_FILENAME = 'b';
+    private const FILENAME = 'a';
+    private const PARSED_FILENAME_VALUE = 'b';
 
-    /** @var SourceKeyParserInterface */
-    private $keyParser;
+    /** @var PlainFilenameParserInterface */
+    private $filenameParser;
 
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
     protected function setUp(): void
     {
-        $this->keyParser = \Phake::mock(SourceKeyParserInterface::class);
+        $this->filenameParser = \Phake::mock(PlainFilenameParserInterface::class);
         $this->storageAccessor = \Phake::mock(StorageAccessorInterface::class);
     }
 
@@ -38,25 +38,26 @@ class SourceImageExtractorTest extends TestCase
     public function getProcessedImage_imageExistsInSource_imageIsReturned(): void
     {
         $extractor = $this->createSourceImageExtractor();
-        $publicFilename = self::PUBLIC_FILENAME;
-        $this->givenKeyParser_parse_returnsSourceKey();
-        $image = $this->givenStorageAccessor_getImage_returnsImage($publicFilename);
+        $parsedFilename = self::PARSED_FILENAME_VALUE;
+        $this->givenFilenameParser_getParsedFilename_returnsPlainFilename();
+        $image = $this->givenStorageAccessor_getImage_returnsImage($parsedFilename);
 
-        $extractedImage = $extractor->getProcessedImage(self::KEY);
+        $extractedImage = $extractor->getProcessedImage(self::FILENAME);
 
+        $this->assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(self::FILENAME);
         $this->assertSame($image, $extractedImage);
     }
 
     private function createSourceImageExtractor(): SourceImageExtractor
     {
-        return new SourceImageExtractor($this->keyParser, $this->storageAccessor);
+        return new SourceImageExtractor($this->filenameParser, $this->storageAccessor);
     }
 
-    private function givenKeyParser_parse_returnsSourceKey(): SourceKey
+    private function givenFilenameParser_getParsedFilename_returnsPlainFilename(): PlainFilename
     {
-        $sourceKey = \Phake::mock(SourceKey::class);
-        \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($sourceKey);
-        \Phake::when($sourceKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
+        $sourceKey = \Phake::mock(PlainFilename::class);
+        \Phake::when($this->filenameParser)->getParsedFilename(\Phake::anyParameters())->thenReturn($sourceKey);
+        \Phake::when($sourceKey)->getValue()->thenReturn(self::PARSED_FILENAME_VALUE);
 
         return $sourceKey;
     }
@@ -67,5 +68,10 @@ class SourceImageExtractorTest extends TestCase
         \Phake::when($this->storageAccessor)->getImage($publicFilename)->thenReturn($image);
 
         return $image;
+    }
+
+    private function assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(string $filename): void
+    {
+        \Phake::verify($this->filenameParser, \Phake::times(1))->getParsedFilename($filename);
     }
 }
