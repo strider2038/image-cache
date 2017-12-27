@@ -15,35 +15,42 @@ use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class PlainFilenameParser implements PlainFilenameParserInterface
 {
-    /** @var KeyValidatorInterface */
-    private $keyValidator;
+    /** @var ModelValidatorInterface */
+    private $validator;
 
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
+    /** @var ViolationFormatterInterface */
+    private $violationsFormatter;
 
     public function __construct(
-        KeyValidatorInterface $keyValidator,
-        ImageValidatorInterface $imageValidator
+        ModelValidatorInterface $validator,
+        ViolationFormatterInterface $violationsFormatter
     ) {
-        $this->keyValidator = $keyValidator;
-        $this->imageValidator = $imageValidator;
+        $this->validator = $validator;
+        $this->violationsFormatter = $violationsFormatter;
     }
 
     public function getParsedFilename(string $filename): PlainFilename
     {
-        if (!$this->keyValidator->isValidPublicFilename($filename)) {
-            throw new InvalidRequestValueException("Invalid filename '{$filename}' in request");
-        }
-        if (!$this->imageValidator->hasValidImageExtension($filename)) {
-            throw new InvalidRequestValueException("Unsupported image extension for '{$filename}'");
+        $plainFilename = new PlainFilename($filename);
+        $violations = $this->validator->validateModel($plainFilename);
+
+        if ($violations->count() > 0) {
+            throw new InvalidRequestValueException(
+                sprintf(
+                    'Filename is not valid: %s',
+                    $this->violationsFormatter->formatViolations($violations)
+                )
+            );
         }
 
-        return new PlainFilename($filename);
+        return $plainFilename;
     }
 }

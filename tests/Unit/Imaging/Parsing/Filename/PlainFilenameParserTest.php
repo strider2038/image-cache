@@ -15,92 +15,76 @@ use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
+use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class PlainFilenameParserTest extends TestCase
 {
-    private const INVALID_KEY = 'a';
+    private const FILENAME = 'filename';
 
-    /** @var KeyValidatorInterface */
-    private $keyValidator;
+    /** @var ModelValidatorInterface */
+    private $validator;
 
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
+    /** @var ViolationFormatterInterface */
+    private $violationsFormatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->keyValidator = \Phake::mock(KeyValidatorInterface::class);
-        $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
+        $this->validator = \Phake::mock(ModelValidatorInterface::class);
+        $this->violationsFormatter = \Phake::mock(ViolationFormatterInterface::class);
     }
 
     /**
      * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
-     * @expectedExceptionMessageRegExp  /Invalid filename .* in request/
+     * @expectedExceptionMessageRegExp  /Filename is not valid.* /
      */
     public function getParsedFilename_givenInvalidFilename_exceptionThrown(): void
     {
-        $parser = $this->createSourceKeyParser();
-        $this->givenKeyValidator_isValidPublicFilename_returns(self::INVALID_KEY,false);
+        $parser = $this->createPlainFilenameParser();
+        $violations = $this->givenValidator_validateModel_returnViolations();
+        $this->givenViolations_count_returnsCount($violations, 1);
 
-        $parser->getParsedFilename(self::INVALID_KEY);
+        $parser->getParsedFilename(self::FILENAME);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Unsupported image extension
-     */
-    public function getParsedFilename_givenFilenameHasInvalidExtension_exceptionThrown(): void
+    /** @test */
+    public function getParsedFilename_givenFilename_parsedFilenameReturned(): void
     {
-        $parser = $this->createSourceKeyParser();
-        $this->givenKeyValidator_isValidPublicFilename_returns(self::INVALID_KEY,true);
-        $this->givenImageValidator_hasValidImageExtension_returns(self::INVALID_KEY, false);
+        $parser = $this->createPlainFilenameParser();
+        $violations = $this->givenValidator_validateModel_returnViolations();
+        $this->givenViolations_count_returnsCount($violations, 0);
 
-        $parser->getParsedFilename(self::INVALID_KEY);
-    }
-
-    /**
-     * @test
-     * @param string $key
-     * @param string $publicFilename
-     * @dataProvider validKeyProvider
-     */
-    public function getParsedFilename_givenFilename_keyParsedToThumbnailKey(string $key, string $publicFilename): void
-    {
-        $parser = $this->createSourceKeyParser();
-        $this->givenKeyValidator_isValidPublicFilename_returns($key,true);
-        $this->givenImageValidator_hasValidImageExtension_returns($key, true);
-
-        $plainFilename = $parser->getParsedFilename($key);
+        $plainFilename = $parser->getParsedFilename(self::FILENAME);
 
         $this->assertInstanceOf(PlainFilename::class, $plainFilename);
-        $this->assertEquals($publicFilename, $plainFilename->getValue());
+        $this->assertEquals(self::FILENAME, $plainFilename->getValue());
+        $this->assertModelValidator_validateModel_isCalledOnceWithInstanceOfPlainFilename();
     }
 
-    public function validKeyProvider(): array
+    private function createPlainFilenameParser(): PlainFilenameParser
     {
-        return [
-            ['a.jpg', 'a.jpg'],
-            ['/a_q1.jpg', '/a_q1.jpg'],
-            ['/b_a1_b2.png', '/b_a1_b2.png'],
-            ['/a/b/c/d_q5.jpg', '/a/b/c/d_q5.jpg'],
-        ];
+        return new PlainFilenameParser($this->validator, $this->violationsFormatter);
     }
 
-    private function createSourceKeyParser(): PlainFilenameParser
+    private function givenValidator_validateModel_returnViolations(): ConstraintViolationListInterface
     {
-        return new PlainFilenameParser($this->keyValidator, $this->imageValidator);
+        $violations = \Phake::mock(ConstraintViolationListInterface::class);
+        \Phake::when($this->validator)->validateModel(\Phake::anyParameters())->thenReturn($violations);
+
+        return $violations;
     }
 
-    private function givenKeyValidator_isValidPublicFilename_returns(string $filename, bool $value): void
+    private function givenViolations_count_returnsCount(ConstraintViolationListInterface $violations, int $count): void
     {
-        \Phake::when($this->keyValidator)->isValidPublicFilename($filename)->thenReturn($value);
+        \Phake::when($violations)->count()->thenReturn($count);
     }
 
-    private function givenImageValidator_hasValidImageExtension_returns(string $filename, bool $value): void
+    private function assertModelValidator_validateModel_isCalledOnceWithInstanceOfPlainFilename(): void
     {
-        \Phake::when($this->imageValidator)->hasValidImageExtension($filename)->thenReturn($value);
+        \Phake::verify($this->validator, \Phake::times(1))->validateModel(\Phake::capture($model));
+        $this->assertInstanceOf(PlainFilename::class, $model);
     }
 }

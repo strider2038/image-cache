@@ -39,5 +39,5 @@ services:
     plain_filename_parser:
         class: Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser
         arguments:
-            - '@key_validator'
-            - '@image_validator'
+            - '@model_validator'
+            - '@violations_formatter'
