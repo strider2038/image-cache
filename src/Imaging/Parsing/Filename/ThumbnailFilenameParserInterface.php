@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
+namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
+
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ThumbnailKeyParserInterface
+interface ThumbnailFilenameParserInterface
 {
-    public function parse(string $key): ThumbnailKey;
+    public function getParsedFilename(string $key): ThumbnailFilename;
 }

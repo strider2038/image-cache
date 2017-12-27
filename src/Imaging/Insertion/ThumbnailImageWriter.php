@@ -12,8 +12,8 @@ namespace Strider2038\ImgCache\Imaging\Insertion;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 /**
@@ -21,53 +21,57 @@ use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
  */
 class ThumbnailImageWriter implements ImageWriterInterface
 {
-    /** @var ThumbnailKeyParserInterface */
-    private $keyParser;
+    /** @var ThumbnailFilenameParserInterface */
+    private $filenameParser;
 
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
-    public function __construct(ThumbnailKeyParserInterface $keyParser, StorageAccessorInterface $storageAccessor)
-    {
-        $this->keyParser = $keyParser;
+    public function __construct(
+        ThumbnailFilenameParserInterface $filenameParser,
+        StorageAccessorInterface $storageAccessor
+    ) {
+        $this->filenameParser = $filenameParser;
         $this->storageAccessor = $storageAccessor;
     }
 
     public function imageExists(string $filename): bool
     {
-        $parsedKey = $this->parseKey($filename);
-        return $this->storageAccessor->imageExists($parsedKey->getValue());
+        $parsedFilename = $this->getParsedFilename($filename);
+
+        return $this->storageAccessor->imageExists($parsedFilename->getValue());
     }
 
     public function insertImage(string $filename, Image $image): void
     {
-        $parsedKey = $this->parseKey($filename);
-        $this->storageAccessor->putImage($parsedKey->getValue(), $image);
+        $parsedFilename = $this->getParsedFilename($filename);
+        $this->storageAccessor->putImage($parsedFilename->getValue(), $image);
     }
 
     public function deleteImage(string $filename): void
     {
-        $parsedKey = $this->parseKey($filename);
-        $this->storageAccessor->deleteImage($parsedKey->getValue());
+        $parsedFilename = $this->getParsedFilename($filename);
+        $this->storageAccessor->deleteImage($parsedFilename->getValue());
     }
 
     public function getImageFileNameMask(string $filename): string
     {
-        $parsedKey = $this->parseKey($filename);
-        return $parsedKey->getThumbnailMask();
+        $parsedFilename = $this->getParsedFilename($filename);
+
+        return $parsedFilename->getMask();
     }
 
-    private function parseKey(string $key): ThumbnailKey
+    private function getParsedFilename(string $filename): ThumbnailFilename
     {
-        $parsedKey = $this->keyParser->parse($key);
+        $parsedFilename = $this->filenameParser->getParsedFilename($filename);
 
-        if ($parsedKey->hasProcessingConfiguration()) {
+        if ($parsedFilename->hasProcessingConfiguration()) {
             throw new InvalidRequestValueException(sprintf(
                 'Image name "%s" for source image cannot have process configuration.',
-                $key
+                $filename
             ));
         }
 
-        return $parsedKey;
+        return $parsedFilename;
     }
 }

@@ -8,24 +8,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Thumbnail;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Filename;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
-class ThumbnailKeyTest extends TestCase
+class ThumbnailFilenameTest extends TestCase
 {
     use ProviderTrait;
 
-    private const PUBLIC_FILENAME = 'a.jpg';
-    private const THUMBNAIL_MASK = 'thumbnail_mask';
+    private const VALUE = 'a.jpg';
+    private const MASK = 'thumbnail_mask';
 
     /** @var ProcessingConfiguration */
     private $processingConfiguration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processingConfiguration = \Phake::mock(ProcessingConfiguration::class);
     }
@@ -35,8 +35,8 @@ class ThumbnailKeyTest extends TestCase
     {
         $key = $this->createThumbnailKey();
 
-        $this->assertEquals(self::PUBLIC_FILENAME, $key->getValue());
-        $this->assertEquals(self::THUMBNAIL_MASK, $key->getThumbnailMask());
+        $this->assertEquals(self::VALUE, $key->getValue());
+        $this->assertEquals(self::MASK, $key->getMask());
         $this->assertSame($this->processingConfiguration, $key->getProcessingConfiguration());
     }
 
@@ -56,11 +56,11 @@ class ThumbnailKeyTest extends TestCase
         $this->assertEquals(!$isDefault, $result);
     }
 
-    private function createThumbnailKey(): ThumbnailKey
+    private function createThumbnailKey(): ThumbnailFilename
     {
-        return new ThumbnailKey(
-            self::PUBLIC_FILENAME,
-            self::THUMBNAIL_MASK,
+        return new ThumbnailFilename(
+            self::VALUE,
+            self::MASK,
             $this->processingConfiguration
         );
     }

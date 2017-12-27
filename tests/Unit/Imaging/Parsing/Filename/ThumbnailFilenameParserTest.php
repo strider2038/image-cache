@@ -8,17 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Thumbnail;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Filename;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParser;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParser;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
-class ThumbnailKeyParserTest extends TestCase
+class ThumbnailFilenameParserTest extends TestCase
 {
     private const INVALID_KEY = 'a';
     private const KEY_WITH_INVALID_CONFIG = 'a_.jpg';
@@ -32,7 +32,7 @@ class ThumbnailKeyParserTest extends TestCase
     /** @var ProcessingConfigurationParserInterface */
     private $processingConfigurationParser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->keyValidator = \Phake::mock(KeyValidatorInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
@@ -50,7 +50,7 @@ class ThumbnailKeyParserTest extends TestCase
         $parser = $this->createThumbnailKeyParser();
         $this->givenKeyValidator_isValidPublicFilename_returns(self::INVALID_KEY,false);
 
-        $parser->parse(self::INVALID_KEY);
+        $parser->getParsedFilename(self::INVALID_KEY);
     }
 
     /**
@@ -65,7 +65,7 @@ class ThumbnailKeyParserTest extends TestCase
         $this->givenKeyValidator_isValidPublicFilename_returns(self::INVALID_KEY,true);
         $this->givenImageValidator_hasValidImageExtension_returns(self::INVALID_KEY, false);
 
-        $parser->parse(self::INVALID_KEY);
+        $parser->getParsedFilename(self::INVALID_KEY);
     }
 
     /**
@@ -87,11 +87,11 @@ class ThumbnailKeyParserTest extends TestCase
         $this->givenImageValidator_hasValidImageExtension_returns($key, true);
         $processingConfiguration = $this->givenProcessingConfigurationParser_parseConfiguration_returns($processingConfigurationString);
 
-        $thumbnailKey = $parser->parse($key);
+        $thumbnailKey = $parser->getParsedFilename($key);
 
-        $this->assertInstanceOf(ThumbnailKey::class, $thumbnailKey);
+        $this->assertInstanceOf(ThumbnailFilename::class, $thumbnailKey);
         $this->assertEquals($publicFilename, $thumbnailKey->getValue());
-        $this->assertEquals($thumbnailMask, $thumbnailKey->getThumbnailMask());
+        $this->assertEquals($thumbnailMask, $thumbnailKey->getMask());
         $this->assertProcessingConfigurationParser_parseConfiguration_isCalledOnceWith($processingConfigurationString);
         $this->assertSame($processingConfiguration, $thumbnailKey->getProcessingConfiguration());
     }
@@ -121,7 +121,7 @@ class ThumbnailKeyParserTest extends TestCase
         $this->givenKeyValidator_isValidPublicFilename_returns($key,true);
         $this->givenImageValidator_hasValidImageExtension_returns($key, true);
 
-        $parser->parse($key);
+        $parser->getParsedFilename($key);
     }
 
     public function invalidKeyProvider(): array
@@ -133,9 +133,9 @@ class ThumbnailKeyParserTest extends TestCase
         ];
     }
 
-    private function createThumbnailKeyParser(): ThumbnailKeyParser
+    private function createThumbnailKeyParser(): ThumbnailFilenameParser
     {
-        return new ThumbnailKeyParser($this->keyValidator, $this->imageValidator, $this->processingConfigurationParser);
+        return new ThumbnailFilenameParser($this->keyValidator, $this->imageValidator, $this->processingConfigurationParser);
     }
 
     private function givenKeyValidator_isValidPublicFilename_returns(string $filename, bool $value): void

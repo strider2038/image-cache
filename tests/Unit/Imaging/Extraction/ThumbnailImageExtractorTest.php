@@ -13,19 +13,19 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Extraction;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKey;
-use Strider2038\ImgCache\Imaging\Parsing\Thumbnail\ThumbnailKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 class ThumbnailImageExtractorTest extends TestCase
 {
-    private const KEY = '/publicFilename_configString.jpg';
-    private const PUBLIC_FILENAME = '/publicFilename.jpg';
+    private const FILENAME = '/publicFilename_configString.jpg';
+    private const THUMBNAIL_FILENAME_VALUE = '/publicFilename.jpg';
 
-    /** @var ThumbnailKeyParserInterface */
-    private $keyParser;
+    /** @var ThumbnailFilenameParserInterface */
+    private $filenameParser;
 
     /** @var StorageAccessorInterface */
     private $storageAccessor;
@@ -35,7 +35,7 @@ class ThumbnailImageExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->keyParser = \Phake::mock(ThumbnailKeyParserInterface::class);
+        $this->filenameParser = \Phake::mock(ThumbnailFilenameParserInterface::class);
         $this->storageAccessor = \Phake::mock(StorageAccessorInterface::class);
         $this->imageProcessor = \Phake::mock(ImageProcessorInterface::class);
     }
@@ -44,59 +44,80 @@ class ThumbnailImageExtractorTest extends TestCase
     public function getProcessedImage_imageExistsInSource_imageIsProcessedAndReturned(): void
     {
         $extractor = $this->createThumbnailImageExtractor();
-        $thumbnailKey = $this->givenKeyParser_parse_returnsThumbnailKey();
-        $processingConfiguration = $this->givenThumbnailKey_getProcessingConfiguration_returns($thumbnailKey);
-        $sourceImage = \Phake::mock(Image::class);
-        $this->givenStorageAccessor_getImage_returns($sourceImage);
-        $processedImage = $this->givenImageProcessor_process_returnsProcessedImage($sourceImage, $processingConfiguration);
+        $thumbnailKey = $this->givenFilenameParser_getParsedFilename_returnsThumbnailFilename();
+        $processingConfiguration = $this->givenThumbnailFilename_getProcessingConfiguration_returnsProcessingConfiguration($thumbnailKey);
+        $image = $this->givenStorageAccessor_getImage_returnsImage();
+        $processedImage = $this->givenImageProcessor_process_returnsProcessedImage();
 
-        $extractedImage = $extractor->getProcessedImage(self::KEY);
+        $extractedImage = $extractor->getProcessedImage(self::FILENAME);
 
+        $this->assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(self::FILENAME);
+        $this->assertStorageAccessor_getImage_isCalledOnceWithFilename(self::THUMBNAIL_FILENAME_VALUE);
+        $this->assertImageProcessor_process_isCalledOnceWithImageAndProcessingConfiguration($image, $processingConfiguration);
         $this->assertSame($processedImage, $extractedImage);
     }
 
     private function createThumbnailImageExtractor(): ThumbnailImageExtractor
     {
         $extractor = new ThumbnailImageExtractor(
-            $this->keyParser,
+            $this->filenameParser,
             $this->storageAccessor,
             $this->imageProcessor
         );
         return $extractor;
     }
 
-    private function givenStorageAccessor_getImage_returns(Image $sourceImage): void
+    private function givenStorageAccessor_getImage_returnsImage(): Image
     {
-        \Phake::when($this->storageAccessor)->getImage(self::PUBLIC_FILENAME)->thenReturn($sourceImage);
+        $image = \Phake::mock(Image::class);
+        \Phake::when($this->storageAccessor)->getImage(\Phake::anyParameters())->thenReturn($image);
+
+        return $image;
     }
 
-    private function givenKeyParser_parse_returnsThumbnailKey(): ThumbnailKey
+    private function givenFilenameParser_getParsedFilename_returnsThumbnailFilename(): ThumbnailFilename
     {
-        $thumbnailKey = \Phake::mock(ThumbnailKey::class);
-        \Phake::when($thumbnailKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
-        \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($thumbnailKey);
+        $thumbnailFilename = \Phake::mock(ThumbnailFilename::class);
+        \Phake::when($thumbnailFilename)->getValue()->thenReturn(self::THUMBNAIL_FILENAME_VALUE);
+        \Phake::when($this->filenameParser)->getParsedFilename(\Phake::anyParameters())->thenReturn($thumbnailFilename);
 
-        return $thumbnailKey;
+        return $thumbnailFilename;
     }
 
-    private function givenImageProcessor_process_returnsProcessedImage(
-        Image $sourceImage,
-        ProcessingConfiguration $processingConfiguration
-    ): Image {
+    private function givenImageProcessor_process_returnsProcessedImage(): Image
+    {
         $processedImage = \Phake::mock(Image::class);
 
         \Phake::when($this->imageProcessor)
-            ->process($sourceImage, $processingConfiguration)
+            ->process(\Phake::anyParameters())
             ->thenReturn($processedImage);
 
         return $processedImage;
     }
 
-    private function givenThumbnailKey_getProcessingConfiguration_returns($thumbnailKey): ProcessingConfiguration
-    {
+    private function givenThumbnailFilename_getProcessingConfiguration_returnsProcessingConfiguration(
+        ThumbnailFilename $thumbnailFilename
+    ): ProcessingConfiguration {
         $processingConfiguration = \Phake::mock(ProcessingConfiguration::class);
-        \Phake::when($thumbnailKey)->getProcessingConfiguration()->thenReturn($processingConfiguration);
+        \Phake::when($thumbnailFilename)->getProcessingConfiguration()->thenReturn($processingConfiguration);
 
         return $processingConfiguration;
+    }
+
+    private function assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(string $filename): void
+    {
+        \Phake::verify($this->filenameParser, \Phake::times(1))->getParsedFilename($filename);
+    }
+
+    private function assertStorageAccessor_getImage_isCalledOnceWithFilename(string $filename): void
+    {
+        \Phake::verify($this->storageAccessor, \Phake::times(1))->getImage($filename);
+    }
+
+    private function assertImageProcessor_process_isCalledOnceWithImageAndProcessingConfiguration(
+        Image $image,
+        ProcessingConfiguration $processingConfiguration
+    ): void {
+        \Phake::verify($this->imageProcessor, \Phake::times(1))->process($image, $processingConfiguration);
     }
 }

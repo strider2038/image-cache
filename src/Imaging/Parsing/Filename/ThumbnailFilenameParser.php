@@ -8,17 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Thumbnail;
+namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ThumbnailKeyParser implements ThumbnailKeyParserInterface
+class ThumbnailFilenameParser implements ThumbnailFilenameParserInterface
 {
     /** @var KeyValidatorInterface */
     private $keyValidator;
@@ -39,7 +41,7 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         $this->processingConfigurationParser = $configurationParser;
     }
 
-    public function parse(string $key): ThumbnailKey
+    public function getParsedFilename(string $key): ThumbnailFilename
     {
         if (!$this->keyValidator->isValidPublicFilename($key)) {
             throw new InvalidRequestValueException(sprintf('Invalid filename "%s" in request', $key));
@@ -66,6 +68,6 @@ class ThumbnailKeyParser implements ThumbnailKeyParserInterface
         $processingConfigurationString = implode('_', $filenameParts);
         $processingConfiguration = $this->processingConfigurationParser->parseConfiguration($processingConfigurationString);
 
-        return new ThumbnailKey($sourceFilename, $thumbnailMask, $processingConfiguration);
+        return new ThumbnailFilename($sourceFilename, $thumbnailMask, $processingConfiguration);
     }
 }
