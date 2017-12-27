@@ -33,9 +33,9 @@ class YandexMapExtractor implements ImageExtractorInterface
         $this->storageAccessor = $storageAccessor;
     }
 
-    public function extractImage(string $key): Image
+    public function getProcessedImage(string $filename): Image
     {
-        $parameters = $this->parser->parse($key);
+        $parameters = $this->parser->parse($filename);
 
         return $this->storageAccessor->getImage($parameters);
     }

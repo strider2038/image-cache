@@ -41,13 +41,13 @@ class ImageStorageTest extends TestCase
     public function getImage_givenKeyAndExtractorReturnsImage_imageReturned(): void
     {
         $storage = $this->createImageStorage();
-        $extractedImage = $this->givenImageExtractor_extractImage_returnsImage();
+        $extractedImage = $this->givenImageExtractor_getProcessedImage_returnsImage();
         $filename = $this->givenImageFilename(self::IMAGE_FILENAME_VALUE);
 
         $image = $storage->getImage($filename);
 
         $this->assertInstanceOf(Image::class, $image);
-        $this->assertImageExtractor_extractImage_isCalledOnceWith(self::IMAGE_FILENAME_VALUE);
+        $this->assertImageExtractor_getProcessedImage_isCalledOnceWithFilename(self::IMAGE_FILENAME_VALUE);
         $this->assertSame($extractedImage, $image);
     }
 
@@ -117,15 +117,15 @@ class ImageStorageTest extends TestCase
         return $filename;
     }
 
-    private function assertImageExtractor_extractImage_isCalledOnceWith(string $key): void
+    private function assertImageExtractor_getProcessedImage_isCalledOnceWithFilename(string $filename): void
     {
-        \Phake::verify($this->imageExtractor, \Phake::times(1))->extractImage($key);
+        \Phake::verify($this->imageExtractor, \Phake::times(1))->getProcessedImage($filename);
     }
 
-    private function givenImageExtractor_extractImage_returnsImage(): Image
+    private function givenImageExtractor_getProcessedImage_returnsImage(): Image
     {
         $extractedImage = \Phake::mock(Image::class);
-        \Phake::when($this->imageExtractor)->extractImage(\Phake::anyParameters())->thenReturn($extractedImage);
+        \Phake::when($this->imageExtractor)->getProcessedImage(\Phake::anyParameters())->thenReturn($extractedImage);
 
         return $extractedImage;
     }

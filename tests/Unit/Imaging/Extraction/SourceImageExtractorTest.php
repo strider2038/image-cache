@@ -35,14 +35,14 @@ class SourceImageExtractorTest extends TestCase
     }
 
     /** @test */
-    public function extract_imageExistsInSource_imageIsReturned(): void
+    public function getProcessedImage_imageExistsInSource_imageIsReturned(): void
     {
         $extractor = $this->createSourceImageExtractor();
         $publicFilename = self::PUBLIC_FILENAME;
         $this->givenKeyParser_parse_returnsSourceKey();
         $image = $this->givenStorageAccessor_getImage_returnsImage($publicFilename);
 
-        $extractedImage = $extractor->extractImage(self::KEY);
+        $extractedImage = $extractor->getProcessedImage(self::KEY);
 
         $this->assertSame($image, $extractedImage);
     }

@@ -39,9 +39,9 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         $this->imageProcessor = $imageProcessor;
     }
 
-    public function extractImage(string $key): Image
+    public function getProcessedImage(string $filename): Image
     {
-        $thumbnailKey = $this->keyParser->parse($key);
+        $thumbnailKey = $this->keyParser->parse($filename);
         $sourceImage = $this->storageAccessor->getImage($thumbnailKey->getPublicFilename());
 
         return $this->imageProcessor->process($sourceImage, $thumbnailKey->getProcessingConfiguration());

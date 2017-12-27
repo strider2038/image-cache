@@ -33,9 +33,9 @@ class SourceImageExtractor implements ImageExtractorInterface
         $this->storageAccessor = $storageAccessor;
     }
 
-    public function extractImage(string $key): Image
+    public function getProcessedImage(string $filename): Image
     {
-        $sourceKey = $this->keyParser->parse($key);
+        $sourceKey = $this->keyParser->parse($filename);
 
         return $this->storageAccessor->getImage($sourceKey->getPublicFilename());
     }

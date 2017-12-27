@@ -41,7 +41,7 @@ class ThumbnailImageExtractorTest extends TestCase
     }
 
     /** @test */
-    public function extract_imageExistsInSource_imageIsProcessedAndReturned(): void
+    public function getProcessedImage_imageExistsInSource_imageIsProcessedAndReturned(): void
     {
         $extractor = $this->createThumbnailImageExtractor();
         $thumbnailKey = $this->givenKeyParser_parse_returnsThumbnailKey();
@@ -50,7 +50,7 @@ class ThumbnailImageExtractorTest extends TestCase
         $this->givenStorageAccessor_getImage_returns($sourceImage);
         $processedImage = $this->givenImageProcessor_process_returnsProcessedImage($sourceImage, $processingConfiguration);
 
-        $extractedImage = $extractor->extractImage(self::KEY);
+        $extractedImage = $extractor->getProcessedImage(self::KEY);
 
         $this->assertSame($processedImage, $extractedImage);
     }
