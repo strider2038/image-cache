@@ -14,15 +14,27 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class DirectoryNameTest extends TestCase
 {
+    private const DIRECTORY_NAME_ID = 'directory name';
     /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new EntityValidator();
+        $this->validator = new EntityValidator(new ViolationFormatter());
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $directoryName = new DirectoryName('');
+
+        $id = $directoryName->getId();
+
+        $this->assertEquals(self::DIRECTORY_NAME_ID, $id);
     }
 
     /**

@@ -72,6 +72,11 @@ class YandexMapParameters implements EntityInterface, \JsonSerializable
         $this->layers = new StringList();
     }
 
+    public function getId(): string
+    {
+        return 'yandex map parameters';
+    }
+
     public function getLayers(): StringList
     {
         return $this->layers;

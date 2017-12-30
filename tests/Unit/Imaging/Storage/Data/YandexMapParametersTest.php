@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class YandexMapParametersTest extends TestCase
 {
@@ -34,13 +35,24 @@ class YandexMapParametersTest extends TestCase
         'height' => self::HEIGHT,
         'scale' => self::SCALE,
     ];
+    private const YANDEX_MAP_PARAMETERS_ID = 'yandex map parameters';
 
     /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new EntityValidator();
+        $this->validator = new EntityValidator(new ViolationFormatter());
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $parameters = new YandexMapParameters();
+
+        $id = $parameters->getId();
+
+        $this->assertEquals(self::YANDEX_MAP_PARAMETERS_ID, $id);
     }
 
     /**

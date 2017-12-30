@@ -14,17 +14,29 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class ImageFilenameTest extends TestCase
 {
     private const VALUE = 'value';
+    private const IMAGE_FILENAME_ID = 'image filename';
 
     /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new EntityValidator();
+        $this->validator = new EntityValidator(new ViolationFormatter());
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $imageFilename = new ImageFilename(self::VALUE);
+
+        $id = $imageFilename->getId();
+
+        $this->assertEquals(self::IMAGE_FILENAME_ID, $id);
     }
 
     /** @test */

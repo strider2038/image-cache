@@ -15,5 +15,8 @@ namespace Strider2038\ImgCache\Imaging\Naming;
  */
 class DirectoryName extends AbstractName implements DirectoryNameInterface
 {
-
+    public function getId(): string
+    {
+        return 'directory name';
+    }
 }

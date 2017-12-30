@@ -45,6 +45,11 @@ class RoutingPath implements EntityInterface
         $this->controllerId = $controllerId;
     }
 
+    public function getId(): string
+    {
+        return 'routing path';
+    }
+
     public function getUrlPrefix(): string
     {
         return $this->urlPrefix;

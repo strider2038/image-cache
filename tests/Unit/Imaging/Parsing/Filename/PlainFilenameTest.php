@@ -14,17 +14,19 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class PlainFilenameTest extends TestCase
 {
     private const VALUE = 'a.jpg';
+    private const PLAIN_FILENAME_ID = 'filename';
 
     /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new EntityValidator();
+        $this->validator = new EntityValidator(new ViolationFormatter());
     }
 
     /** @test */
@@ -33,6 +35,16 @@ class PlainFilenameTest extends TestCase
         $key = new PlainFilename(self::VALUE);
 
         $this->assertEquals(self::VALUE, $key->getValue());
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $plainFilename = new PlainFilename(self::VALUE);
+
+        $id = $plainFilename->getId();
+
+        $this->assertEquals(self::PLAIN_FILENAME_ID, $id);
     }
 
     /**

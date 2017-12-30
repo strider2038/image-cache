@@ -48,6 +48,11 @@ class PlainFilename implements EntityInterface
         $this->value = $value;
     }
 
+    public function getId(): string
+    {
+        return 'filename';
+    }
+
     public function getValue(): string
     {
         return $this->value;
