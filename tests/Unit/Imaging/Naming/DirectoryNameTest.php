@@ -12,17 +12,17 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class DirectoryNameTest extends TestCase
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new ModelValidator();
+        $this->validator = new EntityValidator();
     }
 
     /**
@@ -35,7 +35,7 @@ class DirectoryNameTest extends TestCase
     {
         $directoryName = new DirectoryName($value);
 
-        $violations = $this->validator->validateModel($directoryName);
+        $violations = $this->validator->validate($directoryName);
 
         $this->assertCount($violationsCount, $violations);
     }

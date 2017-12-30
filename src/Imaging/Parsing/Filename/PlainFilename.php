@@ -10,13 +10,13 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
 
-use Strider2038\ImgCache\Core\ModelInterface;
+use Strider2038\ImgCache\Core\EntityInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class PlainFilename implements ModelInterface
+class PlainFilename implements EntityInterface
 {
     /**
      * @Assert\NotBlank()

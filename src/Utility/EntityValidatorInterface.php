@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Validation;
+namespace Strider2038\ImgCache\Utility;
 
-use Strider2038\ImgCache\Core\ModelInterface;
+use Strider2038\ImgCache\Core\EntityInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ModelValidatorInterface
+interface EntityValidatorInterface
 {
-    public function validateModel(ModelInterface $model): ConstraintViolationListInterface;
+    public function validate(EntityInterface $entity): ConstraintViolationListInterface;
 }

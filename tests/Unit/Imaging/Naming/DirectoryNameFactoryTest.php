@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactory;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class DirectoryNameFactoryTest extends TestCase
@@ -25,7 +25,7 @@ class DirectoryNameFactoryTest extends TestCase
 
     private const DIRECTORY_NAME = 'directory_name';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
@@ -36,7 +36,7 @@ class DirectoryNameFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->violationFormatter = \Phake::mock(ViolationFormatterInterface::class);
         $this->fileOperations = $this->givenFileOperations();
     }
@@ -53,14 +53,14 @@ class DirectoryNameFactoryTest extends TestCase
         string $expectedFilenameValue
     ): void {
         $factory = $this->createDirectoryNameFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 0);
 
         $directoryName = $factory->createDirectoryName($name);
 
         $this->assertInstanceOf(DirectoryName::class, $directoryName);
         $this->assertEquals($expectedFilenameValue, $directoryName->getValue());
-        $this->assetValidator_validateModel_isCalledOnceWithAnyParameter();
+        $this->assetValidator_validate_isCalledOnceWithAnyParameter();
     }
 
     public function directoryNameProvider(): array
@@ -80,7 +80,7 @@ class DirectoryNameFactoryTest extends TestCase
     public function createDirectoryName_givenInvalidName_invalidConfigurationExceptionThrown(): void
     {
         $factory = $this->createDirectoryNameFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 1);
 
         $factory->createDirectoryName(self::DIRECTORY_NAME);
@@ -95,22 +95,22 @@ class DirectoryNameFactoryTest extends TestCase
     public function createDirectoryName_givenNotExistingNameAndCheckExistenceIsTrue_invalidConfigurationExceptionThrown(): void
     {
         $factory = $this->createDirectoryNameFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 0);
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::DIRECTORY_NAME, false);
 
         $factory->createDirectoryName(self::DIRECTORY_NAME, true);
     }
 
-    private function assetValidator_validateModel_isCalledOnceWithAnyParameter(): void
+    private function assetValidator_validate_isCalledOnceWithAnyParameter(): void
     {
-        \Phake::verify($this->validator, \Phake::times(1))->validateModel(\Phake::anyParameters());
+        \Phake::verify($this->validator, \Phake::times(1))->validate(\Phake::anyParameters());
     }
 
-    private function givenValidator_validateModel_returnViolations(): ConstraintViolationListInterface
+    private function givenValidator_validate_returnViolations(): ConstraintViolationListInterface
     {
         $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel(\Phake::anyParameters())->thenReturn($violations);
+        \Phake::when($this->validator)->validate(\Phake::anyParameters())->thenReturn($violations);
 
         return $violations;
     }

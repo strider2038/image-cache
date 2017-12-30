@@ -12,19 +12,19 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class ImageFilenameTest extends TestCase
 {
     private const VALUE = 'value';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new ModelValidator();
+        $this->validator = new EntityValidator();
     }
 
     /** @test */
@@ -47,7 +47,7 @@ class ImageFilenameTest extends TestCase
     {
         $imageFilename = new ImageFilename($value);
 
-        $violations = $this->validator->validateModel($imageFilename);
+        $violations = $this->validator->validate($imageFilename);
 
         $this->assertCount($violationsCount, $violations);
     }

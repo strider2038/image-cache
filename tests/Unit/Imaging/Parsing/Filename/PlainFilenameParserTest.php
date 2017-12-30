@@ -13,17 +13,15 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Filename;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class PlainFilenameParserTest extends TestCase
 {
     private const FILENAME = 'filename';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
@@ -31,7 +29,7 @@ class PlainFilenameParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->violationsFormatter = \Phake::mock(ViolationFormatterInterface::class);
     }
 
@@ -44,7 +42,7 @@ class PlainFilenameParserTest extends TestCase
     public function getParsedFilename_givenInvalidFilename_exceptionThrown(): void
     {
         $parser = $this->createPlainFilenameParser();
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 1);
 
         $parser->getParsedFilename(self::FILENAME);
@@ -54,14 +52,14 @@ class PlainFilenameParserTest extends TestCase
     public function getParsedFilename_givenFilename_parsedFilenameReturned(): void
     {
         $parser = $this->createPlainFilenameParser();
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 0);
 
         $plainFilename = $parser->getParsedFilename(self::FILENAME);
 
         $this->assertInstanceOf(PlainFilename::class, $plainFilename);
         $this->assertEquals(self::FILENAME, $plainFilename->getValue());
-        $this->assertModelValidator_validateModel_isCalledOnceWithInstanceOfPlainFilename();
+        $this->assertModelValidator_validate_isCalledOnceWithInstanceOfPlainFilename();
     }
 
     private function createPlainFilenameParser(): PlainFilenameParser
@@ -69,10 +67,10 @@ class PlainFilenameParserTest extends TestCase
         return new PlainFilenameParser($this->validator, $this->violationsFormatter);
     }
 
-    private function givenValidator_validateModel_returnViolations(): ConstraintViolationListInterface
+    private function givenValidator_validate_returnViolations(): ConstraintViolationListInterface
     {
         $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel(\Phake::anyParameters())->thenReturn($violations);
+        \Phake::when($this->validator)->validate(\Phake::anyParameters())->thenReturn($violations);
 
         return $violations;
     }
@@ -82,9 +80,9 @@ class PlainFilenameParserTest extends TestCase
         \Phake::when($violations)->count()->thenReturn($count);
     }
 
-    private function assertModelValidator_validateModel_isCalledOnceWithInstanceOfPlainFilename(): void
+    private function assertModelValidator_validate_isCalledOnceWithInstanceOfPlainFilename(): void
     {
-        \Phake::verify($this->validator, \Phake::times(1))->validateModel(\Phake::capture($model));
+        \Phake::verify($this->validator, \Phake::times(1))->validate(\Phake::capture($model));
         $this->assertInstanceOf(PlainFilename::class, $model);
     }
 }

@@ -11,10 +11,10 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Service\Routing\RoutingPath;
 use Strider2038\ImgCache\Service\Routing\RoutingPathFactory;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class RoutingPathFactoryTest extends TestCase
@@ -22,7 +22,7 @@ class RoutingPathFactoryTest extends TestCase
     private const PREFIX = 'prefix';
     private const CONTROLLER_ID = 'controllerId';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
@@ -30,7 +30,7 @@ class RoutingPathFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->violationFormatter = \Phake::mock(ViolationFormatterInterface::class);
     }
 
@@ -39,7 +39,7 @@ class RoutingPathFactoryTest extends TestCase
     {
         $mapInArray = [self::PREFIX => self::CONTROLLER_ID];
         $factory = $this->createRoutingPathFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 0);
 
         $map = $factory->createRoutingPathCollection($mapInArray);
@@ -61,7 +61,7 @@ class RoutingPathFactoryTest extends TestCase
     {
         $mapInArray = [self::PREFIX => self::CONTROLLER_ID];
         $factory = $this->createRoutingPathFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 1);
 
         $factory->createRoutingPathCollection($mapInArray);
@@ -72,10 +72,10 @@ class RoutingPathFactoryTest extends TestCase
         return new RoutingPathFactory($this->validator, $this->violationFormatter);
     }
 
-    private function givenValidator_validateModel_returnViolations(): ConstraintViolationListInterface
+    private function givenValidator_validate_returnViolations(): ConstraintViolationListInterface
     {
         $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel(\Phake::anyParameters())->thenReturn($violations);
+        \Phake::when($this->validator)->validate(\Phake::anyParameters())->thenReturn($violations);
 
         return $violations;
     }

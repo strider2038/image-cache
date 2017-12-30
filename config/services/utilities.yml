@@ -30,3 +30,6 @@ services:
 
     metadata_reader:
         class: Strider2038\ImgCache\Utility\MetadataReader
+
+    entity_validator:
+        class: Strider2038\ImgCache\Utility\EntityValidator

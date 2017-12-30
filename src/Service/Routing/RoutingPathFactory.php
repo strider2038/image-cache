@@ -11,21 +11,21 @@
 namespace Strider2038\ImgCache\Service\Routing;
 
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class RoutingPathFactory implements RoutingPathFactoryInterface
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
     private $violationFormatter;
 
-    public function __construct(ModelValidatorInterface $validator, ViolationFormatterInterface $violationFormatter)
+    public function __construct(EntityValidatorInterface $validator, ViolationFormatterInterface $violationFormatter)
     {
         $this->validator = $validator;
         $this->violationFormatter = $violationFormatter;
@@ -34,7 +34,7 @@ class RoutingPathFactory implements RoutingPathFactoryInterface
     public function createRoutingPath(string $urlPrefix, string $controllerId): RoutingPath
     {
         $path = new RoutingPath($urlPrefix, $controllerId);
-        $violations = $this->validator->validateModel($path);
+        $violations = $this->validator->validate($path);
 
         if (\count($violations) > 0) {
             throw new InvalidConfigurationException(sprintf(

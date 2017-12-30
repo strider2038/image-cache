@@ -12,15 +12,15 @@ namespace Strider2038\ImgCache\Imaging\Naming;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class DirectoryNameFactory implements DirectoryNameFactoryInterface
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
@@ -30,7 +30,7 @@ class DirectoryNameFactory implements DirectoryNameFactoryInterface
     private $fileOperations;
 
     public function __construct(
-        ModelValidatorInterface $validator,
+        EntityValidatorInterface $validator,
         ViolationFormatterInterface $violationFormatter,
         FileOperationsInterface $fileOperations
     ) {
@@ -43,7 +43,7 @@ class DirectoryNameFactory implements DirectoryNameFactoryInterface
     {
         $name = new DirectoryName(rtrim($directoryName, '/') . '/');
 
-        $violations = $this->validator->validateModel($name);
+        $violations = $this->validator->validate($name);
 
         if (\count($violations) > 0) {
             throw new InvalidConfigurationException(

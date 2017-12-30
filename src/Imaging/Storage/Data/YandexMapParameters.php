@@ -11,13 +11,13 @@
 namespace Strider2038\ImgCache\Imaging\Storage\Data;
 
 use Strider2038\ImgCache\Collection\StringList;
-use Strider2038\ImgCache\Core\ModelInterface;
+use Strider2038\ImgCache\Core\EntityInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class YandexMapParameters implements ModelInterface, \JsonSerializable
+class YandexMapParameters implements EntityInterface, \JsonSerializable
 {
     /**
      * @Assert\Count(min = 1)

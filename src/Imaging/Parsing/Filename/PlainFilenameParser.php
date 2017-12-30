@@ -11,26 +11,22 @@
 namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
-use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParserInterface;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class PlainFilenameParser implements PlainFilenameParserInterface
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
     private $violationsFormatter;
 
     public function __construct(
-        ModelValidatorInterface $validator,
+        EntityValidatorInterface $validator,
         ViolationFormatterInterface $violationsFormatter
     ) {
         $this->validator = $validator;
@@ -40,7 +36,7 @@ class PlainFilenameParser implements PlainFilenameParserInterface
     public function getParsedFilename(string $filename): PlainFilename
     {
         $plainFilename = new PlainFilename($filename);
-        $violations = $this->validator->validateModel($plainFilename);
+        $violations = $this->validator->validate($plainFilename);
 
         if ($violations->count() > 0) {
             throw new InvalidRequestValueException(

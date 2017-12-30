@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Data;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class YandexMapParametersTest extends TestCase
 {
@@ -35,12 +35,12 @@ class YandexMapParametersTest extends TestCase
         'scale' => self::SCALE,
     ];
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new ModelValidator();
+        $this->validator = new EntityValidator();
     }
 
     /**
@@ -74,7 +74,7 @@ class YandexMapParametersTest extends TestCase
         $model->setHeight($height);
         $model->setScale($scale);
 
-        $violations = $this->validator->validateModel($model);
+        $violations = $this->validator->validate($model);
 
         $this->assertEquals($violationsCount, $violations->count());
     }

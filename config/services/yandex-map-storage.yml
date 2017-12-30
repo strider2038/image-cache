@@ -72,7 +72,7 @@ services:
     yandex_map_storage_accessor:
         class: Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor
         arguments:
-            - '@model_validator'
+            - '@entity_validator'
             - '@violations_formatter'
             - '@yandex_map_storage_driver'
             - '@image_factory'

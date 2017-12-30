@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Validation;
+namespace Strider2038\ImgCache\Utility;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Strider2038\ImgCache\Core\ModelInterface;
+use Strider2038\ImgCache\Core\EntityInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ModelValidator implements ModelValidatorInterface
+class EntityValidator implements EntityValidatorInterface
 {
     /** @var ValidatorInterface */
     private $validator;
@@ -33,8 +33,8 @@ class ModelValidator implements ModelValidatorInterface
             ->getValidator();
     }
 
-    public function validateModel(ModelInterface $model): ConstraintViolationListInterface
+    public function validate(EntityInterface $entity): ConstraintViolationListInterface
     {
-        return $this->validator->validate($model);
+        return $this->validator->validate($entity);
     }
 }

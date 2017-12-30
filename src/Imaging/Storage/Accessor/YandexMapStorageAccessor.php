@@ -19,15 +19,15 @@ use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
@@ -43,7 +43,7 @@ class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
     private $logger;
 
     public function __construct(
-        ModelValidatorInterface $validator,
+        EntityValidatorInterface $validator,
         ViolationFormatterInterface $violationFormatter,
         YandexMapStorageDriverInterface $storageDriver,
         ImageFactoryInterface $imageFactory
@@ -69,7 +69,7 @@ class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
             )
         );
 
-        $violations = $this->validator->validateModel($parameters);
+        $violations = $this->validator->validate($parameters);
 
         if ($violations->count()) {
             throw new InvalidRequestValueException(

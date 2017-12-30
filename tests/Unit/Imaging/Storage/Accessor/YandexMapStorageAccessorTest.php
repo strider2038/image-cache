@@ -20,9 +20,9 @@ use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class YandexMapStorageAccessorTest extends TestCase
@@ -44,7 +44,7 @@ class YandexMapStorageAccessorTest extends TestCase
         'scale' => self::SCALE,
     ];
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
@@ -61,7 +61,7 @@ class YandexMapStorageAccessorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->violationsFormatter = \Phake::mock(ViolationFormatterInterface::class);
         $this->storageDriver = \Phake::mock(YandexMapStorageDriverInterface::class);
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
@@ -78,7 +78,7 @@ class YandexMapStorageAccessorTest extends TestCase
     {
         $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
-        $violations = $this->givenValidator_validateModel_returnViolations($parameters);
+        $violations = $this->givenValidator_validate_returnViolations($parameters);
         $this->givenViolations_count_returnsCount($violations, 1);
         $this->givenViolationFormatter_formatViolations_returnsString($violations, 'formatted violations');
 
@@ -90,7 +90,7 @@ class YandexMapStorageAccessorTest extends TestCase
     {
         $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
-        $this->givenValidator_validateModel_returnViolations($parameters);
+        $this->givenValidator_validate_returnViolations($parameters);
         $stream = $this->givenStorageDriver_getMapContents_returnsStream();
         $expectedImage = $this->givenImageFactory_createFromStream_returnsImage();
 
@@ -116,11 +116,11 @@ class YandexMapStorageAccessorTest extends TestCase
         return $accessor;
     }
 
-    private function givenValidator_validateModel_returnViolations(
+    private function givenValidator_validate_returnViolations(
         YandexMapParameters $parameters
     ): ConstraintViolationListInterface {
         $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel($parameters)->thenReturn($violations);
+        \Phake::when($this->validator)->validate($parameters)->thenReturn($violations);
 
         return $violations;
     }

@@ -11,19 +11,19 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Service\Routing\RoutingPath;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class RoutingPathTest extends TestCase
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new ModelValidator();
+        $this->validator = new EntityValidator();
     }
 
     /**
@@ -40,7 +40,7 @@ class RoutingPathTest extends TestCase
     ): void {
         $path = new RoutingPath($urlPrefix, $controllerId);
 
-        $violations = $this->validator->validateModel($path);
+        $violations = $this->validator->validate($path);
 
         $this->assertGreaterThan(0, $violations->count());
         foreach ($violations as $violation) {

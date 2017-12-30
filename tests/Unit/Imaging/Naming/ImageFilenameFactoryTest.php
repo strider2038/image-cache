@@ -15,15 +15,15 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactory;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ImageFilenameFactoryTest extends TestCase
 {
     private const URI_PATH = 'uri_path';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
@@ -31,7 +31,7 @@ class ImageFilenameFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->violationFormatter = \Phake::mock(ViolationFormatterInterface::class);
     }
 
@@ -50,7 +50,7 @@ class ImageFilenameFactoryTest extends TestCase
         $request = $this->givenRequest();
         $uri = $this->givenRequest_getUri_returnsUri($request);
         $this->givenUri_getPath_returnsString($uri, $uriPath);
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 0);
 
         $filename = $factory->createImageFilenameFromRequest($request);
@@ -59,7 +59,7 @@ class ImageFilenameFactoryTest extends TestCase
         $this->assertRequest_getUri_isCalledOnce($request);
         $this->assertUri_getPath_isCalledOnce($uri);
         $this->assertEquals($expectedFilenameValue, $filename->getValue());
-        $this->assetValidator_validateModel_isCalledOnceWithAnyParameter();
+        $this->assetValidator_validate_isCalledOnceWithAnyParameter();
     }
 
     public function filenameProvider(): array
@@ -82,7 +82,7 @@ class ImageFilenameFactoryTest extends TestCase
         $request = $this->givenRequest();
         $uri = $this->givenRequest_getUri_returnsUri($request);
         $this->givenUri_getPath_returnsString($uri, self::URI_PATH);
-        $violations = $this->givenValidator_validateModel_returnViolations();
+        $violations = $this->givenValidator_validate_returnViolations();
         $this->givenViolations_count_returnsCount($violations, 1);
 
         $factory->createImageFilenameFromRequest($request);
@@ -116,15 +116,15 @@ class ImageFilenameFactoryTest extends TestCase
         \Phake::when($uri)->getPath()->thenReturn($path);
     }
 
-    private function assetValidator_validateModel_isCalledOnceWithAnyParameter(): void
+    private function assetValidator_validate_isCalledOnceWithAnyParameter(): void
     {
-        \Phake::verify($this->validator, \Phake::times(1))->validateModel(\Phake::anyParameters());
+        \Phake::verify($this->validator, \Phake::times(1))->validate(\Phake::anyParameters());
     }
 
-    private function givenValidator_validateModel_returnViolations(): ConstraintViolationListInterface
+    private function givenValidator_validate_returnViolations(): ConstraintViolationListInterface
     {
         $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel(\Phake::anyParameters())->thenReturn($violations);
+        \Phake::when($this->validator)->validate(\Phake::anyParameters())->thenReturn($violations);
 
         return $violations;
     }

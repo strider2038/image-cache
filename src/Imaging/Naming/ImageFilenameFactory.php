@@ -12,21 +12,21 @@ namespace Strider2038\ImgCache\Imaging\Naming;
 
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageFilenameFactory implements ImageFilenameFactoryInterface
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     /** @var ViolationFormatterInterface */
     private $violationFormatter;
 
-    public function __construct(ModelValidatorInterface $validator, ViolationFormatterInterface $violationFormatter)
+    public function __construct(EntityValidatorInterface $validator, ViolationFormatterInterface $violationFormatter)
     {
         $this->validator = $validator;
         $this->violationFormatter = $violationFormatter;
@@ -38,7 +38,7 @@ class ImageFilenameFactory implements ImageFilenameFactoryInterface
         $path = $uri->getPath();
         $filename = new ImageFilename(ltrim($path, '/'));
 
-        $violations = $this->validator->validateModel($filename);
+        $violations = $this->validator->validate($filename);
 
         if (\count($violations) > 0) {
             throw new InvalidRequestValueException(
