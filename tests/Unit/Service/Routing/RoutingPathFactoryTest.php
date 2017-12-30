@@ -11,10 +11,10 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Service\Routing\RoutingPath;
 use Strider2038\ImgCache\Service\Routing\RoutingPathFactory;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class RoutingPathFactoryTest extends TestCase

@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Validation;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatter;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 

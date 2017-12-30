@@ -20,9 +20,9 @@ use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class YandexMapStorageAccessorTest extends TestCase

@@ -19,4 +19,5 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 interface EntityValidatorInterface
 {
     public function validate(EntityInterface $entity): ConstraintViolationListInterface;
+    public function validateWithException(EntityInterface $entity, string $exceptionClass): void;
 }

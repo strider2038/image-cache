@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Validation;
+namespace Strider2038\ImgCache\Utility;
 
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 

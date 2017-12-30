@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Validation;
+namespace Strider2038\ImgCache\Utility;
 
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -21,6 +21,7 @@ class ViolationFormatter implements ViolationFormatterInterface
     public function formatViolations(ConstraintViolationListInterface $violations): string
     {
         $messages = [];
+
         /** @var ConstraintViolationInterface $violation */
         foreach ($violations as $violation) {
             $messages[] = sprintf('%s: %s', $violation->getPropertyPath(), $violation->getMessage());

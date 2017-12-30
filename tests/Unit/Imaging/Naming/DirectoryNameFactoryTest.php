@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactory;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class DirectoryNameFactoryTest extends TestCase

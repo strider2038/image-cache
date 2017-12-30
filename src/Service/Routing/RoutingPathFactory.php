@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Service\Routing;
 
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

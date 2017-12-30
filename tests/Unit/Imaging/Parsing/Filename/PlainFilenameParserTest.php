@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Filename;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class PlainFilenameParserTest extends TestCase

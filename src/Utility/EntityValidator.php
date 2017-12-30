@@ -24,17 +24,37 @@ class EntityValidator implements EntityValidatorInterface
     /** @var ValidatorInterface */
     private $validator;
 
-    public function __construct()
+    /** @var ViolationFormatterInterface */
+    private $violationFormatter;
+
+    public function __construct(ViolationFormatterInterface $violationFormatter)
     {
         AnnotationRegistry::registerLoader('class_exists');
 
         $this->validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
             ->getValidator();
+
+        $this->violationFormatter = $violationFormatter;
     }
 
     public function validate(EntityInterface $entity): ConstraintViolationListInterface
     {
         return $this->validator->validate($entity);
+    }
+
+    public function validateWithException(EntityInterface $entity, string $exceptionClass): void
+    {
+        $violations = $this->validate($entity);
+
+        if ($violations->count() > 0) {
+            throw new $exceptionClass(
+                sprintf(
+                    'Given invalid %s: %s',
+                    $entity->getId(),
+                    $this->violationFormatter->formatViolations($violations)
+                )
+            );
+        }
     }
 }

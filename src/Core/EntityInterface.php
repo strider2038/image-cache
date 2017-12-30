@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Core;
  */
 interface EntityInterface
 {
-
+    public function getId(): string;
 }

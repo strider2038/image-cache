@@ -15,8 +15,8 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactory;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ImageFilenameFactoryTest extends TestCase

@@ -34,4 +34,9 @@ class AnnotatedEntityMock implements EntityInterface
     {
         $this->property = $property;
     }
+
+    public function getId(): string
+    {
+        return 'annotated entity mock';
+    }
 }
