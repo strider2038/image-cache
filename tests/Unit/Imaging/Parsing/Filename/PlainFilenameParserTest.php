@@ -11,11 +11,10 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Filename;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
-use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class PlainFilenameParserTest extends TestCase
 {
@@ -24,65 +23,38 @@ class PlainFilenameParserTest extends TestCase
     /** @var EntityValidatorInterface */
     private $validator;
 
-    /** @var ViolationFormatterInterface */
-    private $violationsFormatter;
-
     protected function setUp(): void
     {
         $this->validator = \Phake::mock(EntityValidatorInterface::class);
-        $this->violationsFormatter = \Phake::mock(ViolationFormatterInterface::class);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessageRegExp  /Filename is not valid.* /
-     */
-    public function getParsedFilename_givenInvalidFilename_exceptionThrown(): void
-    {
-        $parser = $this->createPlainFilenameParser();
-        $violations = $this->givenValidator_validate_returnViolations();
-        $this->givenViolations_count_returnsCount($violations, 1);
-
-        $parser->getParsedFilename(self::FILENAME);
     }
 
     /** @test */
     public function getParsedFilename_givenFilename_parsedFilenameReturned(): void
     {
         $parser = $this->createPlainFilenameParser();
-        $violations = $this->givenValidator_validate_returnViolations();
-        $this->givenViolations_count_returnsCount($violations, 0);
 
         $plainFilename = $parser->getParsedFilename(self::FILENAME);
 
         $this->assertInstanceOf(PlainFilename::class, $plainFilename);
         $this->assertEquals(self::FILENAME, $plainFilename->getValue());
-        $this->assertModelValidator_validate_isCalledOnceWithInstanceOfPlainFilename();
+        $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+            PlainFilename::class,
+            InvalidRequestValueException::class
+        );
     }
 
     private function createPlainFilenameParser(): PlainFilenameParser
     {
-        return new PlainFilenameParser($this->validator, $this->violationsFormatter);
+        return new PlainFilenameParser($this->validator);
     }
 
-    private function givenValidator_validate_returnViolations(): ConstraintViolationListInterface
-    {
-        $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validate(\Phake::anyParameters())->thenReturn($violations);
-
-        return $violations;
-    }
-
-    private function givenViolations_count_returnsCount(ConstraintViolationListInterface $violations, int $count): void
-    {
-        \Phake::when($violations)->count()->thenReturn($count);
-    }
-
-    private function assertModelValidator_validate_isCalledOnceWithInstanceOfPlainFilename(): void
-    {
-        \Phake::verify($this->validator, \Phake::times(1))->validate(\Phake::capture($model));
-        $this->assertInstanceOf(PlainFilename::class, $model);
+    private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+        string $entityClass,
+        string $exceptionClass
+    ): void {
+        \Phake::verify($this->validator, \Phake::times(1))
+            ->validateWithException(\Phake::capture($entity), \Phake::capture($exception));
+        $this->assertInstanceOf($entityClass, $entity);
+        $this->assertEquals($exceptionClass, $exception);
     }
 }

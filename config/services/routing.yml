@@ -16,7 +16,6 @@ services:
         class: Strider2038\ImgCache\Service\Routing\RoutingPathFactory
         arguments:
             - '@entity_validator'
-            - '@violations_formatter'
 
     routing_paths:
         factory:

@@ -41,4 +41,3 @@ services:
         class: Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser
         arguments:
             - '@entity_validator'
-            - '@violations_formatter'

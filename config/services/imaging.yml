@@ -7,13 +7,11 @@ services:
         class: Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactory
         arguments:
             - '@entity_validator'
-            - '@violations_formatter'
             - '@file_operations'
     image_filename_factory:
         class: Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactory
         arguments:
             - '@entity_validator'
-            - '@violations_formatter'
 
     # imaging/image
     image_factory:
@@ -75,6 +73,3 @@ services:
         class: Strider2038\ImgCache\Imaging\Validation\ImageValidator
     key_validator:
         class: Strider2038\ImgCache\Imaging\Validation\KeyValidator
-
-    violations_formatter:
-        class: Strider2038\ImgCache\Imaging\Validation\ViolationFormatter

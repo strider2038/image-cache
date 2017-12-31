@@ -13,7 +13,6 @@ namespace Strider2038\ImgCache\Imaging\Naming;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
-use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -23,13 +22,9 @@ class ImageFilenameFactory implements ImageFilenameFactoryInterface
     /** @var EntityValidatorInterface */
     private $validator;
 
-    /** @var ViolationFormatterInterface */
-    private $violationFormatter;
-
-    public function __construct(EntityValidatorInterface $validator, ViolationFormatterInterface $violationFormatter)
+    public function __construct(EntityValidatorInterface $validator)
     {
         $this->validator = $validator;
-        $this->violationFormatter = $violationFormatter;
     }
 
     public function createImageFilenameFromRequest(RequestInterface $request): ImageFilenameInterface
@@ -37,17 +32,7 @@ class ImageFilenameFactory implements ImageFilenameFactoryInterface
         $uri = $request->getUri();
         $path = $uri->getPath();
         $filename = new ImageFilename(ltrim($path, '/'));
-
-        $violations = $this->validator->validate($filename);
-
-        if (\count($violations) > 0) {
-            throw new InvalidRequestValueException(
-                sprintf(
-                    'Given invalid image filename: %s.',
-                    $this->violationFormatter->formatViolations($violations)
-                )
-            );
-        }
+        $this->validator->validateWithException($filename, InvalidRequestValueException::class);
 
         return $filename;
     }

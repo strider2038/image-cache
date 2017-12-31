@@ -33,3 +33,7 @@ services:
 
     entity_validator:
         class: Strider2038\ImgCache\Utility\EntityValidator
+        arguments:
+            - '@violation_formatter'
+    violation_formatter:
+        class: Strider2038\ImgCache\Utility\ViolationFormatter
