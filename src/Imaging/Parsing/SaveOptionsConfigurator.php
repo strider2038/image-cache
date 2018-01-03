@@ -11,14 +11,14 @@
 namespace Strider2038\ImgCache\Imaging\Parsing;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class SaveOptionsConfigurator implements SaveOptionsConfiguratorInterface
 {
-    public function updateSaveOptionsByConfiguration(SaveOptions $saveOptions, string $configuration): void
+    public function updateSaveOptionsByConfiguration(ImageParameters $saveOptions, string $configuration): void
     {
         if (\strlen($configuration) <= 0 || $configuration[0] !== 'q') {
             return;

@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Processing;
+namespace Strider2038\ImgCache\Imaging\Image;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class SaveOptionsFactory implements SaveOptionsFactoryInterface
+class ImageParametersFactory implements ImageParametersFactoryInterface
 {
     /** @var int */
-    private $quality = SaveOptions::QUALITY_VALUE_DEFAULT;
+    private $quality = ImageParameters::QUALITY_VALUE_DEFAULT;
 
     public function getQuality(): int
     {
@@ -28,9 +28,9 @@ class SaveOptionsFactory implements SaveOptionsFactoryInterface
         $this->quality = $quality;
     }
 
-    public function create(): SaveOptions
+    public function createImageParameters(): ImageParameters
     {
-        $saveOptions = new SaveOptions();
+        $saveOptions = new ImageParameters();
         $saveOptions->setQuality($this->quality);
 
         return $saveOptions;

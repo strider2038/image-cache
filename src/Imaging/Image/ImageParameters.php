@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Processing;
+namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Exception\InvalidValueException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class SaveOptions
+class ImageParameters
 {
     public const QUALITY_VALUE_MIN = 15;
     public const QUALITY_VALUE_MAX = 100;

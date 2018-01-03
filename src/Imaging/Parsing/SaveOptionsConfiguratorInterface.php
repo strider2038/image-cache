@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing;
 
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface SaveOptionsConfiguratorInterface
 {
-    public function updateSaveOptionsByConfiguration(SaveOptions $saveOptions, string $configuration): void;
+    public function updateSaveOptionsByConfiguration(ImageParameters $saveOptions, string $configuration): void;
 }

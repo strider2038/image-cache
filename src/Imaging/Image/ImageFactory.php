@@ -16,8 +16,6 @@ use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 
 /**
@@ -25,7 +23,7 @@ use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
  */
 class ImageFactory implements ImageFactoryInterface
 {
-    /** @var SaveOptionsFactoryInterface */
+    /** @var ImageParametersFactoryInterface */
     private $saveOptionsFactory;
 
     /** @var ImageValidatorInterface */
@@ -38,7 +36,7 @@ class ImageFactory implements ImageFactoryInterface
     private $streamFactory;
 
     public function __construct(
-        SaveOptionsFactoryInterface $saveOptionsFactory,
+        ImageParametersFactoryInterface $saveOptionsFactory,
         ImageValidatorInterface $imageValidator,
         FileOperationsInterface $fileOperations,
         StreamFactoryInterface $streamFactory
@@ -49,7 +47,7 @@ class ImageFactory implements ImageFactoryInterface
         $this->streamFactory = $streamFactory;
     }
 
-    public function create(StreamInterface $data, SaveOptions $saveOptions): Image
+    public function create(StreamInterface $data, ImageParameters $saveOptions): Image
     {
         if (!$this->imageValidator->hasDataValidImageMimeType($data->getContents())) {
             throw new InvalidMediaTypeException('Image has unsupported mime type');
@@ -98,8 +96,8 @@ class ImageFactory implements ImageFactoryInterface
         return new Image($this->createSaveOptions(), $stream);
     }
 
-    private function createSaveOptions(): SaveOptions
+    private function createSaveOptions(): ImageParameters
     {
-        return $this->saveOptionsFactory->create();
+        return $this->saveOptionsFactory->createImageParameters();
     }
 }

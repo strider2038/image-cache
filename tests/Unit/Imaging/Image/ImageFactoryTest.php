@@ -18,8 +18,8 @@ use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactory;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
+use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
 
@@ -30,7 +30,7 @@ class ImageFactoryTest extends TestCase
     private const FILENAME = 'file';
     private const DATA = 'data';
 
-    /** @var SaveOptionsFactoryInterface */
+    /** @var ImageParametersFactoryInterface */
     private $saveOptionsFactory;
 
     /** @var ImageValidatorInterface */
@@ -45,7 +45,7 @@ class ImageFactoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
+        $this->saveOptionsFactory = \Phake::mock(ImageParametersFactoryInterface::class);
         $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->fileOperations = $this->givenFileOperations();
         $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
@@ -56,13 +56,13 @@ class ImageFactoryTest extends TestCase
     {
         $factory = $this->createImageFactory();
         $stream = $this->givenStreamWithData();
-        $saveOptions = \Phake::mock(SaveOptions::class);
+        $saveOptions = \Phake::mock(ImageParameters::class);
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
 
         $image = $factory->create($stream, $saveOptions);
 
         $this->assertSame($stream, $image->getData());
-        $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertSame($saveOptions, $image->getParameters());
     }
 
     /**
@@ -75,7 +75,7 @@ class ImageFactoryTest extends TestCase
     {
         $factory = $this->createImageFactory();
         $stream = $this->givenStreamWithData();
-        $saveOptions = \Phake::mock(SaveOptions::class);
+        $saveOptions = \Phake::mock(ImageParameters::class);
         $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
 
         $factory->create($stream, $saveOptions);
@@ -88,13 +88,13 @@ class ImageFactoryTest extends TestCase
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
         $this->givenImageValidator_hasValidImageExtension_returns(true);
         $this->givenImageValidator_hasFileValidImageMimeType_returns(true);
-        $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+        $saveOptions = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
         $expectedStream = $this->givenFileOperations_openFile_returnsStream($this->fileOperations);
 
         $image = $factory->createFromFile(self::FILENAME);
 
         $this->assertInstanceOf(Image::class, $image);
-        $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertSame($saveOptions, $image->getParameters());
         $this->assertSame($expectedStream, $image->getData());
         $this->assertFileOperations_openFile_isCalledOnceWithFilenameAndMode(
             $this->fileOperations,
@@ -153,13 +153,13 @@ class ImageFactoryTest extends TestCase
     {
         $factory = $this->createImageFactory();
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
-        $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+        $saveOptions = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
         $stream = $this->givenStreamFactory_createStreamFromData_returnsStream();
 
         $image = $factory->createFromData(self::DATA);
 
         $this->assertInstanceOf(Image::class, $image);
-        $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertSame($saveOptions, $image->getParameters());
         $this->assertStreamFactory_createStreamFromData_isCalledOnceWithData(self::DATA);
         $this->assertSame($stream, $image->getData());
     }
@@ -184,13 +184,13 @@ class ImageFactoryTest extends TestCase
         $factory = $this->createImageFactory();
         $stream = $this->givenStreamWithData();
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
-        $saveOptions = $this->givenSaveOptionsFactory_create_returnsSaveOptions();
+        $saveOptions = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
         $image = $factory->createFromStream($stream);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertStream_rewind_isCalledOnce($stream);
-        $this->assertSame($saveOptions, $image->getSaveOptions());
+        $this->assertSame($saveOptions, $image->getParameters());
         $this->assertSame($stream, $image->getData());
         $this->assertImageValidator_hasDataValidImageMimeType_isCalledOnceWith(self::DATA);
     }
@@ -222,13 +222,13 @@ class ImageFactoryTest extends TestCase
         return $factory;
     }
 
-    private function givenSaveOptionsFactory_create_returnsSaveOptions(): SaveOptions
+    private function givenImageParametersFactory_createImageParameters_returnsImageParameters(): ImageParameters
     {
-        $saveOptions = \Phake::mock(SaveOptions::class);
+        $imageParameters = \Phake::mock(ImageParameters::class);
 
-        \Phake::when($this->saveOptionsFactory)->create()->thenReturn($saveOptions);
+        \Phake::when($this->saveOptionsFactory)->createImageParameters()->thenReturn($imageParameters);
 
-        return $saveOptions;
+        return $imageParameters;
     }
 
     private function givenImageValidator_hasValidImageExtension_returns(bool $value): void

@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 class SaveOptionsConfiguratorTest extends TestCase
 {
@@ -32,9 +32,9 @@ class SaveOptionsConfiguratorTest extends TestCase
         \Phake::verifyNoInteraction($saveOptions);
     }
 
-    private function givenSaveOptions(): SaveOptions
+    private function givenSaveOptions(): ImageParameters
     {
-        return \Phake::mock(SaveOptions::class);
+        return \Phake::mock(ImageParameters::class);
     }
 
     /**

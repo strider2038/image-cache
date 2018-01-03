@@ -11,33 +11,32 @@
 namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class Image
 {
-    /** @var SaveOptions */
-    private $saveOptions;
+    /** @var ImageParameters */
+    private $parameters;
 
     /** @var StreamInterface */
     private $data;
 
-    public function __construct(SaveOptions $saveOptions, StreamInterface $data)
+    public function __construct(ImageParameters $parameters, StreamInterface $data)
     {
-        $this->saveOptions = $saveOptions;
+        $this->parameters = $parameters;
         $this->data = $data;
     }
 
-    public function setSaveOptions(SaveOptions $saveOptions): void
+    public function setParameters(ImageParameters $parameters): void
     {
-        $this->saveOptions = $saveOptions;
+        $this->parameters = $parameters;
     }
 
-    public function getSaveOptions(): SaveOptions
+    public function getParameters(): ImageParameters
     {
-        return $this->saveOptions;
+        return $this->parameters;
     }
 
     public function getData(): StreamInterface

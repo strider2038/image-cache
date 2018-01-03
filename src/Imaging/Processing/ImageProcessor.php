@@ -65,7 +65,7 @@ class ImageProcessor implements ImageProcessorInterface
     public function saveToFile(Image $image, string $filename): void
     {
         $transformer = $this->createTransformer($image);
-        $saveOptions = $image->getSaveOptions();
+        $saveOptions = $image->getParameters();
 
         $transformer->setCompressionQuality($saveOptions->getQuality());
         $transformer->writeToFile($filename);

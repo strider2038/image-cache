@@ -11,14 +11,13 @@
 namespace Strider2038\ImgCache\Imaging\Image;
 
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageFactoryInterface
 {
-    public function create(StreamInterface $data, SaveOptions $saveOptions): Image;
+    public function create(StreamInterface $data, ImageParameters $saveOptions): Image;
     public function createFromFile(string $filename): Image;
     public function createFromData(string $data): Image;
     public function createFromStream(StreamInterface $stream): Image;

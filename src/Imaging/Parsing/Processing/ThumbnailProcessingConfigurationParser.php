@@ -10,9 +10,9 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Processing;
 
+use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
 
@@ -24,7 +24,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
     /** @var TransformationCreatorInterface */
     private $transformationsCreator;
 
-    /** @var SaveOptionsFactoryInterface */
+    /** @var ImageParametersFactoryInterface */
     private $saveOptionsFactory;
 
     /** @var SaveOptionsConfiguratorInterface */
@@ -32,7 +32,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
 
     public function __construct(
         TransformationCreatorInterface $transformationsCreator,
-        SaveOptionsFactoryInterface $saveOptionsFactory,
+        ImageParametersFactoryInterface $saveOptionsFactory,
         SaveOptionsConfiguratorInterface $saveOptionsConfigurator
     ) {
         $this->transformationsCreator = $transformationsCreator;
@@ -43,7 +43,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
     public function parseConfiguration(string $configuration): ProcessingConfiguration
     {
         $transformations = new TransformationCollection();
-        $saveOptions = $this->saveOptionsFactory->create();
+        $saveOptions = $this->saveOptionsFactory->createImageParameters();
         $isDefault = true;
 
         if (!empty($configuration)) {

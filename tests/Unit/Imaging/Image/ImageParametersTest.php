@@ -8,18 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 
-class SaveOptionsTest extends TestCase
+class ImageParametersTest extends TestCase
 {
-    const QUALITY_VALUE_DEFAULT = 85;
+    private const QUALITY_VALUE_DEFAULT = 85;
 
     public function testGetQuality_ClassConstructed_ReturnedValuesHasDefaultValue(): void
     {
-        $saveOptions = new SaveOptions();
+        $saveOptions = new ImageParameters();
 
         $result = $saveOptions->getQuality();
 
@@ -31,7 +31,7 @@ class SaveOptionsTest extends TestCase
      */
     public function testSetQuality_ValidQualityValueIsSet_ReturnedValuesMatchesSetValue(int $quality): void
     {
-        $saveOptions = new SaveOptions();
+        $saveOptions = new ImageParameters();
 
         $saveOptions->setQuality($quality);
 
@@ -55,7 +55,7 @@ class SaveOptionsTest extends TestCase
      */
     public function testSetQuality_InvalidQualityValueIsSet_InvalidValueExceptionThrown(int $quality): void
     {
-        $saveOptions = new SaveOptions();
+        $saveOptions = new ImageParameters();
 
         $saveOptions->setQuality($quality);
     }

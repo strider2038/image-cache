@@ -15,11 +15,11 @@ use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessor;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerFactoryInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
@@ -79,13 +79,13 @@ class ImageProcessorTest extends TestCase
         $image = $this->givenImage();
         $stream = $this->givenImage_getData_returnsStream($image);
         $transformer = $this->givenTransformerFactory_createTransformer_returnsTransformer($stream);
-        $this->givenImageHasSaveOptionsWithQuality($image, self::QUALITY);
+        $this->givenImageHasParametersWithQuality($image, self::QUALITY);
 
         $processor->saveToFile($image, self::FILENAME);
 
         $this->assertImage_getData_isCalledOnce($image);
         $this->assertTransformerFactory_createTransformer_isCalledOnceWith($stream);
-        $this->assertImage_getSaveOptions_isCalledOnce($image);
+        $this->assertImage_getParameters_isCalledOnce($image);
         $this->assertTransformer_setCompressionQuality_isCalledOnceWith($transformer, self::QUALITY);
         $this->assertTransformer_writeToFile_isCalledOnceWith($transformer, self::FILENAME);
         $this->assertLogger_info_isCalledOnce($this->logger);
@@ -159,16 +159,16 @@ class ImageProcessorTest extends TestCase
 
     private function givenProcessingConfiguration_getSaveOptions_returnsSaveOptions(
         ProcessingConfiguration $processingConfiguration
-    ): SaveOptions {
-        $saveOptions = \Phake::mock(SaveOptions::class);
+    ): ImageParameters {
+        $saveOptions = \Phake::mock(ImageParameters::class);
         \Phake::when($processingConfiguration)->getSaveOptions()->thenReturn($saveOptions);
 
         return $saveOptions;
     }
 
-    private function assertImage_getSaveOptions_isCalledOnce(Image $image): void
+    private function assertImage_getParameters_isCalledOnce(Image $image): void
     {
-        \Phake::verify($image, \Phake::times(1))->getSaveOptions();
+        \Phake::verify($image, \Phake::times(1))->getParameters();
     }
 
     private function assertTransformer_setCompressionQuality_isCalledOnceWith(
@@ -178,11 +178,11 @@ class ImageProcessorTest extends TestCase
         \Phake::verify($transformer, \Phake::times(1))->setCompressionQuality($quality);
     }
 
-    private function givenImageHasSaveOptionsWithQuality(Image $image, int $quality): void
+    private function givenImageHasParametersWithQuality(Image $image, int $quality): void
     {
-        $saveOptions = \Phake::mock(SaveOptions::class);
-        \Phake::when($image)->getSaveOptions()->thenReturn($saveOptions);
-        \Phake::when($saveOptions)->getQuality()->thenReturn($quality);
+        $parameters = \Phake::mock(ImageParameters::class);
+        \Phake::when($image)->getParameters()->thenReturn($parameters);
+        \Phake::when($parameters)->getQuality()->thenReturn($quality);
     }
 
     private function assertTransformer_writeToFile_isCalledOnceWith(
@@ -215,7 +215,7 @@ class ImageProcessorTest extends TestCase
 
     private function assertImageFactory_create_isCalledOnceWith(
         StreamInterface $stream,
-        SaveOptions $saveOptions
+        ImageParameters $saveOptions
     ): void {
         \Phake::verify($this->imageFactory, \Phake::times(1))->create($stream, $saveOptions);
     }
