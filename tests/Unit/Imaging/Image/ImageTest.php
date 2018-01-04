@@ -18,34 +18,34 @@ use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 class ImageTest extends TestCase
 {
     /** @var ImageParameters */
-    private $saveOptions;
+    private $parameters;
 
     /** @var StreamInterface */
     private $data;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->saveOptions = \Phake::mock(ImageParameters::class);
+        $this->parameters = \Phake::mock(ImageParameters::class);
         $this->data = \Phake::mock(StreamInterface::class);
     }
 
     /** @test */
     public function construct_givenSaveOptionsAndData_SaveOptionsAndDataAreAccessible(): void
     {
-        $image = new Image($this->saveOptions, $this->data);
+        $image = new Image($this->data, $this->parameters);
 
-        $this->assertSame($this->saveOptions, $image->getParameters());
+        $this->assertSame($this->parameters, $image->getParameters());
         $this->assertSame($this->data, $image->getData());
     }
 
     /** @test */
-    public function setSaveOptions_givenSaveOptions_SaveOptionsIsSet(): void
+    public function setParameters_givenParameters_ParametersAreSet(): void
     {
-        $saveOptions = \Phake::mock(ImageParameters::class);
-        $image = new Image($this->saveOptions, $this->data);
+        $parameters = \Phake::mock(ImageParameters::class);
+        $image = new Image($this->data, $this->parameters);
 
-        $image->setParameters($saveOptions);
+        $image->setParameters($parameters);
 
-        $this->assertSame($saveOptions, $image->getParameters());
+        $this->assertSame($parameters, $image->getParameters());
     }
 }

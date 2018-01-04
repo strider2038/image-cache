@@ -57,7 +57,7 @@ class ImageProcessorTest extends TestCase
         $transformation = $this->givenProcessingConfiguration_getTransformations_returnsCollectionWithTransformation($processingConfiguration);
         $transformer = $this->givenTransformerFactory_createTransformer_returnsTransformer($stream);
         $saveOptions = $this->givenProcessingConfiguration_getSaveOptions_returnsSaveOptions($processingConfiguration);
-        $expectedProcessedImage = $this->givenImageFactory_create_returnsImage();
+        $expectedProcessedImage = $this->givenImageFactory_createImage_returnsImage();
         $processedStream = $this->givenTransformer_getData_returnsStream($transformer);
 
         $processedImage = $processor->process($image, $processingConfiguration);
@@ -68,7 +68,7 @@ class ImageProcessorTest extends TestCase
         $this->assertProcessingConfiguration_getTransformations_isCalledOnce($processingConfiguration);
         $this->assertTransformation_apply_isCalledOnceWith($transformation, $transformer);
         $this->assertProcessingConfiguration_getSaveOptions_isCalledOnce($processingConfiguration);
-        $this->assertImageFactory_create_isCalledOnceWith($processedStream, $saveOptions);
+        $this->assertImageFactory_createImage_isCalledOnceWithStreamAndImageParameters($processedStream, $saveOptions);
         $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
@@ -205,18 +205,18 @@ class ImageProcessorTest extends TestCase
         \Phake::verify($image, \Phake::times(1))->getData();
     }
 
-    private function givenImageFactory_create_returnsImage(): Image
+    private function givenImageFactory_createImage_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->create(\Phake::anyParameters())->thenReturn($image);
+        \Phake::when($this->imageFactory)->createImage(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
     }
 
-    private function assertImageFactory_create_isCalledOnceWith(
+    private function assertImageFactory_createImage_isCalledOnceWithStreamAndImageParameters(
         StreamInterface $stream,
-        ImageParameters $saveOptions
+        ImageParameters $imageParameters
     ): void {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->create($stream, $saveOptions);
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createImage($stream, $imageParameters);
     }
 }

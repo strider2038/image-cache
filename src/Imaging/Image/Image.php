@@ -17,16 +17,21 @@ use Strider2038\ImgCache\Core\Streaming\StreamInterface;
  */
 class Image
 {
-    /** @var ImageParameters */
-    private $parameters;
-
     /** @var StreamInterface */
     private $data;
 
-    public function __construct(ImageParameters $parameters, StreamInterface $data)
+    /** @var ImageParameters */
+    private $parameters;
+
+    public function __construct(StreamInterface $data, ImageParameters $parameters)
     {
-        $this->parameters = $parameters;
         $this->data = $data;
+        $this->parameters = $parameters;
+    }
+
+    public function getData(): StreamInterface
+    {
+        return $this->data;
     }
 
     public function setParameters(ImageParameters $parameters): void
@@ -37,10 +42,5 @@ class Image
     public function getParameters(): ImageParameters
     {
         return $this->parameters;
-    }
-
-    public function getData(): StreamInterface
-    {
-        return $this->data;
     }
 }

@@ -40,7 +40,7 @@ class ThumbnailFilenameParserTest extends TestCase
         string $thumbnailMask,
         string $processingConfiguration
     ): void {
-        $parser = $this->createThumbnailKeyParser();
+        $parser = $this->createThumbnailFilenameParser();
 
         $filename = $parser->getParsedFilename($key);
 
@@ -65,7 +65,7 @@ class ThumbnailFilenameParserTest extends TestCase
         ];
     }
 
-    private function createThumbnailKeyParser(): ThumbnailFilenameParser
+    private function createThumbnailFilenameParser(): ThumbnailFilenameParser
     {
         return new ThumbnailFilenameParser($this->validator);
     }

@@ -69,7 +69,7 @@ class YandexMapStorageAccessorTest extends TestCase
         $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
         $stream = $this->givenStorageDriver_getMapContents_returnsStream();
-        $expectedImage = $this->givenImageFactory_createFromStream_returnsImage();
+        $expectedImage = $this->givenImageFactory_createImageFromStream_returnsImage();
 
         $image = $accessor->getImage($parameters);
 
@@ -78,7 +78,7 @@ class YandexMapStorageAccessorTest extends TestCase
             InvalidRequestValueException::class
         );
         $this->assertStorageDriver_getMapContents_isCalledOnceWithQueryParameters(self::EXPECTED_QUERY_PARAMETERS);
-        $this->assertImageFactory_createFromStream_isCalledOnceWithStream($stream);
+        $this->assertImageFactory_createImageFromStream_isCalledOnceWithStream($stream);
         $this->assertLogger_info_isCalledOnce($this->logger);
         $this->assertSame($expectedImage, $image);
     }
@@ -128,15 +128,15 @@ class YandexMapStorageAccessorTest extends TestCase
         return $image;
     }
 
-    private function assertImageFactory_createFromStream_isCalledOnceWithStream(StreamInterface $stream): void
+    private function assertImageFactory_createImageFromStream_isCalledOnceWithStream(StreamInterface $stream): void
     {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createImageFromStream($stream);
     }
 
-    private function givenImageFactory_createFromStream_returnsImage(): Image
+    private function givenImageFactory_createImageFromStream_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromStream(\Phake::anyParameters())->thenReturn($image);
+        \Phake::when($this->imageFactory)->createImageFromStream(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
     }

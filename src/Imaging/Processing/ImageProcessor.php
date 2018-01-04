@@ -59,7 +59,7 @@ class ImageProcessor implements ImageProcessorInterface
         $data = $transformer->getData();
         $saveOptions = $configuration->getSaveOptions();
 
-        return $this->imageFactory->create($data, $saveOptions);
+        return $this->imageFactory->createImage($data, $saveOptions);
     }
 
     public function saveToFile(Image $image, string $filename): void

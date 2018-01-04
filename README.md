@@ -33,6 +33,7 @@ Image caching microservice with connection to cloud hostings
     - ThumbnailKeyParser
     - YandexMapParametersParser ?
     - SaveOptions ?
+    - ImageFactory
     - FilenameKeyMapperInterface to factory
 - [ ] ViolationsChecker service
 - [ ] Shift transformation

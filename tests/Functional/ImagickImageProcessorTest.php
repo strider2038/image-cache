@@ -44,7 +44,7 @@ class ImagickImageProcessorTest extends FunctionalTestCase
     public function saveToFile_givenImageAndFilenameInSubdirectory_imageIsSaved(): void
     {
         $this->givenImageJpeg(self::JPEG_ORIGINAL_FILENAME);
-        $image = $this->imageFactory->createFromFile(self::JPEG_ORIGINAL_FILENAME);
+        $image = $this->imageFactory->createImageFromFile(self::JPEG_ORIGINAL_FILENAME);
 
         $this->imageProcessor->saveToFile($image, self::JPEG_FILENAME_IN_SUBDIRECTORY);
 
@@ -56,7 +56,7 @@ class ImagickImageProcessorTest extends FunctionalTestCase
     public function saveToFile_givenPngImageAndJpgFilename_imageIsConvertedToJpgAndSaved(): void
     {
         $this->givenImagePng(self::PNG_ORIGINAL_FILENAME);
-        $image = $this->imageFactory->createFromFile(self::PNG_ORIGINAL_FILENAME);
+        $image = $this->imageFactory->createImageFromFile(self::PNG_ORIGINAL_FILENAME);
 
         $this->imageProcessor->saveToFile($image, self::JPEG_FILENAME);
 
@@ -68,7 +68,7 @@ class ImagickImageProcessorTest extends FunctionalTestCase
     public function saveToFile_givenJpegImageAndPngFilename_imageIsConvertedToPngAndSaved(): void
     {
         $this->givenImageJpeg(self::JPEG_ORIGINAL_FILENAME);
-        $image = $this->imageFactory->createFromFile(self::JPEG_ORIGINAL_FILENAME);
+        $image = $this->imageFactory->createImageFromFile(self::JPEG_ORIGINAL_FILENAME);
 
         $this->imageProcessor->saveToFile($image, self::PNG_FILENAME);
 

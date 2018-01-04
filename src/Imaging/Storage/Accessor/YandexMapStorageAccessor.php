@@ -83,6 +83,6 @@ class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
 
         $stream = $this->storageDriver->getMapContents($query);
 
-        return $this->imageFactory->createFromStream($stream);
+        return $this->imageFactory->createImageFromStream($stream);
     }
 }

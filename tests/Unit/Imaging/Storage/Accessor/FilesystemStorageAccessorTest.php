@@ -54,7 +54,7 @@ class FilesystemStorageAccessorTest extends TestCase
         $accessor = $this->createFilesystemStorageAccessor();
         $filenameKey = $this->givenKeyMapper_getKey_returnsFilenameKey(self::KEY);
         $stream = $this->givenStorageDriver_getFileContents_returnsStream($filenameKey);
-        $createdImage = $this->givenImageFactory_createFromStream_returnsImage();
+        $createdImage = $this->givenImageFactory_createImageFromStream_returnsImage();
 
         $image = $accessor->getImage(self::KEY);
 
@@ -62,7 +62,7 @@ class FilesystemStorageAccessorTest extends TestCase
         $this->assertLogger_info_isCalledTimes($this->logger, 2);
         $this->assertKeyMapper_getKey_isCalledOnceWithKey(self::KEY);
         $this->assertStorageDriver_getFileContents_isCalledOnceWithFilenameKey($filenameKey);
-        $this->assertImageFactory_createFromStream_isCalledOnceWithStream($stream);
+        $this->assertImageFactory_createImageFromStream_isCalledOnceWithStream($stream);
     }
 
     /**
@@ -173,15 +173,15 @@ class FilesystemStorageAccessorTest extends TestCase
         \Phake::verify($this->storageDriver, \Phake::times(1))->getFileContents($filenameKey);
     }
 
-    private function assertImageFactory_createFromStream_isCalledOnceWithStream(StreamInterface $stream): void
+    private function assertImageFactory_createImageFromStream_isCalledOnceWithStream(StreamInterface $stream): void
     {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createImageFromStream($stream);
     }
 
-    private function givenImageFactory_createFromStream_returnsImage(): Image
+    private function givenImageFactory_createImageFromStream_returnsImage(): Image
     {
         $createdImage = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromStream(\Phake::anyParameters())->thenReturn($createdImage);
+        \Phake::when($this->imageFactory)->createImageFromStream(\Phake::anyParameters())->thenReturn($createdImage);
 
         return $createdImage;
     }

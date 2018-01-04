@@ -55,7 +55,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
     {
         $filenameKey = $this->composeFilenameKey($key);
         $stream = $this->storageDriver->getFileContents($filenameKey);
-        $image = $this->imageFactory->createFromStream($stream);
+        $image = $this->imageFactory->createImageFromStream($stream);
 
         $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s"', $key));
 
