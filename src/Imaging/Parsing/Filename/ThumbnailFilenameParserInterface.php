@@ -10,12 +10,10 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
 
-use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ThumbnailFilenameParserInterface
 {
-    public function getParsedFilename(string $key): ThumbnailFilename;
+    public function getParsedFilename(string $filename): ThumbnailFilename;
 }

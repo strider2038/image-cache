@@ -11,63 +11,39 @@
 namespace Strider2038\ImgCache\Imaging\Parsing\Filename;
 
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParserInterface;
-use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
-use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilename;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\KeyValidatorInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ThumbnailFilenameParser implements ThumbnailFilenameParserInterface
 {
-    /** @var KeyValidatorInterface */
-    private $keyValidator;
+    /** @var EntityValidatorInterface */
+    private $validator;
 
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
-
-    /** @var ProcessingConfigurationParserInterface */
-    private $processingConfigurationParser;
-
-    public function __construct(
-        KeyValidatorInterface $keyValidator,
-        ImageValidatorInterface $imageValidator,
-        ProcessingConfigurationParserInterface $configurationParser
-    ) {
-        $this->keyValidator = $keyValidator;
-        $this->imageValidator = $imageValidator;
-        $this->processingConfigurationParser = $configurationParser;
+    public function __construct(EntityValidatorInterface $validator)
+    {
+        $this->validator = $validator;
     }
 
-    public function getParsedFilename(string $key): ThumbnailFilename
+    public function getParsedFilename(string $filename): ThumbnailFilename
     {
-        if (!$this->keyValidator->isValidPublicFilename($key)) {
-            throw new InvalidRequestValueException(sprintf('Invalid filename "%s" in request', $key));
-        }
-        if (!$this->imageValidator->hasValidImageExtension($key)) {
-            throw new InvalidRequestValueException(sprintf('Unsupported image extension for "%s"', $key));
-        }
-
-        $path = pathinfo($key);
-        $filename = trim($path['filename'] ?? '');
-        $filenameLength = strlen($filename);
+        $path = pathinfo($filename);
+        $baseFilename = trim($path['filename'] ?? '');
         $extension = $path['extension'] ?? '';
         $directoryName = $path['dirname'] ?? '';
-        if ($filenameLength <= 0 || $filename[$filenameLength - 1] === '_') {
-            throw new InvalidRequestValueException(sprintf('Invalid filename "%s" in request', $key));
-        }
 
-        $filenameParts = explode('_', $filename);
+        $filenameParts = explode('_', $baseFilename);
         $directory = $directoryName === '.' ? '' : (rtrim($directoryName, '/') . '/');
-        $baseFilename = array_shift($filenameParts);
-        $sourceFilename = sprintf('%s%s.%s', $directory, $baseFilename, $extension);
-        $thumbnailMask = sprintf('%s%s*.%s', $directory, $baseFilename, $extension);
+        $sourceFilename = array_shift($filenameParts);
 
-        $processingConfigurationString = implode('_', $filenameParts);
-        $processingConfiguration = $this->processingConfigurationParser->parseConfiguration($processingConfigurationString);
+        $fullSourceFilename = sprintf('%s%s.%s', $directory, $sourceFilename, $extension);
+        $thumbnailMask = sprintf('%s%s*.%s', $directory, $sourceFilename, $extension);
+        $processingConfiguration = implode('_', $filenameParts);
 
-        return new ThumbnailFilename($sourceFilename, $thumbnailMask, $processingConfiguration);
+        $thumbnailFilename = new ThumbnailFilename($fullSourceFilename, $thumbnailMask, $processingConfiguration);
+        $this->validator->validateWithException($thumbnailFilename, InvalidRequestValueException::class);
+
+        return $thumbnailFilename;
     }
 }
