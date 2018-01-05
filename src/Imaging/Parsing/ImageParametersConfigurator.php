@@ -16,9 +16,9 @@ use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class SaveOptionsConfigurator implements SaveOptionsConfiguratorInterface
+class ImageParametersConfigurator implements ImageParametersConfiguratorInterface
 {
-    public function updateSaveOptionsByConfiguration(ImageParameters $saveOptions, string $configuration): void
+    public function updateSaveOptionsByConfiguration(ImageParameters $parameters, string $configuration): void
     {
         if (\strlen($configuration) <= 0 || $configuration[0] !== 'q') {
             return;
@@ -30,6 +30,6 @@ class SaveOptionsConfigurator implements SaveOptionsConfiguratorInterface
             throw new InvalidRequestValueException('Invalid configuration for quality transformation');
         }
 
-        $saveOptions->setQuality((int) $value);
+        $parameters->setQuality($value);
     }
 }

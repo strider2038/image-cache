@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
-use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
+use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
@@ -28,27 +28,25 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     /** @var ImageParametersFactoryInterface */
     private $imageParametersFactory;
 
-    /** @var SaveOptionsConfiguratorInterface */
-    private $saveOptionsConfigurator;
+    /** @var ImageParametersConfiguratorInterface */
+    private $imageParametersConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformationsCreator = \Phake::mock(TransformationCreatorInterface::class);
         $this->imageParametersFactory = \Phake::mock(ImageParametersFactoryInterface::class);
-        $this->saveOptionsConfigurator = \Phake::mock(SaveOptionsConfiguratorInterface::class);
+        $this->imageParametersConfigurator = \Phake::mock(ImageParametersConfiguratorInterface::class);
     }
 
     /**
      * @test
      * @param string $configuration
      * @param int $count
-     * @param bool $isDefault
      * @dataProvider configurationsProvider
      */
     public function parse_givenConfigurationWithTransformations_countOfTransformationsReturned(
         string $configuration,
-        int $count,
-        bool $isDefault
+        int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
         $this->givenTransformationsFactory_create_returnsTransformation();
@@ -58,21 +56,19 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertSaveOptionsConfigurator_updateSaveOptionsByConfiguration_isCalled(0);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
+        $this->assertImageParametersConfigurator_updateSaveOptionsByConfiguration_isCalledTimes(0);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions);
     }
 
     /**
      * @test
      * @param string $configuration
      * @param int $count
-     * @param bool $isDefault
      * @dataProvider configurationsProvider
      */
     public function getRequestConfiguration_givenConfigurationWithSaveOptions_countOfSaveOptionsConfiguratorConfigureVerified(
         string $configuration,
-        int $count,
-        bool $isDefault
+        int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
         $this->givenTransformationsFactory_create_returnsNull();
@@ -82,16 +78,16 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertSaveOptionsConfigurator_updateSaveOptionsByConfiguration_isCalled($count);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
+        $this->assertImageParametersConfigurator_updateSaveOptionsByConfiguration_isCalledTimes($count);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions);
     }
 
     public function configurationsProvider(): array
     {
         return [
-            ['', 0, true],
-            ['q95', 1, false],
-            ['sz85_q7', 2, false],
+            ['', 0],
+            ['q95', 1],
+            ['sz85_q7', 2],
         ];
     }
 
@@ -100,7 +96,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $parser = new ThumbnailProcessingConfigurationParser(
             $this->transformationsCreator,
             $this->imageParametersFactory,
-            $this->saveOptionsConfigurator
+            $this->imageParametersConfigurator
         );
 
         return $parser;
@@ -117,14 +113,10 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
     private function verifyProcessingConfiguration(
         ProcessingConfiguration $configuration,
-        ImageParameters $defaultSaveOptions,
-        bool $isDefault
+        ImageParameters $imageParameters
     ): void {
-        $this->assertInstanceOf(ProcessingConfiguration::class, $configuration);
-        $this->assertInstanceOf(TransformationCollection::class, $configuration->getTransformations());
         $this->assertImageParametersFactory_createImageParameters_isCalledOnce();
-        $this->assertSame($defaultSaveOptions, $configuration->getSaveOptions());
-        $this->assertEquals($isDefault, $configuration->isDefault());
+        $this->assertSame($imageParameters, $configuration->getImageParameters());
     }
 
     private function assertTransformationsCount(int $count, ProcessingConfiguration $configuration): void
@@ -139,9 +131,9 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
             ->create(\Phake::anyParameters());
     }
 
-    private function assertSaveOptionsConfigurator_updateSaveOptionsByConfiguration_isCalled(int $times): void
+    private function assertImageParametersConfigurator_updateSaveOptionsByConfiguration_isCalledTimes(int $times): void
     {
-        \Phake::verify($this->saveOptionsConfigurator, \Phake::times($times))
+        \Phake::verify($this->imageParametersConfigurator, \Phake::times($times))
             ->updateSaveOptionsByConfiguration(\Phake::anyParameters());
     }
 

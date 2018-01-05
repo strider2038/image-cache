@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SaveOptionsConfiguratorInterface
+interface ImageParametersConfiguratorInterface
 {
-    public function updateSaveOptionsByConfiguration(ImageParameters $saveOptions, string $configuration): void;
+    public function updateSaveOptionsByConfiguration(ImageParameters $parameters, string $configuration): void;
 }

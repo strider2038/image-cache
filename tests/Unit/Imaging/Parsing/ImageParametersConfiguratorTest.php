@@ -12,9 +12,9 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\ImageParameters;
-use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator;
+use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfigurator;
 
-class SaveOptionsConfiguratorTest extends TestCase
+class ImageParametersConfiguratorTest extends TestCase
 {
     private const SAVE_OPTIONS_QUALITY = 51;
     private const NOT_SUPPORTED_CONFIGURATION = 'a';
@@ -24,15 +24,15 @@ class SaveOptionsConfiguratorTest extends TestCase
     /** @test */
     public function updateSaveOptionsByConfiguration_configurationIsNotSupported_saveOptionsValueNotModified(): void
     {
-        $saveOptions = $this->givenSaveOptions();
-        $configurator = new SaveOptionsConfigurator();
+        $imageParameters = $this->givenImageParameters();
+        $configurator = new ImageParametersConfigurator();
 
-        $configurator->updateSaveOptionsByConfiguration($saveOptions, self::NOT_SUPPORTED_CONFIGURATION);
+        $configurator->updateSaveOptionsByConfiguration($imageParameters, self::NOT_SUPPORTED_CONFIGURATION);
 
-        \Phake::verifyNoInteraction($saveOptions);
+        \Phake::verifyNoInteraction($imageParameters);
     }
 
-    private function givenSaveOptions(): ImageParameters
+    private function givenImageParameters(): ImageParameters
     {
         return \Phake::mock(ImageParameters::class);
     }
@@ -45,20 +45,20 @@ class SaveOptionsConfiguratorTest extends TestCase
      */
     public function updateSaveOptionsByConfiguration_configurationIsInvalid_exceptionThrown(): void
     {
-        $saveOptions = $this->givenSaveOptions();
-        $configurator = new SaveOptionsConfigurator();
+        $imageParameters = $this->givenImageParameters();
+        $configurator = new ImageParametersConfigurator();
 
-        $configurator->updateSaveOptionsByConfiguration($saveOptions, self::INVALID_CONFIGURATION);
+        $configurator->updateSaveOptionsByConfiguration($imageParameters, self::INVALID_CONFIGURATION);
     }
 
     /** @test */
     public function updateSaveOptionsByConfiguration_configurationIsValid_valueIsSetToSaveOptions(): void
     {
-        $saveOptions = $this->givenSaveOptions();
-        $configurator = new SaveOptionsConfigurator();
+        $imageParameters = $this->givenImageParameters();
+        $configurator = new ImageParametersConfigurator();
 
-        $configurator->updateSaveOptionsByConfiguration($saveOptions, self::VALID_CONFIGURATION);
+        $configurator->updateSaveOptionsByConfiguration($imageParameters, self::VALID_CONFIGURATION);
 
-        \Phake::verify($saveOptions, \Phake::times(1))->setQuality(self::SAVE_OPTIONS_QUALITY);
+        \Phake::verify($imageParameters, \Phake::times(1))->setQuality(self::SAVE_OPTIONS_QUALITY);
     }
 }

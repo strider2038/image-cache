@@ -22,19 +22,12 @@ class ProcessingConfiguration
     private $transformations;
 
     /** @var ImageParameters */
-    private $saveOptions;
+    private $imageParameters;
 
-    /** @var bool */
-    private $isDefault;
-
-    public function __construct(
-        TransformationCollection $transformations,
-        ImageParameters $saveOptions,
-        bool $isDefault
-    ) {
+    public function __construct(TransformationCollection $transformations, ImageParameters $saveOptions)
+    {
         $this->transformations = $transformations;
-        $this->saveOptions = $saveOptions;
-        $this->isDefault = $isDefault;
+        $this->imageParameters = $saveOptions;
     }
 
     public function getTransformations(): TransformationCollection
@@ -42,13 +35,8 @@ class ProcessingConfiguration
         return $this->transformations;
     }
 
-    public function getSaveOptions(): ImageParameters
+    public function getImageParameters(): ImageParameters
     {
-        return $this->saveOptions;
-    }
-
-    public function isDefault(): bool
-    {
-        return $this->isDefault;
+        return $this->imageParameters;
     }
 }
