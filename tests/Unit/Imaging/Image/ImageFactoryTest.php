@@ -52,37 +52,7 @@ class ImageFactoryTest extends TestCase
     }
 
     /** @test */
-    public function create_givenStreamAndImageParameters_imageIsReturned(): void
-    {
-        $factory = $this->createImageFactory();
-        $stream = $this->givenStreamWithData();
-        $imageParameters = \Phake::mock(ImageParameters::class);
-        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
-
-        $image = $factory->createImage($stream, $imageParameters);
-
-        $this->assertSame($stream, $image->getData());
-        $this->assertSame($imageParameters, $image->getParameters());
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidMediaTypeException
-     * @expectedExceptionCode 415
-     * @expectedExceptionMessage Image has unsupported mime type
-     */
-    public function create_givenImageHasInvalidMimeType_exceptionThrown(): void
-    {
-        $factory = $this->createImageFactory();
-        $stream = $this->givenStreamWithData();
-        $imageParameters = \Phake::mock(ImageParameters::class);
-        $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
-
-        $factory->createImage($stream, $imageParameters);
-    }
-
-    /** @test */
-    public function createFromFile_givenImage_imageIsReturned(): void
+    public function createImageFromFile_givenImage_imageIsReturned(): void
     {
         $factory = $this->createImageFactory();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
@@ -109,7 +79,7 @@ class ImageFactoryTest extends TestCase
      * @expectedExceptionCode 404
      * @expectedExceptionMessageRegExp /File .* not found/
      */
-    public function createFromFile_givenFileDoesNotExist_exceptionThrown(): void
+    public function createImageFromFile_givenFileDoesNotExist_exceptionThrown(): void
     {
         $factory = $this->createImageFactory();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, false);
@@ -123,7 +93,7 @@ class ImageFactoryTest extends TestCase
      * @expectedExceptionCode 415
      * @expectedExceptionMessageRegExp /File .* has unsupported image extension/
      */
-    public function createFromFile_givenImageHasInvalidExtension_exceptionThrown(): void
+    public function createImageFromFile_givenImageHasInvalidExtension_exceptionThrown(): void
     {
         $factory = $this->createImageFactory();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
@@ -138,7 +108,7 @@ class ImageFactoryTest extends TestCase
      * @expectedExceptionCode 415
      * @expectedExceptionMessageRegExp /File .* has unsupported mime type/
      */
-    public function createFromFile_givenImageHasInvalidMimeType_exceptionThrown(): void
+    public function createImageFromFile_givenImageHasInvalidMimeType_exceptionThrown(): void
     {
         $factory = $this->createImageFactory();
         $this->givenFileOperations_isFile_returns($this->fileOperations, self::FILENAME, true);
@@ -149,7 +119,7 @@ class ImageFactoryTest extends TestCase
     }
 
     /** @test */
-    public function createFromData_givenBlob_imageIsReturned(): void
+    public function createImageFromData_givenBlob_imageIsReturned(): void
     {
         $factory = $this->createImageFactory();
         $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
@@ -170,7 +140,7 @@ class ImageFactoryTest extends TestCase
      * @expectedExceptionCode 415
      * @expectedExceptionMessage Image has unsupported mime type
      */
-    public function createFromData_givenImageHasInvalidMimeType_exceptionThrown(): void
+    public function createImageFromData_givenImageHasInvalidMimeType_exceptionThrown(): void
     {
         $factory = $this->createImageFactory();
         $this->givenImageValidator_hasDataValidImageMimeType_returns(false);
@@ -179,7 +149,7 @@ class ImageFactoryTest extends TestCase
     }
 
     /** @test */
-    public function createFromStream_givenStream_imageIsReturned(): void
+    public function createImageFromStream_givenStreamAndNoParameters_imageWithCreatedParametersReturned(): void
     {
         $factory = $this->createImageFactory();
         $stream = $this->givenStreamWithData();
@@ -190,6 +160,25 @@ class ImageFactoryTest extends TestCase
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertStream_rewind_isCalledOnce($stream);
+        $this->assertImageParametersFactory_createImageParameters_isCalledOnce();
+        $this->assertSame($imageParameters, $image->getParameters());
+        $this->assertSame($stream, $image->getData());
+        $this->assertImageValidator_hasDataValidImageMimeType_isCalledOnceWith(self::DATA);
+    }
+
+    /** @test */
+    public function createImageFromStream_givenStreamAndParameters_imageWithGivenParametersReturned(): void
+    {
+        $factory = $this->createImageFactory();
+        $stream = $this->givenStreamWithData();
+        $this->givenImageValidator_hasDataValidImageMimeType_returns(true);
+        $imageParameters = \Phake::mock(ImageParameters::class);
+
+        $image = $factory->createImageFromStream($stream, $imageParameters);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertStream_rewind_isCalledOnce($stream);
+        $this->assertImageParametersFactory_createImageParameters_isNeverCalled();
         $this->assertSame($imageParameters, $image->getParameters());
         $this->assertSame($stream, $image->getData());
         $this->assertImageValidator_hasDataValidImageMimeType_isCalledOnceWith(self::DATA);
@@ -201,7 +190,7 @@ class ImageFactoryTest extends TestCase
      * @expectedExceptionCode 415
      * @expectedExceptionMessage Image has unsupported mime type
      */
-    public function createFromStream_givenImageHasInvalidMimeType_exceptionThrown(): void
+    public function createImageFromStream_givenImageHasInvalidMimeType_exceptionThrown(): void
     {
         $factory = $this->createImageFactory();
         $stream = $this->givenStreamWithData();
@@ -225,10 +214,19 @@ class ImageFactoryTest extends TestCase
     private function givenImageParametersFactory_createImageParameters_returnsImageParameters(): ImageParameters
     {
         $imageParameters = \Phake::mock(ImageParameters::class);
-
         \Phake::when($this->imageParametersFactory)->createImageParameters()->thenReturn($imageParameters);
 
         return $imageParameters;
+    }
+
+    private function assertImageParametersFactory_createImageParameters_isCalledOnce(): void
+    {
+        \Phake::verify($this->imageParametersFactory, \Phake::times(1))->createImageParameters();
+    }
+
+    private function assertImageParametersFactory_createImageParameters_isNeverCalled(): void
+    {
+        \Phake::verify($this->imageParametersFactory, \Phake::times(0))->createImageParameters();
     }
 
     private function givenImageValidator_hasValidImageExtension_returns(bool $value): void

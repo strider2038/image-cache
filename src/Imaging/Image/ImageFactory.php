@@ -47,15 +47,6 @@ class ImageFactory implements ImageFactoryInterface
         $this->streamFactory = $streamFactory;
     }
 
-    public function createImage(StreamInterface $data, ImageParameters $parameters): Image
-    {
-        if (!$this->imageValidator->hasDataValidImageMimeType($data->getContents())) {
-            throw new InvalidMediaTypeException('Image has unsupported mime type');
-        }
-
-        return new Image($data, $parameters);
-    }
-
     public function createImageFromFile(string $filename): Image
     {
         if (!$this->fileOperations->isFile($filename)) {
@@ -85,7 +76,7 @@ class ImageFactory implements ImageFactoryInterface
         return new Image($stream, $this->createImageParameters());
     }
 
-    public function createImageFromStream(StreamInterface $stream): Image
+    public function createImageFromStream(StreamInterface $stream, ImageParameters $parameters = null): Image
     {
         if (!$this->imageValidator->hasDataValidImageMimeType($stream->getContents())) {
             throw new InvalidMediaTypeException('Image has unsupported mime type');
@@ -93,7 +84,7 @@ class ImageFactory implements ImageFactoryInterface
 
         $stream->rewind();
 
-        return new Image($stream, $this->createImageParameters());
+        return new Image($stream, $parameters ?? $this->createImageParameters());
     }
 
     private function createImageParameters(): ImageParameters
