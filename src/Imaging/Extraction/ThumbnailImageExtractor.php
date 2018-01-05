@@ -44,6 +44,6 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         $thumbnailFilename = $this->filenameParser->getParsedFilename($filename);
         $sourceImage = $this->storageAccessor->getImage($thumbnailFilename->getValue());
 
-        return $this->imageProcessor->process($sourceImage, $thumbnailFilename->getProcessingConfiguration());
+        return $this->imageProcessor->transformImage($sourceImage, $thumbnailFilename->getProcessingConfiguration());
     }
 }

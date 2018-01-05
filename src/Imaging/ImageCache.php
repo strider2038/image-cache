@@ -59,7 +59,7 @@ class ImageCache implements ImageCacheInterface
     public function putImage(ImageFilenameInterface $filename, Image $image): void
     {
         $destinationFileName = $this->composeDestinationFileName($filename);
-        $this->imageProcessor->saveToFile($image, $destinationFileName);
+        $this->imageProcessor->saveImageToFile($image, $destinationFileName);
     }
 
     public function deleteImagesByMask(string $fileNameMask): void
