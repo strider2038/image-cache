@@ -82,7 +82,7 @@ class ImageCacheTest extends TestCase
 
         $cache->putImage($filename, $image);
 
-        $this->assertImageProcessor_saveToFile_isCalledOnceWith($image, self::CACHE_FILE_NAME);
+        $this->assertImageProcessor_saveImageToFile_isCalledOnceWith($image, self::CACHE_FILE_NAME);
     }
 
     /** @test */
@@ -125,8 +125,8 @@ class ImageCacheTest extends TestCase
         return $filename;
     }
 
-    private function assertImageProcessor_saveToFile_isCalledOnceWith(Image $image, string $fileName): void
+    private function assertImageProcessor_saveImageToFile_isCalledOnceWith(Image $image, string $fileName): void
     {
-        \Phake::verify($this->imageProcessor, \Phake::times(1))->saveToFile($image, $fileName);
+        \Phake::verify($this->imageProcessor, \Phake::times(1))->saveImageToFile($image, $fileName);
     }
 }
