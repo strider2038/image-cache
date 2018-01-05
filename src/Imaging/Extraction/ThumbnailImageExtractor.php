@@ -12,8 +12,6 @@ namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParserInterface;
-use Strider2038\ImgCache\Imaging\Parsing\Processing\ProcessingConfigurationParserInterface;
-use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 /**
@@ -24,25 +22,20 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
     /** @var ThumbnailFilenameParserInterface */
     private $filenameParser;
 
-    /** @var ProcessingConfigurationParserInterface */
-    private $processingConfigurationParser;
-
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
-    /** @var ImageProcessorInterface */
-    private $imageProcessor;
+    /** @var ThumbnailImageCreatorInterface */
+    private $thumbnailImageCreator;
 
     public function __construct(
         ThumbnailFilenameParserInterface $filenameParser,
-        ProcessingConfigurationParserInterface $processingConfigurationParser,
         StorageAccessorInterface $storageAccessor,
-        ImageProcessorInterface $imageProcessor
+        ThumbnailImageCreatorInterface $thumbnailImageCreator
     ) {
         $this->filenameParser = $filenameParser;
-        $this->processingConfigurationParser = $processingConfigurationParser;
         $this->storageAccessor = $storageAccessor;
-        $this->imageProcessor = $imageProcessor;
+        $this->thumbnailImageCreator = $thumbnailImageCreator;
     }
 
     public function getProcessedImage(string $filename): Image
@@ -50,15 +43,7 @@ class ThumbnailImageExtractor implements ImageExtractorInterface
         $thumbnailFilename = $this->filenameParser->getParsedFilename($filename);
         $sourceImage = $this->storageAccessor->getImage($thumbnailFilename->getValue());
 
-        $processingConfigurationString = $thumbnailFilename->getProcessingConfiguration();
-        $processingConfiguration = $this->processingConfigurationParser->parseConfiguration($processingConfigurationString);
-
-        $transformations = $processingConfiguration->getTransformations();
-        $imageParameters = $processingConfiguration->getImageParameters();
-
-        $thumbnailImage = $this->imageProcessor->transformImage($sourceImage, $transformations);
-        $thumbnailImage->setParameters($imageParameters);
-
-        return $thumbnailImage;
+        $processingConfiguration = $thumbnailFilename->getProcessingConfiguration();
+        return $this->thumbnailImageCreator->createThumbnailImageByConfiguration($sourceImage, $processingConfiguration);
     }
 }
