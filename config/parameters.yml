@@ -4,7 +4,7 @@ parameters:
     log.directory: '%app.directory%/runtime'
     log.name: 'app.log'
     log.level: 100
-    save_options.quality: 90
+    image_parameters.quality: 90
 
     filesystem_image_cache.base_directory: '%app.directory%/web/i'
     filesystem_storage_driver.base_directory: '%app.directory%/tests/assets'

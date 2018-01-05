@@ -69,7 +69,7 @@ services:
         arguments:
             - '@thumbnail_filename_parser'
             - '@filesystem_storage_accessor'
-            - '@image_processor'
+            - '@thumbnail_image_creator'
 
     filesystem_image_writer:
         class: Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter

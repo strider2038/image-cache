@@ -1,7 +1,14 @@
 parameters:
-    save_options.quality: 90
+    image_parameters.quality: 90
 
 services:
+    # imaging/extraction
+    thumbnail_image_creator:
+        class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageCreator
+        arguments:
+            - '@thumbnail_processing_configuration_parser'
+            - '@image_processor'
+
     # imaging/naming
     directory_name_factory:
         class: Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactory
@@ -17,7 +24,7 @@ services:
     image_factory:
         class: Strider2038\ImgCache\Imaging\Image\ImageFactory
         arguments:
-            - '@save_options_factory'
+            - '@image_parameters_factory'
             - '@image_validator'
             - '@file_operations'
             - '@stream_factory'
@@ -26,23 +33,21 @@ services:
     thumbnail_filename_parser:
         class: Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParser
         arguments:
-            - '@key_validator'
-            - '@image_validator'
-            - '@thumbnail_processing_configuration_parser'
+            - '@entity_validator'
     thumbnail_processing_configuration_parser:
         class: Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser
         arguments:
             - '@transformations_creator'
-            - '@save_options_factory'
-            - '@save_options_configurator'
+            - '@image_parameters_factory'
+            - '@image_parameters_configurator'
 
     # imaging/processing
-    save_options_factory:
-        class: Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactory
+    image_parameters_factory:
+        class: Strider2038\ImgCache\Imaging\Image\ImageParametersFactory
         calls:
-            - [setQuality, ['%save_options.quality%']]
-    save_options_configurator:
-        class: Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfigurator
+            - [setQuality, ['%image_parameters.quality%']]
+    image_parameters_configurator:
+        class: Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfigurator
     image_processor:
         class: Strider2038\ImgCache\Imaging\Processing\ImageProcessor
         arguments:
