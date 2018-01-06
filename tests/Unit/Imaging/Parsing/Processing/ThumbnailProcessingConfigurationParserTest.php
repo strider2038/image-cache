@@ -13,10 +13,9 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Processing;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
-use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
 use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 
@@ -50,14 +49,14 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
         $this->givenTransformationsFactory_create_returnsTransformation();
-        $defaultSaveOptions = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
+        $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
         $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertImageParametersConfigurator_updateSaveOptionsByConfiguration_isCalledTimes(0);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions);
+        $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(0);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
 
     /**
@@ -66,20 +65,20 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
      * @param int $count
      * @dataProvider configurationsProvider
      */
-    public function getRequestConfiguration_givenConfigurationWithSaveOptions_countOfSaveOptionsConfiguratorConfigureVerified(
+    public function getRequestConfiguration_givenConfigurationWithParameters_countOfParametersConfiguratorConfigureVerified(
         string $configuration,
         int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
         $this->givenTransformationsFactory_create_returnsNull();
-        $defaultSaveOptions = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
+        $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
         $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertImageParametersConfigurator_updateSaveOptionsByConfiguration_isCalledTimes($count);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions);
+        $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes($count);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
 
     public function configurationsProvider(): array
@@ -131,10 +130,10 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
             ->create(\Phake::anyParameters());
     }
 
-    private function assertImageParametersConfigurator_updateSaveOptionsByConfiguration_isCalledTimes(int $times): void
+    private function assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(int $times): void
     {
         \Phake::verify($this->imageParametersConfigurator, \Phake::times($times))
-            ->updateSaveOptionsByConfiguration(\Phake::anyParameters());
+            ->updateParametersByConfiguration(\Phake::anyParameters());
     }
 
     private function givenTransformationsFactory_create_returnsNull(): void

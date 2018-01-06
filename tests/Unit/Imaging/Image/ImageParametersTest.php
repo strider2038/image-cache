@@ -17,25 +17,27 @@ class ImageParametersTest extends TestCase
 {
     private const QUALITY_VALUE_DEFAULT = 85;
 
-    public function testGetQuality_ClassConstructed_ReturnedValuesHasDefaultValue(): void
+    /** @test */
+    public function getQuality_classConstructed_returnedValuesHasDefaultValue(): void
     {
-        $saveOptions = new ImageParameters();
+        $parameters = new ImageParameters();
 
-        $result = $saveOptions->getQuality();
+        $result = $parameters->getQuality();
 
         $this->assertEquals(self::QUALITY_VALUE_DEFAULT, $result);
     }
 
     /**
+     * @test
      * @dataProvider getValidQualityValues
      */
-    public function testSetQuality_ValidQualityValueIsSet_ReturnedValuesMatchesSetValue(int $quality): void
+    public function setQuality_validQualityValueIsSet_returnedValuesMatchesSetValue(int $quality): void
     {
-        $saveOptions = new ImageParameters();
+        $parameters = new ImageParameters();
 
-        $saveOptions->setQuality($quality);
+        $parameters->setQuality($quality);
 
-        $result = $saveOptions->getQuality();
+        $result = $parameters->getQuality();
         $this->assertEquals($quality, $result);
     }
 
@@ -48,16 +50,17 @@ class ImageParametersTest extends TestCase
     }
 
     /**
+     * @test
      * @dataProvider getInvalidQualityValues
      * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
      * @expectedExceptionCode 500
      * @expectedExceptionMessage Quality value must be between 15 and 100
      */
-    public function testSetQuality_InvalidQualityValueIsSet_InvalidValueExceptionThrown(int $quality): void
+    public function setQuality_invalidQualityValueIsSet_invalidValueExceptionThrown(int $quality): void
     {
-        $saveOptions = new ImageParameters();
+        $parameters = new ImageParameters();
 
-        $saveOptions->setQuality($quality);
+        $parameters->setQuality($quality);
     }
 
     public function getInvalidQualityValues(): array

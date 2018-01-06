@@ -30,7 +30,6 @@ Image caching microservice with connection to cloud hostings
 - [x] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
     - YandexMapParametersParser ?
-    - SaveOptions ?
     - ImageFactory
     - FilenameKeyMapperInterface to factory
 - [ ] ViolationsChecker service
@@ -45,7 +44,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Acceptance testing
 - [ ] Move all todos to github issues
 - [ ] Rename project to "Image caching microservice"
-- [ ] Refactor SaveOptions to be ignored while saving
+- [ ] Refactor ImageParameters to be ignored while saving
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1

@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Imaging\Image\ImageParameters;
  */
 class ImageParametersConfigurator implements ImageParametersConfiguratorInterface
 {
-    public function updateSaveOptionsByConfiguration(ImageParameters $parameters, string $configuration): void
+    public function updateParametersByConfiguration(ImageParameters $parameters, string $configuration): void
     {
         if (\strlen($configuration) <= 0 || $configuration[0] !== 'q') {
             return;

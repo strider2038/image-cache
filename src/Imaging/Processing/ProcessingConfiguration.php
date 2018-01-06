@@ -24,10 +24,10 @@ class ProcessingConfiguration
     /** @var ImageParameters */
     private $imageParameters;
 
-    public function __construct(TransformationCollection $transformations, ImageParameters $saveOptions)
+    public function __construct(TransformationCollection $transformations, ImageParameters $imageParameters)
     {
         $this->transformations = $transformations;
-        $this->imageParameters = $saveOptions;
+        $this->imageParameters = $imageParameters;
     }
 
     public function getTransformations(): TransformationCollection

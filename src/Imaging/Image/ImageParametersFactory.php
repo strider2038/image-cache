@@ -16,23 +16,18 @@ namespace Strider2038\ImgCache\Imaging\Image;
 class ImageParametersFactory implements ImageParametersFactoryInterface
 {
     /** @var int */
-    private $quality = ImageParameters::QUALITY_VALUE_DEFAULT;
+    private $quality;
 
-    public function getQuality(): int
-    {
-        return $this->quality;
-    }
-
-    public function setQuality(int $quality): void
+    public function __construct(int $quality = ImageParameters::QUALITY_VALUE_DEFAULT)
     {
         $this->quality = $quality;
     }
 
     public function createImageParameters(): ImageParameters
     {
-        $saveOptions = new ImageParameters();
-        $saveOptions->setQuality($this->quality);
+        $parameters = new ImageParameters();
+        $parameters->setQuality($this->quality);
 
-        return $saveOptions;
+        return $parameters;
     }
 }

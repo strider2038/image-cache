@@ -44,8 +44,8 @@ services:
     # imaging/processing
     image_parameters_factory:
         class: Strider2038\ImgCache\Imaging\Image\ImageParametersFactory
-        calls:
-            - [setQuality, ['%image_parameters.quality%']]
+        arguments:
+            - '%image_parameters.quality%'
     image_parameters_configurator:
         class: Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfigurator
     image_processor:

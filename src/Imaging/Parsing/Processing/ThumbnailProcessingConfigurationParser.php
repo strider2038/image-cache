@@ -51,7 +51,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
             if ($transformation !== null) {
                 $transformations->add($transformation);
             } else {
-                $this->imageParametersConfigurator->updateSaveOptionsByConfiguration($imageParameters, $value);
+                $this->imageParametersConfigurator->updateParametersByConfiguration($imageParameters, $value);
             }
         }
 

@@ -22,12 +22,12 @@ class ImageParametersConfiguratorTest extends TestCase
     private const VALID_CONFIGURATION = 'q51';
 
     /** @test */
-    public function updateSaveOptionsByConfiguration_configurationIsNotSupported_saveOptionsValueNotModified(): void
+    public function updateParametersByConfiguration_configurationIsNotSupported_parametersValueNotModified(): void
     {
         $imageParameters = $this->givenImageParameters();
         $configurator = new ImageParametersConfigurator();
 
-        $configurator->updateSaveOptionsByConfiguration($imageParameters, self::NOT_SUPPORTED_CONFIGURATION);
+        $configurator->updateParametersByConfiguration($imageParameters, self::NOT_SUPPORTED_CONFIGURATION);
 
         \Phake::verifyNoInteraction($imageParameters);
     }
@@ -43,21 +43,21 @@ class ImageParametersConfiguratorTest extends TestCase
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Invalid configuration for quality transformation
      */
-    public function updateSaveOptionsByConfiguration_configurationIsInvalid_exceptionThrown(): void
+    public function updateParametersByConfiguration_configurationIsInvalid_exceptionThrown(): void
     {
         $imageParameters = $this->givenImageParameters();
         $configurator = new ImageParametersConfigurator();
 
-        $configurator->updateSaveOptionsByConfiguration($imageParameters, self::INVALID_CONFIGURATION);
+        $configurator->updateParametersByConfiguration($imageParameters, self::INVALID_CONFIGURATION);
     }
 
     /** @test */
-    public function updateSaveOptionsByConfiguration_configurationIsValid_valueIsSetToSaveOptions(): void
+    public function updateParametersByConfiguration_configurationIsValid_valueIsSetToParameters(): void
     {
         $imageParameters = $this->givenImageParameters();
         $configurator = new ImageParametersConfigurator();
 
-        $configurator->updateSaveOptionsByConfiguration($imageParameters, self::VALID_CONFIGURATION);
+        $configurator->updateParametersByConfiguration($imageParameters, self::VALID_CONFIGURATION);
 
         \Phake::verify($imageParameters, \Phake::times(1))->setQuality(self::SAVE_OPTIONS_QUALITY);
     }

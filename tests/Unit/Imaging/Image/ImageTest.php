@@ -30,7 +30,7 @@ class ImageTest extends TestCase
     }
 
     /** @test */
-    public function construct_givenSaveOptionsAndData_SaveOptionsAndDataAreAccessible(): void
+    public function construct_givenImageParametersAndData_ImageParametersAndDataAreAccessible(): void
     {
         $image = new Image($this->data, $this->parameters);
 

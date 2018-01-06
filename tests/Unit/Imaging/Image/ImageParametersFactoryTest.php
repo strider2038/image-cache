@@ -17,11 +17,12 @@ use Strider2038\ImgCache\Imaging\Image\ImageParametersFactory;
 class ImageParametersFactoryTest extends TestCase
 {
     private const QUALITY = 51;
+    private const DEFAULT_QUALITY = 85;
 
-    public function testCreate_GivenQuality_SaveOptionsWithInjectedPropertiesIsReturned(): void
+    /** @test */
+    public function construct_givenQuality_imageParametersWithSpecifiedValuesReturned(): void
     {
-        $imageParametersFactory = $this->createImageParametersFactory();
-        $imageParametersFactory->setQuality(self::QUALITY);
+        $imageParametersFactory = new ImageParametersFactory(self::QUALITY);
 
         $imageParameters = $imageParametersFactory->createImageParameters();
 
@@ -29,18 +30,14 @@ class ImageParametersFactoryTest extends TestCase
         $this->assertEquals(self::QUALITY, $imageParameters->getQuality());
     }
 
-    public function testGetQuality_GivenQuality_QualityValueIsReturned(): void
+    /** @test */
+    public function construct_noParameters_imageParametersWithDefaultValuesReturned(): void
     {
-        $imageParametersFactory = $this->createImageParametersFactory();
-        $imageParametersFactory->setQuality(self::QUALITY);
+        $imageParametersFactory = new ImageParametersFactory();
 
-        $quality = $imageParametersFactory->getQuality();
+        $imageParameters = $imageParametersFactory->createImageParameters();
 
-        $this->assertEquals(self::QUALITY, $quality);
-    }
-
-    private function createImageParametersFactory(): ImageParametersFactory
-    {
-        return new ImageParametersFactory();
+        $this->assertInstanceOf(ImageParameters::class, $imageParameters);
+        $this->assertEquals(self::DEFAULT_QUALITY, $imageParameters->getQuality());
     }
 }
