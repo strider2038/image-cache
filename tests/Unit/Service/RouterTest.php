@@ -18,7 +18,6 @@ use Strider2038\ImgCache\Core\Http\Uri;
 use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Service\Router;
 use Strider2038\ImgCache\Service\Routing\UrlRoute;
 use Strider2038\ImgCache\Service\Routing\UrlRouteDetectorInterface;
@@ -40,9 +39,6 @@ class RouterTest extends TestCase
     /** @var RequestInterface */
     private $request;
 
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
-
     /** @var UrlRouteDetectorInterface */
     private $urlRouteDetector;
 
@@ -52,7 +48,6 @@ class RouterTest extends TestCase
     protected function setUp(): void
     {
         $this->request = \Phake::mock(RequestInterface::class);
-        $this->imageValidator = \Phake::mock(ImageValidatorInterface::class);
         $this->urlRouteDetector = \Phake::mock(UrlRouteDetectorInterface::class);
         $this->logger = $this->givenLogger();
     }
@@ -70,7 +65,6 @@ class RouterTest extends TestCase
         $router = $this->createRouter();
         $this->givenRequest_getMethod_returns($requestMethod);
         $this->givenRequest_getUri_getPath_returns(self::REQUEST_URL);
-        $this->givenImageValidator_hasValidImageExtension_returns(self::REQUEST_URL,true);
         $this->givenUrlRouteDetector_getUrlRoute_returnsUrlRouteWithControllerIdAndUri();
         $processedRequest = $this->givenRequest_withUri_returnsProcessedRequest();
 
@@ -98,10 +92,9 @@ class RouterTest extends TestCase
     /** @test */
     public function getRoute_givenRequestAndDefaultRouteDetector_defaultRouteReturned(): void
     {
-        $router = new Router($this->imageValidator);
+        $router = new Router();
         $this->givenRequest_getMethod_returns(self::REQUEST_METHOD_GET);
         $this->givenRequest_getUri_getPath_returns(self::REQUEST_URL);
-        $this->givenImageValidator_hasValidImageExtension_returns(self::REQUEST_URL,true);
         $processedRequest = $this->givenRequest_withUri_returnsProcessedRequest();
 
         $route = $router->getRoute($this->request);
@@ -127,25 +120,9 @@ class RouterTest extends TestCase
         $router->getRoute($this->request);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Requested file has incorrect extension
-     */
-    public function getRoute_requestedFileHasNotAllowedExtension_exceptionThrown(): void
-    {
-        $router = $this->createRouter();
-        $this->givenRequest_getMethod_returns(self::REQUEST_METHOD_GET);
-        $this->givenRequest_getUri_getPath_returns('/a.php');
-        $this->givenImageValidator_hasValidImageExtension_returns(self::REQUEST_URL,false);
-        
-        $router->getRoute($this->request);
-    }
-
     private function createRouter(): Router
     {
-        $router = new Router($this->imageValidator, $this->urlRouteDetector);
+        $router = new Router($this->urlRouteDetector);
         $router->setLogger($this->logger);
 
         return $router;
@@ -163,11 +140,6 @@ class RouterTest extends TestCase
         $uri = \Phake::mock(UriInterface::class);
         \Phake::when($this->request)->getUri()->thenReturn($uri);
         \Phake::when($uri)->getPath()->thenReturn($value);
-    }
-
-    private function givenImageValidator_hasValidImageExtension_returns(string $url, bool $value): void
-    {
-        \Phake::when($this->imageValidator)->hasValidImageExtension($url)->thenReturn($value);
     }
 
     private function assertRequest_withUri_isCalledOnceWithUriWithPath(string $expectedPath): void

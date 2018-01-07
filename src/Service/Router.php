@@ -16,9 +16,7 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Route;
 use Strider2038\ImgCache\Core\RouterInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
-use Strider2038\ImgCache\Exception\InvalidRequestException;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 use Strider2038\ImgCache\Service\Routing\UrlRouteDetectorInterface;
 
 /**
@@ -26,9 +24,6 @@ use Strider2038\ImgCache\Service\Routing\UrlRouteDetectorInterface;
  */
 class Router implements RouterInterface
 {
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
-
     /** @var UrlRouteDetectorInterface */
     private $urlRouteDetector;
 
@@ -42,11 +37,8 @@ class Router implements RouterInterface
         HttpMethodEnum::DELETE => 'delete',
     ];
 
-    public function __construct(
-        ImageValidatorInterface $imageValidator,
-        UrlRouteDetectorInterface $urlRouteDetector = null
-    ) {
-        $this->imageValidator = $imageValidator;
+    public function __construct(UrlRouteDetectorInterface $urlRouteDetector = null)
+    {
         $this->urlRouteDetector = $urlRouteDetector ?? new ImageDefaultRouteDetector();
         $this->logger = new NullLogger();
     }
@@ -65,10 +57,6 @@ class Router implements RouterInterface
 
         if (!array_key_exists($requestMethod, $this->methodsToActionsMap)) {
             throw new InvalidRouteException('Route not found');
-        }
-
-        if (!$this->imageValidator->hasValidImageExtension($url)) {
-            throw new InvalidRequestException('Requested file has incorrect extension');
         }
 
         $urlRoute = $this->urlRouteDetector->getUrlRoute($request);
