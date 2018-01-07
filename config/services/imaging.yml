@@ -76,5 +76,3 @@ services:
     # imaging/validation
     image_validator:
         class: Strider2038\ImgCache\Imaging\Validation\ImageValidator
-    key_validator:
-        class: Strider2038\ImgCache\Imaging\Validation\KeyValidator
