@@ -61,7 +61,6 @@ services:
     yandex_map_parameters_parser:
         class: Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser
         arguments:
-            - '@image_validator'
             - '@yandex_map_value_configurator_factory'
             - '@yandex_map_parameters_factory'
     yandex_map_value_configurator_factory:
