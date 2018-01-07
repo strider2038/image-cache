@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Utility;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Strider2038\ImgCache\Core\EntityInterface;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -27,11 +28,14 @@ class EntityValidator implements EntityValidatorInterface
     /** @var ViolationFormatterInterface */
     private $violationFormatter;
 
-    public function __construct(ViolationFormatterInterface $violationFormatter)
-    {
+    public function __construct(
+        CustomConstraintValidatorFactory $validatorFactory,
+        ViolationFormatterInterface $violationFormatter
+    ) {
         AnnotationRegistry::registerLoader('class_exists');
 
         $this->validator = Validation::createValidatorBuilder()
+            ->setConstraintValidatorFactory($validatorFactory)
             ->enableAnnotationMapping()
             ->getValidator();
 

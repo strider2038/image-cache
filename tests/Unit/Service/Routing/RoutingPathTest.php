@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Service\Routing\RoutingPath;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\MetadataReader;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
 use Strider2038\ImgCache\Utility\ViolationFormatter;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
@@ -26,7 +28,12 @@ class RoutingPathTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = new EntityValidator(new ViolationFormatter());
+        $this->validator = new EntityValidator(
+            new CustomConstraintValidatorFactory(
+                new MetadataReader()
+            ),
+            new ViolationFormatter()
+        );
     }
 
     /** @test */

@@ -13,16 +13,23 @@ namespace Strider2038\ImgCache\Tests\Unit\Utility;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Tests\Support\AnnotatedEntityMock;
 use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\MetadataReaderInterface;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
 use Strider2038\ImgCache\Utility\ViolationFormatterInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
-class ModelValidatorTest extends TestCase
+class EntityValidatorTest extends TestCase
 {
+    /** @var CustomConstraintValidatorFactory */
+    private $validatorFactory;
+
     /** @var ViolationFormatterInterface */
     private $violationFormatter;
 
     protected function setUp(): void
     {
+        $metadataReader = \Phake::mock(MetadataReaderInterface::class);
+        $this->validatorFactory = new CustomConstraintValidatorFactory($metadataReader);
         $this->violationFormatter = \Phake::mock(ViolationFormatterInterface::class);
     }
 
@@ -68,6 +75,6 @@ class ModelValidatorTest extends TestCase
 
     private function createEntityValidator(): EntityValidator
     {
-        return new EntityValidator($this->violationFormatter);
+        return new EntityValidator($this->validatorFactory, $this->violationFormatter);
     }
 }

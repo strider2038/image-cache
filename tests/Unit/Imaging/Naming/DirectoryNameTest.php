@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\MetadataReader;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
 use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class DirectoryNameTest extends TestCase
@@ -24,7 +26,12 @@ class DirectoryNameTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = new EntityValidator(new ViolationFormatter());
+        $this->validator = new EntityValidator(
+            new CustomConstraintValidatorFactory(
+                new MetadataReader()
+            ),
+            new ViolationFormatter()
+        );
     }
 
     /** @test */

@@ -10,14 +10,19 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
+use Strider2038\ImgCache\Core\EntityInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
+use Strider2038\ImgCache\Utility\Validation as CustomAssert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Image
+class Image implements EntityInterface
 {
-    /** @var StreamInterface */
+    /**
+     * @CustomAssert\ImageMimeType()
+     * @var StreamInterface
+     */
     private $data;
 
     /** @var ImageParameters */
@@ -27,6 +32,11 @@ class Image
     {
         $this->data = $data;
         $this->parameters = $parameters;
+    }
+
+    public function getId(): string
+    {
+        return 'image';
     }
 
     public function getData(): StreamInterface
