@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Validation;
+namespace Strider2038\ImgCache\Tests\Unit\Utility;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Utility\ViolationFormatter;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ViolationsFormatterTest extends TestCase
+class ViolationFormatterTest extends TestCase
 {
     /** @test */
     public function format_givenViolations_stringIsReturned(): void
