@@ -38,7 +38,7 @@ class TransformationCreatorTest extends TestCase
         $transformation = $this->givenTransformationFactory_Create_ReturnsTransformation($factory, '12');
         $this->givenTransformationFactoryFlyweight_FindFactory_Returns('ab', $factory);
 
-        $actualTransformation = $creator->create('ab12');
+        $actualTransformation = $creator->createTransformation('ab12');
 
         $this->assertInstanceOf(TransformationInterface::class, $actualTransformation);
         $this->assertSame($transformation, $actualTransformation);
@@ -52,7 +52,7 @@ class TransformationCreatorTest extends TestCase
         $transformation = $this->givenTransformationFactory_Create_ReturnsTransformation($factory, '12');
         $this->givenTransformationFactoryFlyweight_FindFactory_Returns('a', $factory);
 
-        $actualTransformation = $creator->create('a12');
+        $actualTransformation = $creator->createTransformation('a12');
 
         $this->assertInstanceOf(TransformationInterface::class, $actualTransformation);
         $this->assertSame($transformation, $actualTransformation);
@@ -62,7 +62,7 @@ class TransformationCreatorTest extends TestCase
     {
         $creator = $this->createTransformationsCreator();
 
-        $actualTransformation = $creator->create('a12');
+        $actualTransformation = $creator->createTransformation('a12');
 
         $this->assertNull($actualTransformation);
     }
