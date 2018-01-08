@@ -16,26 +16,33 @@ namespace Strider2038\ImgCache\Imaging\Transformation;
  */
 class TransformationCreator implements TransformationCreatorInterface
 {
-    /** @var TransformationFactoryFlyweightInterface */
-    private $factoryFlyweight;
+    /** @var TransformationFactoryMap */
+    private $factoryMap;
     
-    public function __construct(TransformationFactoryFlyweightInterface $factoryFlyweight)
+    public function __construct(TransformationFactoryMap $factoryMap = null)
     {
-        $this->factoryFlyweight = $factoryFlyweight;
+        $this->factoryMap = $factoryMap ?? $this->getDefaultTransformationFactoryMap();
     }
 
     public function createTransformation(string $configuration): ? TransformationInterface
     {
-        $factory = $this->factoryFlyweight->findFactory(substr($configuration, 0, 2));
-        if ($factory !== null) {
-            return $factory->create(substr($configuration, 2));
-        }
-
-        $factory = $this->factoryFlyweight->findFactory(substr($configuration, 0, 1));
-        if ($factory !== null) {
-            return $factory->create(substr($configuration, 1));
+        /**
+         * @var string $pattern
+         * @var TransformationFactoryInterface $factory
+         */
+        foreach ($this->factoryMap as $pattern => $factory) {
+            if (preg_match_all($pattern, $configuration, $matches)) {
+                return $factory->createTransformation($matches[1][0] ?? '');
+            }
         }
 
         return null;
+    }
+
+    private function getDefaultTransformationFactoryMap(): TransformationFactoryMap
+    {
+        return new TransformationFactoryMap([
+            '/^size(.*)$/' => new ResizeTransformationFactory(),
+        ]);
     }
 }

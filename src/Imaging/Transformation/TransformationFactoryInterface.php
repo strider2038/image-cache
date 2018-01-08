@@ -7,5 +7,5 @@ namespace Strider2038\ImgCache\Imaging\Transformation;
  */
 interface TransformationFactoryInterface
 {
-    public function create(string $configuration): TransformationInterface;
+    public function createTransformation(string $configuration): TransformationInterface;
 }

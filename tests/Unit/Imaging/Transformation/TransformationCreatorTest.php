@@ -12,9 +12,10 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Transformation\ResizeTransformation;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreator;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweightInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryInterface;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryMap;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 
 /**
@@ -22,75 +23,62 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
  */
 class TransformationCreatorTest extends TestCase
 {
-    /** @var TransformationFactoryFlyweightInterface */
-    private $factoryFlyweight;
+    private const INVALID_CONFIGURATION = 'configuration';
+    private const CUSTOM_CONFIGURATION = 'transformation-id400x200';
+    private const CUSTOM_CONFIGURATION_VALUE = '400x200';
+    private const SIZE_CONFIGURATION = 'size400x200';
 
-    protected function setUp()
+    /** @test */
+    public function createTransformation_givenConfigurationAndFactoryNotFound_nullReturned(): void
     {
-        $this->factoryFlyweight = \Phake::mock(TransformationFactoryFlyweightInterface::class);
+        $factoryMap = new TransformationFactoryMap();
+        $creator = new TransformationCreator($factoryMap);
+
+        $transformation = $creator->createTransformation(self::INVALID_CONFIGURATION);
+
+        $this->assertNull($transformation);
     }
 
-    public function testCreate_GivenValidConfigurationWithFactoryByTwoChars_TransformationIsReturned(): void
+    /** @test */
+    public function createTransformation_givenCustomFactoryMapConfigurationAndFactoryFound_transformationCreatedAndReturned(): void
     {
-        $creator = $this->createTransformationsCreator();
-        $this->givenTransformationFactoryFlyweight_FindFactory_Returns('a', $this->givenTransformationFactory());
-        $factory = $this->givenTransformationFactory();
-        $transformation = $this->givenTransformationFactory_Create_ReturnsTransformation($factory, '12');
-        $this->givenTransformationFactoryFlyweight_FindFactory_Returns('ab', $factory);
+        $factory = \Phake::mock(TransformationFactoryInterface::class);
+        $factoryMap = new TransformationFactoryMap([
+            '/^transformation-id(.*)$/' => $factory
+        ]);
+        $creator = new TransformationCreator($factoryMap);
+        $expectedTransformation = $this->givenTransformationFactory_createTransformation_returnsTransformation($factory);
 
-        $actualTransformation = $creator->createTransformation('ab12');
+        $transformation = $creator->createTransformation(self::CUSTOM_CONFIGURATION);
 
-        $this->assertInstanceOf(TransformationInterface::class, $actualTransformation);
-        $this->assertSame($transformation, $actualTransformation);
+        $this->assertNotNull($transformation);
+        $this->assertTransformationFactory_createTransformation_isCalledOnceWithValue($factory, self::CUSTOM_CONFIGURATION_VALUE);
+        $this->assertSame($expectedTransformation, $transformation);
     }
 
-    public function testCreate_GivenValidConfigurationWithFactoryByOneChar_TransformationIsReturned(): void
+    /** @test */
+    public function createTransformation_givenDefaultFactoryMapConfigurationAndFactoryFound_transformationCreatedAndReturned(): void
     {
-        $creator = $this->createTransformationsCreator();
-        $this->givenTransformationFactoryFlyweight_FindFactory_Returns('ab', $this->givenTransformationFactory());
-        $factory = $this->givenTransformationFactory();
-        $transformation = $this->givenTransformationFactory_Create_ReturnsTransformation($factory, '12');
-        $this->givenTransformationFactoryFlyweight_FindFactory_Returns('a', $factory);
+        $creator = new TransformationCreator();
 
-        $actualTransformation = $creator->createTransformation('a12');
+        $transformation = $creator->createTransformation(self::SIZE_CONFIGURATION);
 
-        $this->assertInstanceOf(TransformationInterface::class, $actualTransformation);
-        $this->assertSame($transformation, $actualTransformation);
+        $this->assertInstanceOf(ResizeTransformation::class, $transformation);
     }
 
-    public function testCreate_GivenInvalidConfiguration_NullIsReturned(): void
-    {
-        $creator = $this->createTransformationsCreator();
-
-        $actualTransformation = $creator->createTransformation('a12');
-
-        $this->assertNull($actualTransformation);
-    }
-
-    private function createTransformationsCreator(): TransformationCreator
-    {
-        return new TransformationCreator($this->factoryFlyweight);
-    }
-
-    private function givenTransformationFactory(): TransformationFactoryInterface
-    {
-        return \Phake::mock(TransformationFactoryInterface::class);
-    }
-
-    private function givenTransformationFactory_Create_ReturnsTransformation(
-        TransformationFactoryInterface $factory,
-        string $configuration
+    private function givenTransformationFactory_createTransformation_returnsTransformation(
+        TransformationFactoryInterface $factory
     ): TransformationInterface {
         $transformation = \Phake::mock(TransformationInterface::class);
-        \Phake::when($factory)->create($configuration)->thenReturn($transformation);
+        \Phake::when($factory)->createTransformation(\Phake::anyParameters())->thenReturn($transformation);
 
         return $transformation;
     }
 
-    private function givenTransformationFactoryFlyweight_FindFactory_Returns(
-        string $configuration,
-        ?TransformationFactoryInterface $factory
+    private function assertTransformationFactory_createTransformation_isCalledOnceWithValue(
+        TransformationFactoryInterface $factory,
+        string $value
     ): void {
-        \Phake::when($this->factoryFlyweight)->findFactory($configuration)->thenReturn($factory);
+        \Phake::verify($factory, \Phake::times(1))->createTransformation($value);
     }
 }

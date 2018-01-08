@@ -38,7 +38,7 @@ class ResizeTransformationFactoryTest extends TestCase
         $factory = new ResizeTransformationFactory();
 
         /** @var ResizeTransformation $resize */
-        $resize = $factory->create($configuration);
+        $resize = $factory->createTransformation($configuration);
 
         $this->assertInstanceOf(ResizeTransformation::class, $resize);
         $this->assertEquals($width, $resize->getParameters()->getWidth());
@@ -72,7 +72,7 @@ class ResizeTransformationFactoryTest extends TestCase
     {
         $factory = new ResizeTransformationFactory();
 
-        $factory->create($configuration);
+        $factory->createTransformation($configuration);
     }
 
     public function resizeInvalidConfigProvider(): array
