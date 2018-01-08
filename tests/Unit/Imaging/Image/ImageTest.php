@@ -25,6 +25,8 @@ use Strider2038\ImgCache\Utility\ViolationFormatter;
 class ImageTest extends FileTestCase
 {
     private const IMAGE_ID = 'image';
+    private const VALID_IMAGE_QUALITY = 80;
+    private const INVALID_IMAGE_QUALITY = 150;
 
     /** @var ImageParameters */
     private $parameters;
@@ -77,26 +79,46 @@ class ImageTest extends FileTestCase
         $this->assertSame($parameters, $image->getParameters());
     }
 
-    /** @test */
-    public function validate_givenValidImage_noViolationsReturned(): void
-    {
-        $stream = $this->givenFileStream(self::IMAGE_BOX_JPG);
-        $image = new Image($stream, $this->parameters);
+    /**
+     * @test
+     * @param StreamInterface $stream
+     * @param int $quality
+     * @param int $violationsCount
+     * @dataProvider streamAndParametersProvider
+     */
+    public function validate_givenStreamAndParameters_violationsReturned(
+        StreamInterface $stream,
+        int $quality,
+        int $violationsCount
+    ): void {
+        $parameters = new ImageParameters();
+        $parameters->setQuality($quality);
+        $image = new Image($stream, $parameters);
 
         $violations = $this->validator->validate($image);
 
-        $this->assertCount(0, $violations);
+        $this->assertCount($violationsCount, $violations);
     }
 
-    /** @test */
-    public function validate_givenInvalidImage_violationsReturned(): void
+    public function streamAndParametersProvider(): array
     {
-        $stream = $this->givenFileStream(self::FILE_JSON);
-        $image = new Image($stream, $this->parameters);
-
-        $violations = $this->validator->validate($image);
-
-        $this->assertCount(1, $violations);
+        return [
+            [
+                $this->givenFileStream(self::IMAGE_BOX_JPG),
+                self::VALID_IMAGE_QUALITY,
+                0,
+            ],
+            [
+                $this->givenFileStream(self::FILE_JSON),
+                self::VALID_IMAGE_QUALITY,
+                1,
+            ],
+            [
+                $this->givenFileStream(self::IMAGE_BOX_JPG),
+                self::INVALID_IMAGE_QUALITY,
+                1,
+            ],
+        ];
     }
 
     private function givenFileStream(string $assetFilename): ResourceStream

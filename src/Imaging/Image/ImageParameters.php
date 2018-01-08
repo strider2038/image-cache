@@ -10,38 +10,36 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Exception\InvalidValueException;
+use Strider2038\ImgCache\Core\EntityInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageParameters
+class ImageParameters implements EntityInterface
 {
-    public const QUALITY_VALUE_MIN = 15;
-    public const QUALITY_VALUE_MAX = 100;
     public const QUALITY_VALUE_DEFAULT = 85;
 
     /** @var int */
     private $quality = self::QUALITY_VALUE_DEFAULT;
 
+    public function getId(): string
+    {
+        return 'image parameters';
+    }
+
+    /**
+     * @Assert\GreaterThanOrEqual(15)
+     * @Assert\LessThanOrEqual(100)
+     * @return int
+     */
     public function getQuality(): int
     {
         return $this->quality;
     }
 
-    /**
-     * @param int $quality
-     * @throws InvalidValueException
-     */
     public function setQuality(int $quality): void
     {
-        if ($quality < self::QUALITY_VALUE_MIN || $quality > self::QUALITY_VALUE_MAX) {
-            throw new InvalidValueException(sprintf(
-                'Quality value must be between %d and %d',
-                self::QUALITY_VALUE_MIN,
-                self::QUALITY_VALUE_MAX
-            ));
-        }
         $this->quality = $quality;
     }
 }

@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Image;
 use Strider2038\ImgCache\Core\EntityInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Utility\Validation as CustomAssert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -25,7 +26,10 @@ class Image implements EntityInterface
      */
     private $data;
 
-    /** @var ImageParameters */
+    /**
+     * @Assert\Valid()
+     * @var ImageParameters
+     */
     private $parameters;
 
     public function __construct(StreamInterface $data, ImageParameters $parameters)

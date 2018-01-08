@@ -12,10 +12,39 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Image;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\ImageParameters;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\MetadataReader;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class ImageParametersTest extends TestCase
 {
+    private const IMAGE_PARAMETERS_ID = 'image parameters';
     private const QUALITY_VALUE_DEFAULT = 85;
+
+    /** @var EntityValidatorInterface */
+    private $validator;
+
+    protected function setUp(): void
+    {
+        $this->validator = new EntityValidator(
+            new CustomConstraintValidatorFactory(
+                new MetadataReader()
+            ),
+            new ViolationFormatter()
+        );
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $image = new ImageParameters();
+
+        $id = $image->getId();
+
+        $this->assertEquals(self::IMAGE_PARAMETERS_ID, $id);
+    }
 
     /** @test */
     public function getQuality_classConstructed_returnedValuesHasDefaultValue(): void
@@ -29,45 +58,27 @@ class ImageParametersTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidQualityValues
+     * @param int $quality
+     * @param int $violationsCount
+     * @dataProvider qualityAndViolationsCountProvider
      */
-    public function setQuality_validQualityValueIsSet_returnedValuesMatchesSetValue(int $quality): void
+    public function validate_givenQuality_violationsReturned(int $quality, int $violationsCount): void
     {
         $parameters = new ImageParameters();
-
         $parameters->setQuality($quality);
 
-        $result = $parameters->getQuality();
-        $this->assertEquals($quality, $result);
+        $violations = $this->validator->validate($parameters);
+
+        $this->assertCount($violationsCount, $violations);
     }
 
-    public function getValidQualityValues(): array
+    public function qualityAndViolationsCountProvider(): array
     {
         return [
-            [15],
-            [100],
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider getInvalidQualityValues
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidValueException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage Quality value must be between 15 and 100
-     */
-    public function setQuality_invalidQualityValueIsSet_invalidValueExceptionThrown(int $quality): void
-    {
-        $parameters = new ImageParameters();
-
-        $parameters->setQuality($quality);
-    }
-
-    public function getInvalidQualityValues(): array
-    {
-        return [
-            [14],
-            [101],
+            [15, 0],
+            [100, 0],
+            [14, 1],
+            [101, 1],
         ];
     }
 }

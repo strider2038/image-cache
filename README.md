@@ -29,6 +29,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Yandex.Disk source
 - [x] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
+    - ImageParameters validation in ImageFactory
     - ImageFactory
     - FilenameKeyMapperInterface to factory
 - [ ] ViolationsChecker service
