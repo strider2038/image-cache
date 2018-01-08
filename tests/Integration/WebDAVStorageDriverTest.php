@@ -27,10 +27,8 @@ use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
 class WebDAVStorageDriverTest extends IntegrationTestCase
 {
     private const BASE_DIRECTORY = '/imgcache-test/';
-    private const FILENAME = 'file.json';
-    private const FILENAME_FULL = self::BASE_DIRECTORY . self::FILENAME;
-    private const FILENAME_IN_SUBDIRECTORY = 'a/b/c/file.json';
-    private const FILENAME_IN_SUBDIRECTORY_FULL = self::BASE_DIRECTORY . self::FILENAME_IN_SUBDIRECTORY;
+    private const FILENAME = self::BASE_DIRECTORY . 'file.json';
+    private const FILENAME_IN_SUBDIRECTORY = self::BASE_DIRECTORY . 'a/b/c/file.json';
     private const JSON_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . '/' . self::FILENAME;
     private const JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . '/img.jpeg';
 
@@ -61,7 +59,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
     {
         $this->givenJsonFile(self::JSON_TEMPORARY_FILENAME);
         $this->givenUploadedFile(
-            self::BASE_DIRECTORY . self::FILENAME,
+            self::FILENAME,
             self::JSON_TEMPORARY_FILENAME
         );
         $storageFilename = new StorageFilename(self::FILENAME);
@@ -89,7 +87,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
     {
         $this->givenJsonFile(self::JSON_TEMPORARY_FILENAME);
         $this->givenUploadedFile(
-            self::BASE_DIRECTORY . self::FILENAME,
+            self::FILENAME,
             self::JSON_TEMPORARY_FILENAME
         );
         $storageFilename = new StorageFilename(self::FILENAME);
@@ -117,7 +115,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
 
         $this->driver->createFile($storageFilename, $stream);
 
-        $this->assertStorageFileExists(self::FILENAME_FULL);
+        $this->assertStorageFileExists(self::FILENAME);
     }
 
     /** @test */
@@ -128,7 +126,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
 
         $this->driver->createFile($storageFilename, $stream);
 
-        $this->assertStorageFileExists(self::FILENAME_IN_SUBDIRECTORY_FULL);
+        $this->assertStorageFileExists(self::FILENAME_IN_SUBDIRECTORY);
     }
 
     /** @test */
@@ -136,7 +134,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
     {
         $this->givenImageJpeg(self::JPEG_TEMPORARY_FILENAME);
         $this->givenUploadedFile(
-            self::BASE_DIRECTORY . self::FILENAME,
+            self::FILENAME,
             self::JPEG_TEMPORARY_FILENAME
         );
         $storageFilename = new StorageFilename(self::FILENAME);
@@ -144,7 +142,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
 
         $this->driver->createFile($storageFilename, $stream);
 
-        $this->assertStorageFileExists(self::FILENAME_FULL);
+        $this->assertStorageFileExists(self::FILENAME);
     }
 
     /** @test */
@@ -152,14 +150,14 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
     {
         $this->givenJsonFile(self::JSON_TEMPORARY_FILENAME);
         $this->givenUploadedFile(
-            self::BASE_DIRECTORY . self::FILENAME,
+            self::FILENAME,
             self::JSON_TEMPORARY_FILENAME
         );
         $storageFilename = new StorageFilename(self::FILENAME);
 
         $this->driver->deleteFile($storageFilename);
 
-        $this->assertStorageFileNotExists(self::FILENAME_FULL);
+        $this->assertStorageFileNotExists(self::FILENAME);
     }
 
     private function givenUploadedFile(string $remoteFilename, string $localFilename): void

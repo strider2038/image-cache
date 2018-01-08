@@ -15,7 +15,6 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 
 /**
@@ -25,44 +24,35 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
 {
     private const CHUNK_SIZE = 8 * 1024 * 1024;
 
-    /** @var DirectoryNameInterface */
-    private $baseDirectory;
-
     /** @var FileOperationsInterface */
     private $fileOperations;
     
-    public function __construct(DirectoryNameInterface $baseDirectory, FileOperationsInterface $fileOperations)
+    public function __construct(FileOperationsInterface $fileOperations)
     {
         $this->fileOperations = $fileOperations;
-        $this->baseDirectory = $baseDirectory;
     }
     
     public function getFileContents(StorageFilenameInterface $filename): StreamInterface
     {
-        $sourceFilename = $this->composeSourceFilename($filename);
-
-        if (!$this->fileOperations->isFile($sourceFilename)) {
-            throw new FileNotFoundException(sprintf('File "%s" not found', $sourceFilename));
+        if (!$this->fileOperations->isFile($filename)) {
+            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
         }
 
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
-        return $this->fileOperations->openFile($sourceFilename, $mode);
+        return $this->fileOperations->openFile($filename, $mode);
     }
 
     public function fileExists(StorageFilenameInterface $filename): bool
     {
-        $sourceFilename = $this->composeSourceFilename($filename);
-
-        return $this->fileOperations->isFile($sourceFilename);
+        return $this->fileOperations->isFile($filename);
     }
 
     public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void
     {
-        $sourceFilename = $this->composeSourceFilename($filename);
-        $this->fileOperations->createDirectory(\dirname($sourceFilename));
+        $this->fileOperations->createDirectory(\dirname($filename));
 
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::WRITE_AND_READ);
-        $outputStream = $this->fileOperations->openFile($sourceFilename, $mode);
+        $outputStream = $this->fileOperations->openFile($filename, $mode);
         while (!$data->eof()) {
             $outputStream->write($data->read(self::CHUNK_SIZE));
         }
@@ -70,12 +60,6 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
 
     public function deleteFile(StorageFilenameInterface $filename): void
     {
-        $sourceFilename = $this->composeSourceFilename($filename);
-        $this->fileOperations->deleteFile($sourceFilename);
-    }
-
-    private function composeSourceFilename(StorageFilenameInterface $key): string
-    {
-        return $this->baseDirectory . $key->getValue();
+        $this->fileOperations->deleteFile($filename);
     }
 }

@@ -102,14 +102,25 @@ services:
         arguments:
             - '@yandex_disk_storage_driver'
             - '@image_factory'
-            - '@storage_filename_factory'
+            - '@yandex_disk_storage_filename_factory'
         calls:
             - [setLogger, ['@logger']]
+
+    yandex_disk_storage_filename_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameFactory
+        arguments:
+            - '@yandex_disk_storage_driver_directory'
+
+    yandex_disk_storage_driver_directory:
+        factory:
+            - '@directory_name_factory'
+            - 'createDirectoryName'
+        arguments:
+            - '%yandex_disk_storage_driver.base_directory%'
 
     yandex_disk_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver
         arguments:
-            - '%yandex_disk_storage_driver.base_directory%'
             - '@yandex_disk_resource_manipulator'
             - '@yandex_disk_resource_checker'
 

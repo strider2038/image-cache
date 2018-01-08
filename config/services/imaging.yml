@@ -66,8 +66,3 @@ services:
             - '@transformation_factory_flyweight'
     transformation_factory_flyweight:
         class: Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight
-
-    # imaging/source
-    storage_filename_factory:
-        class: Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameFactory
-

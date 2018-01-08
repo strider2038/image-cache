@@ -20,9 +20,6 @@ use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceManipulatorInterf
  */
 class WebDAVStorageDriver implements FilesystemStorageDriverInterface
 {
-    /** @var string */
-    private $baseDirectory;
-
     /** @var ResourceManipulatorInterface */
     private $resourceManipulator;
 
@@ -30,51 +27,46 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
     private $resourceChecker;
 
     public function __construct(
-        string $baseDirectory,
         ResourceManipulatorInterface $clientAdapter,
         ResourceCheckerInterface $resourceChecker
     ) {
-        $this->baseDirectory = rtrim($baseDirectory, '/') . '/';
         $this->resourceManipulator = $clientAdapter;
         $this->resourceChecker = $resourceChecker;
     }
 
     public function getFileContents(StorageFilenameInterface $filename): StreamInterface
     {
-        $storageFilename = $this->baseDirectory . $filename->getValue();
-
-        return $this->resourceManipulator->getResource($storageFilename);
+        return $this->resourceManipulator->getResource($filename);
     }
 
     public function fileExists(StorageFilenameInterface $filename): bool
     {
-        $storageFilename = $this->baseDirectory . $filename->getValue();
-
-        return $this->resourceChecker->isFile($storageFilename);
+        return $this->resourceChecker->isFile($filename);
     }
 
     public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void
     {
-        $filenameString = $filename->getValue();
-        $directories = explode('/', pathinfo($filenameString, PATHINFO_DIRNAME));
+        $directories = array_values(
+            array_filter(
+                explode('/', pathinfo($filename, PATHINFO_DIRNAME))
+            )
+        );
 
-        if (count($directories) > 0 && $directories[0] !== '.') {
+        if (\count($directories) > 0 && $directories[0] !== '.') {
             $this->createDirectoriesRecursively($directories);
         }
 
-        $storageFilename = $this->baseDirectory . $filenameString;
-        $this->resourceManipulator->putResource($storageFilename, $data);
+        $this->resourceManipulator->putResource($filename, $data);
     }
 
     public function deleteFile(StorageFilenameInterface $filename): void
     {
-        $storageFilename = $this->baseDirectory . $filename->getValue();
-        $this->resourceManipulator->deleteResource($storageFilename);
+        $this->resourceManipulator->deleteResource($filename);
     }
 
     private function createDirectoriesRecursively(array $directories): void
     {
-        $directoryName = rtrim($this->baseDirectory, '/');
+        $directoryName = '';
 
         foreach ($directories as $directory) {
             $directoryName .= '/' . $directory;

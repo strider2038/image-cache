@@ -45,6 +45,5 @@ services:
     webdav_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver
         arguments:
-            - '%storage.directory%'
             - '@resource_manipulator'
             - '@resource_checker'

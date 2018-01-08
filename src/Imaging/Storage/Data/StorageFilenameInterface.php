@@ -16,4 +16,5 @@ namespace Strider2038\ImgCache\Imaging\Storage\Data;
 interface StorageFilenameInterface
 {
     public function getValue(): string;
+    public function __toString();
 }

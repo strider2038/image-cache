@@ -22,14 +22,11 @@ class WebDAVStorageDriverTest extends TestCase
 {
     use ProviderTrait;
 
-    private const BASE_DIRECTORY = 'base_directory';
     private const FILENAME = 'filename.jpg';
-    private const FILENAME_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME;
     private const FILENAME_IN_SUBDIRECTORY = 'a/b/c/' . self::FILENAME;
-    private const FILENAME_IN_SUBDIRECTORY_FULL = self::BASE_DIRECTORY . '/' . self::FILENAME_IN_SUBDIRECTORY;
-    private const SUBDIRECTORY_A = self::BASE_DIRECTORY . '/a';
-    private const SUBDIRECTORY_B = self::BASE_DIRECTORY . '/a/b';
-    private const SUBDIRECTORY_C = self::BASE_DIRECTORY . '/a/b/c';
+    private const SUBDIRECTORY_A = '/a';
+    private const SUBDIRECTORY_B = '/a/b';
+    private const SUBDIRECTORY_C = '/a/b/c';
 
     /** @var ResourceManipulatorInterface */
     private $resourceManipulator;
@@ -52,7 +49,7 @@ class WebDAVStorageDriverTest extends TestCase
 
         $fileContents = $driver->getFileContents($storageFilename);
 
-        $this->assertResourceManipulator_getResource_isCalledOnceWithResourceUri(self::FILENAME_FULL);
+        $this->assertResourceManipulator_getResource_isCalledOnceWithResourceUri(self::FILENAME);
         $this->assertInstanceOf(StreamInterface::class, $fileContents);
         $this->assertSame($stream, $fileContents);
     }
@@ -71,7 +68,7 @@ class WebDAVStorageDriverTest extends TestCase
 
         $fileExists = $driver->fileExists($storageFilename);
 
-        $this->assertResourceChecker_isFile_isCalledOnceWithResourceUri(self::FILENAME_FULL);
+        $this->assertResourceChecker_isFile_isCalledOnceWithResourceUri(self::FILENAME);
         $this->assertEquals($expectedFileExists, $fileExists);
     }
 
@@ -85,7 +82,7 @@ class WebDAVStorageDriverTest extends TestCase
         $driver->createFile($storageFilename, $fileContents);
 
         $this->assertResourceManipulator_putResource_isCalledOnceWithResourceUriAndStream(
-            self::FILENAME_FULL,
+            self::FILENAME,
             $fileContents
         );
         $this->assertResourceChecker_isDirectory_isNeverCalled();
@@ -108,7 +105,7 @@ class WebDAVStorageDriverTest extends TestCase
         $this->assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(self::SUBDIRECTORY_B);
         $this->assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(self::SUBDIRECTORY_C);
         $this->assertResourceManipulator_putResource_isCalledOnceWithResourceUriAndStream(
-            self::FILENAME_IN_SUBDIRECTORY_FULL,
+            self::FILENAME_IN_SUBDIRECTORY,
             $fileContents
         );
     }
@@ -121,13 +118,12 @@ class WebDAVStorageDriverTest extends TestCase
 
         $driver->deleteFile($storageFilename);
 
-        $this->assertResourceManipulator_deleteResource_isCalledOnceWithResourceUri(self::FILENAME_FULL);
+        $this->assertResourceManipulator_deleteResource_isCalledOnceWithResourceUri(self::FILENAME);
     }
 
     private function createWebDAVStorageDriver(): WebDAVStorageDriver
     {
         return new WebDAVStorageDriver(
-            self::BASE_DIRECTORY,
             $this->resourceManipulator,
             $this->resourceChecker
         );
@@ -136,7 +132,7 @@ class WebDAVStorageDriverTest extends TestCase
     private function givenStorageFilename(string $filename = self::FILENAME): StorageFilenameInterface
     {
         $key = \Phake::mock(StorageFilenameInterface::class);
-        \Phake::when($key)->getValue()->thenReturn($filename);
+        \Phake::when($key)->__toString()->thenReturn($filename);
 
         return $key;
     }
