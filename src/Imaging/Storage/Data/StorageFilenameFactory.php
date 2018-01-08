@@ -13,7 +13,10 @@ namespace Strider2038\ImgCache\Imaging\Storage\Data;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface FilenameKeyMapperInterface
+class StorageFilenameFactory implements StorageFilenameFactoryInterface
 {
-    public function getKey(string $filename): StorageFilenameInterface;
+    public function createStorageFilename(string $filename): StorageFilenameInterface
+    {
+        return new StorageFilename($filename);
+    }
 }

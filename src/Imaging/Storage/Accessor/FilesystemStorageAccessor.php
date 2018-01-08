@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Storage\Data\FilenameKeyMapperInterface;
+use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverInterface;
 
@@ -29,8 +29,8 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
-    /** @var FilenameKeyMapperInterface */
-    private $keyMapper;
+    /** @var StorageFilenameFactoryInterface */
+    private $filenameFactory;
 
     /** @var LoggerInterface */
     private $logger;
@@ -38,11 +38,11 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
     public function __construct(
         FilesystemStorageDriverInterface $storageDriver,
         ImageFactoryInterface $imageFactory,
-        FilenameKeyMapperInterface $keyMapper
+        StorageFilenameFactoryInterface $filenameFactory
     ) {
         $this->storageDriver = $storageDriver;
         $this->imageFactory = $imageFactory;
-        $this->keyMapper = $keyMapper;
+        $this->filenameFactory = $filenameFactory;
         $this->logger = new NullLogger();
     }
 
@@ -51,60 +51,66 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $this->logger = $logger;
     }
 
-    public function getImage(string $key): Image
+    public function getImage(string $filename): Image
     {
-        $filenameKey = $this->composeFilenameKey($key);
-        $stream = $this->storageDriver->getFileContents($filenameKey);
+        $storageFilename = $this->getStorageFilename($filename);
+        $stream = $this->storageDriver->getFileContents($storageFilename);
         $image = $this->imageFactory->createImageFromStream($stream);
 
-        $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s"', $key));
+        $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s"', $filename));
 
         return $image;
     }
 
-    public function imageExists(string $key): bool
+    public function imageExists(string $filename): bool
     {
-        $filenameKey = $this->composeFilenameKey($key);
-        $exists = $this->storageDriver->fileExists($filenameKey);
+        $storageFilename = $this->getStorageFilename($filename);
+        $exists = $this->storageDriver->fileExists($storageFilename);
 
         $this->logger->info(sprintf(
             'Image with key "%s" %s in filesystem source',
-            $key,
+            $filename,
             $exists ? 'exists' : 'does not exist'
         ));
 
         return $exists;
     }
 
-    public function putImage(string $key, Image $image): void
+    public function putImage(string $filename, Image $image): void
     {
-        $filenameKey = $this->composeFilenameKey($key);
+        $storageFilename = $this->getStorageFilename($filename);
         $data = $image->getData();
-        $this->storageDriver->createFile($filenameKey, $data);
+        $this->storageDriver->createFile($storageFilename, $data);
 
         $this->logger->info(sprintf(
             "Image is successfully putted to source under key '%s'",
-            $key
+            $filename
         ));
     }
 
-    public function deleteImage(string $key): void
+    public function deleteImage(string $filename): void
     {
-        $filenameKey = $this->composeFilenameKey($key);
-        $this->storageDriver->deleteFile($filenameKey);
+        $storageFilename = $this->getStorageFilename($filename);
+        $this->storageDriver->deleteFile($storageFilename);
 
         $this->logger->info(sprintf(
             "Image with key '%s' is successfully deleted from source",
-            $key
+            $filename
         ));
     }
 
-    private function composeFilenameKey(string $key): StorageFilenameInterface
+    private function getStorageFilename(string $filename): StorageFilenameInterface
     {
-        $filenameKey = $this->keyMapper->getKey($key);
+        $storageFilename = $this->filenameFactory->createStorageFilename($filename);
 
-        $this->logger->info(sprintf('Key "%s" is mapped to "%s"', $key, $filenameKey->getValue()));
+        $this->logger->info(
+            sprintf(
+                'Storage filename "%s" created for filename "%s"',
+                $storageFilename->getValue(),
+                $filename
+            )
+        );
 
-        return $filenameKey;
+        return $storageFilename;
     }
 }

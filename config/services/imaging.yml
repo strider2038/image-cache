@@ -68,9 +68,6 @@ services:
         class: Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight
 
     # imaging/source
-    direct_key_mapper:
-        class: Strider2038\ImgCache\Imaging\Storage\Data\DirectKeyMapper
+    storage_filename_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameFactory
 
-    # imaging/validation
-    image_validator:
-        class: Strider2038\ImgCache\Imaging\Validation\ImageValidator

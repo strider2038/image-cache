@@ -82,7 +82,7 @@ services:
         arguments:
             - '@filesystem_storage_driver'
             - '@image_factory'
-            - '@direct_key_mapper'
+            - '@storage_filename_factory'
         calls:
             - [setLogger, ['@logger']]
 
