@@ -30,7 +30,6 @@ Image caching microservice with connection to cloud hostings
 - [x] Migrate to collections based on Doctrine ArrayCollection
 - [ ] Migrate to validation based on Symfony and Doctrine annotations
     - FilenameKeyMapperInterface to factory
-- [ ] ViolationsChecker service
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
