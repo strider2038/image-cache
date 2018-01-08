@@ -28,12 +28,10 @@ Image caching microservice with connection to cloud hostings
 - [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
 - [x] Yandex.Disk source
 - [x] Migrate to collections based on Doctrine ArrayCollection
-- [ ] Migrate to validation based on Symfony and Doctrine annotations
-    - FilenameKeyMapperInterface to factory
+- [x] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
-- [ ] Migrate from supervisor to systemd daemons
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
 - [ ] Support for building docker containers in Travis
@@ -50,6 +48,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Support for phpDocumentor
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor HttpClientInterface to use object-based options
+- [ ] Migrate from supervisor to systemd daemons
 
 ## Ideas
 - Google map source (inspect licensing problems)
