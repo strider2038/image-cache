@@ -87,14 +87,14 @@ services:
     yandex_disk_image_extractor:
         class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@yandex_disk_storage_accessor'
-            - '@image_processor'
+            - '@thumbnail_image_creator'
 
     yandex_disk_image_writer:
         class: Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@yandex_disk_storage_accessor'
 
     yandex_disk_storage_accessor:
@@ -102,14 +102,25 @@ services:
         arguments:
             - '@yandex_disk_storage_driver'
             - '@image_factory'
-            - '@direct_key_mapper'
+            - '@yandex_disk_storage_filename_factory'
         calls:
             - [setLogger, ['@logger']]
+
+    yandex_disk_storage_filename_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameFactory
+        arguments:
+            - '@yandex_disk_storage_driver_directory'
+
+    yandex_disk_storage_driver_directory:
+        factory:
+            - '@directory_name_factory'
+            - 'createDirectoryName'
+        arguments:
+            - '%yandex_disk_storage_driver.base_directory%'
 
     yandex_disk_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver
         arguments:
-            - '%yandex_disk_storage_driver.base_directory%'
             - '@yandex_disk_resource_manipulator'
             - '@yandex_disk_resource_checker'
 

@@ -59,7 +59,7 @@ class ReplaceActionTest extends TestCase
         $request = $this->givenRequest();
         $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
         $stream = $this->givenRequest_getBody_returnsStream($request);
-        $image = $this->givenImageFactory_createFromStream_returnsImage();
+        $image = $this->givenImageFactory_createImageFromStream_returnsImage();
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
         $response = $action->processRequest($request);
@@ -70,7 +70,7 @@ class ReplaceActionTest extends TestCase
         $this->assertImageStorage_deleteImage_isNeverCalled();
         $this->assertImageCache_deleteImagesByMask_isNeverCalled();
         $this->assertRequest_getBody_isCalledOnceWithRequest($request);
-        $this->assertImageFactory_createFromStream_isCalledOnceWith($stream);
+        $this->assertImageFactory_createImageFromStream_isCalledOnceWith($stream);
         $this->assertImageStorage_putImage_isCalledOnceWithFilenameAndImage($filename, $image);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
     }
@@ -84,7 +84,7 @@ class ReplaceActionTest extends TestCase
         $this->givenImageStorage_imageExists_returns(true);
         $this->givenImageStorage_getImageFileNameMask_returnsFileNameMask();
         $stream = $this->givenRequest_getBody_returnsStream($request);
-        $image = $this->givenImageFactory_createFromStream_returnsImage();
+        $image = $this->givenImageFactory_createImageFromStream_returnsImage();
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
         $response = $action->processRequest($request);
@@ -96,7 +96,7 @@ class ReplaceActionTest extends TestCase
         $this->assertImageStorage_getImageFileNameMask_isCalledOnceWithFilename($filename);
         $this->assertImageCache_deleteImagesByMask_isCalledOnceWithFileNameMask();
         $this->assertRequest_getBody_isCalledOnceWithRequest($request);
-        $this->assertImageFactory_createFromStream_isCalledOnceWith($stream);
+        $this->assertImageFactory_createImageFromStream_isCalledOnceWith($stream);
         $this->assertImageStorage_putImage_isCalledOnceWithFilenameAndImage($filename, $image);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
     }
@@ -141,10 +141,10 @@ class ReplaceActionTest extends TestCase
         return $stream;
     }
 
-    private function givenImageFactory_createFromStream_returnsImage(): Image
+    private function givenImageFactory_createImageFromStream_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromStream(\Phake::anyParameters())->thenReturn($image);
+        \Phake::when($this->imageFactory)->createImageFromStream(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
     }
@@ -164,9 +164,9 @@ class ReplaceActionTest extends TestCase
         \Phake::verify($request, \Phake::times(1))->getBody();
     }
 
-    private function assertImageFactory_createFromStream_isCalledOnceWith(StreamInterface $stream): void
+    private function assertImageFactory_createImageFromStream_isCalledOnceWith(StreamInterface $stream): void
     {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createImageFromStream($stream);
     }
 
     private function assertImageStorage_putImage_isCalledOnceWithFilenameAndImage(

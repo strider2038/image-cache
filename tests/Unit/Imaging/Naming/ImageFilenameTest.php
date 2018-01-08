@@ -12,19 +12,38 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilename;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\MetadataReader;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class ImageFilenameTest extends TestCase
 {
     private const VALUE = 'value';
+    private const IMAGE_FILENAME_ID = 'image filename';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new ModelValidator();
+        $this->validator = new EntityValidator(
+            new CustomConstraintValidatorFactory(
+                new MetadataReader()
+            ),
+            new ViolationFormatter()
+        );
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $imageFilename = new ImageFilename(self::VALUE);
+
+        $id = $imageFilename->getId();
+
+        $this->assertEquals(self::IMAGE_FILENAME_ID, $id);
     }
 
     /** @test */
@@ -47,7 +66,7 @@ class ImageFilenameTest extends TestCase
     {
         $imageFilename = new ImageFilename($value);
 
-        $violations = $this->validator->validateModel($imageFilename);
+        $violations = $this->validator->validate($imageFilename);
 
         $this->assertCount($violationsCount, $violations);
     }

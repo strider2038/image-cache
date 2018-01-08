@@ -12,17 +12,36 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\MetadataReader;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class DirectoryNameTest extends TestCase
 {
-    /** @var ModelValidatorInterface */
+    private const DIRECTORY_NAME_ID = 'directory name';
+    /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new ModelValidator();
+        $this->validator = new EntityValidator(
+            new CustomConstraintValidatorFactory(
+                new MetadataReader()
+            ),
+            new ViolationFormatter()
+        );
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $directoryName = new DirectoryName('');
+
+        $id = $directoryName->getId();
+
+        $this->assertEquals(self::DIRECTORY_NAME_ID, $id);
     }
 
     /**
@@ -35,7 +54,7 @@ class DirectoryNameTest extends TestCase
     {
         $directoryName = new DirectoryName($value);
 
-        $violations = $this->validator->validateModel($directoryName);
+        $violations = $this->validator->validate($directoryName);
 
         $this->assertCount($violationsCount, $violations);
     }

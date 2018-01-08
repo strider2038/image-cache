@@ -70,7 +70,7 @@ class CreateActionTest extends TestCase
         $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
         $this->givenImageStorage_imageExists_returns(false);
         $stream = $this->givenRequest_getBody_returnsStream($request);
-        $image = $this->givenImageFactory_createFromStream_returnsImage();
+        $image = $this->givenImageFactory_createImageFromStream_returnsImage();
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
         $response = $action->processRequest($request);
@@ -79,7 +79,7 @@ class CreateActionTest extends TestCase
         $this->assertFilenameFactory_createImageFilenameFromRequest_isCalledOnceWithRequest($request);
         $this->assertImageStorage_imageExists_isCalledOnceWithFilename($filename);
         $this->assertRequest_getBody_isCalledOnce($request);
-        $this->assertImageFactory_createFromStream_isCalledOnceWith($stream);
+        $this->assertImageFactory_createImageFromStream_isCalledOnceWith($stream);
         $this->assertImageStorage_putImage_isCalledOnceWithFilenameAndImage($filename, $image);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
@@ -139,9 +139,9 @@ class CreateActionTest extends TestCase
         \Phake::verify($request, \Phake::times(1))->getBody();
     }
 
-    private function assertImageFactory_createFromStream_isCalledOnceWith(StreamInterface $stream): void
+    private function assertImageFactory_createImageFromStream_isCalledOnceWith(StreamInterface $stream): void
     {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createImageFromStream($stream);
     }
 
     private function assertImageStorage_putImage_isCalledOnceWithFilenameAndImage(
@@ -151,10 +151,10 @@ class CreateActionTest extends TestCase
         \Phake::verify($this->imageStorage, \Phake::times(1))->putImage($filename, $image);
     }
 
-    private function givenImageFactory_createFromStream_returnsImage(): Image
+    private function givenImageFactory_createImageFromStream_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromStream(\Phake::anyParameters())->thenReturn($image);
+        \Phake::when($this->imageFactory)->createImageFromStream(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
     }

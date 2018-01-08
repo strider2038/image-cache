@@ -11,27 +11,22 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Service\Routing\RoutingPath;
 use Strider2038\ImgCache\Service\Routing\RoutingPathFactory;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class RoutingPathFactoryTest extends TestCase
 {
     private const PREFIX = 'prefix';
     private const CONTROLLER_ID = 'controllerId';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
-
-    /** @var ViolationFormatterInterface */
-    private $violationFormatter;
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
-        $this->violationFormatter = \Phake::mock(ViolationFormatterInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
     }
 
     /** @test */
@@ -39,49 +34,32 @@ class RoutingPathFactoryTest extends TestCase
     {
         $mapInArray = [self::PREFIX => self::CONTROLLER_ID];
         $factory = $this->createRoutingPathFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
-        $this->givenViolations_count_returnsCount($violations, 0);
 
         $map = $factory->createRoutingPathCollection($mapInArray);
 
         $this->assertCount(1, $map);
+        $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+            RoutingPath::class,
+            InvalidConfigurationException::class
+        );
         /** @var RoutingPath $firstPath */
         $firstPath = $map->first();
         $this->assertEquals(self::PREFIX, $firstPath->getUrlPrefix());
         $this->assertEquals(self::CONTROLLER_ID, $firstPath->getControllerId());
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage Invalid routing map
-     */
-    public function createRoutingPathCollection_givenInvalidRoutingMapInArray_exceptionThrown(): void
-    {
-        $mapInArray = [self::PREFIX => self::CONTROLLER_ID];
-        $factory = $this->createRoutingPathFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
-        $this->givenViolations_count_returnsCount($violations, 1);
-
-        $factory->createRoutingPathCollection($mapInArray);
-    }
-
     private function createRoutingPathFactory(): RoutingPathFactory
     {
-        return new RoutingPathFactory($this->validator, $this->violationFormatter);
+        return new RoutingPathFactory($this->validator);
     }
 
-    private function givenValidator_validateModel_returnViolations(): ConstraintViolationListInterface
-    {
-        $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel(\Phake::anyParameters())->thenReturn($violations);
-
-        return $violations;
-    }
-
-    private function givenViolations_count_returnsCount(ConstraintViolationListInterface $violations, int $count): void
-    {
-        \Phake::when($violations)->count()->thenReturn($count);
+    private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+        string $entityClass,
+        string $exceptionClass
+    ): void {
+        \Phake::verify($this->validator, \Phake::times(1))
+            ->validateWithException(\Phake::capture($entity), \Phake::capture($exception));
+        $this->assertInstanceOf($entityClass, $entity);
+        $this->assertEquals($exceptionClass, $exception);
     }
 }

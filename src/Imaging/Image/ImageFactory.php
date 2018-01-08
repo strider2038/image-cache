@@ -10,96 +10,38 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
+use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageFactory implements ImageFactoryInterface
 {
-    /** @var SaveOptionsFactoryInterface */
-    private $saveOptionsFactory;
+    /** @var ImageParametersFactoryInterface */
+    private $parametersFactory;
 
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
-
-    /** @var FileOperationsInterface */
-    private $fileOperations;
-
-    /** @var StreamFactoryInterface */
-    private $streamFactory;
+    /** @var EntityValidatorInterface */
+    private $validator;
 
     public function __construct(
-        SaveOptionsFactoryInterface $saveOptionsFactory,
-        ImageValidatorInterface $imageValidator,
-        FileOperationsInterface $fileOperations,
-        StreamFactoryInterface $streamFactory
+        ImageParametersFactoryInterface $imageParametersFactory,
+        EntityValidatorInterface $imageValidator
     ) {
-        $this->saveOptionsFactory = $saveOptionsFactory;
-        $this->imageValidator = $imageValidator;
-        $this->fileOperations = $fileOperations;
-        $this->streamFactory = $streamFactory;
+        $this->parametersFactory = $imageParametersFactory;
+        $this->validator = $imageValidator;
     }
 
-    public function create(StreamInterface $data, SaveOptions $saveOptions): Image
+    public function createImageFromStream(StreamInterface $stream, ImageParameters $parameters = null): Image
     {
-        if (!$this->imageValidator->hasDataValidImageMimeType($data->getContents())) {
-            throw new InvalidMediaTypeException('Image has unsupported mime type');
-        }
+        $image = new Image(
+            $stream,
+            $parameters ?? $this->parametersFactory->createImageParameters()
+        );
 
-        return new Image($saveOptions, $data);
-    }
+        $this->validator->validateWithException($image, InvalidImageException::class);
 
-    public function createFromFile(string $filename): Image
-    {
-        if (!$this->fileOperations->isFile($filename)) {
-            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
-        }
-        if (!$this->imageValidator->hasValidImageExtension($filename)) {
-            throw new InvalidMediaTypeException(sprintf('File "%s" has unsupported image extension', $filename));
-        }
-        if (!$this->imageValidator->hasFileValidImageMimeType($filename)) {
-            throw new InvalidMediaTypeException(sprintf('File "%s" has unsupported mime type', $filename));
-        }
-
-        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
-        $data = $this->fileOperations->openFile($filename, $mode);
-
-        return new Image($this->createSaveOptions(), $data);
-    }
-
-    public function createFromData(string $data): Image
-    {
-        if (!$this->imageValidator->hasDataValidImageMimeType($data)) {
-            throw new InvalidMediaTypeException('Image has unsupported mime type');
-        }
-
-        $stream = $this->streamFactory->createStreamFromData($data);
-
-        return new Image($this->createSaveOptions(), $stream);
-    }
-
-    public function createFromStream(StreamInterface $stream): Image
-    {
-        if (!$this->imageValidator->hasDataValidImageMimeType($stream->getContents())) {
-            throw new InvalidMediaTypeException('Image has unsupported mime type');
-        }
-
-        $stream->rewind();
-
-        return new Image($this->createSaveOptions(), $stream);
-    }
-
-    private function createSaveOptions(): SaveOptions
-    {
-        return $this->saveOptionsFactory->create();
+        return $image;
     }
 }

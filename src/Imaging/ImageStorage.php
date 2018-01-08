@@ -35,7 +35,7 @@ class ImageStorage implements ImageStorageInterface
 
     public function getImage(ImageFilenameInterface $filename): Image
     {
-        return $this->imageExtractor->extractImage($filename);
+        return $this->imageExtractor->getProcessedImage($filename);
     }
 
     public function putImage(ImageFilenameInterface $filename, Image $image): void

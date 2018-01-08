@@ -15,5 +15,8 @@ namespace Strider2038\ImgCache\Imaging\Naming;
  */
 class ImageFilename extends AbstractName implements ImageFilenameInterface
 {
-
+    public function getId(): string
+    {
+        return 'image filename';
+    }
 }

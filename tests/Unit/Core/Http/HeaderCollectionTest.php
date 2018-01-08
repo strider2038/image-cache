@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
-use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 
 class HeaderCollectionTest extends TestCase
@@ -25,24 +25,36 @@ class HeaderCollectionTest extends TestCase
         $collection = new HeaderCollection($elements);
 
         $values = $collection->get(HttpHeaderEnum::AUTHORIZATION);
-        $this->assertInstanceOf(HeaderValueCollection::class, $values);
+        $this->assertInstanceOf(StringList::class, $values);
     }
 
     /** @test */
-    public function containsKey_givenArrayWithHeader_returnsTrue(): void
+    public function get_givenKeyAndNoElements_emptyHeaderValueCollectionReturned(): void
     {
-        $elements = $this->givenElements();
-        $collection = new HeaderCollection($elements);
+        $collection = new HeaderCollection();
 
-        $result = $collection->containsKey(HttpHeaderEnum::AUTHORIZATION);
+        $values = $collection->get(HttpHeaderEnum::AUTHORIZATION);
 
-        $this->assertTrue($result);
+        $this->assertInstanceOf(StringList::class, $values);
+        $this->assertCount(0, $values);
+    }
+
+    /**
+     * @test
+     * @expectedException \DomainException
+     * @expectedExceptionMessage Not implemented
+     */
+    public function add_givenElement_domainExceptionThrown(): void
+    {
+        $collection = new HeaderCollection();
+
+        $collection->add(new StringList());
     }
 
     private function givenElements(): array
     {
         $elements = [
-            HttpHeaderEnum::AUTHORIZATION => new HeaderValueCollection([
+            HttpHeaderEnum::AUTHORIZATION => new StringList([
                 'AuthorizationValue'
             ])
         ];

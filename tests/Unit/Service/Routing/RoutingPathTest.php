@@ -11,19 +11,39 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidator;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
 use Strider2038\ImgCache\Service\Routing\RoutingPath;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\MetadataReader;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 class RoutingPathTest extends TestCase
 {
-    /** @var ModelValidatorInterface */
+    private const ROUTING_PATH_ID = 'routing path';
+
+    /** @var EntityValidatorInterface */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new ModelValidator();
+        $this->validator = new EntityValidator(
+            new CustomConstraintValidatorFactory(
+                new MetadataReader()
+            ),
+            new ViolationFormatter()
+        );
+    }
+
+    /** @test */
+    public function getId_emptyParameters_idReturned(): void
+    {
+        $routingPath = new RoutingPath('', '');
+
+        $id = $routingPath->getId();
+
+        $this->assertEquals(self::ROUTING_PATH_ID, $id);
     }
 
     /**
@@ -40,7 +60,7 @@ class RoutingPathTest extends TestCase
     ): void {
         $path = new RoutingPath($urlPrefix, $controllerId);
 
-        $violations = $this->validator->validateModel($path);
+        $violations = $this->validator->validate($path);
 
         $this->assertGreaterThan(0, $violations->count());
         foreach ($violations as $violation) {

@@ -11,38 +11,31 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ProcessingConfigurationTest extends TestCase
 {
-    use ProviderTrait;
-
     /** @var TransformationCollection */
     private $transformations;
 
-    /** @var SaveOptions */
-    private $saveOptions;
+    /** @var ImageParameters */
+    private $imageParameters;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformations = \Phake::mock(TransformationCollection::class);
-        $this->saveOptions = \Phake::mock(SaveOptions::class);
+        $this->imageParameters = \Phake::mock(ImageParameters::class);
     }
 
-    /**
-     * @test
-     * @param bool $isDefault
-     * @dataProvider boolValuesProvider
-     */
-    public function construct_givenProperties_propertiesAreSet(bool $isDefault): void
+    /** @test */
+    public function construct_givenProperties_propertiesAreSet(): void
     {
-        $configuration = new ProcessingConfiguration($this->transformations, $this->saveOptions, $isDefault);
+        $configuration = new ProcessingConfiguration($this->transformations, $this->imageParameters);
 
         $this->assertSame($this->transformations, $configuration->getTransformations());
-        $this->assertSame($this->saveOptions, $configuration->getSaveOptions());
-        $this->assertEquals($isDefault, $configuration->isDefault());
+        $this->assertSame($this->imageParameters, $configuration->getImageParameters());
     }
 }

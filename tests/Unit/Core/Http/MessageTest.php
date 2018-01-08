@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
-use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 use Strider2038\ImgCache\Core\Http\Message;
 use Strider2038\ImgCache\Core\Streaming\NullStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
@@ -35,7 +35,7 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function setProtocolVersion_versionIs10_versionIsReturned(): void
+    public function setProtocolVersion_versionIs10_versionReturned(): void
     {
         $message = new Message();
         $protocolVersion = new HttpProtocolVersionEnum(HttpProtocolVersionEnum::V1_0);
@@ -46,7 +46,7 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function hasHeader_givenHeaderCollection_returnedIsTrue(): void
+    public function hasHeader_givenHeaderCollection_tureReturned(): void
     {
         $message = new Message();
         $headers = \Phake::mock(HeaderCollection::class);
@@ -59,11 +59,11 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function getHeader_givenHeaderCollection_headerValueCollectionIsReturned(): void
+    public function getHeader_givenHeaderCollection_headerValueCollectionReturned(): void
     {
         $message = new Message();
         $headers = \Phake::mock(HeaderCollection::class);
-        $headerValues = \Phake::mock(HeaderValueCollection::class);
+        $headerValues = \Phake::mock(StringList::class);
         \Phake::when($headers)->get(\Phake::anyParameters())->thenReturn($headerValues);
         $message->setHeaders($headers);
 
@@ -73,10 +73,10 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function getHeaderLine_givenHeaderCollection_concatenatedHeaderValuesIsReturned(): void
+    public function getHeaderLine_givenHeaderCollection_concatenatedHeaderValuesReturned(): void
     {
         $message = new Message();
-        $headerValues = new HeaderValueCollection(self::HEADER_VALUES);
+        $headerValues = new StringList(self::HEADER_VALUES);
         $headers = new HeaderCollection([HttpHeaderEnum::AUTHORIZATION => $headerValues]);
         $message->setHeaders($headers);
 
@@ -86,7 +86,7 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function getHeaderLine_givenEmptyHeaderCollection_emptyHeaderValueIsReturned(): void
+    public function getHeaderLine_givenEmptyHeaderCollection_emptyHeaderValueReturned(): void
     {
         $message = new Message();
         $message->setHeaders(new HeaderCollection());

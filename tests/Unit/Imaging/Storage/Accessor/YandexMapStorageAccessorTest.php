@@ -15,15 +15,14 @@ use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\QueryParametersCollection;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
+use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class YandexMapStorageAccessorTest extends TestCase
 {
@@ -44,11 +43,8 @@ class YandexMapStorageAccessorTest extends TestCase
         'scale' => self::SCALE,
     ];
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
-
-    /** @var ViolationFormatterInterface */
-    private $violationsFormatter;
 
     /** @var YandexMapStorageDriverInterface */
     private $storageDriver;
@@ -61,28 +57,10 @@ class YandexMapStorageAccessorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
-        $this->violationsFormatter = \Phake::mock(ViolationFormatterInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->storageDriver = \Phake::mock(YandexMapStorageDriverInterface::class);
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->logger = $this->givenLogger();
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Invalid map parameters: formatted violations
-     */
-    public function getImage_givenInvalidParameters_exceptionThrown(): void
-    {
-        $accessor = $this->createYandexMapStorageAccessor();
-        $parameters = $this->givenParameters();
-        $violations = $this->givenValidator_validateModel_returnViolations($parameters);
-        $this->givenViolations_count_returnsCount($violations, 1);
-        $this->givenViolationFormatter_formatViolations_returnsString($violations, 'formatted violations');
-
-        $accessor->getImage($parameters);
     }
 
     /** @test */
@@ -90,14 +68,17 @@ class YandexMapStorageAccessorTest extends TestCase
     {
         $accessor = $this->createYandexMapStorageAccessor();
         $parameters = $this->givenParameters();
-        $this->givenValidator_validateModel_returnViolations($parameters);
         $stream = $this->givenStorageDriver_getMapContents_returnsStream();
-        $expectedImage = $this->givenImageFactory_createFromStream_returnsImage();
+        $expectedImage = $this->givenImageFactory_createImageFromStream_returnsImage();
 
         $image = $accessor->getImage($parameters);
 
+        $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+            YandexMapParameters::class,
+            InvalidRequestValueException::class
+        );
         $this->assertStorageDriver_getMapContents_isCalledOnceWithQueryParameters(self::EXPECTED_QUERY_PARAMETERS);
-        $this->assertImageFactory_createFromStream_isCalledOnceWithStream($stream);
+        $this->assertImageFactory_createImageFromStream_isCalledOnceWithStream($stream);
         $this->assertLogger_info_isCalledOnce($this->logger);
         $this->assertSame($expectedImage, $image);
     }
@@ -106,7 +87,6 @@ class YandexMapStorageAccessorTest extends TestCase
     {
         $accessor = new YandexMapStorageAccessor(
             $this->validator,
-            $this->violationsFormatter,
             $this->storageDriver,
             $this->imageFactory
         );
@@ -114,20 +94,6 @@ class YandexMapStorageAccessorTest extends TestCase
         $accessor->setLogger($this->logger);
 
         return $accessor;
-    }
-
-    private function givenValidator_validateModel_returnViolations(
-        YandexMapParameters $parameters
-    ): ConstraintViolationListInterface {
-        $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel($parameters)->thenReturn($violations);
-
-        return $violations;
-    }
-
-    private function givenViolations_count_returnsCount(ConstraintViolationListInterface $violations, int $count): void
-    {
-        \Phake::when($violations)->count()->thenReturn($count);
     }
 
     private function givenParameters(): YandexMapParameters
@@ -162,23 +128,26 @@ class YandexMapStorageAccessorTest extends TestCase
         return $image;
     }
 
-    private function givenViolationFormatter_formatViolations_returnsString(
-        ConstraintViolationListInterface $violationList,
-        string $violations
-    ): void {
-        \Phake::when($this->violationsFormatter)->formatViolations($violationList)->thenReturn($violations);
-    }
-
-    private function assertImageFactory_createFromStream_isCalledOnceWithStream(StreamInterface $stream): void
+    private function assertImageFactory_createImageFromStream_isCalledOnceWithStream(StreamInterface $stream): void
     {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->createFromStream($stream);
+        \Phake::verify($this->imageFactory, \Phake::times(1))->createImageFromStream($stream);
     }
 
-    private function givenImageFactory_createFromStream_returnsImage(): Image
+    private function givenImageFactory_createImageFromStream_returnsImage(): Image
     {
         $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createFromStream(\Phake::anyParameters())->thenReturn($image);
+        \Phake::when($this->imageFactory)->createImageFromStream(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
+    }
+
+    private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+        string $entityClass,
+        string $exceptionClass
+    ): void {
+        \Phake::verify($this->validator, \Phake::times(1))
+            ->validateWithException(\Phake::capture($entity), \Phake::capture($exception));
+        $this->assertInstanceOf($entityClass, $entity);
+        $this->assertEquals($exceptionClass, $exception);
     }
 }

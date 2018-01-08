@@ -30,3 +30,15 @@ services:
 
     metadata_reader:
         class: Strider2038\ImgCache\Utility\MetadataReader
+
+    entity_validator:
+        class: Strider2038\ImgCache\Utility\EntityValidator
+        arguments:
+            - '@constraint_validator_factory'
+            - '@violation_formatter'
+    violation_formatter:
+        class: Strider2038\ImgCache\Utility\ViolationFormatter
+    constraint_validator_factory:
+        class: Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory
+        arguments:
+            - '@metadata_reader'

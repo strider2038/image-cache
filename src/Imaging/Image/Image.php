@@ -10,38 +10,51 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
+use Strider2038\ImgCache\Core\EntityInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
+use Strider2038\ImgCache\Utility\Validation as CustomAssert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class Image
+class Image implements EntityInterface
 {
-    /** @var SaveOptions */
-    private $saveOptions;
-
-    /** @var StreamInterface */
+    /**
+     * @CustomAssert\ImageMimeType()
+     * @var StreamInterface
+     */
     private $data;
 
-    public function __construct(SaveOptions $saveOptions, StreamInterface $data)
+    /**
+     * @Assert\Valid()
+     * @var ImageParameters
+     */
+    private $parameters;
+
+    public function __construct(StreamInterface $data, ImageParameters $parameters)
     {
-        $this->saveOptions = $saveOptions;
         $this->data = $data;
+        $this->parameters = $parameters;
     }
 
-    public function setSaveOptions(SaveOptions $saveOptions): void
+    public function getId(): string
     {
-        $this->saveOptions = $saveOptions;
-    }
-
-    public function getSaveOptions(): SaveOptions
-    {
-        return $this->saveOptions;
+        return 'image';
     }
 
     public function getData(): StreamInterface
     {
         return $this->data;
+    }
+
+    public function setParameters(ImageParameters $parameters): void
+    {
+        $this->parameters = $parameters;
+    }
+
+    public function getParameters(): ImageParameters
+    {
+        return $this->parameters;
     }
 }

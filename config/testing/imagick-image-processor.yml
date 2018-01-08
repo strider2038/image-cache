@@ -1,5 +1,6 @@
 imports:
     - { resource: 'services/core.yml' }
+    - { resource: 'services/utilities.yml' }
     - { resource: 'services/imaging.yml' }
 
 services:

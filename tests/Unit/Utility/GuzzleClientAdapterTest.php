@@ -211,7 +211,7 @@ class GuzzleClientAdapterTest extends TestCase
     private function assertHeadersAreValid(HeaderCollection $headers): void
     {
         $this->assertCount(1, $headers);
-        $contentTypeHeader = new HttpHeaderEnum(HttpHeaderEnum::CONTENT_TYPE);
+        $contentTypeHeader = HttpHeaderEnum::CONTENT_TYPE;
         $this->assertTrue($headers->containsKey($contentTypeHeader));
         $headerValues = $headers->get($contentTypeHeader);
         $this->assertCount(1, $headerValues);

@@ -11,12 +11,11 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Processing;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Image\ImageParameters;
+use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
+use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
-use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptions;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 
@@ -25,73 +24,69 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     /** @var TransformationCreatorInterface */
     private $transformationsCreator;
 
-    /** @var SaveOptionsFactoryInterface */
-    private $saveOptionsFactory;
+    /** @var ImageParametersFactoryInterface */
+    private $imageParametersFactory;
 
-    /** @var SaveOptionsConfiguratorInterface */
-    private $saveOptionsConfigurator;
+    /** @var ImageParametersConfiguratorInterface */
+    private $imageParametersConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformationsCreator = \Phake::mock(TransformationCreatorInterface::class);
-        $this->saveOptionsFactory = \Phake::mock(SaveOptionsFactoryInterface::class);
-        $this->saveOptionsConfigurator = \Phake::mock(SaveOptionsConfiguratorInterface::class);
+        $this->imageParametersFactory = \Phake::mock(ImageParametersFactoryInterface::class);
+        $this->imageParametersConfigurator = \Phake::mock(ImageParametersConfiguratorInterface::class);
     }
 
     /**
      * @test
      * @param string $configuration
      * @param int $count
-     * @param bool $isDefault
      * @dataProvider configurationsProvider
      */
     public function parse_givenConfigurationWithTransformations_countOfTransformationsReturned(
         string $configuration,
-        int $count,
-        bool $isDefault
+        int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
         $this->givenTransformationsFactory_create_returnsTransformation();
-        $defaultSaveOptions = $this->givenSaveOptionsFactory_create_returns_saveOptions();
+        $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
-        $parsedConfiguration = $parser->parse($configuration);
+        $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertSaveOptionsConfigurator_configure_isCalled(0);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
+        $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(0);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
 
     /**
      * @test
      * @param string $configuration
      * @param int $count
-     * @param bool $isDefault
      * @dataProvider configurationsProvider
      */
-    public function getRequestConfiguration_givenConfigurationWithSaveOptions_countOfSaveOptionsConfiguratorConfigureVerified(
+    public function getRequestConfiguration_givenConfigurationWithParameters_countOfParametersConfiguratorConfigureVerified(
         string $configuration,
-        int $count,
-        bool $isDefault
+        int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
         $this->givenTransformationsFactory_create_returnsNull();
-        $defaultSaveOptions = $this->givenSaveOptionsFactory_create_returns_saveOptions();
+        $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
-        $parsedConfiguration = $parser->parse($configuration);
+        $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
         $this->assertTransformationsFactory_create_isCalled($count);
-        $this->assertSaveOptionsConfigurator_configure_isCalled($count);
-        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultSaveOptions, $isDefault);
+        $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes($count);
+        $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
 
     public function configurationsProvider(): array
     {
         return [
-            ['', 0, true],
-            ['q95', 1, false],
-            ['sz85_q7', 2, false],
+            ['', 0],
+            ['q95', 1],
+            ['sz85_q7', 2],
         ];
     }
 
@@ -99,8 +94,8 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     {
         $parser = new ThumbnailProcessingConfigurationParser(
             $this->transformationsCreator,
-            $this->saveOptionsFactory,
-            $this->saveOptionsConfigurator
+            $this->imageParametersFactory,
+            $this->imageParametersConfigurator
         );
 
         return $parser;
@@ -117,14 +112,10 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
     private function verifyProcessingConfiguration(
         ProcessingConfiguration $configuration,
-        SaveOptions $defaultSaveOptions,
-        bool $isDefault
+        ImageParameters $imageParameters
     ): void {
-        $this->assertInstanceOf(ProcessingConfiguration::class, $configuration);
-        $this->assertInstanceOf(TransformationCollection::class, $configuration->getTransformations());
-        $this->assertSaveOptionsFactory_create_isCalledOnce();
-        $this->assertSame($defaultSaveOptions, $configuration->getSaveOptions());
-        $this->assertEquals($isDefault, $configuration->isDefault());
+        $this->assertImageParametersFactory_createImageParameters_isCalledOnce();
+        $this->assertSame($imageParameters, $configuration->getImageParameters());
     }
 
     private function assertTransformationsCount(int $count, ProcessingConfiguration $configuration): void
@@ -139,10 +130,10 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
             ->create(\Phake::anyParameters());
     }
 
-    private function assertSaveOptionsConfigurator_configure_isCalled(int $times): void
+    private function assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(int $times): void
     {
-        \Phake::verify($this->saveOptionsConfigurator, \Phake::times($times))
-            ->configure(\Phake::anyParameters());
+        \Phake::verify($this->imageParametersConfigurator, \Phake::times($times))
+            ->updateParametersByConfiguration(\Phake::anyParameters());
     }
 
     private function givenTransformationsFactory_create_returnsNull(): void
@@ -152,16 +143,16 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
             ->thenReturn(null);
     }
 
-    private function givenSaveOptionsFactory_create_returns_saveOptions(): SaveOptions
+    private function givenImageParametersFactory_createImageParameters_returnsImageParameters(): ImageParameters
     {
-        $defaultSaveOptions = \Phake::mock(SaveOptions::class);
-        \Phake::when($this->saveOptionsFactory)->create()->thenReturn($defaultSaveOptions);
+        $imageParameters = \Phake::mock(ImageParameters::class);
+        \Phake::when($this->imageParametersFactory)->createImageParameters()->thenReturn($imageParameters);
 
-        return $defaultSaveOptions;
+        return $imageParameters;
     }
 
-    private function assertSaveOptionsFactory_create_isCalledOnce(): void
+    private function assertImageParametersFactory_createImageParameters_isCalledOnce(): void
     {
-        \Phake::verify($this->saveOptionsFactory, \Phake::times(1))->create();
+        \Phake::verify($this->imageParametersFactory, \Phake::times(1))->createImageParameters();
     }
 }

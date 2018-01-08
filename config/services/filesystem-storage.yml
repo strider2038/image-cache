@@ -67,14 +67,14 @@ services:
     filesystem_image_extractor:
         class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@filesystem_storage_accessor'
-            - '@image_processor'
+            - '@thumbnail_image_creator'
 
     filesystem_image_writer:
         class: Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
         arguments:
-            - '@thumbnail_key_parser'
+            - '@thumbnail_filename_parser'
             - '@filesystem_storage_accessor'
 
     filesystem_storage_accessor:
@@ -82,9 +82,14 @@ services:
         arguments:
             - '@filesystem_storage_driver'
             - '@image_factory'
-            - '@direct_key_mapper'
+            - '@filesystem_storage_filename_factory'
         calls:
             - [setLogger, ['@logger']]
+
+    filesystem_storage_filename_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameFactory
+        arguments:
+            - '@filesystem_storage_driver_directory'
 
     filesystem_storage_driver_directory:
         factory:
@@ -97,5 +102,4 @@ services:
     filesystem_storage_driver:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver
         arguments:
-            - '@filesystem_storage_driver_directory'
             - '@file_operations'

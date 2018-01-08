@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Insertion;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKey;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilename;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
@@ -22,18 +22,18 @@ class SourceImageWriterTest extends TestCase
 {
     use ProviderTrait;
 
-    private const KEY = 'key';
-    private const PUBLIC_FILENAME = 'public_filename';
+    private const FILENAME = 'key';
+    private const PARSED_FILENAME_VALUE = 'public_filename';
 
-    /** @var SourceKeyParserInterface */
-    private $keyParser;
+    /** @var PlainFilenameParserInterface */
+    private $filenameParser;
 
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
     protected function setUp(): void
     {
-        $this->keyParser = \Phake::mock(SourceKeyParserInterface::class);
+        $this->filenameParser = \Phake::mock(PlainFilenameParserInterface::class);
         $this->storageAccessor = \Phake::mock(StorageAccessorInterface::class);
     }
 
@@ -45,12 +45,13 @@ class SourceImageWriterTest extends TestCase
     public function imageExists_sourceAccessorExistsReturnBool_boolIsReturned(bool $expectedExists): void
     {
         $writer = $this->createSourceImageWriter();
-        $publicFilename = self::PUBLIC_FILENAME;
-        $this->givenKeyParser_parse_returnsSourceKey();
-        $this->givenStorageAccessor_imageExists_returns($publicFilename, $expectedExists);
+        $publicFilename = self::PARSED_FILENAME_VALUE;
+        $this->givenFilenameParser_getParsedFilename_returnsPlainFilename();
+        $this->givenStorageAccessor_imageExists_returnsBoolean($publicFilename, $expectedExists);
 
-        $actualExists = $writer->imageExists(self::KEY);
+        $actualExists = $writer->imageExists(self::FILENAME);
 
+        $this->assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(self::FILENAME);
         $this->assertEquals($expectedExists, $actualExists);
     }
 
@@ -59,71 +60,71 @@ class SourceImageWriterTest extends TestCase
     {
         $writer = $this->createSourceImageWriter();
         $image = \Phake::mock(Image::class);
-        $this->givenKeyParser_parse_returnsSourceKey();
+        $this->givenFilenameParser_getParsedFilename_returnsPlainFilename();
 
-        $writer->insertImage(self::KEY, $image);
+        $writer->insertImage(self::FILENAME, $image);
 
-        $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertStorageAccessor_putImage_isCalledOnceWith($image);
+        $this->assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(self::FILENAME);
+        $this->assertStorageAccessor_putImage_isCalledOnceWithImage($image);
     }
 
     /** @test */
     public function deleteImage_givenKey_keyIsParsedAndSourceAccessorDeleteIsCalled(): void
     {
         $writer = $this->createSourceImageWriter();
-        $this->givenKeyParser_parse_returnsSourceKey();
+        $this->givenFilenameParser_getParsedFilename_returnsPlainFilename();
 
-        $writer->deleteImage(self::KEY);
+        $writer->deleteImage(self::FILENAME);
 
-        $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertStorageAccessor_deleteImage_isCalledOnce();
+        $this->assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(self::FILENAME);
+        $this->assertStorageAccessor_deleteImage_isCalledOnceWithParsedFilenameValue();
     }
 
     /** @test */
     public function getImageFileNameMask_givenKey_keyIsParsedAndFileMaskIsReturned(): void
     {
         $writer = $this->createSourceImageWriter();
-        $this->givenKeyParser_parse_returnsSourceKey();
+        $this->givenFilenameParser_getParsedFilename_returnsPlainFilename();
 
-        $filename = $writer->getImageFileNameMask(self::KEY);
+        $filename = $writer->getImageFileNameMask(self::FILENAME);
 
-        $this->assertKeyParser_parse_isCalledOnce();
-        $this->assertEquals(self::PUBLIC_FILENAME, $filename);
+        $this->assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(self::FILENAME);
+        $this->assertEquals(self::PARSED_FILENAME_VALUE, $filename);
     }
 
-    private function givenKeyParser_parse_returnsSourceKey(): SourceKey
+    private function givenFilenameParser_getParsedFilename_returnsPlainFilename(): PlainFilename
     {
-        $parsedKey = \Phake::mock(SourceKey::class);
-        \Phake::when($this->keyParser)->parse(self::KEY)->thenReturn($parsedKey);
-        \Phake::when($parsedKey)->getPublicFilename()->thenReturn(self::PUBLIC_FILENAME);
+        $parsedKey = \Phake::mock(PlainFilename::class);
+        \Phake::when($this->filenameParser)->getParsedFilename(\Phake::anyParameters())->thenReturn($parsedKey);
+        \Phake::when($parsedKey)->getValue()->thenReturn(self::PARSED_FILENAME_VALUE);
 
         return $parsedKey;
     }
 
-    private function givenStorageAccessor_imageExists_returns(string $publicFilename, bool $value): void
+    private function givenStorageAccessor_imageExists_returnsBoolean(string $publicFilename, bool $value): void
     {
         \Phake::when($this->storageAccessor)->imageExists($publicFilename)->thenReturn($value);
     }
 
-    private function assertKeyParser_parse_isCalledOnce(): void
+    private function assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(string $filename): void
     {
-        \Phake::verify($this->keyParser, \Phake::times(1))->parse(self::KEY);
+        \Phake::verify($this->filenameParser, \Phake::times(1))->getParsedFilename($filename);
     }
 
-    private function assertStorageAccessor_putImage_isCalledOnceWith(Image $image): void
+    private function assertStorageAccessor_putImage_isCalledOnceWithImage(Image $image): void
     {
         \Phake::verify($this->storageAccessor, \Phake::times(1))
-            ->putImage(self::PUBLIC_FILENAME, $image);
+            ->putImage(self::PARSED_FILENAME_VALUE, $image);
     }
 
-    private function assertStorageAccessor_deleteImage_isCalledOnce(): void
+    private function assertStorageAccessor_deleteImage_isCalledOnceWithParsedFilenameValue(): void
     {
         \Phake::verify($this->storageAccessor, \Phake::times(1))
-            ->deleteImage(self::PUBLIC_FILENAME);
+            ->deleteImage(self::PARSED_FILENAME_VALUE);
     }
 
     private function createSourceImageWriter(): SourceImageWriter
     {
-        return new SourceImageWriter($this->keyParser, $this->storageAccessor);
+        return new SourceImageWriter($this->filenameParser, $this->storageAccessor);
     }
 }

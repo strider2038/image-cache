@@ -10,21 +10,11 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Data;
 
+use Strider2038\ImgCache\Imaging\Naming\AbstractName;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class StorageFilename implements StorageFilenameInterface
+class StorageFilename extends AbstractName implements StorageFilenameInterface
 {
-    /** @var string */
-    private $value;
-
-    public function __construct($value)
-    {
-        $this->value = $value;
-    }
-
-    public function getValue(): string
-    {
-        return $this->value;
-    }
 }

@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
+use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
 
 /**
@@ -44,40 +45,39 @@ class ImageProcessor implements ImageProcessorInterface
         $this->logger = $logger;
     }
 
-    public function process(Image $image, ProcessingConfiguration $configuration): Image
+    public function transformImage(Image $image, TransformationCollection $transformations): Image
     {
-        $transformer = $this->createTransformer($image);
+        $imageTransformer = $this->createImageTransformer($image);
 
-        $transformations = $configuration->getTransformations();
         foreach ($transformations as $transformation) {
             /** @var TransformationInterface $transformation */
-            $transformation->apply($transformer);
+            $transformation->apply($imageTransformer);
         }
 
         $this->logger->info(sprintf('Transformations count applied to image: %d.', $transformations->count()));
 
-        $data = $transformer->getData();
-        $saveOptions = $configuration->getSaveOptions();
+        $data = $imageTransformer->getData();
+        $parameters = $image->getParameters();
 
-        return $this->imageFactory->create($data, $saveOptions);
+        return $this->imageFactory->createImageFromStream($data, $parameters);
     }
 
-    public function saveToFile(Image $image, string $filename): void
+    public function saveImageToFile(Image $image, string $filename): void
     {
-        $transformer = $this->createTransformer($image);
-        $saveOptions = $image->getSaveOptions();
+        $transformer = $this->createImageTransformer($image);
+        $imageParameters = $image->getParameters();
 
-        $transformer->setCompressionQuality($saveOptions->getQuality());
+        $transformer->setCompressionQuality($imageParameters->getQuality());
         $transformer->writeToFile($filename);
 
         $this->logger->info(sprintf(
             'Image was saved to file "%s" with compression quality %d.',
             $filename,
-            $saveOptions->getQuality()
+            $imageParameters->getQuality()
         ));
     }
 
-    private function createTransformer(Image $image): ImageTransformerInterface
+    private function createImageTransformer(Image $image): ImageTransformerInterface
     {
         return $this->transformerFactory->createTransformer($image->getData());
     }

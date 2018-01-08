@@ -12,12 +12,11 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactory;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\FileOperationsTrait;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class DirectoryNameFactoryTest extends TestCase
 {
@@ -25,19 +24,15 @@ class DirectoryNameFactoryTest extends TestCase
 
     private const DIRECTORY_NAME = 'directory_name';
 
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
-
-    /** @var ViolationFormatterInterface */
-    private $violationFormatter;
 
     /** @var FileOperationsInterface */
     private $fileOperations;
 
     protected function setUp(): void
     {
-        $this->validator = \Phake::mock(ModelValidatorInterface::class);
-        $this->violationFormatter = \Phake::mock(ViolationFormatterInterface::class);
+        $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->fileOperations = $this->givenFileOperations();
     }
 
@@ -53,14 +48,15 @@ class DirectoryNameFactoryTest extends TestCase
         string $expectedFilenameValue
     ): void {
         $factory = $this->createDirectoryNameFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
-        $this->givenViolations_count_returnsCount($violations, 0);
 
         $directoryName = $factory->createDirectoryName($name);
 
         $this->assertInstanceOf(DirectoryName::class, $directoryName);
         $this->assertEquals($expectedFilenameValue, $directoryName->getValue());
-        $this->assetValidator_validateModel_isCalledOnceWithAnyParameter();
+        $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+            DirectoryName::class,
+            InvalidConfigurationException::class
+        );
     }
 
     public function directoryNameProvider(): array
@@ -75,56 +71,30 @@ class DirectoryNameFactoryTest extends TestCase
      * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
      * @expectedExceptionCode 500
-     * @expectedExceptionMessage Given invalid directory name
-     */
-    public function createDirectoryName_givenInvalidName_invalidConfigurationExceptionThrown(): void
-    {
-        $factory = $this->createDirectoryNameFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
-        $this->givenViolations_count_returnsCount($violations, 1);
-
-        $factory->createDirectoryName(self::DIRECTORY_NAME);
-    }
-
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
-     * @expectedExceptionCode 500
      * @expectedExceptionMessageRegExp /Directory .* does not exist/
      */
     public function createDirectoryName_givenNotExistingNameAndCheckExistenceIsTrue_invalidConfigurationExceptionThrown(): void
     {
         $factory = $this->createDirectoryNameFactory();
-        $violations = $this->givenValidator_validateModel_returnViolations();
-        $this->givenViolations_count_returnsCount($violations, 0);
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::DIRECTORY_NAME, false);
 
         $factory->createDirectoryName(self::DIRECTORY_NAME, true);
     }
 
-    private function assetValidator_validateModel_isCalledOnceWithAnyParameter(): void
-    {
-        \Phake::verify($this->validator, \Phake::times(1))->validateModel(\Phake::anyParameters());
-    }
-
-    private function givenValidator_validateModel_returnViolations(): ConstraintViolationListInterface
-    {
-        $violations = \Phake::mock(ConstraintViolationListInterface::class);
-        \Phake::when($this->validator)->validateModel(\Phake::anyParameters())->thenReturn($violations);
-
-        return $violations;
-    }
-
-    private function givenViolations_count_returnsCount(ConstraintViolationListInterface $violations, int $count): void
-    {
-        \Phake::when($violations)->count()->thenReturn($count);
+    private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
+        string $entityClass,
+        string $exceptionClass
+    ): void {
+        \Phake::verify($this->validator, \Phake::times(1))
+            ->validateWithException(\Phake::capture($entity), \Phake::capture($exception));
+        $this->assertInstanceOf($entityClass, $entity);
+        $this->assertEquals($exceptionClass, $exception);
     }
 
     private function createDirectoryNameFactory(): DirectoryNameFactory
     {
         return new DirectoryNameFactory(
             $this->validator,
-            $this->violationFormatter,
             $this->fileOperations
         );
     }

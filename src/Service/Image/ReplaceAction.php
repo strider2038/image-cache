@@ -68,7 +68,7 @@ class ReplaceAction implements ActionInterface
         }
 
         $stream = $request->getBody();
-        $image = $this->imageFactory->createFromStream($stream);
+        $image = $this->imageFactory->createImageFromStream($stream);
         $this->imageStorage->putImage($filename, $image);
 
         return $this->responseFactory->createMessageResponse(

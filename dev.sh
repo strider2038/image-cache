@@ -1,9 +1,9 @@
 #!/bin/bash
 
-build_prod=0
+build=0
 for i in $@; do
-    if [[ "$i" == "--build-prod" || "$i" == "-p" ]]; then
-        build_prod=1
+    if [[ "$i" == "--build" || "$i" == "-b" ]]; then
+        build=1
     fi
 done
 
@@ -15,17 +15,17 @@ echo "========================================================================="
 docker stop "$container_name"
 docker rm "$container_name"
 
-if [ ${build_prod} -eq 1 ]; then
+if [ ${build} -eq 1 ]; then
     ./build.sh
+
+    echo "Building development image $container_tag..."
+    echo "========================================================================="
+
+    docker build \
+        --file Dockerfile.dev \
+        --tag "$container_tag" \
+        .
 fi
-
-echo "Building development image $container_tag..."
-echo "========================================================================="
-
-docker build \
-    --file Dockerfile.dev \
-    --tag "$container_tag" \
-    .
 
 echo "Starting container $container_name..."
 echo "========================================================================="

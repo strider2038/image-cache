@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
@@ -95,9 +96,14 @@ class ResponseFactory implements ResponseFactoryInterface
         $response->setProtocolVersion($this->request->getProtocolVersion());
 
         $headers = new HeaderCollection();
-        $headers->set(new HttpHeaderEnum(HttpHeaderEnum::CONTENT_TYPE), new HeaderValueCollection([
-            mime_content_type($filename)
-        ]));
+        $headers->set(
+            HttpHeaderEnum::CONTENT_TYPE,
+            new StringList(
+                [
+                    mime_content_type($filename)
+                ]
+            )
+        );
 
         $response->setHeaders($headers);
 

@@ -10,9 +10,9 @@
 
 namespace Strider2038\ImgCache\Imaging\Parsing\Processing;
 
-use Strider2038\ImgCache\Imaging\Parsing\SaveOptionsConfiguratorInterface;
+use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
+use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Processing\SaveOptionsFactoryInterface;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
 
@@ -24,45 +24,37 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
     /** @var TransformationCreatorInterface */
     private $transformationsCreator;
 
-    /** @var SaveOptionsFactoryInterface */
-    private $saveOptionsFactory;
+    /** @var ImageParametersFactoryInterface */
+    private $imageParametersFactory;
 
-    /** @var SaveOptionsConfiguratorInterface */
-    private $saveOptionsConfigurator;
+    /** @var ImageParametersConfiguratorInterface */
+    private $imageParametersConfigurator;
 
     public function __construct(
         TransformationCreatorInterface $transformationsCreator,
-        SaveOptionsFactoryInterface $saveOptionsFactory,
-        SaveOptionsConfiguratorInterface $saveOptionsConfigurator
+        ImageParametersFactoryInterface $imageParametersFactory,
+        ImageParametersConfiguratorInterface $imageParametersConfigurator
     ) {
         $this->transformationsCreator = $transformationsCreator;
-        $this->saveOptionsFactory = $saveOptionsFactory;
-        $this->saveOptionsConfigurator = $saveOptionsConfigurator;
+        $this->imageParametersFactory = $imageParametersFactory;
+        $this->imageParametersConfigurator = $imageParametersConfigurator;
     }
 
-    public function parse(string $configuration): ProcessingConfiguration
+    public function parseConfiguration(string $configuration): ProcessingConfiguration
     {
         $transformations = new TransformationCollection();
-        $saveOptions = $this->saveOptionsFactory->create();
-        $isDefault = true;
+        $imageParameters = $this->imageParametersFactory->createImageParameters();
+        $configurationValues = array_filter(explode('_', $configuration));
 
-        if (!empty($configuration)) {
-            $configurationValues = explode('_', $configuration);
-            $isDefault = false;
-
-            foreach ($configurationValues as $value) {
-
-                $transformation = $this->transformationsCreator->create($value);
-                if ($transformation !== null) {
-                    $transformations->add($transformation);
-                    continue;
-                }
-
-                $this->saveOptionsConfigurator->configure($saveOptions, $value);
-
+        foreach ($configurationValues as $value) {
+            $transformation = $this->transformationsCreator->create($value);
+            if ($transformation !== null) {
+                $transformations->add($transformation);
+            } else {
+                $this->imageParametersConfigurator->updateParametersByConfiguration($imageParameters, $value);
             }
         }
 
-        return new ProcessingConfiguration($transformations, $saveOptions, $isDefault);
+        return new ProcessingConfiguration($transformations, $imageParameters);
     }
 }

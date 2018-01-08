@@ -17,5 +17,5 @@ use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
  */
 interface YandexMapParametersParserInterface
 {
-    public function parse(string $key): YandexMapParameters;
+    public function parseParametersFromFilename(string $filename): YandexMapParameters;
 }

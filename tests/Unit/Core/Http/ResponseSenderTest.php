@@ -11,8 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
-use Strider2038\ImgCache\Core\Http\HeaderValueCollection;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSender;
 use Strider2038\ImgCache\Core\Streaming\NullStream;
@@ -34,9 +34,7 @@ class ResponseSenderTest extends TestCase
         $response = \Phake::mock(ResponseInterface::class);
         \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
         $headers = new HeaderCollection([
-            HttpHeaderEnum::CONTENT_TYPE => new HeaderValueCollection([
-                'text/plain'
-            ]),
+            HttpHeaderEnum::CONTENT_TYPE => new StringList(['text/plain']),
         ]);
         \Phake::when($response)->getHeaders()->thenReturn($headers);
         \Phake::when($response)->getBody()->thenReturn(new NullStream());

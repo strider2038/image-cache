@@ -34,21 +34,21 @@ class YandexMapExtractorTest extends TestCase
     }
 
     /** @test */
-    public function extract_givenKey_keyIsParsedAndImageIsReturned(): void
+    public function getProcessedImage_givenKey_keyIsParsedAndImageIsReturned(): void
     {
         $extractor = new YandexMapExtractor($this->parser, $this->storageAccessor);
-        $parameters = $this->givenParser_parse_returnsParameters();
+        $parameters = $this->givenParser_parseParametersFromFilename_returnsParameters();
         $expectedImage = $this->givenStorageAccessor_getImage_returnsImage($parameters);
 
-        $image = $extractor->extractImage(self::KEY);
+        $image = $extractor->getProcessedImage(self::KEY);
 
         $this->assertSame($expectedImage, $image);
     }
 
-    private function givenParser_parse_returnsParameters(): YandexMapParameters
+    private function givenParser_parseParametersFromFilename_returnsParameters(): YandexMapParameters
     {
         $parameters = new YandexMapParameters();
-        \Phake::when($this->parser)->parse(self::KEY)->thenReturn($parameters);
+        \Phake::when($this->parser)->parseParametersFromFilename(self::KEY)->thenReturn($parameters);
 
         return $parameters;
     }

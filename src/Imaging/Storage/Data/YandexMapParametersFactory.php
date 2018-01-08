@@ -86,7 +86,7 @@ class YandexMapParametersFactory implements YandexMapParametersFactoryInterface
         $this->scale = $scale;
     }
 
-    public function create(): YandexMapParameters
+    public function createYandexMapParameters(): YandexMapParameters
     {
         $parameters = new YandexMapParameters();
         $parameters->setLayers($this->layers);

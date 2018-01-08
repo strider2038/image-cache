@@ -2,7 +2,6 @@ services:
     router:
         class: Strider2038\ImgCache\Service\Router
         arguments:
-            - '@image_validator'
             - '@url_route_detector'
         calls:
             - [setLogger, ['@logger']]
@@ -15,8 +14,7 @@ services:
     routing_path_factory:
         class: Strider2038\ImgCache\Service\Routing\RoutingPathFactory
         arguments:
-            - '@model_validator'
-            - '@violations_formatter'
+            - '@entity_validator'
 
     routing_paths:
         factory:

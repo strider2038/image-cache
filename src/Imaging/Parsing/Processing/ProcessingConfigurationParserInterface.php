@@ -17,5 +17,5 @@ use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
  */
 interface ProcessingConfigurationParserInterface
 {
-    public function parse(string $configuration): ProcessingConfiguration;
+    public function parseConfiguration(string $configuration): ProcessingConfiguration;
 }

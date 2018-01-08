@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Core\Http;
 
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpProtocolVersionEnum;
@@ -22,7 +23,7 @@ interface MessageInterface
     public function getProtocolVersion(): HttpProtocolVersionEnum;
     public function getHeaders(): HeaderCollection;
     public function hasHeader(HttpHeaderEnum $name): bool;
-    public function getHeader(HttpHeaderEnum $name): HeaderValueCollection;
+    public function getHeader(HttpHeaderEnum $name): StringList;
     public function getHeaderLine(HttpHeaderEnum $name): string;
     public function getBody(): StreamInterface;
 }

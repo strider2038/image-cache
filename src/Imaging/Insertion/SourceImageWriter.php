@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Insertion;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Parsing\Source\SourceKeyParserInterface;
+use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParserInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
 
 /**
@@ -19,39 +19,43 @@ use Strider2038\ImgCache\Imaging\Storage\Accessor\StorageAccessorInterface;
  */
 class SourceImageWriter implements ImageWriterInterface
 {
-    /** @var SourceKeyParserInterface */
-    private $keyParser;
+    /** @var PlainFilenameParserInterface */
+    private $filenameParser;
 
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
-    public function __construct(SourceKeyParserInterface $keyParser, StorageAccessorInterface $storageAccessor)
-    {
-        $this->keyParser = $keyParser;
+    public function __construct(
+        PlainFilenameParserInterface $filenameParser,
+        StorageAccessorInterface $storageAccessor
+    ) {
+        $this->filenameParser = $filenameParser;
         $this->storageAccessor = $storageAccessor;
     }
 
-    public function imageExists(string $key): bool
+    public function imageExists(string $filename): bool
     {
-        $parsedKey = $this->keyParser->parse($key);
-        return $this->storageAccessor->imageExists($parsedKey->getPublicFilename());
+        $parsedFilename = $this->filenameParser->getParsedFilename($filename);
+
+        return $this->storageAccessor->imageExists($parsedFilename->getValue());
     }
 
-    public function insertImage(string $key, Image $image): void
+    public function insertImage(string $filename, Image $image): void
     {
-        $parsedKey = $this->keyParser->parse($key);
-        $this->storageAccessor->putImage($parsedKey->getPublicFilename(), $image);
+        $parsedFilename = $this->filenameParser->getParsedFilename($filename);
+        $this->storageAccessor->putImage($parsedFilename->getValue(), $image);
     }
 
-    public function deleteImage(string $key): void
+    public function deleteImage(string $filename): void
     {
-        $parsedKey = $this->keyParser->parse($key);
-        $this->storageAccessor->deleteImage($parsedKey->getPublicFilename());
+        $parsedFilename = $this->filenameParser->getParsedFilename($filename);
+        $this->storageAccessor->deleteImage($parsedFilename->getValue());
     }
 
-    public function getImageFileNameMask(string $key): string
+    public function getImageFileNameMask(string $filename): string
     {
-        $parsedKey = $this->keyParser->parse($key);
-        return $parsedKey->getPublicFilename();
+        $parsedFilename = $this->filenameParser->getParsedFilename($filename);
+
+        return $parsedFilename->getValue();
     }
 }

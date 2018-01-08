@@ -1,6 +1,7 @@
 imports:
     - { resource: 'services/core.yml' }
     - { resource: 'services/imaging.yml' }
+    - { resource: 'services/utilities.yml' }
     - { resource: 'services/yandex-map-storage.yml' }
 
 parameters:

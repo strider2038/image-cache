@@ -27,13 +27,11 @@ Image caching microservice with connection to cloud hostings
 - [x] Logging guzzle requests
 - [x] Add CodeSniffer (rejected) and SensioLabs Insight to CI
 - [x] Yandex.Disk source
-- [ ] Migrate to collections based on Doctrine ArrayCollection
-- [ ] Migrate to validation based on Symfony and Doctrine annotations
-  - storage and cache key as data object
+- [x] Migrate to collections based on Doctrine ArrayCollection
+- [x] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation
 - [ ] Rotate transformation
 - [ ] Flip transformation
-- [ ] Migrate from supervisor to systemd daemons
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
 - [ ] Support for building docker containers in Travis
@@ -41,7 +39,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Acceptance testing
 - [ ] Move all todos to github issues
 - [ ] Rename project to "Image caching microservice"
-- [ ] Refactor SaveOptions to be ignored while saving
+- [ ] Refactor ImageParameters to be ignored while saving
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1
@@ -50,6 +48,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Support for phpDocumentor
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor HttpClientInterface to use object-based options
+- [ ] Migrate from supervisor to systemd daemons
 
 ## Ideas
 - Google map source (inspect licensing problems)
@@ -57,3 +56,5 @@ Image caching microservice with connection to cloud hostings
 - Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php
 - Add referrer control to Security component
 - Facade ImageCachingSystem for ImageCache and ImageStorage
+- rename ImageExtractor and ImageWriter?
+- rename ImageExtractor::extractImage() and ImageWriter::insertImage()?

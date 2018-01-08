@@ -19,19 +19,15 @@ use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 use Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriverInterface;
-use Strider2038\ImgCache\Imaging\Validation\ModelValidatorInterface;
-use Strider2038\ImgCache\Imaging\Validation\ViolationFormatterInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
 {
-    /** @var ModelValidatorInterface */
+    /** @var EntityValidatorInterface */
     private $validator;
-
-    /** @var ViolationFormatterInterface */
-    private $violationFormatter;
 
     /** @var YandexMapStorageDriverInterface */
     private $storageDriver;
@@ -43,13 +39,11 @@ class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
     private $logger;
 
     public function __construct(
-        ModelValidatorInterface $validator,
-        ViolationFormatterInterface $violationFormatter,
+        EntityValidatorInterface $validator,
         YandexMapStorageDriverInterface $storageDriver,
         ImageFactoryInterface $imageFactory
     ) {
         $this->validator = $validator;
-        $this->violationFormatter = $violationFormatter;
         $this->storageDriver = $storageDriver;
         $this->imageFactory = $imageFactory;
         $this->logger = new NullLogger();
@@ -69,13 +63,7 @@ class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
             )
         );
 
-        $violations = $this->validator->validateModel($parameters);
-
-        if ($violations->count()) {
-            throw new InvalidRequestValueException(
-                sprintf('Invalid map parameters: %s.', $this->violationFormatter->formatViolations($violations))
-            );
-        }
+        $this->validator->validateWithException($parameters, InvalidRequestValueException::class);
 
         $query = new QueryParametersCollection([
             new QueryParameter('l', $parameters->getLayers()->implode()),
@@ -95,6 +83,6 @@ class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
 
         $stream = $this->storageDriver->getMapContents($query);
 
-        return $this->imageFactory->createFromStream($stream);
+        return $this->imageFactory->createImageFromStream($stream);
     }
 }

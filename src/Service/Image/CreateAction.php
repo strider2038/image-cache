@@ -64,7 +64,7 @@ class CreateAction implements ActionInterface
             );
         } else {
             $stream = $request->getBody();
-            $image = $this->imageFactory->createFromStream($stream);
+            $image = $this->imageFactory->createImageFromStream($stream);
             $this->imageStorage->putImage($filename, $image);
 
             $response = $this->responseFactory->createMessageResponse(
