@@ -10,13 +10,9 @@
 
 namespace Strider2038\ImgCache\Imaging\Image;
 
-use Strider2038\ImgCache\Core\FileOperationsInterface;
-use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Exception\FileNotFoundException;
-use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
-use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
+use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -24,71 +20,28 @@ use Strider2038\ImgCache\Imaging\Validation\ImageValidatorInterface;
 class ImageFactory implements ImageFactoryInterface
 {
     /** @var ImageParametersFactoryInterface */
-    private $imageParametersFactory;
+    private $parametersFactory;
 
-    /** @var ImageValidatorInterface */
-    private $imageValidator;
-
-    /** @var FileOperationsInterface */
-    private $fileOperations;
-
-    /** @var StreamFactoryInterface */
-    private $streamFactory;
+    /** @var EntityValidatorInterface */
+    private $validator;
 
     public function __construct(
         ImageParametersFactoryInterface $imageParametersFactory,
-        ImageValidatorInterface $imageValidator,
-        FileOperationsInterface $fileOperations,
-        StreamFactoryInterface $streamFactory
+        EntityValidatorInterface $imageValidator
     ) {
-        $this->imageParametersFactory = $imageParametersFactory;
-        $this->imageValidator = $imageValidator;
-        $this->fileOperations = $fileOperations;
-        $this->streamFactory = $streamFactory;
-    }
-
-    public function createImageFromFile(string $filename): Image
-    {
-        if (!$this->fileOperations->isFile($filename)) {
-            throw new FileNotFoundException(sprintf('File "%s" not found', $filename));
-        }
-        if (!$this->imageValidator->hasValidImageExtension($filename)) {
-            throw new InvalidMediaTypeException(sprintf('File "%s" has unsupported image extension', $filename));
-        }
-        if (!$this->imageValidator->hasFileValidImageMimeType($filename)) {
-            throw new InvalidMediaTypeException(sprintf('File "%s" has unsupported mime type', $filename));
-        }
-
-        $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
-        $data = $this->fileOperations->openFile($filename, $mode);
-
-        return new Image($data, $this->createImageParameters());
-    }
-
-    public function createImageFromData(string $data): Image
-    {
-        if (!$this->imageValidator->hasDataValidImageMimeType($data)) {
-            throw new InvalidMediaTypeException('Image has unsupported mime type');
-        }
-
-        $stream = $this->streamFactory->createStreamFromData($data);
-
-        return new Image($stream, $this->createImageParameters());
+        $this->parametersFactory = $imageParametersFactory;
+        $this->validator = $imageValidator;
     }
 
     public function createImageFromStream(StreamInterface $stream, ImageParameters $parameters = null): Image
     {
-        if (!$this->imageValidator->hasDataValidImageMimeType($stream->getContents())) {
-            throw new InvalidMediaTypeException('Image has unsupported mime type');
-        }
+        $image = new Image(
+            $stream,
+            $parameters ?? $this->parametersFactory->createImageParameters()
+        );
 
-        $stream->rewind();
+        $this->validator->validateWithException($image, InvalidImageException::class);
 
-        return new Image($stream, $parameters ?? $this->createImageParameters());
-    }
-
-    private function createImageParameters(): ImageParameters
-    {
-        return $this->imageParametersFactory->createImageParameters();
+        return $image;
     }
 }

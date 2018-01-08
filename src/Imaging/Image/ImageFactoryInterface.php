@@ -17,7 +17,5 @@ use Strider2038\ImgCache\Core\Streaming\StreamInterface;
  */
 interface ImageFactoryInterface
 {
-    public function createImageFromFile(string $filename): Image;
-    public function createImageFromData(string $data): Image;
     public function createImageFromStream(StreamInterface $stream, ImageParameters $parameters = null): Image;
 }

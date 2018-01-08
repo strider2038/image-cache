@@ -25,9 +25,7 @@ services:
         class: Strider2038\ImgCache\Imaging\Image\ImageFactory
         arguments:
             - '@image_parameters_factory'
-            - '@image_validator'
-            - '@file_operations'
-            - '@stream_factory'
+            - '@entity_validator'
 
     # imaging/parsing
     thumbnail_filename_parser:
