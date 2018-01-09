@@ -62,7 +62,3 @@ services:
     # imaging/transformation
     transformations_creator:
         class: Strider2038\ImgCache\Imaging\Transformation\TransformationCreator
-        arguments:
-            - '@transformation_factory_flyweight'
-    transformation_factory_flyweight:
-        class: Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight

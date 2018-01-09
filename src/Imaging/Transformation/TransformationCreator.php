@@ -32,7 +32,7 @@ class TransformationCreator implements TransformationCreatorInterface
          */
         foreach ($this->factoryMap as $pattern => $factory) {
             if (preg_match_all($pattern, $configuration, $matches)) {
-                return $factory->createTransformation($matches[1][0] ?? '');
+                return $factory->createTransformation($matches['parameters'][0] ?? '');
             }
         }
 
@@ -42,7 +42,7 @@ class TransformationCreator implements TransformationCreatorInterface
     private function getDefaultTransformationFactoryMap(): TransformationFactoryMap
     {
         return new TransformationFactoryMap([
-            '/^size(.*)$/' => new ResizeTransformationFactory(),
+            '/^(s|size)(?P<parameters>\d.*)$/' => new ResizeTransformationFactory(),
         ]);
     }
 }

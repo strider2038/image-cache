@@ -26,7 +26,6 @@ class TransformationCreatorTest extends TestCase
     private const INVALID_CONFIGURATION = 'configuration';
     private const CUSTOM_CONFIGURATION = 'transformation-id400x200';
     private const CUSTOM_CONFIGURATION_VALUE = '400x200';
-    private const SIZE_CONFIGURATION = 'size400x200';
 
     /** @test */
     public function createTransformation_givenConfigurationAndFactoryNotFound_nullReturned(): void
@@ -44,7 +43,7 @@ class TransformationCreatorTest extends TestCase
     {
         $factory = \Phake::mock(TransformationFactoryInterface::class);
         $factoryMap = new TransformationFactoryMap([
-            '/^transformation-id(.*)$/' => $factory
+            '/^transformation-id(?P<parameters>.*)$/' => $factory
         ]);
         $creator = new TransformationCreator($factoryMap);
         $expectedTransformation = $this->givenTransformationFactory_createTransformation_returnsTransformation($factory);
@@ -56,14 +55,29 @@ class TransformationCreatorTest extends TestCase
         $this->assertSame($expectedTransformation, $transformation);
     }
 
-    /** @test */
-    public function createTransformation_givenDefaultFactoryMapConfigurationAndFactoryFound_transformationCreatedAndReturned(): void
-    {
+    /**
+     * @test
+     * @param string $configuration
+     * @param string $expectedTransformationClass
+     * @dataProvider configurationAndTransformationClassProvider
+     */
+    public function createTransformation_givenDefaultFactoryMapConfigurationAndFactoryFound_transformationCreatedAndReturned(
+        string $configuration,
+        string $expectedTransformationClass
+    ): void {
         $creator = new TransformationCreator();
 
-        $transformation = $creator->createTransformation(self::SIZE_CONFIGURATION);
+        $transformation = $creator->createTransformation($configuration);
 
-        $this->assertInstanceOf(ResizeTransformation::class, $transformation);
+        $this->assertInstanceOf($expectedTransformationClass, $transformation);
+    }
+
+    public function configurationAndTransformationClassProvider(): array
+    {
+        return [
+            ['s400x200', ResizeTransformation::class],
+            ['size400x200', ResizeTransformation::class],
+        ];
     }
 
     private function givenTransformationFactory_createTransformation_returnsTransformation(
