@@ -35,7 +35,7 @@ services:
     thumbnail_processing_configuration_parser:
         class: Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser
         arguments:
-            - '@transformations_creator'
+            - '@transformation_creator'
             - '@image_parameters_factory'
             - '@image_parameters_configurator'
 
@@ -60,5 +60,5 @@ services:
             - '@stream_factory'
 
     # imaging/transformation
-    transformations_creator:
+    transformation_creator:
         class: Strider2038\ImgCache\Imaging\Transformation\TransformationCreator

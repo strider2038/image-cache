@@ -19,10 +19,12 @@ use Strider2038\ImgCache\Exception\InvalidRequestValueException;
  */
 class ResizeTransformationFactory implements TransformationFactoryInterface
 {
+    private const PARSING_PATTERN = '/^(\d+)(x(\d+))?([fswh]{1})?$/';
+
     public function createTransformation(string $configuration): TransformationInterface
     {
         $isValid = preg_match(
-            '/^(\d+)(x(\d+)){0,1}([fswh]{1}){0,1}$/', 
+            self::PARSING_PATTERN,
             strtolower($configuration),
             $matches
         );
