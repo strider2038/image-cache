@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
  */
 class TransformationsFactoryInterfaceMock implements TransformationFactoryInterface
 {
-    public function createTransformation(string $configuration): TransformationInterface
+    public function createTransformation(string $stringParameters): TransformationInterface
     {
         return new class implements TransformationInterface {
             public function apply(ImageTransformerInterface $image): void {}

@@ -11,8 +11,11 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
+use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -20,30 +23,37 @@ use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 class ResizeTransformationFactory implements TransformationFactoryInterface
 {
     private const PARSING_PATTERN = '/^(\d+)(x(\d+))?([fswh]{1})?$/';
+    private const PARAMETER_NAMES = ['width', 'height', 'mode'];
 
-    public function createTransformation(string $configuration): TransformationInterface
+    /** @var StringParametersParserInterface */
+    private $parametersParser;
+
+    /** @var EntityValidatorInterface */
+    private $validator;
+
+    public function __construct(StringParametersParserInterface $parametersParser, EntityValidatorInterface $validator)
     {
-        $isValid = preg_match(
+        $this->parametersParser = $parametersParser;
+        $this->validator = $validator;
+    }
+
+    public function createTransformation(string $stringParameters): TransformationInterface
+    {
+        $parametersList = $this->parametersParser->parseParameters(
             self::PARSING_PATTERN,
-            strtolower($configuration),
-            $matches
+            new StringList(self::PARAMETER_NAMES),
+            strtolower($stringParameters)
         );
 
-        if (!$isValid) {
-            throw new InvalidRequestValueException('Invalid config for resize transformation');
-        }
-
-        $width = $matches[1] ?? 0;
-        $height = !empty($matches[3]) ? (int) $matches[3] : $width;
-        $modeCode = $matches[4] ?? null;
-
-        if (ResizeModeEnum::isValid($modeCode)) {
-            $mode = new ResizeModeEnum($modeCode);
-        } else {
-            $mode = new ResizeModeEnum(ResizeModeEnum::STRETCH);
-        }
+        $width = (int) $parametersList->get('width');
+        $height = (int) $parametersList->get('height');
+        $height = $height === 0 ? $width : $height;
+        $modeCode = $parametersList->get('mode');
+        $mode = new ResizeModeEnum(ResizeModeEnum::isValid($modeCode) ? $modeCode : ResizeModeEnum::STRETCH);
 
         $parameters = new ResizeParameters($width, $height, $mode);
+
+        $this->validator->validateWithException($parameters, InvalidRequestValueException::class);
 
         return new ResizeTransformation($parameters);
     }
