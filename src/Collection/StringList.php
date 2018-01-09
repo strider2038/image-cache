@@ -51,7 +51,7 @@ class StringList extends ArrayCollection
         return implode($glue, $this->toArray());
     }
 
-    public static function createFromString(string $list, $delimiter = ','): StringList
+    public static function createFromString(string $list, string $delimiter = ','): StringList
     {
         return new self(explode($delimiter, $list));
     }
