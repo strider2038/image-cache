@@ -11,6 +11,8 @@
 namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
+use Strider2038\ImgCache\Imaging\Transformation\FlipTransformation;
+use Strider2038\ImgCache\Imaging\Transformation\FlopTransformation;
 use Strider2038\ImgCache\Imaging\Transformation\ResizeTransformation;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreator;
 use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
@@ -28,6 +30,31 @@ class TransformationCreatorTest extends FunctionalTestCase
     {
         $container = $this->loadContainer('transformation-creator.yml');
         $this->transformationCreator = $container->get('transformation_creator');
+    }
+
+    /**
+     * @test
+     * @param string $configuration
+     * @param string $transformationClass
+     * @dataProvider configurationAndTransformationClassProvider
+     */
+    public function createTransformation_givenStringConfiguration_expectedTransformationCreatedAndReturned(
+        string $configuration,
+        string $transformationClass
+    ): void {
+        $transformation = $this->transformationCreator->createTransformation($configuration);
+
+        $this->assertInstanceOf($transformationClass, $transformation);
+    }
+
+    public function configurationAndTransformationClassProvider(): array
+    {
+        return [
+            ['s200x100', ResizeTransformation::class],
+            ['size200x100', ResizeTransformation::class],
+            ['flip', FlipTransformation::class],
+            ['flop', FlopTransformation::class],
+        ];
     }
 
     /**

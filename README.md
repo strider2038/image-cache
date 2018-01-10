@@ -31,7 +31,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation
 - [ ] Rotate transformation
-- [ ] Flip transformation
+- [x] Flip and flop transformations
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
 - [ ] Support for building docker containers in Travis

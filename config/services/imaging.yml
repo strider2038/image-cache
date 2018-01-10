@@ -72,9 +72,15 @@ services:
         arguments:
             -
                 /^(s|size)(?P<parameters>\d.*)$/: '@resize_transformation_factory'
+                /^flip$/: '@flip_transformation_factory'
+                /^flop$/: '@flop_transformation_factory'
 
     resize_transformation_factory:
         class: Strider2038\ImgCache\Imaging\Transformation\ResizeTransformationFactory
         arguments:
             - '@string_parameters_parser'
             - '@entity_validator'
+    flip_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Transformation\FlipTransformationFactory
+    flop_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Transformation\FlopTransformationFactory
