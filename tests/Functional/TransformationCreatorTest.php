@@ -65,6 +65,14 @@ class TransformationCreatorTest extends FunctionalTestCase
             ['s200x300', 200, 300, ResizeModeEnum::STRETCH],
             ['s200f', 200, 200, ResizeModeEnum::FIT_IN],
             ['s150', 150, 150, ResizeModeEnum::STRETCH],
+            ['size100x100f', 100, 100, ResizeModeEnum::FIT_IN],
+            ['size500x200s', 500, 200, ResizeModeEnum::STRETCH],
+            ['size50x1000w', 50, 1000, ResizeModeEnum::PRESERVE_WIDTH],
+            ['size300x200h', 300, 200, ResizeModeEnum::PRESERVE_HEIGHT],
+            ['size400X250H', 400, 250, ResizeModeEnum::PRESERVE_HEIGHT],
+            ['size200x300', 200, 300, ResizeModeEnum::STRETCH],
+            ['size200f', 200, 200, ResizeModeEnum::FIT_IN],
+            ['size150', 150, 150, ResizeModeEnum::STRETCH],
         ];
     }
 }

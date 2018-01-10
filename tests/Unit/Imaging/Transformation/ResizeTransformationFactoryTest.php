@@ -28,7 +28,7 @@ class ResizeTransformationFactoryTest extends TestCase
 {
     private const STRING_PARAMETERS = 'String Parameters';
     private const STRING_PARAMETERS_LOWER_CASE = 'string parameters';
-    private const PARSING_PATTERN = '/^(\d+)(x(\d+))?([fswh]{1})?$/';
+    private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
     private const PARAMETER_NAMES = ['width', 'height', 'mode'];
 
     /** @var StringParametersParserInterface */

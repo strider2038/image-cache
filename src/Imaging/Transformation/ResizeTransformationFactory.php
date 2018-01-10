@@ -22,7 +22,7 @@ use Strider2038\ImgCache\Utility\EntityValidatorInterface;
  */
 class ResizeTransformationFactory implements TransformationFactoryInterface
 {
-    private const PARSING_PATTERN = '/^(\d+)(x(\d+))?([fswh]{1})?$/';
+    private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
     private const PARAMETER_NAMES = ['width', 'height', 'mode'];
 
     /** @var StringParametersParserInterface */

@@ -19,9 +19,9 @@ class TransformationCreator implements TransformationCreatorInterface
     /** @var TransformationFactoryMap */
     private $factoryMap;
     
-    public function __construct(TransformationFactoryMap $factoryMap = null)
+    public function __construct(TransformationFactoryMap $factoryMap)
     {
-        $this->factoryMap = $factoryMap ?? $this->getDefaultTransformationFactoryMap();
+        $this->factoryMap = $factoryMap;
     }
 
     public function createTransformation(string $configuration): ? TransformationInterface
@@ -37,12 +37,5 @@ class TransformationCreator implements TransformationCreatorInterface
         }
 
         return null;
-    }
-
-    private function getDefaultTransformationFactoryMap(): TransformationFactoryMap
-    {
-        return new TransformationFactoryMap([
-            '/^(s|size)(?P<parameters>\d.*)$/' => new ResizeTransformationFactory(),
-        ]);
     }
 }

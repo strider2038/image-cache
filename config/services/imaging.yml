@@ -38,6 +38,8 @@ services:
             - '@transformation_creator'
             - '@image_parameters_factory'
             - '@image_parameters_configurator'
+    string_parameters_parser:
+        class: Strider2038\ImgCache\Imaging\Parsing\StringParametersParser
 
     # imaging/processing
     image_parameters_factory:
@@ -62,3 +64,17 @@ services:
     # imaging/transformation
     transformation_creator:
         class: Strider2038\ImgCache\Imaging\Transformation\TransformationCreator
+        arguments:
+            - '@transformation_factory_map'
+
+    transformation_factory_map:
+        class: Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryMap
+        arguments:
+            -
+                /^(s|size)(?P<parameters>\d.*)$/: '@resize_transformation_factory'
+
+    resize_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Transformation\ResizeTransformationFactory
+        arguments:
+            - '@string_parameters_parser'
+            - '@entity_validator'
