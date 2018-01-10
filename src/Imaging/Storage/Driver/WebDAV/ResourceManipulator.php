@@ -43,7 +43,7 @@ class ResourceManipulator implements ResourceManipulatorInterface
             throw new FileNotFoundException(sprintf('File "%s" not found in storage.', $resourceUri));
         }
 
-        $this->checkResponseIsValid($response,HttpStatusCodeEnum::OK);
+        $this->checkResponseIsValid($response, HttpStatusCodeEnum::OK);
 
         return $response->getBody();
     }

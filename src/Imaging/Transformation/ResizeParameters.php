@@ -12,8 +12,6 @@ namespace Strider2038\ImgCache\Imaging\Transformation;
 
 use Strider2038\ImgCache\Core\EntityInterface;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
-use Strider2038\ImgCache\Exception\InvalidRequestValueException;
-use Strider2038\ImgCache\Imaging\Processing\Size;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
