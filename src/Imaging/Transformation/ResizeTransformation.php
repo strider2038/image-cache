@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
 use Strider2038\ImgCache\Imaging\Processing\Rectangle;
 use Strider2038\ImgCache\Imaging\Processing\Size;
+use Strider2038\ImgCache\Imaging\Processing\SizeInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -37,24 +38,12 @@ class ResizeTransformation implements TransformationInterface
     public function apply(ImageTransformerInterface $transformer): void
     {
         $sourceSize = $transformer->getSize();
-
-        $ratios = [
-            (float) $this->parameters->getWidth() / (float) $sourceSize->getWidth(),
-            (float) $this->parameters->getHeight() / (float) $sourceSize->getHeight(),
-        ];
-        
-        $ratio = 1;
-        switch ($this->parameters->getMode()->getValue()) {
-            case ResizeModeEnum::FIT_IN: $ratio = min($ratios); break;
-            case ResizeModeEnum::STRETCH: $ratio = max($ratios); break;
-            case ResizeModeEnum::PRESERVE_WIDTH: $ratio = $ratios[0]; break;
-            case ResizeModeEnum::PRESERVE_HEIGHT: $ratio = $ratios[1]; break;
-        }
-
+        $ratio = $this->calculateImageRatio($sourceSize);
         $newSize = new Size(
             round($sourceSize->getWidth() * $ratio),
             round($sourceSize->getHeight() * $ratio)
         );
+
         $transformer->resize($newSize);
         
         if ($this->parameters->getMode()->getValue() === ResizeModeEnum::STRETCH) {
@@ -66,5 +55,31 @@ class ResizeTransformation implements TransformationInterface
             );
             $transformer->crop($cropRectangle);
         }
+    }
+
+    private function calculateImageRatio(SizeInterface $sourceSize): float
+    {
+        $ratios = [
+            (float)$this->parameters->getWidth() / (float)$sourceSize->getWidth(),
+            (float)$this->parameters->getHeight() / (float)$sourceSize->getHeight(),
+        ];
+
+        $ratio = 1;
+        switch ($this->parameters->getMode()->getValue()) {
+            case ResizeModeEnum::FIT_IN:
+                $ratio = min($ratios);
+                break;
+            case ResizeModeEnum::STRETCH:
+                $ratio = max($ratios);
+                break;
+            case ResizeModeEnum::PRESERVE_WIDTH:
+                $ratio = $ratios[0];
+                break;
+            case ResizeModeEnum::PRESERVE_HEIGHT:
+                $ratio = $ratios[1];
+                break;
+        }
+
+        return $ratio;
     }
 }
