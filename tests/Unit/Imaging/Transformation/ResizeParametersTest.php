@@ -13,46 +13,73 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Imaging\Transformation\ResizeParameters;
+use Strider2038\ImgCache\Utility\EntityValidator;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+use Strider2038\ImgCache\Utility\MetadataReader;
+use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
+use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class ResizeParametersTest extends TestCase
 {
-    private const MIN_VALUE = 20;
-    private const MAX_VALUE = 2000;
+    private const RESIZE_PARAMETERS_ID = 'resize parameters';
+
+    /** @var EntityValidatorInterface */
+    private $validator;
+
+    protected function setUp(): void
+    {
+        $this->validator = new EntityValidator(
+            new CustomConstraintValidatorFactory(
+                new MetadataReader()
+            ),
+            new ViolationFormatter()
+        );
+    }
 
     /** @test */
-    public function construct_givenParameters_parametersAreSet(): void
+    public function getId_emptyParameters_idReturned(): void
     {
-        $mode = new ResizeModeEnum(ResizeModeEnum::STRETCH);
+        $directoryName = new ResizeParameters(0, 0, new ResizeModeEnum(ResizeModeEnum::STRETCH));
 
-        $parameters = new ResizeParameters(self::MIN_VALUE, self::MAX_VALUE, $mode);
+        $id = $directoryName->getId();
 
-        $this->assertEquals(self::MIN_VALUE, $parameters->getWidth());
-        $this->assertEquals(self::MAX_VALUE, $parameters->getHeight());
-        $this->assertEquals(ResizeModeEnum::STRETCH, $parameters->getMode()->getValue());
+        $this->assertEquals(self::RESIZE_PARAMETERS_ID, $id);
     }
 
     /**
-     * @dataProvider incorrectParametersProvider
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage of the image must be between
+     * @test
      * @param int $width
      * @param int $height
+     * @param string $mode
+     * @param int $violationsCount
+     * @dataProvider resizeParametersAndViolationsCountProvider
      */
-    public function testConstruct_IncorrectWidthHeightOrMode_ExceptionThrown(int $width, int $height): void
-    {
-        $mode = new ResizeModeEnum(ResizeModeEnum::STRETCH);
+    public function validate_givenWidthAndHeightAndMode_violationsReturned(
+        int $width,
+        int $height,
+        string $mode,
+        int $violationsCount
+    ): void {
+        $resizeParameters = new ResizeParameters($width, $height, new ResizeModeEnum($mode));
 
-        new ResizeParameters($width, $height, $mode);
+        $violations = $this->validator->validate($resizeParameters);
+
+        $this->assertCount($violationsCount, $violations);
+        $this->assertEquals($width, $resizeParameters->getWidth());
+        $this->assertEquals($height, $resizeParameters->getHeight());
+        $this->assertEquals($mode, $resizeParameters->getMode()->getValue());
     }
 
-    public function incorrectParametersProvider(): array
+    public function resizeParametersAndViolationsCountProvider(): array
     {
         return [
-            [self::MIN_VALUE - 1, 100],
-            [self::MAX_VALUE + 1, 100],
-            [100, self::MIN_VALUE - 1],
-            [100, self::MAX_VALUE + 1],
+            [20, 20, ResizeModeEnum::FIT_IN, 0],
+            [19, 20, ResizeModeEnum::FIT_IN, 1],
+            [2000, 20, ResizeModeEnum::FIT_IN, 0],
+            [2001, 20, ResizeModeEnum::FIT_IN, 1],
+            [20, 19, ResizeModeEnum::FIT_IN, 1],
+            [20, 2000, ResizeModeEnum::FIT_IN, 0],
+            [20, 2001, ResizeModeEnum::FIT_IN, 1],
         ];
     }
 }

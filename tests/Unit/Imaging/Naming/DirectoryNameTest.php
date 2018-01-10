@@ -21,6 +21,7 @@ use Strider2038\ImgCache\Utility\ViolationFormatter;
 class DirectoryNameTest extends TestCase
 {
     private const DIRECTORY_NAME_ID = 'directory name';
+
     /** @var EntityValidatorInterface */
     private $validator;
 

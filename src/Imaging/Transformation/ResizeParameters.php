@@ -10,44 +10,58 @@
 
 namespace Strider2038\ImgCache\Imaging\Transformation;
 
+use Strider2038\ImgCache\Core\EntityInterface;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Processing\Size;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeParameters extends Size
+class ResizeParameters implements EntityInterface
 {
-    private const MIN_VALUE = 20;
-    private const MAX_VALUE = 2000;
+    /**
+     * @Assert\GreaterThanOrEqual(20)
+     * @Assert\LessThanOrEqual(2000)
+     * @var int
+     */
+    private $width;
+
+    /**
+     * @Assert\GreaterThanOrEqual(20)
+     * @Assert\LessThanOrEqual(2000)
+     * @var int
+     */
+    private $height;
 
     /** @var ResizeModeEnum */
     private $mode;
 
     public function __construct(int $width, int $height, ResizeModeEnum $mode)
     {
-        parent::__construct($width, $height);
+        $this->width = $width;
+        $this->height = $height;
         $this->mode = $mode;
-        $this->validateValue('Width', $width);
-        $this->validateValue('Height', $height);
+    }
+
+    public function getId(): string
+    {
+        return 'resize parameters';
+    }
+
+    public function getWidth(): int
+    {
+        return $this->width;
+    }
+
+    public function getHeight(): int
+    {
+        return $this->height;
     }
 
     public function getMode(): ResizeModeEnum
     {
         return $this->mode;
-    }
-
-    private function validateValue(string $name, int $value): void
-    {
-        if ($value < self::MIN_VALUE || $value > self::MAX_VALUE) {
-            $message = sprintf(
-                '%s of the image must be between %d and %d',
-                $name,
-                self::MIN_VALUE,
-                self::MAX_VALUE
-            );
-            throw new InvalidRequestValueException($message);
-        }
     }
 }
