@@ -66,6 +66,20 @@ class ImagickTransformer implements ImageTransformerInterface
         return $this;
     }
 
+    public function flip(): ImageTransformerInterface
+    {
+        $this->imagick->flipImage();
+
+        return $this;
+    }
+
+    public function flop(): ImageTransformerInterface
+    {
+        $this->imagick->flopImage();
+
+        return $this;
+    }
+
     public function getSize(): SizeInterface
     {
         return new Size($this->imagick->getImageWidth(), $this->imagick->getImageHeight());

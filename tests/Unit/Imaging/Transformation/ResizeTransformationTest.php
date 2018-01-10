@@ -113,6 +113,8 @@ class ResizeTransformationTest extends TestCase
                 return new Size($this->width, $this->height);
             }
 
+            public function flip(): ImageTransformerInterface {}
+            public function flop(): ImageTransformerInterface {}
             public function getImage(): Image {}
             public function setCompressionQuality(int $quality): ImageTransformerInterface {}
             public function writeToFile(string $filename): ImageTransformerInterface {}
