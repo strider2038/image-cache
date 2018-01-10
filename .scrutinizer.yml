@@ -1,15 +1,18 @@
 build:
-  environment:
-    php:
-      version: 7.1
-  dependencies:
-    before:
-      - sudo apt-get install -y libmagickwand-dev libmagickcore-dev
-      - pecl install imagick
-  tests:
-    override:
-      -
-        command: ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
-        coverage:
-          file: ./build/logs/clover.xml
-          format: php-clover
+    nodes:
+        application:
+            environment:
+                php:
+                    version: 7.1
+            dependencies:
+                before:
+                    - sudo apt-get install -y libmagickwand-dev libmagickcore-dev
+                    - pecl install imagick
+            tests:
+                override:
+                    - php-scrutinizer-run
+                    -
+                        command: ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
+                        coverage:
+                            file: ./build/logs/clover.xml
+                            format: php-clover
