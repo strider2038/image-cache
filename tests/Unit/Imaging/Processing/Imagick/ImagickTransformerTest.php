@@ -71,7 +71,7 @@ class ImagickTransformerTest extends FileTestCase
     }
 
     /** @test */
-    public function flip_givenSize_imageFlipped(): void
+    public function flip_noParameters_imageFlipped(): void
     {
         $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
         $transformer = $this->createTransformer($imagick);
@@ -83,12 +83,24 @@ class ImagickTransformerTest extends FileTestCase
     }
 
     /** @test */
-    public function flop_givenSize_imageFlopped(): void
+    public function flop_noParameters_imageFlopped(): void
     {
         $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
         $transformer = $this->createTransformer($imagick);
 
         $returnedTransformer = $transformer->flop();
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertPixelColorIsBlack($imagick, 3, 0);
+    }
+
+    /** @test */
+    public function rotate_given90degrees_imageRotatedBy90degreesClockwise(): void
+    {
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
+        $transformer = $this->createTransformer($imagick);
+
+        $returnedTransformer = $transformer->rotate(90);
 
         $this->assertSame($returnedTransformer, $transformer);
         $this->assertPixelColorIsBlack($imagick, 3, 0);

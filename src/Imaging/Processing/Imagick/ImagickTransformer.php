@@ -80,6 +80,13 @@ class ImagickTransformer implements ImageTransformerInterface
         return $this;
     }
 
+    public function rotate(float $degree): ImageTransformerInterface
+    {
+        $this->imagick->rotateImage(new \ImagickPixel('#00000000'), $degree);
+
+        return $this;
+    }
+
     public function getSize(): SizeInterface
     {
         return new Size($this->imagick->getImageWidth(), $this->imagick->getImageHeight());

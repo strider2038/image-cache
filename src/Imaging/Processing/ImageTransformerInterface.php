@@ -21,6 +21,7 @@ interface ImageTransformerInterface
     public function crop(RectangleInterface $rectangle): ImageTransformerInterface;
     public function flip(): ImageTransformerInterface;
     public function flop(): ImageTransformerInterface;
+    public function rotate(float $degree): ImageTransformerInterface;
     public function setCompressionQuality(int $quality): ImageTransformerInterface;
     public function writeToFile(string $filename): ImageTransformerInterface;
     public function getSize(): SizeInterface;
