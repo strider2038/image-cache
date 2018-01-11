@@ -39,9 +39,9 @@ class ResizeParametersTest extends TestCase
     /** @test */
     public function getId_emptyParameters_idReturned(): void
     {
-        $directoryName = new ResizeParameters(0, 0, new ResizeModeEnum(ResizeModeEnum::STRETCH));
+        $parameters = new ResizeParameters(0, 0, new ResizeModeEnum(ResizeModeEnum::STRETCH));
 
-        $id = $directoryName->getId();
+        $id = $parameters->getId();
 
         $this->assertEquals(self::RESIZE_PARAMETERS_ID, $id);
     }
