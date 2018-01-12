@@ -13,8 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
-use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
 
 class ProcessingConfigurationTest extends TestCase
 {

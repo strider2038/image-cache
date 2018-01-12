@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
-use Strider2038\ImgCache\Imaging\Transformation\RotatingTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformation;
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Transformation\RotationParameters;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\RotationParameters;
 
 class RotatingTransformationTest extends TestCase
 {

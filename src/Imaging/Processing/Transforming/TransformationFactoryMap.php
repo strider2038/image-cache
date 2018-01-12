@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
+namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
 use Strider2038\ImgCache\Collection\AbstractClassCollection;
 

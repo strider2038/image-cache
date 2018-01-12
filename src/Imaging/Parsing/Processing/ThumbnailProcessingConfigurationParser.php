@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Processing;
 use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

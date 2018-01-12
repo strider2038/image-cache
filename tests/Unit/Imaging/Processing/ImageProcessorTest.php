@@ -19,8 +19,8 @@ use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessor;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerFactoryInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 class ImageProcessorTest extends TestCase

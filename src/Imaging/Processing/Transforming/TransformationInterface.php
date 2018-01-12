@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of ImgCache.
  *
@@ -8,15 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
+namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
+
+use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FlopTransformationFactory implements TransformationFactoryInterface
+interface TransformationInterface
 {
-    public function createTransformation(string $stringParameters): TransformationInterface
-    {
-        return new FlopTransformation();
-    }
+    public function apply(ImageTransformerInterface $transformer): void;
 }

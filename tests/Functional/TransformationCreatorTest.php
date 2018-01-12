@@ -11,11 +11,10 @@
 namespace Strider2038\ImgCache\Tests\Functional;
 
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
-use Strider2038\ImgCache\Imaging\Transformation\FlipTransformation;
-use Strider2038\ImgCache\Imaging\Transformation\FlopTransformation;
-use Strider2038\ImgCache\Imaging\Transformation\ResizeTransformation;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCreator;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\FlopTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 /**

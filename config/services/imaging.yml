@@ -63,12 +63,12 @@ services:
 
     # imaging/transformation
     transformation_creator:
-        class: Strider2038\ImgCache\Imaging\Transformation\TransformationCreator
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreator
         arguments:
             - '@transformation_factory_map'
 
     transformation_factory_map:
-        class: Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryMap
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryMap
         arguments:
             -
                 /^(s|size)(?P<parameters>\d.*)$/: '@resize_transformation_factory'
@@ -76,11 +76,11 @@ services:
                 /^flop$/: '@flop_transformation_factory'
 
     resize_transformation_factory:
-        class: Strider2038\ImgCache\Imaging\Transformation\ResizeTransformationFactory
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformationFactory
         arguments:
             - '@string_parameters_parser'
             - '@entity_validator'
     flip_transformation_factory:
-        class: Strider2038\ImgCache\Imaging\Transformation\FlipTransformationFactory
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformationFactory
     flop_transformation_factory:
-        class: Strider2038\ImgCache\Imaging\Transformation\FlopTransformationFactory
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\FlopTransformationFactory

@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryMap;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryMap;
 
 class TransformationFactoryMapTest extends TestCase
 {

@@ -8,17 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
+namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FlopTransformation implements TransformationInterface
+class FlipTransformation implements TransformationInterface
 {
     public function apply(ImageTransformerInterface $transformer): void
     {
-        $transformer->flop();
+        $transformer->flip();
     }
 }

@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
-use Strider2038\ImgCache\Imaging\Transformation\ResizeParameters;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeParameters;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Strider2038\ImgCache\Utility\MetadataReader;

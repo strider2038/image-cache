@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
-use Strider2038\ImgCache\Imaging\Transformation\FlipTransformation;
-use Strider2038\ImgCache\Imaging\Transformation\FlipTransformationFactory;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformationFactory;
 use PHPUnit\Framework\TestCase;
 
 class FlipTransformationFactoryTest extends TestCase

@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
+namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class FlipTransformationFactory implements TransformationFactoryInterface
+class FlopTransformationFactory implements TransformationFactoryInterface
 {
     public function createTransformation(string $stringParameters): TransformationInterface
     {
-        return new FlipTransformation();
+        return new FlopTransformation();
     }
 }

@@ -8,25 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Transformation;
+namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class RotatingTransformation implements TransformationInterface
+class FlopTransformation implements TransformationInterface
 {
-    /** @var RotationParameters */
-    private $parameters;
-
-    public function __construct(RotationParameters $parameters)
-    {
-        $this->parameters = $parameters;
-    }
-
     public function apply(ImageTransformerInterface $transformer): void
     {
-        $transformer->rotate($this->parameters->getDegree());
+        $transformer->flop();
     }
 }

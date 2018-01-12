@@ -16,8 +16,8 @@ use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationInterface;
 
 class ThumbnailProcessingConfigurationParserTest extends TestCase
 {

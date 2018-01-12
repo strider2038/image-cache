@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Transformation\ResizeTransformation;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCreator;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryMap;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreator;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryMap;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
