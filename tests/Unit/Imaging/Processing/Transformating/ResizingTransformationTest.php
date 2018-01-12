@@ -20,12 +20,12 @@ use Strider2038\ImgCache\Imaging\Processing\RectangleInterface;
 use Strider2038\ImgCache\Imaging\Processing\Size;
 use Strider2038\ImgCache\Imaging\Processing\SizeInterface;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeParameters;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeTransformationTest extends TestCase
+class ResizingTransformationTest extends TestCase
 {
     /**
      * @test
@@ -55,7 +55,7 @@ class ResizeTransformationTest extends TestCase
         $transformer->width = $sourceWidth;
         $transformer->height = $sourceHeight;
         $parameters = new ResizeParameters($resizeWidth, $resizeHeight, new ResizeModeEnum($resizeMode));
-        $transformation = new ResizeTransformation($parameters);
+        $transformation = new ResizingTransformation($parameters);
 
         $transformation->apply($transformer);
 

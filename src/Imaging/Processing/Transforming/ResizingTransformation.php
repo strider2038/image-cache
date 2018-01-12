@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Imaging\Processing\SizeInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeTransformation implements TransformationInterface
+class ResizingTransformation implements TransformationInterface
 {
     /** @var ResizeParameters */
     private $parameters;

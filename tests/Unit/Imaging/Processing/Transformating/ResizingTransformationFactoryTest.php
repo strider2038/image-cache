@@ -17,14 +17,14 @@ use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeParameters;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformation;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformationFactory;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformationFactory;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeTransformationFactoryTest extends TestCase
+class ResizingTransformationFactoryTest extends TestCase
 {
     private const STRING_PARAMETERS = 'String Parameters';
     private const STRING_PARAMETERS_LOWER_CASE = 'string parameters';
@@ -61,7 +61,7 @@ class ResizeTransformationFactoryTest extends TestCase
         $expectedHeight,
         $expectedMode
     ): void {
-        $factory = new ResizeTransformationFactory($this->parametersParser, $this->validator);
+        $factory = new ResizingTransformationFactory($this->parametersParser, $this->validator);
         $parametersList = new StringList([
             'width' => $stringWidth,
             'height' => $stringHeight,
@@ -69,10 +69,10 @@ class ResizeTransformationFactoryTest extends TestCase
         ]);
         $this->givenStringParametersParser_parseParameters_returnsParametersList($parametersList);
 
-        /** @var ResizeTransformation $transformation */
+        /** @var ResizingTransformation $transformation */
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
-        $this->assertInstanceOf(ResizeTransformation::class, $transformation);
+        $this->assertInstanceOf(ResizingTransformation::class, $transformation);
         $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
             self::PARSING_PATTERN,
             self::PARAMETER_NAMES,

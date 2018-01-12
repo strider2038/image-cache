@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Functional;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\FlopTransformation;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
@@ -49,8 +49,8 @@ class TransformationCreatorTest extends FunctionalTestCase
     public function configurationAndTransformationClassProvider(): array
     {
         return [
-            ['s200x100', ResizeTransformation::class],
-            ['size200x100', ResizeTransformation::class],
+            ['s200x100', ResizingTransformation::class],
+            ['size200x100', ResizingTransformation::class],
             ['flip', FlipTransformation::class],
             ['flop', FlopTransformation::class],
         ];
@@ -70,11 +70,11 @@ class TransformationCreatorTest extends FunctionalTestCase
         int $height,
         string $mode
     ): void {
-        /** @var ResizeTransformation $transformation */
+        /** @var ResizingTransformation $transformation */
         $transformation = $this->transformationCreator->createTransformation($configuration);
 
         $this->assertNotNull($transformation);
-        $this->assertInstanceOf(ResizeTransformation::class, $transformation);
+        $this->assertInstanceOf(ResizingTransformation::class, $transformation);
         $this->assertEquals($width, $transformation->getParameters()->getWidth());
         $this->assertEquals($height, $transformation->getParameters()->getHeight());
         $this->assertEquals($mode, $transformation->getParameters()->getMode());

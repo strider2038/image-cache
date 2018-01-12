@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeTransformationFactory implements TransformationFactoryInterface
+class ResizingTransformationFactory implements TransformationFactoryInterface
 {
     private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
     private const PARAMETER_NAMES = ['width', 'height', 'mode'];
@@ -55,6 +55,6 @@ class ResizeTransformationFactory implements TransformationFactoryInterface
 
         $this->validator->validateWithException($parameters, InvalidRequestValueException::class);
 
-        return new ResizeTransformation($parameters);
+        return new ResizingTransformation($parameters);
     }
 }

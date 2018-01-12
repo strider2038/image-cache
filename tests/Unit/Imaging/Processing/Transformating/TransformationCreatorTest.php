@@ -12,7 +12,7 @@
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreator;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryInterface;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryMap;

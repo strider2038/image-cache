@@ -71,12 +71,12 @@ services:
         class: Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryMap
         arguments:
             -
-                /^(s|size)(?P<parameters>\d.*)$/: '@resize_transformation_factory'
+                /^(s|size)(?P<parameters>\d.*)$/: '@resizing_transformation_factory'
                 /^flip$/: '@flip_transformation_factory'
                 /^flop$/: '@flop_transformation_factory'
 
-    resize_transformation_factory:
-        class: Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeTransformationFactory
+    resizing_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformationFactory
         arguments:
             - '@string_parameters_parser'
             - '@entity_validator'
