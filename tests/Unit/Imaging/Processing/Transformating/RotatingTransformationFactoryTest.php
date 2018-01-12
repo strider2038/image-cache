@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of ImgCache.
  *
@@ -11,25 +10,21 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
-use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
-use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeParameters;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformationFactory;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformationFactory;
+use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\RotationParameters;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
-/**
- * @author Igor Lazarev <strider2038@rambler.ru>
- */
-class ResizingTransformationFactoryTest extends TestCase
+class RotatingTransformationFactoryTest extends TestCase
 {
     private const STRING_PARAMETERS = 'String Parameters';
     private const STRING_PARAMETERS_IN_LOWER_CASE = 'string parameters';
-    private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
-    private const PARAMETER_NAMES = ['width', 'height', 'mode'];
+    private const PARSING_PATTERN = '/^(?P<degree>-?\d*\.?\d*)$/';
+    private const PARAMETER_NAMES = ['degree'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -43,79 +38,29 @@ class ResizingTransformationFactoryTest extends TestCase
         $this->validator = \Phake::mock(EntityValidatorInterface::class);
     }
 
-    /**
-     * @test
-     * @param string $stringWidth
-     * @param string $stringHeight
-     * @param string $stringMode
-     * @param int $expectedWidth
-     * @param int $expectedHeight
-     * @param string $expectedMode
-     * @dataProvider stringParametersAndExpectedParametersProvider
-     */
-    public function createTransformation_givenStringParameters_resizeTransformationCreatedAndReturned(
-        $stringWidth,
-        $stringHeight,
-        $stringMode,
-        $expectedWidth,
-        $expectedHeight,
-        $expectedMode
-    ): void {
-        $factory = new ResizingTransformationFactory($this->parametersParser, $this->validator);
-        $parametersList = new StringList([
-            'width' => $stringWidth,
-            'height' => $stringHeight,
-            'mode' => $stringMode,
-        ]);
-        $this->givenStringParametersParser_parseParameters_returnsParametersList($parametersList);
+    /** @test */
+    public function createTransformation_givenStringParameters_rotatingTransformationCreatedAndReturned(): void
+    {
+        $factory = new RotatingTransformationFactory($this->parametersParser, $this->validator);
+        $this->givenStringParametersParser_parseParameters_returnsParametersList(new StringList([
+            'degree' => '-34.4'
+        ]));
 
-        /** @var ResizingTransformation $transformation */
+        /** @var RotatingTransformation $transformation */
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
-        $this->assertInstanceOf(ResizingTransformation::class, $transformation);
+        $this->assertInstanceOf(RotatingTransformation::class, $transformation);
         $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
             self::PARSING_PATTERN,
             self::PARAMETER_NAMES,
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
-        $transformationParameters = $transformation->getParameters();
-        $this->assertEquals($expectedWidth, $transformationParameters->getWidth());
-        $this->assertEquals($expectedHeight, $transformationParameters->getHeight());
-        $this->assertEquals($expectedMode, $transformationParameters->getMode()->getValue());
+        $parameters = $transformation->getParameters();
+        $this->assertEquals(-34.4, $parameters->getDegree());
         $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
-            ResizeParameters::class,
+            RotationParameters::class,
             InvalidRequestValueException::class
         );
-    }
-
-    public function stringParametersAndExpectedParametersProvider(): array
-    {
-        return [
-            [
-                '100',
-                '150',
-                'f',
-                100,
-                150,
-                ResizeModeEnum::FIT_IN,
-            ],
-            [
-                '100',
-                '',
-                'w',
-                100,
-                100,
-                ResizeModeEnum::PRESERVE_WIDTH,
-            ],
-            [
-                '100',
-                '150',
-                '',
-                100,
-                150,
-                ResizeModeEnum::STRETCH,
-            ],
-        ];
     }
 
     private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(

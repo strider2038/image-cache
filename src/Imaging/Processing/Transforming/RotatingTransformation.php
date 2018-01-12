@@ -25,6 +25,11 @@ class RotatingTransformation implements TransformationInterface
         $this->parameters = $parameters;
     }
 
+    public function getParameters(): RotationParameters
+    {
+        return $this->parameters;
+    }
+
     public function apply(ImageTransformerInterface $transformer): void
     {
         $transformer->rotate($this->parameters->getDegree());

@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\FlopTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
@@ -53,6 +54,8 @@ class TransformationCreatorTest extends FunctionalTestCase
             ['size200x100', ResizingTransformation::class],
             ['flip', FlipTransformation::class],
             ['flop', FlopTransformation::class],
+            ['r90', RotatingTransformation::class],
+            ['rotate90', RotatingTransformation::class],
         ];
     }
 
@@ -62,9 +65,9 @@ class TransformationCreatorTest extends FunctionalTestCase
      * @param int $width
      * @param int $height
      * @param string $mode
-     * @dataProvider resizeConfigurationProvider
+     * @dataProvider resizingConfigurationProvider
      */
-    public function createTransformation_givenResizeConfiguration_resizeTransformationWithValidParametersCreated(
+    public function createTransformation_givenResizeConfiguration_resizingTransformationWithValidParametersCreated(
         string $configuration,
         int $width,
         int $height,
@@ -80,7 +83,7 @@ class TransformationCreatorTest extends FunctionalTestCase
         $this->assertEquals($mode, $transformation->getParameters()->getMode());
     }
 
-    public function resizeConfigurationProvider(): array
+    public function resizingConfigurationProvider(): array
     {
         return [
             ['s100x100f', 100, 100, ResizeModeEnum::FIT_IN],
@@ -99,6 +102,34 @@ class TransformationCreatorTest extends FunctionalTestCase
             ['size200x300', 200, 300, ResizeModeEnum::STRETCH],
             ['size200f', 200, 200, ResizeModeEnum::FIT_IN],
             ['size150', 150, 150, ResizeModeEnum::STRETCH],
+        ];
+    }
+
+    /**
+     * @test
+     * @param string $configuration
+     * @param float $rotationDegree
+     * @dataProvider rotatingConfigurationProvider
+     */
+    public function createTransformation_givenRotatingConfiguration_rotatingTransformationWithValidParametersCreated(
+        string $configuration,
+        float $rotationDegree
+    ): void {
+        /** @var RotatingTransformation $transformation */
+        $transformation = $this->transformationCreator->createTransformation($configuration);
+
+        $this->assertNotNull($transformation);
+        $this->assertInstanceOf(RotatingTransformation::class, $transformation);
+        $this->assertEquals($rotationDegree, $transformation->getParameters()->getDegree());
+    }
+
+    public function rotatingConfigurationProvider(): array
+    {
+        return [
+            ['r90', 90],
+            ['rotate53.3', 53.3],
+            ['rotate0.325', 0.325],
+            ['rotate-3.5', -3.5],
         ];
     }
 }
