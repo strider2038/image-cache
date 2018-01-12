@@ -31,6 +31,9 @@ Image caching microservice with connection to cloud hostings
 - [x] Migrate to validation based on Symfony and Doctrine annotations
 - [ ] Shift transformation
 - [ ] Rotate transformation
+    - rename Transformation namespace to Transforming
+    - move transformations to Transforming\Transformation namespace 
+    - split transformation interfaces
 - [x] Flip and flop transformations
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
