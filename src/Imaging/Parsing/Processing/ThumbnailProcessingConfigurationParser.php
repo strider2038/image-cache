@@ -47,7 +47,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
         $configurationValues = array_filter(explode('_', $configuration));
 
         foreach ($configurationValues as $value) {
-            $transformation = $this->transformationsCreator->createTransformation($value);
+            $transformation = $this->transformationsCreator->findAndCreateTransformation($value);
             if ($transformation !== null) {
                 $transformations->add($transformation);
             } else {

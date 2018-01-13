@@ -28,18 +28,18 @@ class TransformationCreatorTest extends TestCase
     private const CUSTOM_CONFIGURATION_VALUE = '400x200';
 
     /** @test */
-    public function createTransformation_givenConfigurationAndFactoryNotFound_nullReturned(): void
+    public function findAndCreateTransformation_givenConfigurationAndFactoryNotFound_nullReturned(): void
     {
         $factoryMap = new TransformationFactoryMap();
         $creator = new TransformationCreator($factoryMap);
 
-        $transformation = $creator->createTransformation(self::INVALID_CONFIGURATION);
+        $transformation = $creator->findAndCreateTransformation(self::INVALID_CONFIGURATION);
 
         $this->assertNull($transformation);
     }
 
     /** @test */
-    public function createTransformation_givenFactoryMapConfigurationAndFactoryFound_transformationCreatedAndReturned(): void
+    public function findAndCreateTransformation_givenFactoryMapConfigurationAndFactoryFound_transformationCreatedAndReturned(): void
     {
         $factory = \Phake::mock(TransformationFactoryInterface::class);
         $factoryMap = new TransformationFactoryMap([
@@ -48,7 +48,7 @@ class TransformationCreatorTest extends TestCase
         $creator = new TransformationCreator($factoryMap);
         $expectedTransformation = $this->givenTransformationFactory_createTransformation_returnsTransformation($factory);
 
-        $transformation = $creator->createTransformation(self::CUSTOM_CONFIGURATION);
+        $transformation = $creator->findAndCreateTransformation(self::CUSTOM_CONFIGURATION);
 
         $this->assertNotNull($transformation);
         $this->assertTransformationFactory_createTransformation_isCalledOnceWithValue($factory, self::CUSTOM_CONFIGURATION_VALUE);

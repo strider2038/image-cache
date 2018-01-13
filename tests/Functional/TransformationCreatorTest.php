@@ -38,11 +38,11 @@ class TransformationCreatorTest extends FunctionalTestCase
      * @param string $transformationClass
      * @dataProvider configurationAndTransformationClassProvider
      */
-    public function createTransformation_givenStringConfiguration_expectedTransformationCreatedAndReturned(
+    public function findAndCreateTransformation_givenStringConfiguration_expectedTransformationCreatedAndReturned(
         string $configuration,
         string $transformationClass
     ): void {
-        $transformation = $this->transformationCreator->createTransformation($configuration);
+        $transformation = $this->transformationCreator->findAndCreateTransformation($configuration);
 
         $this->assertInstanceOf($transformationClass, $transformation);
     }
@@ -67,14 +67,14 @@ class TransformationCreatorTest extends FunctionalTestCase
      * @param string $mode
      * @dataProvider resizingConfigurationProvider
      */
-    public function createTransformation_givenResizeConfiguration_resizingTransformationWithValidParametersCreated(
+    public function findAndCreateTransformation_givenResizeConfiguration_resizingTransformationWithValidParametersCreated(
         string $configuration,
         int $width,
         int $height,
         string $mode
     ): void {
         /** @var ResizingTransformation $transformation */
-        $transformation = $this->transformationCreator->createTransformation($configuration);
+        $transformation = $this->transformationCreator->findAndCreateTransformation($configuration);
 
         $this->assertNotNull($transformation);
         $this->assertInstanceOf(ResizingTransformation::class, $transformation);
@@ -111,12 +111,12 @@ class TransformationCreatorTest extends FunctionalTestCase
      * @param float $rotationDegree
      * @dataProvider rotatingConfigurationProvider
      */
-    public function createTransformation_givenRotatingConfiguration_rotatingTransformationWithValidParametersCreated(
+    public function findAndCreateTransformation_givenRotatingConfiguration_rotatingTransformationWithValidParametersCreated(
         string $configuration,
         float $rotationDegree
     ): void {
         /** @var RotatingTransformation $transformation */
-        $transformation = $this->transformationCreator->createTransformation($configuration);
+        $transformation = $this->transformationCreator->findAndCreateTransformation($configuration);
 
         $this->assertNotNull($transformation);
         $this->assertInstanceOf(RotatingTransformation::class, $transformation);

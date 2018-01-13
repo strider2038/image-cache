@@ -24,7 +24,7 @@ class TransformationCreator implements TransformationCreatorInterface
         $this->factoryMap = $factoryMap;
     }
 
-    public function createTransformation(string $configuration): ? TransformationInterface
+    public function findAndCreateTransformation(string $configuration): ? TransformationInterface
     {
         /**
          * @var string $pattern

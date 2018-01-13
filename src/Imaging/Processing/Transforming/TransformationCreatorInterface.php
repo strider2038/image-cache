@@ -16,5 +16,5 @@ namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
  */
 interface TransformationCreatorInterface
 {
-    public function createTransformation(string $configuration): ? TransformationInterface;
+    public function findAndCreateTransformation(string $configuration): ? TransformationInterface;
 }

@@ -48,13 +48,13 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
-        $this->givenTransformationCreator_createTransformation_returnsTransformation();
+        $this->givenTransformationCreator_findAndCreateTransformation_returnsTransformation();
         $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
         $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
-        $this->assertTransformationCreator_createTransformation_isCalledTimes($count);
+        $this->assertTransformationCreator_findAndCreateTransformation_isCalledTimes($count);
         $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(0);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
@@ -70,13 +70,13 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
-        $this->givenTransformationCreator_createTransformation_returnsNull();
+        $this->givenTransformationCreator_findAndCreateTransformation_returnsNull();
         $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
         $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
-        $this->assertTransformationCreator_createTransformation_isCalledTimes($count);
+        $this->assertTransformationCreator_findAndCreateTransformation_isCalledTimes($count);
         $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes($count);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
@@ -101,13 +101,20 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         return $parser;
     }
 
-    private function givenTransformationCreator_createTransformation_returnsTransformation(): void
+    private function givenTransformationCreator_findAndCreateTransformation_returnsTransformation(): void
     {
         $transformation = \Phake::mock(TransformationInterface::class);
 
         \Phake::when($this->transformationsCreator)
-            ->createTransformation(\Phake::anyParameters())
+            ->findAndCreateTransformation(\Phake::anyParameters())
             ->thenReturn($transformation);
+    }
+
+    private function givenTransformationCreator_findAndCreateTransformation_returnsNull(): void
+    {
+        \Phake::when($this->transformationsCreator)
+            ->findAndCreateTransformation(\Phake::anyParameters())
+            ->thenReturn(null);
     }
 
     private function verifyProcessingConfiguration(
@@ -124,23 +131,16 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $this->assertEquals($count, $transformations->count());
     }
 
-    private function assertTransformationCreator_createTransformation_isCalledTimes(int $times): void
+    private function assertTransformationCreator_findAndCreateTransformation_isCalledTimes(int $times): void
     {
         \Phake::verify($this->transformationsCreator, \Phake::times($times))
-            ->createTransformation(\Phake::anyParameters());
+            ->findAndCreateTransformation(\Phake::anyParameters());
     }
 
     private function assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(int $times): void
     {
         \Phake::verify($this->imageParametersConfigurator, \Phake::times($times))
             ->updateParametersByConfiguration(\Phake::anyParameters());
-    }
-
-    private function givenTransformationCreator_createTransformation_returnsNull(): void
-    {
-        \Phake::when($this->transformationsCreator)
-            ->createTransformation(\Phake::anyParameters())
-            ->thenReturn(null);
     }
 
     private function givenImageParametersFactory_createImageParameters_returnsImageParameters(): ImageParameters
