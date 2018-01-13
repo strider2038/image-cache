@@ -38,12 +38,19 @@ class RotatingTransformationFactoryTest extends TestCase
         $this->validator = \Phake::mock(EntityValidatorInterface::class);
     }
 
-    /** @test */
-    public function createTransformation_givenStringParameters_rotatingTransformationCreatedAndReturned(): void
-    {
+    /**
+     * @test
+     * @param string $stringDegree
+     * @param float $rotationDegree
+     * @dataProvider rotationParametersProvider
+     */
+    public function createTransformation_givenStringParameters_rotatingTransformationCreatedAndReturned(
+        string $stringDegree,
+        float $rotationDegree
+    ): void {
         $factory = new RotatingTransformationFactory($this->parametersParser, $this->validator);
         $this->givenStringParametersParser_parseParameters_returnsParametersList(new StringList([
-            'degree' => '-34.4'
+            'degree' => $stringDegree
         ]));
 
         /** @var RotatingTransformation $transformation */
@@ -56,11 +63,19 @@ class RotatingTransformationFactoryTest extends TestCase
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
         $parameters = $transformation->getParameters();
-        $this->assertEquals(-34.4, $parameters->getDegree());
+        $this->assertEquals($rotationDegree, $parameters->getDegree());
         $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
             RotationParameters::class,
             InvalidRequestValueException::class
         );
+    }
+
+    public function rotationParametersProvider(): array
+    {
+        return [
+            ['-34.4', -34.4],
+            ['', 0],
+        ];
     }
 
     private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
@@ -78,6 +93,7 @@ class RotatingTransformationFactoryTest extends TestCase
     {
         \Phake::when($this->parametersParser)->parseParameters(\Phake::anyParameters())->thenReturn($parametersList);
     }
+
     private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
         string $entityClass,
         string $exceptionClass

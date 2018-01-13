@@ -43,7 +43,7 @@ class RotatingTransformationFactory implements TransformationFactoryInterface
             strtolower($stringParameters)
         );
 
-        $parameters = new RotationParameters($parametersList->get('degree') ?? 0);
+        $parameters = new RotationParameters((float) $parametersList->get('degree'));
 
         $this->validator->validateWithException($parameters, InvalidRequestValueException::class);
 
