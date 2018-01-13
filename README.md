@@ -29,9 +29,11 @@ Image caching microservice with connection to cloud hostings
 - [x] Yandex.Disk source
 - [x] Migrate to collections based on Doctrine ArrayCollection
 - [x] Migrate to validation based on Symfony and Doctrine annotations
-- [ ] Shift transformation
-- [ ] Rotate transformation
+- [x] Shift transformation
+- [x] Rotate transformation
 - [x] Flip and flop transformations
+- [ ] Multipurpose interface to request geographical map images
+- [ ] Make user-friendly configuration of microservice 
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
 - [ ] Support for building docker containers in Travis
