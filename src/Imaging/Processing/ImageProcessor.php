@@ -14,8 +14,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

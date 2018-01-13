@@ -16,8 +16,8 @@ use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationInterface;
 
 class ThumbnailProcessingConfigurationParserTest extends TestCase
 {
@@ -48,13 +48,13 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
-        $this->givenTransformationsFactory_create_returnsTransformation();
+        $this->givenTransformationCreator_findAndCreateTransformation_returnsTransformation();
         $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
         $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
-        $this->assertTransformationsFactory_create_isCalled($count);
+        $this->assertTransformationCreator_findAndCreateTransformation_isCalledTimes($count);
         $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(0);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
@@ -70,13 +70,13 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         int $count
     ): void {
         $parser = $this->createThumbnailProcessingConfigurationParser();
-        $this->givenTransformationsFactory_create_returnsNull();
+        $this->givenTransformationCreator_findAndCreateTransformation_returnsNull();
         $defaultParameters = $this->givenImageParametersFactory_createImageParameters_returnsImageParameters();
 
         $parsedConfiguration = $parser->parseConfiguration($configuration);
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
-        $this->assertTransformationsFactory_create_isCalled($count);
+        $this->assertTransformationCreator_findAndCreateTransformation_isCalledTimes($count);
         $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes($count);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
@@ -101,13 +101,20 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         return $parser;
     }
 
-    private function givenTransformationsFactory_create_returnsTransformation(): void
+    private function givenTransformationCreator_findAndCreateTransformation_returnsTransformation(): void
     {
         $transformation = \Phake::mock(TransformationInterface::class);
 
         \Phake::when($this->transformationsCreator)
-            ->create(\Phake::anyParameters())
+            ->findAndCreateTransformation(\Phake::anyParameters())
             ->thenReturn($transformation);
+    }
+
+    private function givenTransformationCreator_findAndCreateTransformation_returnsNull(): void
+    {
+        \Phake::when($this->transformationsCreator)
+            ->findAndCreateTransformation(\Phake::anyParameters())
+            ->thenReturn(null);
     }
 
     private function verifyProcessingConfiguration(
@@ -124,23 +131,16 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $this->assertEquals($count, $transformations->count());
     }
 
-    private function assertTransformationsFactory_create_isCalled(int $times): void
+    private function assertTransformationCreator_findAndCreateTransformation_isCalledTimes(int $times): void
     {
         \Phake::verify($this->transformationsCreator, \Phake::times($times))
-            ->create(\Phake::anyParameters());
+            ->findAndCreateTransformation(\Phake::anyParameters());
     }
 
     private function assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(int $times): void
     {
         \Phake::verify($this->imageParametersConfigurator, \Phake::times($times))
             ->updateParametersByConfiguration(\Phake::anyParameters());
-    }
-
-    private function givenTransformationsFactory_create_returnsNull(): void
-    {
-        \Phake::when($this->transformationsCreator)
-            ->create(\Phake::anyParameters())
-            ->thenReturn(null);
     }
 
     private function givenImageParametersFactory_createImageParameters_returnsImageParameters(): ImageParameters

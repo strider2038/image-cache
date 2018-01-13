@@ -10,14 +10,11 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing;
 
-use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ImageProcessorInterface
+interface PointInterface
 {
-    public function transformImage(Image $image, TransformationCollection $transformations): Image;
-    public function saveImageToFile(Image $image, string $filename): void;
+    public function getX(): int;
+    public function getY(): int;
 }

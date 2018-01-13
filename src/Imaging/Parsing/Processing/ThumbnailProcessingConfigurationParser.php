@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Imaging\Parsing\Processing;
 use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCreatorInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -47,7 +47,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
         $configurationValues = array_filter(explode('_', $configuration));
 
         foreach ($configurationValues as $value) {
-            $transformation = $this->transformationsCreator->create($value);
+            $transformation = $this->transformationsCreator->findAndCreateTransformation($value);
             if ($transformation !== null) {
                 $transformations->add($transformation);
             } else {

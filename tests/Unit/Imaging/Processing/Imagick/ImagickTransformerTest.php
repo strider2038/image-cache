@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformer;
+use Strider2038\ImgCache\Imaging\Processing\Point;
 use Strider2038\ImgCache\Imaging\Processing\Rectangle;
 use Strider2038\ImgCache\Imaging\Processing\Size;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
@@ -27,9 +28,6 @@ class ImagickTransformerTest extends FileTestCase
     private const QUALITY = 70;
     private const IMAGE_DESTINATION_FILE = self::TEST_CACHE_DIR . '/imagick_result.jpg';
 
-    /** @var \Imagick */
-    private $imagick;
-
     /** @var FileOperationsInterface */
     private $fileOperations;
 
@@ -39,15 +37,15 @@ class ImagickTransformerTest extends FileTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->imagick = new \Imagick($this->givenAssetFilename(self::IMAGE_BOX_JPG));
         $this->fileOperations = \Phake::mock(FileOperationsInterface::class);
         $this->streamFactory = \Phake::mock(StreamFactoryInterface::class);
     }
 
     /** @test */
-    public function resize_givenSize_imageIsResize(): void
+    public function resize_givenSize_imageResize(): void
     {
-        $transformer = $this->createTransformer();
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_BOX_PNG);
+        $transformer = $this->createTransformer($imagick);
         $size = new Size(self::IMAGE_FINAL_WIDTH, self::IMAGE_FINAL_HEIGHT);
 
         $returnedTransformer = $transformer->resize($size);
@@ -59,9 +57,10 @@ class ImagickTransformerTest extends FileTestCase
     }
 
     /** @test */
-    public function crop_givenSize_imageIsCropped(): void
+    public function crop_givenSize_imageCropped(): void
     {
-        $transformer = $this->createTransformer();
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_BOX_PNG);
+        $transformer = $this->createTransformer($imagick);
         $rectangle = new Rectangle(self::IMAGE_SOURCE_WIDTH - 2, self::IMAGE_SOURCE_HEIGHT - 1, 1, 1);
 
         $returnedTransformer = $transformer->crop($rectangle);
@@ -73,10 +72,61 @@ class ImagickTransformerTest extends FileTestCase
     }
 
     /** @test */
+    public function flip_noParameters_imageFlipped(): void
+    {
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
+        $transformer = $this->createTransformer($imagick);
+
+        $returnedTransformer = $transformer->flip();
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertPixelColorIsBlack($imagick, 0, 3);
+    }
+
+    /** @test */
+    public function flop_noParameters_imageFlopped(): void
+    {
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
+        $transformer = $this->createTransformer($imagick);
+
+        $returnedTransformer = $transformer->flop();
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertPixelColorIsBlack($imagick, 3, 0);
+    }
+
+    /** @test */
+    public function rotate_given90degrees_imageRotatedBy90degreesClockwise(): void
+    {
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
+        $transformer = $this->createTransformer($imagick);
+
+        $returnedTransformer = $transformer->rotate(90);
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertPixelColorIsBlack($imagick, 3, 0);
+    }
+
+    /** @test */
+    public function shift_givenShiftPoint_imageShiftedByPointCoordinates(): void
+    {
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
+        $transformer = $this->createTransformer($imagick);
+        $point = new Point(2, 1);
+
+        /** @var ImagickTransformer $returnedTransformer */
+        $returnedTransformer = $transformer->shift($point);
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertPixelColorIsBlack($returnedTransformer->getImagick(), 2, 1);
+    }
+
+    /** @test */
     public function getData_givenImage_imageIsReturnedWithTheSameContents(): void
     {
-        $transformer = $this->createTransformer();
-        $expectedData = $this->imagick->getImageBlob();
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_BOX_PNG);
+        $transformer = $this->createTransformer($imagick);
+        $expectedData = $imagick->getImageBlob();
         $expectedStream = $this->givenStreamFactory_createStreamFromData_returnsStream();
 
         $data = $transformer->getData();
@@ -88,7 +138,8 @@ class ImagickTransformerTest extends FileTestCase
     /** @test */
     public function setCompressionQuality_givenQuality_valueIsSet(): void
     {
-        $transformer = $this->createTransformer();
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_BOX_PNG);
+        $transformer = $this->createTransformer($imagick);
 
         $returnedTransformer = $transformer->setCompressionQuality(self::QUALITY);
 
@@ -99,7 +150,8 @@ class ImagickTransformerTest extends FileTestCase
     /** @test */
     public function writeToFile_givenFilename_fileIsCreated(): void
     {
-        $transformer = $this->createTransformer();
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_BOX_PNG);
+        $transformer = $this->createTransformer($imagick);
 
         $returnedTransformer = $transformer->writeToFile(self::IMAGE_DESTINATION_FILE);
 
@@ -108,9 +160,14 @@ class ImagickTransformerTest extends FileTestCase
         $this->assertFileExists(self::IMAGE_DESTINATION_FILE);
     }
 
-    private function createTransformer(): ImagickTransformer
+    private function createImagickFromAssetImage(string $imageFilename): \Imagick
     {
-        return new ImagickTransformer($this->imagick, $this->fileOperations, $this->streamFactory);
+        return new \Imagick($this->givenAssetFilename($imageFilename));
+    }
+
+    private function createTransformer(\Imagick $imagick): ImagickTransformer
+    {
+        return new ImagickTransformer($imagick, $this->fileOperations, $this->streamFactory);
     }
 
     private function assertFileOperations_createDirectory_isCalledOnce(): void
@@ -129,5 +186,20 @@ class ImagickTransformerTest extends FileTestCase
         \Phake::when($this->streamFactory)->createStreamFromData(\Phake::anyParameters())->thenReturn($stream);
 
         return $stream;
+    }
+
+    private function assertPixelColorIsBlack(\Imagick $imagick, int $x, int $y): void
+    {
+        $pixel = $imagick->getImagePixelColor($x, $y);
+        $color = $pixel->getColor();
+        $this->assertEquals(
+            [
+                'r' => 0,
+                'g' => 0,
+                'b' => 0,
+                'a' => 1,
+            ],
+            $color
+        );
     }
 }

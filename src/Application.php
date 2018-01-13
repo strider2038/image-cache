@@ -129,7 +129,7 @@ class Application
 
         if ($error !== null) {
             $message = implode(PHP_EOL, array_map(
-                function ($value, $key) {
+                function($value, $key) {
                     return sprintf('%s: %s', ucfirst($key), $value);
                 },
                 $error,

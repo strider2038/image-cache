@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationCollection;
-use Strider2038\ImgCache\Imaging\Transformation\TransformationInterface;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationInterface;
 
 class TransformationCollectionTest extends TestCase
 {

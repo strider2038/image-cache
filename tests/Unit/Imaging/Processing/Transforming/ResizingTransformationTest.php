@@ -9,23 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Transformation;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
+use Strider2038\ImgCache\Imaging\Processing\PointInterface;
 use Strider2038\ImgCache\Imaging\Processing\RectangleInterface;
 use Strider2038\ImgCache\Imaging\Processing\Size;
 use Strider2038\ImgCache\Imaging\Processing\SizeInterface;
-use Strider2038\ImgCache\Imaging\Transformation\ResizeParameters;
-use Strider2038\ImgCache\Imaging\Transformation\ResizeTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizeParameters;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ResizeTransformationTest extends TestCase
+class ResizingTransformationTest extends TestCase
 {
     /**
      * @test
@@ -55,7 +56,7 @@ class ResizeTransformationTest extends TestCase
         $transformer->width = $sourceWidth;
         $transformer->height = $sourceHeight;
         $parameters = new ResizeParameters($resizeWidth, $resizeHeight, new ResizeModeEnum($resizeMode));
-        $transformation = new ResizeTransformation($parameters);
+        $transformation = new ResizingTransformation($parameters);
 
         $transformation->apply($transformer);
 
@@ -113,6 +114,10 @@ class ResizeTransformationTest extends TestCase
                 return new Size($this->width, $this->height);
             }
 
+            public function flip(): ImageTransformerInterface {}
+            public function flop(): ImageTransformerInterface {}
+            public function rotate(float $degree): ImageTransformerInterface {}
+            public function shift(PointInterface $point): ImageTransformerInterface {}
             public function getImage(): Image {}
             public function setCompressionQuality(int $quality): ImageTransformerInterface {}
             public function writeToFile(string $filename): ImageTransformerInterface {}

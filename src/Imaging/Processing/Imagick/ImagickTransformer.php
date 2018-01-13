@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
+use Strider2038\ImgCache\Imaging\Processing\PointInterface;
 use Strider2038\ImgCache\Imaging\Processing\RectangleInterface;
 use Strider2038\ImgCache\Imaging\Processing\Size;
 use Strider2038\ImgCache\Imaging\Processing\SizeInterface;
@@ -62,6 +63,50 @@ class ImagickTransformer implements ImageTransformerInterface
             $rectangle->getLeft(),
             $rectangle->getTop()
         );
+
+        return $this;
+    }
+
+    public function flip(): ImageTransformerInterface
+    {
+        $this->imagick->flipImage();
+
+        return $this;
+    }
+
+    public function flop(): ImageTransformerInterface
+    {
+        $this->imagick->flopImage();
+
+        return $this;
+    }
+
+    public function rotate(float $degree): ImageTransformerInterface
+    {
+        $this->imagick->rotateImage(new \ImagickPixel('#00000000'), $degree);
+
+        return $this;
+    }
+
+    public function shift(PointInterface $point): ImageTransformerInterface
+    {
+        $transparentImage = new \Imagick();
+        $transparentImage->newImage(
+            $this->imagick->getImageWidth(),
+            $this->imagick->getImageHeight(),
+            new \ImagickPixel('#00000000')
+        );
+
+        $transparentImage->compositeImage(
+            $this->imagick,
+            \Imagick::COMPOSITE_COPY,
+            $point->getX(),
+            $point->getY()
+        );
+
+        $transparentImage->setImageFormat($this->imagick->getImageFormat());
+
+        $this->imagick = $transparentImage;
 
         return $this;
     }

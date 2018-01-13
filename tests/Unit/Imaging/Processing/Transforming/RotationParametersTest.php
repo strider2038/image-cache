@@ -8,19 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Imaging\Naming;
+namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
+use Strider2038\ImgCache\Imaging\Processing\Transforming\RotationParameters;
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Utility\EntityValidator;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Strider2038\ImgCache\Utility\MetadataReader;
 use Strider2038\ImgCache\Utility\Validation\CustomConstraintValidatorFactory;
 use Strider2038\ImgCache\Utility\ViolationFormatter;
 
-class DirectoryNameTest extends TestCase
+class RotationParametersTest extends TestCase
 {
-    private const DIRECTORY_NAME_ID = 'directory name';
+    private const ROTATION_PARAMETERS_ID = 'rotation parameters';
 
     /** @var EntityValidatorInterface */
     private $validator;
@@ -38,37 +38,37 @@ class DirectoryNameTest extends TestCase
     /** @test */
     public function getId_emptyParameters_idReturned(): void
     {
-        $directoryName = new DirectoryName('');
+        $parameters = new RotationParameters(0);
 
-        $id = $directoryName->getId();
+        $id = $parameters->getId();
 
-        $this->assertEquals(self::DIRECTORY_NAME_ID, $id);
+        $this->assertEquals(self::ROTATION_PARAMETERS_ID, $id);
     }
 
     /**
      * @test
-     * @dataProvider valueProvider
-     * @param string $value
+     * @param float $degree
      * @param int $violationsCount
+     * @dataProvider rotationParametersAndViolationsCountProvider
      */
-    public function validate_givenImageFilename_violationsReturned(string $value, int $violationsCount): void
+    public function validate_givenDegree_violationsReturned(float $degree, int $violationsCount): void
     {
-        $directoryName = new DirectoryName($value);
+        $parameters = new RotationParameters($degree);
 
-        $violations = $this->validator->validate($directoryName);
+        $violations = $this->validator->validate($parameters);
 
         $this->assertCount($violationsCount, $violations);
+        $this->assertEquals($degree, $parameters->getDegree());
     }
 
-    public function valueProvider(): array
+    public function rotationParametersAndViolationsCountProvider(): array
     {
         return [
-            ['', 1],
-            ['/', 1],
-            ['/directory//name/', 1],
-            ['/$directory/', 1],
-            ['directory', 1],
-            ['/Directory_Name/sub.a-b/', 0],
+            [0, 0],
+            [360, 0],
+            [360.1, 1],
+            [-360, 0],
+            [-360.1, 1],
         ];
     }
 }

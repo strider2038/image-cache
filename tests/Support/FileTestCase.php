@@ -25,6 +25,7 @@ class FileTestCase extends TestCase
     protected const IMAGE_RIDER_PNG = 'sample/rider.png';
     protected const IMAGE_BOX_JPG = 'box.jpg';
     protected const IMAGE_BOX_PNG = 'box.png';
+    protected const IMAGE_POINT_PNG = 'point.png';
     protected const FILE_JSON = 'file.json';
     protected const FILE_JSON_CONTENTS = '{"isJson": true}';
     protected const FILE_WEBDAV_RESPONSE_XML = 'webdav-response.xml';

@@ -35,9 +35,11 @@ services:
     thumbnail_processing_configuration_parser:
         class: Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser
         arguments:
-            - '@transformations_creator'
+            - '@transformation_creator'
             - '@image_parameters_factory'
             - '@image_parameters_configurator'
+    string_parameters_parser:
+        class: Strider2038\ImgCache\Imaging\Parsing\StringParametersParser
 
     # imaging/processing
     image_parameters_factory:
@@ -60,9 +62,36 @@ services:
             - '@stream_factory'
 
     # imaging/transformation
-    transformations_creator:
-        class: Strider2038\ImgCache\Imaging\Transformation\TransformationCreator
+    transformation_creator:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreator
         arguments:
-            - '@transformation_factory_flyweight'
-    transformation_factory_flyweight:
-        class: Strider2038\ImgCache\Imaging\Transformation\TransformationFactoryFlyweight
+            - '@transformation_factory_map'
+
+    transformation_factory_map:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryMap
+        arguments:
+            -
+                /^(s|size)(?P<parameters>\d.*)$/: '@resizing_transformation_factory'
+                /^(r|rotate)(?P<parameters>-?\d.*)$/: '@rotating_transformation_factory'
+                /^(s|shift)(?P<parameters>(x|y).*)$/: '@shifting_transformation_factory'
+                /^flip$/: '@flip_transformation_factory'
+                /^flop$/: '@flop_transformation_factory'
+
+    resizing_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformationFactory
+        arguments:
+            - '@string_parameters_parser'
+            - '@entity_validator'
+    rotating_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformationFactory
+        arguments:
+            - '@string_parameters_parser'
+            - '@entity_validator'
+    shifting_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformationFactory
+        arguments:
+            - '@string_parameters_parser'
+    flip_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformationFactory
+    flop_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\FlopTransformationFactory
