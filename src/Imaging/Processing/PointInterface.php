@@ -15,5 +15,6 @@ namespace Strider2038\ImgCache\Imaging\Processing;
  */
 interface PointInterface
 {
-
+    public function getX(): int;
+    public function getY(): int;
 }
