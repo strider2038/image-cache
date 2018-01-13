@@ -16,7 +16,7 @@ use Strider2038\ImgCache\Imaging\Processing\PointInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ShiftTransformation implements TransformationInterface
+class ShiftingTransformation implements TransformationInterface
 {
     /** @var PointInterface */
     private $parameters;

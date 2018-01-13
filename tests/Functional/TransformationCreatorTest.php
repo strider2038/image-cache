@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\FlopTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
@@ -56,6 +57,8 @@ class TransformationCreatorTest extends FunctionalTestCase
             ['flop', FlopTransformation::class],
             ['r90', RotatingTransformation::class],
             ['rotate90', RotatingTransformation::class],
+            ['sx5y2', ShiftingTransformation::class],
+            ['shiftx5y2', ShiftingTransformation::class],
         ];
     }
 
@@ -130,6 +133,41 @@ class TransformationCreatorTest extends FunctionalTestCase
             ['rotate53.3', 53.3],
             ['rotate0.325', 0.325],
             ['rotate-3.5', -3.5],
+        ];
+    }
+
+    /**
+     * @test
+     * @param string $configuration
+     * @param int $shiftX
+     * @param int $shiftY
+     * @dataProvider shiftingConfigurationProvider
+     */
+    public function findAndCreateTransformation_givenShiftingConfiguration_shiftingTransformationWithValidParametersCreated(
+        string $configuration,
+        int $shiftX,
+        int $shiftY
+    ): void {
+        /** @var ShiftingTransformation $transformation */
+        $transformation = $this->transformationCreator->findAndCreateTransformation($configuration);
+
+        $this->assertNotNull($transformation);
+        $this->assertInstanceOf(ShiftingTransformation::class, $transformation);
+        $this->assertEquals($shiftX, $transformation->getParameters()->getX());
+        $this->assertEquals($shiftY, $transformation->getParameters()->getY());
+    }
+
+    public function shiftingConfigurationProvider(): array
+    {
+        return [
+            ['sx5y2', 5, 2],
+            ['shiftx5y2', 5, 2],
+            ['sx-10y-5', -10, -5],
+            ['shiftx-10y-5', -10, -5],
+            ['sx5', 5, 0],
+            ['sy5', 0, 5],
+            ['shiftx', 0, 0],
+            ['shifty', 0, 0],
         ];
     }
 }

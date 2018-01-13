@@ -73,6 +73,7 @@ services:
             -
                 /^(s|size)(?P<parameters>\d.*)$/: '@resizing_transformation_factory'
                 /^(r|rotate)(?P<parameters>-?\d.*)$/: '@rotating_transformation_factory'
+                /^(s|shift)(?P<parameters>(x|y).*)$/: '@shifting_transformation_factory'
                 /^flip$/: '@flip_transformation_factory'
                 /^flop$/: '@flop_transformation_factory'
 
@@ -86,6 +87,10 @@ services:
         arguments:
             - '@string_parameters_parser'
             - '@entity_validator'
+    shifting_transformation_factory:
+        class: Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformationFactory
+        arguments:
+            - '@string_parameters_parser'
     flip_transformation_factory:
         class: Strider2038\ImgCache\Imaging\Processing\Transforming\FlipTransformationFactory
     flop_transformation_factory:

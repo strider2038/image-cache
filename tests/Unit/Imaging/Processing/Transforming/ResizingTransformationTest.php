@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Processing\ImageTransformerInterface;
+use Strider2038\ImgCache\Imaging\Processing\PointInterface;
 use Strider2038\ImgCache\Imaging\Processing\RectangleInterface;
 use Strider2038\ImgCache\Imaging\Processing\Size;
 use Strider2038\ImgCache\Imaging\Processing\SizeInterface;
@@ -116,6 +117,7 @@ class ResizingTransformationTest extends TestCase
             public function flip(): ImageTransformerInterface {}
             public function flop(): ImageTransformerInterface {}
             public function rotate(float $degree): ImageTransformerInterface {}
+            public function shift(PointInterface $point): ImageTransformerInterface {}
             public function getImage(): Image {}
             public function setCompressionQuality(int $quality): ImageTransformerInterface {}
             public function writeToFile(string $filename): ImageTransformerInterface {}
