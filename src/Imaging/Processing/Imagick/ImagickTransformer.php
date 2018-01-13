@@ -104,6 +104,8 @@ class ImagickTransformer implements ImageTransformerInterface
             $point->getY()
         );
 
+        $transparentImage->setImageFormat($this->imagick->getImageFormat());
+
         $this->imagick = $transparentImage;
 
         return $this;

@@ -15,6 +15,9 @@ use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactory;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessor;
+use Strider2038\ImgCache\Imaging\Processing\Point;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformation;
+use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 /**
@@ -77,6 +80,22 @@ class ImagickImageProcessorTest extends FunctionalTestCase
 
         $this->assertFileExists(self::PNG_FILENAME);
         $this->assertFileHasMimeType(self::PNG_FILENAME, self::MIME_TYPE_PNG);
+    }
+
+    /** @test */
+    public function transformImage_givenJpegImageAndShiftingTransformation_imageIsShiftedAndReturned(): void
+    {
+        $this->givenImageJpeg(self::JPEG_ORIGINAL_FILENAME);
+        $image = $this->givenImage(self::JPEG_ORIGINAL_FILENAME);
+        $transformations = new TransformationCollection([
+            new ShiftingTransformation(
+                new Point(10, 0)
+            )
+        ]);
+
+        $transformedImage = $this->imageProcessor->transformImage($image, $transformations);
+
+        $this->assertInstanceOf(Image::class, $transformedImage);
     }
 
     private function givenImage(string $filename): Image
