@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Imaging\Processing\Imagick\ImagickTransformer;
+use Strider2038\ImgCache\Imaging\Processing\Point;
 use Strider2038\ImgCache\Imaging\Processing\Rectangle;
 use Strider2038\ImgCache\Imaging\Processing\Size;
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
@@ -104,6 +105,20 @@ class ImagickTransformerTest extends FileTestCase
 
         $this->assertSame($returnedTransformer, $transformer);
         $this->assertPixelColorIsBlack($imagick, 3, 0);
+    }
+
+    /** @test */
+    public function shift_givenShiftPoint_imageShiftedByPointCoordinates(): void
+    {
+        $imagick = $this->createImagickFromAssetImage(self::IMAGE_POINT_PNG);
+        $transformer = $this->createTransformer($imagick);
+        $point = new Point(2, 1);
+
+        /** @var ImagickTransformer $returnedTransformer */
+        $returnedTransformer = $transformer->shift($point);
+
+        $this->assertSame($returnedTransformer, $transformer);
+        $this->assertPixelColorIsBlack($returnedTransformer->getImagick(), 2, 1);
     }
 
     /** @test */
