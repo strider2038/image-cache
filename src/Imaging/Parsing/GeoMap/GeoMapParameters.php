@@ -70,6 +70,16 @@ class GeoMapParameters implements EntityInterface
      */
     public $scale;
 
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Choice(
+     *     choices={"jpg", "jpeg", "png"},
+     *     strict=true
+     * )
+     * @var string
+     */
+    public $format;
+
     public function getId(): string
     {
         return 'geographical map parameters';
