@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
+use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\RotatingTransformationFactory;
-use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\RotationParameters;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
@@ -48,7 +48,7 @@ class RotatingTransformationFactoryTest extends TestCase
         float $rotationDegree
     ): void {
         $factory = new RotatingTransformationFactory($this->parametersParser, $this->validator);
-        $this->givenStringParametersParser_parseParameters_returnsParametersList(new StringList([
+        $this->givenStringParametersParser_strictlyParseParameters_returnsParametersList(new StringList([
             'degree' => $stringDegree
         ]));
 
@@ -56,7 +56,7 @@ class RotatingTransformationFactoryTest extends TestCase
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
         $this->assertInstanceOf(RotatingTransformation::class, $transformation);
-        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
+        $this->assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
             self::PARSING_PATTERN,
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
@@ -76,18 +76,21 @@ class RotatingTransformationFactoryTest extends TestCase
         ];
     }
 
-    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
+    private function assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
         string $pattern,
         string $parameters
     ): void {
         /** @var StringList $parameterNamesList */
         \Phake::verify($this->parametersParser, \Phake::times(1))
-            ->parseParameters($pattern, $parameters);
+            ->strictlyParseParameters($pattern, $parameters);
     }
 
-    private function givenStringParametersParser_parseParameters_returnsParametersList(StringList $parametersList): void
-    {
-        \Phake::when($this->parametersParser)->parseParameters(\Phake::anyParameters())->thenReturn($parametersList);
+    private function givenStringParametersParser_strictlyParseParameters_returnsParametersList(
+        StringList $parametersList
+    ): void {
+        \Phake::when($this->parametersParser)
+            ->strictlyParseParameters(\Phake::anyParameters())
+            ->thenReturn($parametersList);
     }
 
     private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(

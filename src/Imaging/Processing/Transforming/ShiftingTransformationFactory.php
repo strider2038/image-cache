@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
-use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\Point;
 
@@ -31,7 +30,7 @@ class ShiftingTransformationFactory implements TransformationFactoryInterface
 
     public function createTransformation(string $stringParameters): TransformationInterface
     {
-        $parametersList = $this->parametersParser->parseParameters(
+        $parametersList = $this->parametersParser->strictlyParseParameters(
             self::PARSING_PATTERN,
             strtolower($stringParameters)
         );

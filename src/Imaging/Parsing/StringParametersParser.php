@@ -20,23 +20,30 @@ class StringParametersParser implements StringParametersParserInterface
 {
     public function parseParameters(string $pattern, string $string): StringList
     {
-        $isValid = preg_match_all($pattern, $string, $matches);
+        $values = new StringList();
 
-        if (!$isValid) {
+        if (preg_match_all($pattern, $string, $matches)) {
+            foreach ($matches as $key => $match) {
+                if (\is_string($key)) {
+                    $values->set($key, $match[0]);
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    public function strictlyParseParameters(string $pattern, string $string): StringList
+    {
+        $values = $this->parseParameters($pattern, $string);
+
+        if ($values->count() === 0) {
             throw new InvalidRequestValueException(
                 sprintf(
                     'Given invalid parameter value: %s',
                     $string
                 )
             );
-        }
-
-        $values = new StringList();
-
-        foreach ($matches as $key => $match) {
-            if (\is_string($key)) {
-                $values->set($key, $match[0]);
-            }
         }
 
         return $values;

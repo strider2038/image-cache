@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
-use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
@@ -36,7 +35,7 @@ class RotatingTransformationFactory implements TransformationFactoryInterface
 
     public function createTransformation(string $stringParameters): TransformationInterface
     {
-        $parametersList = $this->parametersParser->parseParameters(
+        $parametersList = $this->parametersParser->strictlyParseParameters(
             self::PARSING_PATTERN,
             strtolower($stringParameters)
         );

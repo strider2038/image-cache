@@ -10,11 +10,11 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
+use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformationFactory;
-use PHPUnit\Framework\TestCase;
 
 class ShiftingTransformationFactoryTest extends TestCase
 {
@@ -45,7 +45,7 @@ class ShiftingTransformationFactoryTest extends TestCase
         int $shiftPointY
     ): void {
         $factory = new ShiftingTransformationFactory($this->parametersParser);
-        $this->givenStringParametersParser_parseParameters_returnsParametersList(
+        $this->givenStringParametersParser_strictlyParseParameters_returnsParametersList(
             new StringList([
                 'x' => $stringX,
                 'y' => $stringY,
@@ -56,7 +56,7 @@ class ShiftingTransformationFactoryTest extends TestCase
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
         $this->assertInstanceOf(ShiftingTransformation::class, $transformation);
-        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
+        $this->assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
             self::PARSING_PATTERN,
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
@@ -73,17 +73,20 @@ class ShiftingTransformationFactoryTest extends TestCase
         ];
     }
 
-    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
+    private function assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
         string $pattern,
         string $parameters
     ): void {
         /** @var StringList $parameterNamesList */
         \Phake::verify($this->parametersParser, \Phake::times(1))
-            ->parseParameters($pattern, $parameters);
+            ->strictlyParseParameters($pattern, $parameters);
     }
 
-    private function givenStringParametersParser_parseParameters_returnsParametersList(StringList $parametersList): void
-    {
-        \Phake::when($this->parametersParser)->parseParameters(\Phake::anyParameters())->thenReturn($parametersList);
+    private function givenStringParametersParser_strictlyParseParameters_returnsParametersList(
+        StringList $parametersList
+    ): void {
+        \Phake::when($this->parametersParser)
+            ->strictlyParseParameters(\Phake::anyParameters())
+            ->thenReturn($parametersList);
     }
 }

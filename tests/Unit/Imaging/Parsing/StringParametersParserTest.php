@@ -10,23 +10,32 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing;
 
-use Strider2038\ImgCache\Collection\StringList;
-use Strider2038\ImgCache\Imaging\Parsing\StringParametersParser;
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Parsing\StringParametersParser;
 
 class StringParametersParserTest extends TestCase
 {
+    /** @test */
+    public function parseParameters_givenPatternAndParameterNamesAndInvalidString_invalidRequestValueExceptionThrown(): void
+    {
+        $parser = new StringParametersParser();
+
+        $parameters = $parser->parseParameters('/^(?P<x>\d+)$/', 'invalid');
+
+        $this->assertCount(0, $parameters);
+    }
+
     /**
      * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Given invalid parameter
      */
-    public function parseParameters_givenPatternAndParameterNamesAndInvalidString_invalidRequestValueExceptionThrown(): void
+    public function strictlyParseParameters_givenPatternAndParameterNamesAndInvalidString_invalidRequestValueExceptionThrown(): void
     {
         $parser = new StringParametersParser();
 
-        $parser->parseParameters('/^(?P<x>\d+)$/', 'invalid');
+        $parser->strictlyParseParameters('/^(?P<x>\d+)$/', 'invalid');
     }
 
     /**
