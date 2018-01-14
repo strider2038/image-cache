@@ -48,12 +48,23 @@ class UriTest extends TestCase
         ];
     }
 
-    public function testToString_GivenValue_ReturnedValue(): void
+    /** @test */
+    public function toString_givenValue_returnedValue(): void
     {
         $uri = new Uri(self::URI_VALUE);
 
         $result = $uri . '';
 
         $this->assertEquals(self::URI_VALUE, $result);
+    }
+
+    /** @test */
+    public function getPort_givenUriWithInvalidPort_nullReturned(): void
+    {
+        $uri = new Uri('http://example.com:port');
+
+        $port = $uri->getPort();
+
+        $this->assertNull($port);
     }
 }

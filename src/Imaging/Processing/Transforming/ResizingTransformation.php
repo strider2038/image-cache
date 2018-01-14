@@ -40,8 +40,8 @@ class ResizingTransformation implements TransformationInterface
         $sourceSize = $transformer->getSize();
         $ratio = $this->calculateImageRatio($sourceSize);
         $newSize = new Size(
-            round($sourceSize->getWidth() * $ratio),
-            round($sourceSize->getHeight() * $ratio)
+            (int) round($sourceSize->getWidth() * $ratio),
+            (int) round($sourceSize->getHeight() * $ratio)
         );
 
         $transformer->resize($newSize);
@@ -60,8 +60,8 @@ class ResizingTransformation implements TransformationInterface
     private function calculateImageRatio(SizeInterface $sourceSize): float
     {
         $ratios = [
-            (float)$this->parameters->getWidth() / (float)$sourceSize->getWidth(),
-            (float)$this->parameters->getHeight() / (float)$sourceSize->getHeight(),
+            (float) $this->parameters->getWidth() / (float) $sourceSize->getWidth(),
+            (float) $this->parameters->getHeight() / (float) $sourceSize->getHeight(),
         ];
 
         $ratio = 1;

@@ -60,3 +60,4 @@ Image caching microservice with connection to cloud hostings
 - Facade ImageCachingSystem for ImageCache and ImageStorage
 - rename ImageExtractor and ImageWriter?
 - rename ImageExtractor::extractImage() and ImageWriter::insertImage()?
+- ImageParametersConfigurator -\> ImageParametersModified, (q|quality)85
