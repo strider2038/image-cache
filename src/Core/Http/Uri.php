@@ -51,7 +51,9 @@ class Uri implements UriInterface
 
     public function getPort(): ? int
     {
-        return parse_url($this->value, PHP_URL_PORT) ?? null;
+        $port = (int) parse_url($this->value, PHP_URL_PORT);
+
+        return $port === 0 ? null : $port;
     }
 
     public function getPath(): string
