@@ -20,7 +20,7 @@
 | Size                   | size={width},{height}     | Width: [1; 600], height: [1; 450]                                   |
 | Map type               | l={map,sat,skl,trf}       | roadmap=map, satellite=sat, hybrid=map+sat, terrain not implemented |
 | Scale                  | scale={scale}             | [1.0; 4.0]                                                          |
-| Extension              |                           | *response can contain JPEG or PNG image*                            |
+| Extension              | *ignored*                 | *response can contain JPEG or PNG image*                            |
 
 ## Conversion to Google static map parameters
 
