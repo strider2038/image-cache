@@ -29,7 +29,6 @@ class ResizingTransformationFactoryTest extends TestCase
     private const STRING_PARAMETERS = 'String Parameters';
     private const STRING_PARAMETERS_IN_LOWER_CASE = 'string parameters';
     private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
-    private const PARAMETER_NAMES = ['width', 'height', 'mode'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -73,9 +72,8 @@ class ResizingTransformationFactoryTest extends TestCase
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
         $this->assertInstanceOf(ResizingTransformation::class, $transformation);
-        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
             self::PARSING_PATTERN,
-            self::PARAMETER_NAMES,
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
         $transformationParameters = $transformation->getParameters();
@@ -118,15 +116,13 @@ class ResizingTransformationFactoryTest extends TestCase
         ];
     }
 
-    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
         string $pattern,
-        array $parameterNames,
         string $parameters
     ): void {
         /** @var StringList $parameterNamesList */
         \Phake::verify($this->parametersParser, \Phake::times(1))
-            ->parseParameters($pattern, \Phake::capture($parameterNamesList), $parameters);
-        $this->assertEquals($parameterNames, $parameterNamesList->toArray());
+            ->parseParameters($pattern, $parameters);
     }
 
     private function givenStringParametersParser_parseParameters_returnsParametersList(StringList $parametersList): void

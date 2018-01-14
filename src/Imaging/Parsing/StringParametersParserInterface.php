@@ -17,5 +17,5 @@ use Strider2038\ImgCache\Collection\StringList;
  */
 interface StringParametersParserInterface
 {
-    public function parseParameters(string $pattern, StringList $parameterNames, string $string): StringList;
+    public function parseParameters(string $pattern, string $string): StringList;
 }

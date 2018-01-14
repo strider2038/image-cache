@@ -23,7 +23,6 @@ use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 class ResizingTransformationFactory implements TransformationFactoryInterface
 {
     private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
-    private const PARAMETER_NAMES = ['width', 'height', 'mode'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -41,7 +40,6 @@ class ResizingTransformationFactory implements TransformationFactoryInterface
     {
         $parametersList = $this->parametersParser->parseParameters(
             self::PARSING_PATTERN,
-            new StringList(self::PARAMETER_NAMES),
             strtolower($stringParameters)
         );
 

@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Exception\InvalidRequestValueException;
  */
 class StringParametersParser implements StringParametersParserInterface
 {
-    public function parseParameters(string $pattern, StringList $parameterNames, string $string): StringList
+    public function parseParameters(string $pattern, string $string): StringList
     {
         $isValid = preg_match_all($pattern, $string, $matches);
 
@@ -33,8 +33,10 @@ class StringParametersParser implements StringParametersParserInterface
 
         $values = new StringList();
 
-        foreach ($parameterNames as $name) {
-            $values->set($name, $matches[$name][0]);
+        foreach ($matches as $key => $match) {
+            if (\is_string($key)) {
+                $values->set($key, $match[0]);
+            }
         }
 
         return $values;

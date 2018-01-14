@@ -21,7 +21,6 @@ class ShiftingTransformationFactoryTest extends TestCase
     private const STRING_PARAMETERS = 'String Parameters';
     private const STRING_PARAMETERS_IN_LOWER_CASE = 'string parameters';
     private const PARSING_PATTERN = '/^(x(?P<x>-?\d*))?(y(?P<y>-?\d*))?$/';
-    private const PARAMETER_NAMES = ['x', 'y'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -57,9 +56,8 @@ class ShiftingTransformationFactoryTest extends TestCase
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
         $this->assertInstanceOf(ShiftingTransformation::class, $transformation);
-        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
             self::PARSING_PATTERN,
-            self::PARAMETER_NAMES,
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
         $parameters = $transformation->getParameters();
@@ -75,15 +73,13 @@ class ShiftingTransformationFactoryTest extends TestCase
         ];
     }
 
-    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndStringParameters(
         string $pattern,
-        array $parameterNames,
         string $parameters
     ): void {
         /** @var StringList $parameterNamesList */
         \Phake::verify($this->parametersParser, \Phake::times(1))
-            ->parseParameters($pattern, \Phake::capture($parameterNamesList), $parameters);
-        $this->assertEquals($parameterNames, $parameterNamesList->toArray());
+            ->parseParameters($pattern, $parameters);
     }
 
     private function givenStringParametersParser_parseParameters_returnsParametersList(StringList $parametersList): void

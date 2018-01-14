@@ -20,7 +20,6 @@ use Strider2038\ImgCache\Imaging\Processing\Point;
 class ShiftingTransformationFactory implements TransformationFactoryInterface
 {
     private const PARSING_PATTERN = '/^(x(?P<x>-?\d*))?(y(?P<y>-?\d*))?$/';
-    private const PARAMETER_NAMES = ['x', 'y'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -34,7 +33,6 @@ class ShiftingTransformationFactory implements TransformationFactoryInterface
     {
         $parametersList = $this->parametersParser->parseParameters(
             self::PARSING_PATTERN,
-            new StringList(self::PARAMETER_NAMES),
             strtolower($stringParameters)
         );
 

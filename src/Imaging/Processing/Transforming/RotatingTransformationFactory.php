@@ -21,7 +21,6 @@ use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 class RotatingTransformationFactory implements TransformationFactoryInterface
 {
     private const PARSING_PATTERN = '/^(?P<degree>-?\d*\.?\d*)$/';
-    private const PARAMETER_NAMES = ['degree'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -39,7 +38,6 @@ class RotatingTransformationFactory implements TransformationFactoryInterface
     {
         $parametersList = $this->parametersParser->parseParameters(
             self::PARSING_PATTERN,
-            new StringList(self::PARAMETER_NAMES),
             strtolower($stringParameters)
         );
 
