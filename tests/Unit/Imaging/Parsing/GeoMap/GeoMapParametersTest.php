@@ -58,13 +58,13 @@ class GeoMapParametersTest extends TestCase
      * @dataProvider geoMapParametersProvider
      */
     public function validate_givenParameters_violationsCountReturned(
-        string $type,
-        float $latitude,
-        float $longitude,
-        int $zoom,
-        int $width,
-        int $height,
-        float $scale,
+        ?string $type,
+        ?float $latitude,
+        ?float $longitude,
+        ?int $zoom,
+        ?int $width,
+        ?int $height,
+        ?float $scale,
         int $violationsCount
     ): void {
         $parameters = new GeoMapParameters();
@@ -84,6 +84,7 @@ class GeoMapParametersTest extends TestCase
     public function geoMapParametersProvider(): array
     {
         return [
+            [null, null, null, null, null, null, null, 7],
             ['roadmap', 0, 0, 1, 50, 50, 1, 0],
             ['satellite', 0, 0, 1, 50, 50, 1, 0],
             ['hybrid', 0, 0, 1, 50, 50, 1, 0],

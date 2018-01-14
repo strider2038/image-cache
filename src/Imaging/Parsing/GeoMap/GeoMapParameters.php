@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class GeoMapParameters implements EntityInterface
 {
     /**
+     * @Assert\NotBlank()
      * @Assert\Choice(
      *     choices={"roadmap", "satellite", "hybrid", "terrain"},
      *     strict=true
@@ -28,36 +29,42 @@ class GeoMapParameters implements EntityInterface
     public $type;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Range(min = -90, max = 90)
      * @var float
      */
     public $latitude;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Range(min = -180, max = 180)
      * @var float
      */
     public $longitude;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Range(min = 1, max = 20)
      * @var int
      */
     public $zoom;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Range(min = 50, max = 640)
      * @var int
      */
     public $width;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Range(min = 50, max = 640)
      * @var int
      */
     public $height;
 
     /**
+     * @Assert\NotBlank()
      * @Assert\Range(min = 1.0, max = 4.0)
      * @var float
      */
