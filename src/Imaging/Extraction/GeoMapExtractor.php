@@ -11,32 +11,31 @@
 namespace Strider2038\ImgCache\Imaging\Extraction;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParserInterface;
-use Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessorInterface;
+use Strider2038\ImgCache\Imaging\Parsing\GeoMap\GeoMapParametersParserInterface;
+use Strider2038\ImgCache\Imaging\Storage\Accessor\GeoMapStorageAccessorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
- * @deprecated
  */
-class YandexMapExtractor implements ImageExtractorInterface
+class GeoMapExtractor implements ImageExtractorInterface
 {
-    /** @var YandexMapParametersParserInterface */
-    private $parser;
+    /** @var GeoMapParametersParserInterface */
+    private $parametersParser;
 
-    /** @var YandexMapStorageAccessorInterface */
+    /** @var GeoMapStorageAccessorInterface */
     private $storageAccessor;
 
     public function __construct(
-        YandexMapParametersParserInterface $parser,
-        YandexMapStorageAccessorInterface $storageAccessor
+        GeoMapParametersParserInterface $parametersParser,
+        GeoMapStorageAccessorInterface $storageAccessor
     ) {
-        $this->parser = $parser;
+        $this->parametersParser = $parametersParser;
         $this->storageAccessor = $storageAccessor;
     }
 
     public function getProcessedImage(string $filename): Image
     {
-        $parameters = $this->parser->parseParametersFromFilename($filename);
+        $parameters = $this->parametersParser->parseMapParametersFromFilename($filename);
 
         return $this->storageAccessor->getImage($parameters);
     }
