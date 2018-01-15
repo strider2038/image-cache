@@ -37,6 +37,17 @@ class GeoMapParametersParser implements GeoMapParametersParserInterface
     /** @var GeoMapParameters */
     private $parameters;
 
+    /** @var array */
+    private $parameterTypeCasting = [
+        'type' => 'strval',
+        'latitude' => 'floatval',
+        'longitude' => 'floatval',
+        'zoom' => 'intval',
+        'width' => 'intval',
+        'height' => 'intval',
+        'scale' => 'floatval',
+    ];
+
     public function __construct(
         StringList $parsingPatterns,
         StringParametersParserInterface $parametersParser,
@@ -52,6 +63,8 @@ class GeoMapParametersParser implements GeoMapParametersParserInterface
     public function parseMapParametersFromFilename(string $filename): GeoMapParameters
     {
         $this->parameters = $this->parametersFactory->createGeoMapParameters();
+
+        $this->parameters->imageFormat = pathinfo($filename, PATHINFO_EXTENSION);
 
         $rawParameters = $this->getRawParametersFromFilename($filename);
         foreach ($rawParameters as $rawParameter) {
@@ -81,7 +94,7 @@ class GeoMapParametersParser implements GeoMapParametersParserInterface
     private function updateParametersByParsedValues(StringList $parsedParameters): void
     {
         foreach ($parsedParameters as $name => $value) {
-            $this->parameters->$name = $value;
+            $this->parameters->$name = $this->parameterTypeCasting[$name]($value);
         }
     }
 }

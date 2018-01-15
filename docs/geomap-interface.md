@@ -4,10 +4,10 @@
 
 | Name                   | Format                             | Short alias | Possible values                             | Default value    |
 | ---------------------- | ---------------------------------- | ----------- | ------------------------------------------- | ---------------- |
+| Map type               | {roadmap/satellite/hybrid/terrain} |             |                                             | roadmap          |
 | Latitude and longitude | center[=]{latitude},{longitude}    | c           | Latitude: [-90; 90], longitude: [-180; 180] | 0, 0             |
 | Zoom                   | zoom[=]{zoom}                      | z           | [1; 20]                                     | 14               |
 | Image size             | size[=]{width}[x{height}]          | s           | Width: [50; 640], height [50; 640]          | 600, 450         |
-| Map type               | {roadmap/satellite/hybrid/terrain} |             |                                             | roadmap          |
 | Scale                  | scale[=]{scale}                    | sc          | 1.0-4.0                                     | 1.0              |
 | Extension              | {filename}.{jpg/jpeg/png}          |             |                                             | *defined by url* |
 

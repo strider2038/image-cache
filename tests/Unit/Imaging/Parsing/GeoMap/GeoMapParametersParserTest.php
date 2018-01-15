@@ -27,6 +27,7 @@ class GeoMapParametersParserTest extends TestCase
     private const PARAMETER = 'parameter';
     private const LATITUDE_VALUE = 60;
     private const LONGITUDE_VALUE = 40;
+    private const IMAGE_FORMAT = 'jpg';
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -73,6 +74,7 @@ class GeoMapParametersParserTest extends TestCase
         $this->assertParametersParser_parseParameters_isCalledOnceWithPatternAndString(self::PATTERN, self::PARAMETER);
         $this->assertEquals(self::LATITUDE_VALUE, $parameters->latitude);
         $this->assertEquals(self::LONGITUDE_VALUE, $parameters->longitude);
+        $this->assertEquals(self::IMAGE_FORMAT, $parameters->imageFormat);
         $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
             GeoMapParameters::class,
             InvalidRequestValueException::class

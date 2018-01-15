@@ -31,7 +31,7 @@ class GeoMapParametersFactoryTest extends TestCase
         $this->assertEquals(600, $parameters->width);
         $this->assertEquals(450, $parameters->height);
         $this->assertEquals(1.0, $parameters->scale);
-        $this->assertNull($parameters->format);
+        $this->assertNull($parameters->imageFormat);
     }
 
     /** @test */

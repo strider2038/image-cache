@@ -20,6 +20,7 @@ class GeoMapParameters implements EntityInterface
 {
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("string")
      * @Assert\Choice(
      *     choices={"roadmap", "satellite", "hybrid", "terrain"},
      *     strict=true
@@ -30,6 +31,7 @@ class GeoMapParameters implements EntityInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("float")
      * @Assert\Range(min = -90, max = 90)
      * @var float
      */
@@ -37,6 +39,7 @@ class GeoMapParameters implements EntityInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("float")
      * @Assert\Range(min = -180, max = 180)
      * @var float
      */
@@ -44,6 +47,7 @@ class GeoMapParameters implements EntityInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("int")
      * @Assert\Range(min = 1, max = 20)
      * @var int
      */
@@ -51,6 +55,7 @@ class GeoMapParameters implements EntityInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("int")
      * @Assert\Range(min = 50, max = 640)
      * @var int
      */
@@ -58,6 +63,7 @@ class GeoMapParameters implements EntityInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("int")
      * @Assert\Range(min = 50, max = 640)
      * @var int
      */
@@ -65,6 +71,7 @@ class GeoMapParameters implements EntityInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("float")
      * @Assert\Range(min = 1.0, max = 4.0)
      * @var float
      */
@@ -72,13 +79,14 @@ class GeoMapParameters implements EntityInterface
 
     /**
      * @Assert\NotBlank()
+     * @Assert\Type("string")
      * @Assert\Choice(
      *     choices={"jpg", "jpeg", "png"},
      *     strict=true
      * )
      * @var string
      */
-    public $format;
+    public $imageFormat;
 
     public function getId(): string
     {

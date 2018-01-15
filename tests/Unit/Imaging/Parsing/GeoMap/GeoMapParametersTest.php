@@ -54,7 +54,7 @@ class GeoMapParametersTest extends TestCase
      * @param int $width
      * @param int $height
      * @param float $scale
-     * @param string $format
+     * @param string $imageFormat
      * @param int $violationsCount
      * @dataProvider geoMapParametersProvider
      */
@@ -66,7 +66,7 @@ class GeoMapParametersTest extends TestCase
         ?int $width,
         ?int $height,
         ?float $scale,
-        ?string $format,
+        ?string $imageFormat,
         int $violationsCount
     ): void {
         $parameters = new GeoMapParameters();
@@ -77,7 +77,7 @@ class GeoMapParametersTest extends TestCase
         $parameters->width = $width;
         $parameters->height = $height;
         $parameters->scale = $scale;
-        $parameters->format = $format;
+        $parameters->imageFormat = $imageFormat;
 
         $violations = $this->validator->validate($parameters);
 
