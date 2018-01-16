@@ -35,37 +35,37 @@ class YandexMapParameters implements EntityInterface, \JsonSerializable
      * @Assert\Range(min = -180, max = 180)
      * @return float
      */
-    private $longitude = 0;
+    private $longitude;
 
     /**
-     * @Assert\Range(min = -180, max = 180)
+     * @Assert\Range(min = -90, max = 90)
      * @return float
      */
-    private $latitude = 0;
+    private $latitude;
 
     /**
      * @Assert\Range(min = 0, max = 17)
      * @return int
      */
-    private $zoom = 0;
+    private $zoom;
 
     /**
      * @Assert\Range(min = 50, max = 650)
      * @return int
      */
-    private $width = 0;
+    private $width;
 
     /**
      * @Assert\Range(min = 50, max = 450)
      * @return int
      */
-    private $height = 0;
+    private $height;
 
     /**
      * @Assert\Range(min = 1.0, max = 4.0)
      * @return float
      */
-    private $scale = 0;
+    private $scale;
 
     public function __construct()
     {
