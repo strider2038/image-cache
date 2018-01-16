@@ -23,6 +23,7 @@ use Strider2038\ImgCache\Utility\HttpClientInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 class YandexMapStorageDriver implements YandexMapStorageDriverInterface
 {

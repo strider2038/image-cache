@@ -23,6 +23,7 @@ use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
 {

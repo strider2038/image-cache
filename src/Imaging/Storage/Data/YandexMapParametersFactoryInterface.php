@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Imaging\Storage\Data;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 interface YandexMapParametersFactoryInterface
 {

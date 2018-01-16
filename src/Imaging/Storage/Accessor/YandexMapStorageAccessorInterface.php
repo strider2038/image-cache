@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 interface YandexMapStorageAccessorInterface
 {

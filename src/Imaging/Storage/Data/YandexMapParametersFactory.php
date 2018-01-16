@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Collection\StringList;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 class YandexMapParametersFactory implements YandexMapParametersFactoryInterface
 {
