@@ -15,10 +15,10 @@
 
 | Parameter              | Yandex map parameter      | Possible values                                                     |
 | ---------------------- | ------------------------- | ------------------------------------------------------------------- |
+| Map type               | l={map,sat,skl,trf}       | roadmap=map, satellite=sat, hybrid=map+sat, terrain not implemented |
 | Latitude and longitude | ll={longitude},{latitude} | Latitude: [-90; 90], longitude: [-180; 180]                         |
 | Zoom                   | z={zoom}                  | [1; 17]                                                             |
-| Size                   | size={width},{height}     | Width: [1; 600], height: [1; 450]                                   |
-| Map type               | l={map,sat,skl,trf}       | roadmap=map, satellite=sat, hybrid=map+sat, terrain not implemented |
+| Image size             | size={width},{height}     | Width: [1; 600], height: [1; 450]                                   |
 | Scale                  | scale={scale}             | [1.0; 4.0]                                                          |
 | Extension              | *ignored*                 | *response can contain JPEG or PNG image*                            |
 
@@ -26,9 +26,9 @@
 
 | Parameter              | Google map parameter                         | Possible values                             |
 | ---------------------- | -------------------------------------------- | ------------------------------------------- |
+| Map type               | maptype={roadmap,satellite,hybrid,terrain}   | roadmap, satellite, hybrid, terrain         |
 | Latitude and longitude | center={latitude},{longitude}                | Latitude: [-90; 90], longitude: [-180; 180] |
 | Zoom                   | zoom={zoom}                                  | [1; 20]                                     |
-| Size                   | size={width}x{height}                        | Width: [1; 640], height: [1; 640]           |
-| Map type               | maptype={roadmap,satellite,hybrid,terrain}   | roadmap, satellite, hybrid, terrain         |
+| Image size             | size={width}x{height}                        | Width: [1; 640], height: [1; 640]           |
 | Scale                  | scale={scale}                                | 1, 2                                        |
 | Extension              | format={png,png8,png32,gif,jpg,jpg-baseline} | png, jpg                                    |
