@@ -10,11 +10,12 @@
 
 namespace Strider2038\ImgCache\Imaging\Storage\Data;
 
+use Strider2038\ImgCache\Imaging\Parsing\GeoMap\GeoMapParameters;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
- * @deprecated
  */
 interface YandexMapParametersFactoryInterface
 {
-    public function createYandexMapParameters(): YandexMapParameters;
+    public function createYandexMapParametersFromGeoMapParameters(GeoMapParameters $geoMapParameters): YandexMapParameters;
 }
