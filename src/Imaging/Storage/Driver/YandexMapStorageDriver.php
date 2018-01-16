@@ -14,7 +14,7 @@ use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\QueryParameter;
-use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\QueryParameterCollection;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -47,7 +47,7 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
         $this->logger = $logger;
     }
 
-    public function getMapContents(QueryParametersCollection $queryParameters): StreamInterface
+    public function getMapContents(QueryParameterCollection $queryParameters): StreamInterface
     {
         $this->logger->info(sprintf(
             'Sending request for map image with parameters: %s.',

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\QueryParameter;
-use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\QueryParameterCollection;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -46,7 +46,7 @@ class YandexMapStorageDriverTest extends TestCase
     public function getMapContents_givenQueryParameters_clientSendsRequestAndStreamReturned(): void
     {
         $driver = $this->createYandexMapStorageDriver();
-        $query = $this->givenQueryParametersCollection();
+        $query = $this->givenQueryParameterCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returnsStatusCode($response, HttpStatusCodeEnum::OK);
         $responseBody = $this->givenResponse_getBody_returnsStream($response);
@@ -64,7 +64,7 @@ class YandexMapStorageDriverTest extends TestCase
     public function getMapContents_givenQueryParametersWithKey_clientSendsRequestWithKey(): void
     {
         $driver = $this->createYandexMapStorageDriver(self::KEY);
-        $query = $this->givenQueryParametersCollection();
+        $query = $this->givenQueryParameterCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returnsStatusCode($response, HttpStatusCodeEnum::OK);
         $this->givenResponse_getBody_returnsStream($response);
@@ -83,7 +83,7 @@ class YandexMapStorageDriverTest extends TestCase
     public function getMapContents_givenInvalidQueryParameters_responseCodeIsNot200AndExceptionThrown(): void
     {
         $driver = $this->createYandexMapStorageDriver();
-        $query = $this->givenQueryParametersCollection();
+        $query = $this->givenQueryParameterCollection();
         $response = $this->givenClient_request_returnsResponse();
         $this->givenResponse_getStatusCode_returnsStatusCode($response, HttpStatusCodeEnum::BAD_REQUEST);
 
@@ -126,9 +126,9 @@ class YandexMapStorageDriverTest extends TestCase
         $this->assertEquals($queryParameters, $parameters['query']);
     }
 
-    private function givenQueryParametersCollection(): QueryParametersCollection
+    private function givenQueryParameterCollection(): QueryParameterCollection
     {
-        $query = new QueryParametersCollection();
+        $query = new QueryParameterCollection();
         $query->add(new QueryParameter('parameter', 'value'));
 
         return $query;

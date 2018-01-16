@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Imaging\Storage\Accessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\QueryParameter;
-use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\QueryParameterCollection;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
@@ -65,7 +65,7 @@ class YandexMapStorageAccessor implements YandexMapStorageAccessorInterface
 
         $this->validator->validateWithException($parameters, InvalidRequestValueException::class);
 
-        $query = new QueryParametersCollection([
+        $query = new QueryParameterCollection([
             new QueryParameter('l', $parameters->getLayers()->implode()),
             new QueryParameter('ll', sprintf(
                 '%s,%s',

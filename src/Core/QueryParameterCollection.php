@@ -15,7 +15,7 @@ use Strider2038\ImgCache\Collection\AbstractClassCollection;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class QueryParametersCollection extends AbstractClassCollection
+class QueryParameterCollection extends AbstractClassCollection
 {
     public function __construct(array $elements = [])
     {

@@ -11,19 +11,19 @@
 namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\QueryParameterCollection;
 use Strider2038\ImgCache\Core\QueryParameterInterface;
-use Strider2038\ImgCache\Core\QueryParametersCollection;
 
-class QueryParametersCollectionTest extends TestCase
+class QueryParameterCollectionTest extends TestCase
 {
     private const NAME = 'name';
     private const VALUE = 'value';
 
     /** @test */
-    public function toArray_givenQueryParameter_properlyFormattedArrayIsReturned(): void
+    public function toArray_givenQueryParameter_properlyFormattedArrayReturned(): void
     {
         $parameter = $this->givenQueryParameter();
-        $collection = new QueryParametersCollection([$parameter]);
+        $collection = new QueryParameterCollection([$parameter]);
 
         $array = $collection->toArray();
 

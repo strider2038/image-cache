@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Storage\Accessor;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Collection\StringList;
-use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\QueryParameterCollection;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Image\Image;
@@ -113,7 +113,7 @@ class YandexMapStorageAccessorTest extends TestCase
     private function assertStorageDriver_getMapContents_isCalledOnceWithQueryParameters(
         array $expectedQueryParameters
     ): void {
-        /** @var QueryParametersCollection $queryParameters */
+        /** @var QueryParameterCollection $queryParameters */
         \Phake::verify($this->storageDriver, \Phake::times(1))
             ->getMapContents(\Phake::capture($queryParameters));
 
