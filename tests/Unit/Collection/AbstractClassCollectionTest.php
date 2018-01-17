@@ -81,6 +81,21 @@ class AbstractClassCollectionTest extends TestCase
         $this->assertInstanceOf(self::class, $collection->first());
     }
 
+    /** @test */
+    public function merge_givenCollection_collectionMergedWithGivenCollection(): void
+    {
+        $collection = $this->createCollection();
+        $collection->set('first', new static());
+        $mergingCollection = $this->createCollection();
+        $mergingCollection->set('second', new static());
+
+        $collection->merge($mergingCollection);
+
+        $this->assertCount(2, $collection);
+        $this->assertTrue($collection->containsKey('first'));
+        $this->assertTrue($collection->containsKey('second'));
+    }
+
     private function createCollection(): AbstractClassCollection
     {
         return new class ([], self::class) extends AbstractClassCollection {};
