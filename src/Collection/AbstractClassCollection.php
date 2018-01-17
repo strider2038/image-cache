@@ -71,6 +71,17 @@ abstract class AbstractClassCollection extends ArrayCollection
     }
 
     /**
+     * @param AbstractClassCollection $collection
+     * @throws \DomainException
+     */
+    public function append(AbstractClassCollection $collection): void
+    {
+        foreach ($collection as $element) {
+            $this->add($element);
+        }
+    }
+
+    /**
      * @param $value
      * @throws \DomainException
      */
