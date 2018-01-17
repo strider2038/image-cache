@@ -45,14 +45,14 @@ class StringParametersParserTest extends TestCase
      * @param array $expectedArray
      * @dataProvider patternAndParameterNamesAndValidStringAndValuesProvider
      */
-    public function parseParameters_givenPatternAndParameterNamesAndValidString_parameterValuesReturned(
+    public function strictlyParseParameters_givenPatternAndParameterNamesAndValidString_parameterValuesReturned(
         string $pattern,
         string $string,
         array $expectedArray
     ): void {
         $parser = new StringParametersParser();
 
-        $parameters = $parser->parseParameters($pattern, $string);
+        $parameters = $parser->strictlyParseParameters($pattern, $string);
 
         $this->assertArraySubset($expectedArray, $parameters->toArray());
     }
