@@ -20,6 +20,11 @@ abstract class AbstractClassCollection extends ArrayCollection
     /** @var string */
     private $className;
 
+    /**
+     * @param array $elements
+     * @param string $className
+     * @throws \DomainException
+     */
     public function __construct(array $elements = [], string $className)
     {
         if (!class_exists($className) && !interface_exists($className)) {
@@ -30,6 +35,7 @@ abstract class AbstractClassCollection extends ArrayCollection
         foreach ($elements as $element) {
             $this->validateElement($element);
         }
+
         parent::__construct($elements);
     }
 
@@ -51,6 +57,28 @@ abstract class AbstractClassCollection extends ArrayCollection
     {
         $this->validateElement($element);
         return parent::add($element);
+    }
+
+    /**
+     * @param AbstractClassCollection $collection
+     * @throws \DomainException
+     */
+    public function merge(AbstractClassCollection $collection): void
+    {
+        foreach ($collection as $key => $value) {
+            $this->set($key, $value);
+        }
+    }
+
+    /**
+     * @param AbstractClassCollection $collection
+     * @throws \DomainException
+     */
+    public function append(AbstractClassCollection $collection): void
+    {
+        foreach ($collection as $element) {
+            $this->add($element);
+        }
     }
 
     /**

@@ -29,7 +29,6 @@ class ResizingTransformationFactoryTest extends TestCase
     private const STRING_PARAMETERS = 'String Parameters';
     private const STRING_PARAMETERS_IN_LOWER_CASE = 'string parameters';
     private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
-    private const PARAMETER_NAMES = ['width', 'height', 'mode'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -67,15 +66,14 @@ class ResizingTransformationFactoryTest extends TestCase
             'height' => $stringHeight,
             'mode' => $stringMode,
         ]);
-        $this->givenStringParametersParser_parseParameters_returnsParametersList($parametersList);
+        $this->givenStringParametersParser_strictlyParseParameters_returnsParametersList($parametersList);
 
         /** @var ResizingTransformation $transformation */
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
         $this->assertInstanceOf(ResizingTransformation::class, $transformation);
-        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+        $this->assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
             self::PARSING_PATTERN,
-            self::PARAMETER_NAMES,
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
         $transformationParameters = $transformation->getParameters();
@@ -118,21 +116,23 @@ class ResizingTransformationFactoryTest extends TestCase
         ];
     }
 
-    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+    private function assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
         string $pattern,
-        array $parameterNames,
         string $parameters
     ): void {
         /** @var StringList $parameterNamesList */
         \Phake::verify($this->parametersParser, \Phake::times(1))
-            ->parseParameters($pattern, \Phake::capture($parameterNamesList), $parameters);
-        $this->assertEquals($parameterNames, $parameterNamesList->toArray());
+            ->strictlyParseParameters($pattern, $parameters);
     }
 
-    private function givenStringParametersParser_parseParameters_returnsParametersList(StringList $parametersList): void
-    {
-        \Phake::when($this->parametersParser)->parseParameters(\Phake::anyParameters())->thenReturn($parametersList);
+    private function givenStringParametersParser_strictlyParseParameters_returnsParametersList(
+        StringList $parametersList
+    ): void {
+        \Phake::when($this->parametersParser)
+            ->strictlyParseParameters(\Phake::anyParameters())
+            ->thenReturn($parametersList);
     }
+
     private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
         string $entityClass,
         string $exceptionClass

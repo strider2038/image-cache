@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
-use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\Point;
 
@@ -20,7 +19,6 @@ use Strider2038\ImgCache\Imaging\Processing\Point;
 class ShiftingTransformationFactory implements TransformationFactoryInterface
 {
     private const PARSING_PATTERN = '/^(x(?P<x>-?\d*))?(y(?P<y>-?\d*))?$/';
-    private const PARAMETER_NAMES = ['x', 'y'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -32,9 +30,8 @@ class ShiftingTransformationFactory implements TransformationFactoryInterface
 
     public function createTransformation(string $stringParameters): TransformationInterface
     {
-        $parametersList = $this->parametersParser->parseParameters(
+        $parametersList = $this->parametersParser->strictlyParseParameters(
             self::PARSING_PATTERN,
-            new StringList(self::PARAMETER_NAMES),
             strtolower($stringParameters)
         );
 

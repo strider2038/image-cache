@@ -8,14 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Yandex\Map;
-
-use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParameters;
+namespace Strider2038\ImgCache\Imaging\Parsing\GeoMap;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ValueConfiguratorInterface
+interface GeoMapParametersParserInterface
 {
-    public function configure(string $value, YandexMapParameters $parameters): void;
+    public function parseMapParametersFromFilename(string $filename): GeoMapParameters;
 }

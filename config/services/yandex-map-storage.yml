@@ -53,31 +53,38 @@ services:
             - '@image_processor'
 
     yandex_map_image_extractor:
-        class: Strider2038\ImgCache\Imaging\Extraction\YandexMapExtractor
+        class: Strider2038\ImgCache\Imaging\Extraction\GeoMapExtractor
         arguments:
             - '@yandex_map_parameters_parser'
             - '@yandex_map_storage_accessor'
 
     yandex_map_parameters_parser:
-        class: Strider2038\ImgCache\Imaging\Parsing\Yandex\YandexMapParametersParser
+        class: Strider2038\ImgCache\Imaging\Parsing\GeoMap\GeoMapParametersParser
         arguments:
-            - '@yandex_map_value_configurator_factory'
-            - '@yandex_map_parameters_factory'
-    yandex_map_value_configurator_factory:
-        class: Strider2038\ImgCache\Imaging\Parsing\Yandex\Map\ValueConfiguratorFactory
+            - '@geo_map_parsing_patterns'
+            - '@string_parameters_parser'
+            - '@geo_map_parameters_factory'
+            - '@entity_validator'
 
     yandex_map_parameters_factory:
         class: Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParametersFactory
-    yandex_map_storage_accessor:
-        class: Strider2038\ImgCache\Imaging\Storage\Accessor\YandexMapStorageAccessor
         arguments:
             - '@entity_validator'
+
+    yandex_map_storage_accessor:
+        class: Strider2038\ImgCache\Imaging\Storage\Accessor\GeoMapStorageAccessor
+        arguments:
+            - '@yandex_map_parameters_converter'
             - '@yandex_map_storage_driver'
             - '@image_factory'
-        calls:
-            - [setLogger, ['@logger']]
+
+    yandex_map_parameters_converter:
+        class: Strider2038\ImgCache\Imaging\Storage\Converter\YandexMapParametersConverter
+        arguments:
+            - '@yandex_map_parameters_factory'
+
     yandex_map_storage_driver:
-        class: Strider2038\ImgCache\Imaging\Storage\Driver\YandexMapStorageDriver
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\ApiStorageDriver
         arguments:
             - '@yandex_map_client_adapter'
         calls:

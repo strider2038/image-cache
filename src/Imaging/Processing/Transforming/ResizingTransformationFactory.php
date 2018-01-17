@@ -11,7 +11,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Processing\Transforming;
 
-use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Enum\ResizeModeEnum;
 use Strider2038\ImgCache\Exception\InvalidRequestValueException;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
@@ -23,7 +22,6 @@ use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 class ResizingTransformationFactory implements TransformationFactoryInterface
 {
     private const PARSING_PATTERN = '/^(?P<width>\d+)(x(?P<height>\d+))?(?P<mode>[fswh]{1})?$/';
-    private const PARAMETER_NAMES = ['width', 'height', 'mode'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -39,9 +37,8 @@ class ResizingTransformationFactory implements TransformationFactoryInterface
 
     public function createTransformation(string $stringParameters): TransformationInterface
     {
-        $parametersList = $this->parametersParser->parseParameters(
+        $parametersList = $this->parametersParser->strictlyParseParameters(
             self::PARSING_PATTERN,
-            new StringList(self::PARAMETER_NAMES),
             strtolower($stringParameters)
         );
 

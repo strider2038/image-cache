@@ -32,7 +32,7 @@ Image caching microservice with connection to cloud hostings
 - [x] Shift transformation
 - [x] Rotate transformation
 - [x] Flip and flop transformations
-- [ ] Multipurpose interface to request geographical map images
+- [x] Multipurpose interface to request geographical map images
 - [ ] Make user-friendly configuration of microservice 
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache

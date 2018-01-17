@@ -37,7 +37,7 @@ class FilesystemStorageDriverTest extends TestCase
     /** @var FileOperationsInterface */
     private $fileOperations;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->fileOperations = $this->givenFileOperations();
     }

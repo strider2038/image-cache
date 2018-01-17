@@ -10,18 +10,17 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Processing\Transforming;
 
+use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Imaging\Parsing\StringParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformation;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\ShiftingTransformationFactory;
-use PHPUnit\Framework\TestCase;
 
 class ShiftingTransformationFactoryTest extends TestCase
 {
     private const STRING_PARAMETERS = 'String Parameters';
     private const STRING_PARAMETERS_IN_LOWER_CASE = 'string parameters';
     private const PARSING_PATTERN = '/^(x(?P<x>-?\d*))?(y(?P<y>-?\d*))?$/';
-    private const PARAMETER_NAMES = ['x', 'y'];
 
     /** @var StringParametersParserInterface */
     private $parametersParser;
@@ -46,7 +45,7 @@ class ShiftingTransformationFactoryTest extends TestCase
         int $shiftPointY
     ): void {
         $factory = new ShiftingTransformationFactory($this->parametersParser);
-        $this->givenStringParametersParser_parseParameters_returnsParametersList(
+        $this->givenStringParametersParser_strictlyParseParameters_returnsParametersList(
             new StringList([
                 'x' => $stringX,
                 'y' => $stringY,
@@ -57,9 +56,8 @@ class ShiftingTransformationFactoryTest extends TestCase
         $transformation = $factory->createTransformation(self::STRING_PARAMETERS);
 
         $this->assertInstanceOf(ShiftingTransformation::class, $transformation);
-        $this->assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+        $this->assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
             self::PARSING_PATTERN,
-            self::PARAMETER_NAMES,
             self::STRING_PARAMETERS_IN_LOWER_CASE
         );
         $parameters = $transformation->getParameters();
@@ -75,19 +73,20 @@ class ShiftingTransformationFactoryTest extends TestCase
         ];
     }
 
-    private function assertStringParametersParser_parseParameters_isCalledOnceWithPatternAndParameterNamesAndStringParameters(
+    private function assertStringParametersParser_strictlyParseParameters_isCalledOnceWithPatternAndStringParameters(
         string $pattern,
-        array $parameterNames,
         string $parameters
     ): void {
         /** @var StringList $parameterNamesList */
         \Phake::verify($this->parametersParser, \Phake::times(1))
-            ->parseParameters($pattern, \Phake::capture($parameterNamesList), $parameters);
-        $this->assertEquals($parameterNames, $parameterNamesList->toArray());
+            ->strictlyParseParameters($pattern, $parameters);
     }
 
-    private function givenStringParametersParser_parseParameters_returnsParametersList(StringList $parametersList): void
-    {
-        \Phake::when($this->parametersParser)->parseParameters(\Phake::anyParameters())->thenReturn($parametersList);
+    private function givenStringParametersParser_strictlyParseParameters_returnsParametersList(
+        StringList $parametersList
+    ): void {
+        \Phake::when($this->parametersParser)
+            ->strictlyParseParameters(\Phake::anyParameters())
+            ->thenReturn($parametersList);
     }
 }

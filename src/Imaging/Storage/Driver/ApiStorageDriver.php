@@ -13,8 +13,8 @@ namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\QueryParameter;
-use Strider2038\ImgCache\Core\QueryParametersCollection;
+use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Core\QueryParameterCollection;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -24,21 +24,23 @@ use Strider2038\ImgCache\Utility\HttpClientInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class YandexMapStorageDriver implements YandexMapStorageDriverInterface
+class ApiStorageDriver implements ApiStorageDriverInterface
 {
     /** @var HttpClientInterface */
     private $client;
 
-    /** @var string */
-    private $key;
+    /** @var QueryParameterCollection */
+    private $additionalQueryParameters;
 
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(HttpClientInterface $client, string $key = '')
-    {
+    public function __construct(
+        HttpClientInterface $client,
+        QueryParameterCollection $additionalParameters = null
+    ) {
         $this->client = $client;
-        $this->key = $key;
+        $this->additionalQueryParameters = $additionalParameters ?? new QueryParameterCollection();
         $this->logger = new NullLogger();
     }
 
@@ -47,26 +49,44 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
         $this->logger = $logger;
     }
 
-    public function getMapContents(QueryParametersCollection $queryParameters): StreamInterface
+    public function getImageContents(QueryParameterCollection $queryParameterCollection): StreamInterface
     {
         $this->logger->info(sprintf(
             'Sending request for map image with parameters: %s.',
-            json_encode($queryParameters->toArray())
+            json_encode($queryParameterCollection->toArray())
         ));
 
-        if ($this->key !== '') {
-            $queryParameters = clone $queryParameters;
-            $queryParameters->add(new QueryParameter('key', $this->key));
-        }
+        $query = $this->collectQueryParameters($queryParameterCollection);
+        $response = $this->makeApiRequest($query);
+        $this->validateResponseIsOk($response);
+        $body = $response->getBody();
 
-        $response = $this->client->request(
+        $this->logger->info('Successful response is received and response body returned.');
+
+        return $body;
+    }
+
+    private function collectQueryParameters(QueryParameterCollection $queryParameterCollection): QueryParameterCollection
+    {
+        $query = clone $queryParameterCollection;
+        $query->append($this->additionalQueryParameters);
+
+        return $query;
+    }
+
+    private function makeApiRequest(QueryParameterCollection $queryParameterCollection): ResponseInterface
+    {
+        return $this->client->request(
             HttpMethodEnum::GET,
             '',
             [
-                RequestOptions::QUERY => $queryParameters->toArray()
+                RequestOptions::QUERY => $queryParameterCollection->toArray()
             ]
         );
+    }
 
+    private function validateResponseIsOk(ResponseInterface $response): void
+    {
         $statusCode = $response->getStatusCode()->getValue();
 
         if ($statusCode !== HttpStatusCodeEnum::OK) {
@@ -78,11 +98,5 @@ class YandexMapStorageDriver implements YandexMapStorageDriverInterface
                 )
             );
         }
-
-        $body = $response->getBody();
-
-        $this->logger->info('Successful response is received and response body returned.');
-
-        return $body;
     }
 }

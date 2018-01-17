@@ -5,6 +5,7 @@ imports:
   - { resource: 'services/routing.yml' }
   - { resource: 'services/imaging.yml' }
   - { resource: 'services/filesystem-storage.yml' }
+  - { resource: 'services/geo-map.yml' }
   - { resource: 'services/yandex-map-storage.yml' }
   - { resource: 'services/yandex-disk-storage.yml' }
   - { resource: 'parameters.yml' }

@@ -8,12 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging\Parsing\Yandex\Map;
+namespace Strider2038\ImgCache\Imaging\Storage\Accessor;
+
+use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Parsing\GeoMap\GeoMapParameters;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ValueConfiguratorFactoryInterface
+interface GeoMapStorageAccessorInterface
 {
-    public function create(string $name): ValueConfiguratorInterface;
+    public function getImage(GeoMapParameters $parameters): Image;
 }

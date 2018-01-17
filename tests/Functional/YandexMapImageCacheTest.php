@@ -26,11 +26,11 @@ class YandexMapImageCacheTest extends FunctionalTestCase
 {
     private const PNG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.png';
     private const JPEG_FILENAME = self::TEMPORARY_DIRECTORY . '/image.jpg';
-    private const IMAGE_WITH_INVALID_PARAMETERS = '/size=0,0.jpg';
-    private const IMAGE_JPEG_CACHE_KEY = '/ll=60.715799,28.729073_size=150,100.jpg';
-    private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . '/ll=60.715799,28.729073_size=150,100.jpg';
-    private const IMAGE_PNG_CACHE_KEY = '/ll=60.715799,28.729073_size=150,100.png';
-    private const IMAGE_PNG_WEB_FILENAME = self::WEB_DIRECTORY . '/ll=60.715799,28.729073_size=150,100.png';
+    private const IMAGE_WITH_INVALID_PARAMETERS = '/center40,60_size0x0.jpg';
+    private const IMAGE_JPEG_CACHE_KEY = '/center60.715799,28.729073_size150x100.jpg';
+    private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . '/center60.715799,28.729073_size150x100.jpg';
+    private const IMAGE_PNG_CACHE_KEY = '/center60.715799,28.729073_size150x100.png';
+    private const IMAGE_PNG_WEB_FILENAME = self::WEB_DIRECTORY . '/center60.715799,28.729073_size150x100.png';
 
     /** @var ClientInterface */
     private $client;

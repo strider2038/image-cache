@@ -84,16 +84,16 @@ class YandexMapParametersTest extends TestCase
         float $scale,
         int $violationsCount
     ): void {
-        $model = new YandexMapParameters();
-        $model->setLayers(new StringList($layers));
-        $model->setLongitude($longitude);
-        $model->setLatitude($latitude);
-        $model->setZoom($zoom);
-        $model->setWidth($width);
-        $model->setHeight($height);
-        $model->setScale($scale);
+        $parameters = new YandexMapParameters();
+        $parameters->layers = new StringList($layers);
+        $parameters->longitude = $longitude;
+        $parameters->latitude = $latitude;
+        $parameters->zoom = $zoom;
+        $parameters->width = $width;
+        $parameters->height = $height;
+        $parameters->scale = $scale;
 
-        $violations = $this->validator->validate($model);
+        $violations = $this->validator->validate($parameters);
 
         $this->assertEquals($violationsCount, $violations->count());
     }
@@ -112,10 +112,14 @@ class YandexMapParametersTest extends TestCase
             [[], 0, 0, 0, 100, 150, 1.0, 1],
             [['a'], 0, 0, 0, 100, 150, 1.0, 1],
             [['a', 'b'], 0, 0, 0, 100, 150, 1.0, 2],
+            [self::LAYERS, -180, 0, 1, 100, 150, 1.0, 0],
             [self::LAYERS, -180.1, 0, 1, 100, 150, 1.0, 1],
             [self::LAYERS, 180.1, 0, 1, 100, 150, 1.0, 1],
-            [self::LAYERS, -180, 180.1, 1, 100, 150, 1.0, 1],
-            [self::LAYERS, 180, -180.1, 1, 100, 150, 1.0, 1],
+            [self::LAYERS, 180, 0, 1, 100, 150, 1.0, 0],
+            [self::LAYERS, -180, 90, 1, 100, 150, 1.0, 0],
+            [self::LAYERS, -180, 90.1, 1, 100, 150, 1.0, 1],
+            [self::LAYERS, 180, -90, 1, 100, 150, 1.0, 0],
+            [self::LAYERS, 180, -90.1, 1, 100, 150, 1.0, 1],
             [self::LAYERS, 0, 0, -1, 100, 150, 1.0, 1],
             [self::LAYERS, 0, 0, 18, 100, 150, 1.0, 1],
             [self::LAYERS, 0, 0, 0, 100, 150, 1.0, 0],
@@ -139,16 +143,16 @@ class YandexMapParametersTest extends TestCase
     /** @test */
     public function jsonSerialize_givenParameters_validJsonIsReturned(): void
     {
-        $model = new YandexMapParameters();
-        $model->setLayers(new StringList(self::LAYERS));
-        $model->setLongitude(self::LONGITUDE);
-        $model->setLatitude(self::LATITUDE);
-        $model->setZoom(self::ZOOM);
-        $model->setWidth(self::WIDTH);
-        $model->setHeight(self::HEIGHT);
-        $model->setScale(self::SCALE);
+        $parameters = new YandexMapParameters();
+        $parameters->layers = new StringList(self::LAYERS);
+        $parameters->longitude = self::LONGITUDE;
+        $parameters->latitude = self::LATITUDE;
+        $parameters->zoom = self::ZOOM;
+        $parameters->width = self::WIDTH;
+        $parameters->height = self::HEIGHT;
+        $parameters->scale = self::SCALE;
 
-        $json = json_encode($model);
+        $json = json_encode($parameters);
 
         $this->assertEquals(json_encode(self::JSON_ARRAY), $json);
     }

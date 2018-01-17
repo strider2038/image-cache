@@ -10,42 +10,49 @@
 
 namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing;
 
-use Strider2038\ImgCache\Collection\StringList;
-use Strider2038\ImgCache\Imaging\Parsing\StringParametersParser;
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Imaging\Parsing\StringParametersParser;
 
 class StringParametersParserTest extends TestCase
 {
+    /** @test */
+    public function parseParameters_givenPatternAndParameterNamesAndInvalidString_invalidRequestValueExceptionThrown(): void
+    {
+        $parser = new StringParametersParser();
+
+        $parameters = $parser->parseParameters('/^(?P<x>\d+)$/', 'invalid');
+
+        $this->assertCount(0, $parameters);
+    }
+
     /**
      * @test
      * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestValueException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Given invalid parameter
      */
-    public function parseParameters_givenPatternAndParameterNamesAndInvalidString_invalidRequestValueExceptionThrown(): void
+    public function strictlyParseParameters_givenPatternAndParameterNamesAndInvalidString_invalidRequestValueExceptionThrown(): void
     {
         $parser = new StringParametersParser();
 
-        $parser->parseParameters('/^(?P<x>\d+)$/', new StringList(['x']), 'invalid');
+        $parser->strictlyParseParameters('/^(?P<x>\d+)$/', 'invalid');
     }
 
     /**
      * @test
      * @param string $pattern
-     * @param array $parameterNames
      * @param string $string
      * @param array $expectedArray
      * @dataProvider patternAndParameterNamesAndValidStringAndValuesProvider
      */
-    public function parseParameters_givenPatternAndParameterNamesAndValidString_parameterValuesReturned(
+    public function strictlyParseParameters_givenPatternAndParameterNamesAndValidString_parameterValuesReturned(
         string $pattern,
-        array $parameterNames,
         string $string,
         array $expectedArray
     ): void {
         $parser = new StringParametersParser();
 
-        $parameters = $parser->parseParameters($pattern, new StringList($parameterNames), $string);
+        $parameters = $parser->strictlyParseParameters($pattern, $string);
 
         $this->assertArraySubset($expectedArray, $parameters->toArray());
     }
@@ -55,7 +62,6 @@ class StringParametersParserTest extends TestCase
         return [
             [
                 '/^(?P<parameterX>\d+)x(?P<parameterY>\d+)$/',
-                ['parameterX', 'parameterY'],
                 '20x30',
                 [
                     'parameterX' => '20',
@@ -64,7 +70,6 @@ class StringParametersParserTest extends TestCase
             ],
             [
                 '/^(?P<parameterX>\d+)x(?P<parameterY>\d+)$/',
-                ['parameterX'],
                 '20x30',
                 [
                     'parameterX' => '20',
@@ -72,7 +77,6 @@ class StringParametersParserTest extends TestCase
             ],
             [
                 '/^(?P<parameterX>\d+)(x)?(?P<parameterY>\d+)?$/',
-                ['parameterX', 'parameterY'],
                 '20',
                 [
                     'parameterX' => '20',
