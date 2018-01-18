@@ -37,7 +37,7 @@ services:
         arguments:
             - '@transformation_creator'
             - '@image_parameters_factory'
-            - '@image_parameters_configurator'
+            - '@image_parameters_modifier'
     string_parameters_parser:
         class: Strider2038\ImgCache\Imaging\Parsing\StringParametersParser
 
@@ -46,8 +46,10 @@ services:
         class: Strider2038\ImgCache\Imaging\Image\ImageParametersFactory
         arguments:
             - '%image_parameters.quality%'
-    image_parameters_configurator:
-        class: Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfigurator
+    image_parameters_modifier:
+        class: Strider2038\ImgCache\Imaging\Parsing\ImageParametersModifier
+        arguments:
+            - '@string_parameters_parser'
     image_processor:
         class: Strider2038\ImgCache\Imaging\Processing\ImageProcessor
         arguments:

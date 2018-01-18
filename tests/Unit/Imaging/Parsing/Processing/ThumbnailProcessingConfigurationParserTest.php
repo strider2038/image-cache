@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Imaging\Parsing\Processing;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
-use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
+use Strider2038\ImgCache\Imaging\Parsing\ImageParametersModifierInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Processing\ThumbnailProcessingConfigurationParser;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
@@ -27,14 +27,14 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
     /** @var ImageParametersFactoryInterface */
     private $imageParametersFactory;
 
-    /** @var ImageParametersConfiguratorInterface */
-    private $imageParametersConfigurator;
+    /** @var ImageParametersModifierInterface */
+    private $imageParametersModifier;
 
     protected function setUp(): void
     {
         $this->transformationsCreator = \Phake::mock(TransformationCreatorInterface::class);
         $this->imageParametersFactory = \Phake::mock(ImageParametersFactoryInterface::class);
-        $this->imageParametersConfigurator = \Phake::mock(ImageParametersConfiguratorInterface::class);
+        $this->imageParametersModifier = \Phake::mock(ImageParametersModifierInterface::class);
     }
 
     /**
@@ -55,7 +55,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
         $this->assertTransformationsCount($count, $parsedConfiguration);
         $this->assertTransformationCreator_findAndCreateTransformation_isCalledTimes($count);
-        $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(0);
+        $this->assertImageParametersModifier_updateParametersByConfiguration_isCalledTimes(0);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
 
@@ -77,7 +77,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
 
         $this->assertTransformationsCount(0, $parsedConfiguration);
         $this->assertTransformationCreator_findAndCreateTransformation_isCalledTimes($count);
-        $this->assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes($count);
+        $this->assertImageParametersModifier_updateParametersByConfiguration_isCalledTimes($count);
         $this->verifyProcessingConfiguration($parsedConfiguration, $defaultParameters);
     }
 
@@ -95,7 +95,7 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
         $parser = new ThumbnailProcessingConfigurationParser(
             $this->transformationsCreator,
             $this->imageParametersFactory,
-            $this->imageParametersConfigurator
+            $this->imageParametersModifier
         );
 
         return $parser;
@@ -137,9 +137,9 @@ class ThumbnailProcessingConfigurationParserTest extends TestCase
             ->findAndCreateTransformation(\Phake::anyParameters());
     }
 
-    private function assertImageParametersConfigurator_updateParametersByConfiguration_isCalledTimes(int $times): void
+    private function assertImageParametersModifier_updateParametersByConfiguration_isCalledTimes(int $times): void
     {
-        \Phake::verify($this->imageParametersConfigurator, \Phake::times($times))
+        \Phake::verify($this->imageParametersModifier, \Phake::times($times))
             ->updateParametersByConfiguration(\Phake::anyParameters());
     }
 

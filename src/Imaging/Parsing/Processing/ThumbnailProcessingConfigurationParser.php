@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Parsing\Processing;
 
 use Strider2038\ImgCache\Imaging\Image\ImageParametersFactoryInterface;
-use Strider2038\ImgCache\Imaging\Parsing\ImageParametersConfiguratorInterface;
+use Strider2038\ImgCache\Imaging\Parsing\ImageParametersModifierInterface;
 use Strider2038\ImgCache\Imaging\Processing\ProcessingConfiguration;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCollection;
 use Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationCreatorInterface;
@@ -27,17 +27,17 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
     /** @var ImageParametersFactoryInterface */
     private $imageParametersFactory;
 
-    /** @var ImageParametersConfiguratorInterface */
-    private $imageParametersConfigurator;
+    /** @var ImageParametersModifierInterface */
+    private $imageParametersModifier;
 
     public function __construct(
         TransformationCreatorInterface $transformationsCreator,
         ImageParametersFactoryInterface $imageParametersFactory,
-        ImageParametersConfiguratorInterface $imageParametersConfigurator
+        ImageParametersModifierInterface $imageParametersModifier
     ) {
         $this->transformationsCreator = $transformationsCreator;
         $this->imageParametersFactory = $imageParametersFactory;
-        $this->imageParametersConfigurator = $imageParametersConfigurator;
+        $this->imageParametersModifier = $imageParametersModifier;
     }
 
     public function parseConfiguration(string $configuration): ProcessingConfiguration
@@ -51,7 +51,7 @@ class ThumbnailProcessingConfigurationParser implements ProcessingConfigurationP
             if ($transformation !== null) {
                 $transformations->add($transformation);
             } else {
-                $this->imageParametersConfigurator->updateParametersByConfiguration($imageParameters, $value);
+                $this->imageParametersModifier->updateParametersByConfiguration($imageParameters, $value);
             }
         }
 
