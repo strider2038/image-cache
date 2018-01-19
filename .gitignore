@@ -2,7 +2,8 @@
 /vendor
 
 # local configuration
-/config/*-local.yml
+/config/local.yml
+/config/parameters.yml
 
 # build logs
 /build/logs/

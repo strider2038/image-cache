@@ -8,5 +8,5 @@ imports:
   - { resource: 'services/geo-map.yml' }
   - { resource: 'services/yandex-map-storage.yml' }
   - { resource: 'services/yandex-disk-storage.yml' }
-  - { resource: 'parameters.yml' }
-  - { resource: 'parameters-local.yml', ignore_errors: true }
+  - { resource: 'services/parameters.yml' }
+  - { resource: 'local.yml', ignore_errors: true }

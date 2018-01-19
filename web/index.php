@@ -10,7 +10,7 @@ require $applicationDirectory . '/vendor/autoload.php';
 
 $container = new ContainerBuilder();
 $loader = new YamlFileLoader($container, new FileLocator($applicationDirectory));
-$loader->load('config/web.yml');
+$loader->load('config/main.yml');
 $container->setParameter('app.directory', $applicationDirectory);
 $container->setParameter('server_configuration', $_SERVER);
 
