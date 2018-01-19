@@ -11,7 +11,7 @@ require $applicationDirectory . '/vendor/autoload.php';
 $container = new ContainerBuilder();
 $loader = new YamlFileLoader($container, new FileLocator($applicationDirectory));
 $loader->load('config/main.yml');
-$container->setParameter('app.directory', $applicationDirectory);
+$container->setParameter('application.directory', $applicationDirectory);
 $container->setParameter('server_configuration', $_SERVER);
 
 $app = new \Strider2038\ImgCache\Application($container);
