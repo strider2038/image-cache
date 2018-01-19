@@ -1,0 +1,7 @@
+@startuml
+
+Application -> RequestHandler : handleRequest(request)
+Application <-- RequestHandler : response
+Application -> ResponseSender : sendResponse(response)
+
+@enduml
