@@ -97,7 +97,7 @@ class ApplicationTest extends TestCase
         $exitCode = $application->run();
 
         $this->assertEquals(0, $exitCode);
-        $this->assertLoggerRequest_logCurrentRequest_isCalledOnce();
+        $this->assertLoggerRequest_logClientRequest_isCalledOnce();
         $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
         $this->assertContainer_get_isCalledOnceWithControllerId(self::CONTROLLER_ID);
         $this->assertController_runAction_isCalledOnceWithActionIdAndRequest($controller, self::ACTION_ID, $routerRequest);
@@ -115,7 +115,7 @@ class ApplicationTest extends TestCase
         $exitCode = $application->run();
 
         $this->assertEquals(1, $exitCode);
-        $this->assertLoggerRequest_logCurrentRequest_isCalledOnce();
+        $this->assertLoggerRequest_logClientRequest_isCalledOnce();
         $this->assertRouter_getRoute_isCalledOnceWithRequest($this->request);
         $this->assertLogger_error_isCalledOnce($this->logger);
         $this->assertResponseFactory_createExceptionResponse_isCalledOnceWithAnyParameters();
@@ -238,8 +238,8 @@ class ApplicationTest extends TestCase
         \Phake::verify($this->responseFactory, \Phake::times(1))->createExceptionResponse(\Phake::anyParameters());
     }
 
-    private function assertLoggerRequest_logCurrentRequest_isCalledOnce(): void
+    private function assertLoggerRequest_logClientRequest_isCalledOnce(): void
     {
-        \Phake::verify($this->requestLogger, \Phake::times(1))->logCurrentRequest();
+        \Phake::verify($this->requestLogger, \Phake::times(1))->logClientRequest();
     }
 }

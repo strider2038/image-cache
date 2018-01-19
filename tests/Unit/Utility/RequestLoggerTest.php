@@ -43,7 +43,7 @@ class RequestLoggerTest extends TestCase
             'SERVER_NAME' => self::SERVER_NAME,
         ]);
 
-        $requestLogger->logCurrentRequest();
+        $requestLogger->logClientRequest();
 
         $message = $this->assertLogger_info_isCalledOnceAndReturnsMessage();
         $this->assertMessageHasSubstring($message, self::REQUEST_METHOD);

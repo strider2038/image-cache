@@ -97,7 +97,7 @@ class Application
 
         try {
             $this->logger->debug('Application started.');
-            $this->requestLogger->logCurrentRequest();
+            $this->requestLogger->logClientRequest();
 
             $route = $this->router->getRoute($this->request);
             /** @var ControllerInterface $controller */

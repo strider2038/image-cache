@@ -21,7 +21,7 @@ class NullRequestLoggerTest extends TestCase
     {
         $logger = new NullRequestLogger();
 
-        $logger->logCurrentRequest();
+        $logger->logClientRequest();
 
         $this->assertInstanceOf(RequestLoggerInterface::class, $logger);
     }

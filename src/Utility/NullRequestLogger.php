@@ -15,7 +15,7 @@ namespace Strider2038\ImgCache\Utility;
  */
 class NullRequestLogger implements RequestLoggerInterface
 {
-    public function logCurrentRequest(): void
+    public function logClientRequest(): void
     {
     }
 }

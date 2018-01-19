@@ -29,7 +29,7 @@ class RequestLogger implements RequestLoggerInterface
         $this->serverConfiguration = $serverConfiguration;
     }
 
-    public function logCurrentRequest(): void
+    public function logClientRequest(): void
     {
         $this->logger->info(sprintf(
             'Processing request %s %s from ip %s, referrer "%s", user agent "%s" by server "%s"',

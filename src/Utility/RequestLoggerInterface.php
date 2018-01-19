@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Utility;
  */
 interface RequestLoggerInterface
 {
-    public function logCurrentRequest(): void;
+    public function logClientRequest(): void;
 }
