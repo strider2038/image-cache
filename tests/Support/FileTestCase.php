@@ -28,6 +28,7 @@ class FileTestCase extends TestCase
     protected const IMAGE_POINT_PNG = 'point.png';
     protected const FILE_JSON = 'file.json';
     protected const FILE_JSON_CONTENTS = '{"isJson": true}';
+    protected const FILE_YAML = 'yaml.yml';
     protected const FILE_WEBDAV_RESPONSE_XML = 'webdav-response.xml';
     protected const DIRECTORY_NAME = 'dirname';
     protected const FILENAME_NOT_EXIST = self::TEST_CACHE_DIR . '/not.exist';
@@ -59,6 +60,14 @@ class FileTestCase extends TestCase
     {
         $filename = self::TEST_CACHE_DIR . '/' . self::FILE_JSON;
         $this->givenAssetFilename(self::FILE_JSON, $filename);
+
+        return $filename;
+    }
+
+    public function givenYamlFile(): string
+    {
+        $filename = self::TEST_CACHE_DIR . '/' . self::FILE_YAML;
+        $this->givenAssetFilename(self::FILE_YAML, $filename);
 
         return $filename;
     }
