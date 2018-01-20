@@ -16,7 +16,7 @@ use Psr\Log\NullLogger;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ErrorHandler
+class ErrorHandler implements ErrorHandlerInterface
 {
     /** @var LoggerInterface */
     private $logger;
