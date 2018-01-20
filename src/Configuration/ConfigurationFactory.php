@@ -15,12 +15,27 @@ namespace Strider2038\ImgCache\Configuration;
  */
 class ConfigurationFactory implements ConfigurationFactoryInterface
 {
+    /** @var ImageSourceFactoryInterface */
+    private $imageSourceFactory;
+
+    public function __construct(ImageSourceFactoryInterface $imageSourceFactory)
+    {
+        $this->imageSourceFactory = $imageSourceFactory;
+    }
+
     public function createConfiguration(array $configuration): Configuration
     {
+        $imageSourceCollection = new ImageSourceCollection();
+
+        foreach ($configuration['image_sources'] as $sourceConfiguration) {
+            $imageSource = $this->imageSourceFactory->createImageSourceByConfiguration($sourceConfiguration);
+            $imageSourceCollection->add($imageSource);
+        }
+
         return new Configuration(
-            '',
-            0,
-            new ImageSourceCollection()
+            $configuration['access_control_token'],
+            $configuration['cached_image_quality'],
+            $imageSourceCollection
         );
     }
 }

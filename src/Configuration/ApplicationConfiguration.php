@@ -18,10 +18,35 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class ApplicationConfiguration implements ConfigurationInterface
 {
+    private const DEFAULT_CACHED_IMAGE_QUALITY = 85;
+
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('application');
+
+        $rootNode->children()
+            ->scalarNode('access_control_token')
+                ->defaultValue('')
+            ->end()
+            ->integerNode('cached_image_quality')
+                ->min(15)
+                ->max(100)
+                ->defaultValue(self::DEFAULT_CACHED_IMAGE_QUALITY)
+            ->end()
+            ->arrayNode('image_sources')
+                ->isRequired()
+                ->requiresAtLeastOneElement()
+                ->arrayPrototype()
+                    ->children()
+                        ->enumNode('type')
+                            ->isRequired()
+                            ->values(['filesystem', 'webdav', 'geomap'])
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
 
         return $treeBuilder;
     }
