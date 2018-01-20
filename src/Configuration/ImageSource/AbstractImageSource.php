@@ -23,6 +23,8 @@ abstract class AbstractImageSource
         $this->cacheDirectory = $cacheDirectory;
     }
 
+    abstract public function getImageStorageServiceId(): string;
+
     public function getCacheDirectory(): string
     {
         return $this->cacheDirectory;
