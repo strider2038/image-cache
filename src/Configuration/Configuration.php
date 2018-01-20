@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Configuration;
 
+use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */

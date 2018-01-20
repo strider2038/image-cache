@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Configuration;
+namespace Strider2038\ImgCache\Tests\Unit\Configuration\ImageSource;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Configuration\AbstractImageSource;
+use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 
 class AbstractImageSourceTest extends TestCase
 {

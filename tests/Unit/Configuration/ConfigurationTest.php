@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Configuration;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\Configuration;
-use Strider2038\ImgCache\Configuration\ImageSourceCollection;
+use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
 
 class ConfigurationTest extends TestCase
 {

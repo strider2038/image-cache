@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Configuration;
+namespace Strider2038\ImgCache\Configuration\ImageSource;
 
 use Strider2038\ImgCache\Collection\AbstractClassCollection;
 

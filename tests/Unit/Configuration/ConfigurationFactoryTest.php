@@ -11,10 +11,9 @@
 namespace Strider2038\ImgCache\Tests\Unit\Configuration;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Configuration\AbstractImageSource;
 use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationFactory;
-use Strider2038\ImgCache\Configuration\ImageSourceFactoryInterface;
+use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceFactoryInterface;
 
 class ConfigurationFactoryTest extends TestCase
 {
@@ -24,12 +23,12 @@ class ConfigurationFactoryTest extends TestCase
         'source_configuration'
     ];
 
-    /** @var ImageSourceFactoryInterface */
+    /** @var \Strider2038\ImgCache\Configuration\ImageSource\ImageSourceFactoryInterface */
     private $imageSourceFactory;
 
     protected function setUp(): void
     {
-        $this->imageSourceFactory = \Phake::mock(ImageSourceFactoryInterface::class);
+        $this->imageSourceFactory = \Phake::mock(\Strider2038\ImgCache\Configuration\ImageSource\ImageSourceFactoryInterface::class);
     }
 
     /** @test */
@@ -56,9 +55,9 @@ class ConfigurationFactoryTest extends TestCase
         $this->assertSame($imageSource, $configuration->getSourceCollection()->first());
     }
 
-    private function givenImageSourceFactory_createImageSourceByConfiguration_returnsImageSource(): AbstractImageSource
+    private function givenImageSourceFactory_createImageSourceByConfiguration_returnsImageSource(): \Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource
     {
-        $imageSource = \Phake::mock(AbstractImageSource::class);
+        $imageSource = \Phake::mock(\Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource::class);
         \Phake::when($this->imageSourceFactory)
             ->createImageSourceByConfiguration(\Phake::anyParameters())
             ->thenReturn($imageSource);
