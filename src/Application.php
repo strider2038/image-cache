@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Application
 {
+    /** @var ContainerInterface */
+    private $container;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
