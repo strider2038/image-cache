@@ -10,15 +10,7 @@
 
 namespace Strider2038\ImgCache;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\ControllerInterface;
-use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
-use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
-use Strider2038\ImgCache\Core\RouterInterface;
-use Strider2038\ImgCache\Utility\NullRequestLogger;
-use Strider2038\ImgCache\Utility\RequestLoggerInterface;
+use Strider2038\ImgCache\Core\CoreServicesContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -26,117 +18,42 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Application
 {
-    private const REQUEST_ID = 'request';
-    private const RESPONSE_FACTORY_ID = 'response_factory';
-    private const RESPONSE_SENDER_ID = 'response_sender';
-    private const ROUTER_ID = 'router';
-    private const LOGGER_ID = 'logger';
-    private const REQUEST_LOGGER_ID = 'request_logger';
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestInterface */
-    private $request;
-
-    /** @var ResponseFactoryInterface */
-    private $responseFactory;
-
-    /** @var ResponseSenderInterface */
-    private $responseSender;
-
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var RequestLoggerInterface */
-    private $requestLogger;
-
-    /** @var bool */
-    private $ready = false;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-
-        if ($this->container->has(self::LOGGER_ID)) {
-            $this->logger = $this->container->get(self::LOGGER_ID);
-        } else {
-            $this->logger = new NullLogger();
-        }
-
-        if ($this->container->has(self::REQUEST_LOGGER_ID)) {
-            $this->requestLogger = $this->container->get(self::REQUEST_LOGGER_ID);
-        } else {
-            $this->requestLogger = new NullRequestLogger();
-        }
-
-        register_shutdown_function([$this, 'onShutdown'], $this->logger);
-
-        try {
-            $this->request = $this->container->get(self::REQUEST_ID);
-            $this->responseSender = $this->container->get(self::RESPONSE_SENDER_ID);
-            $this->responseFactory = $this->container->get(self::RESPONSE_FACTORY_ID);
-            $this->router = $this->container->get(self::ROUTER_ID);
-            $this->ready = true;
-        } catch (\Exception $exception) {
-            $this->logger->critical($exception);
-            header('HTTP/1.1 500 Internal server error');
-        }
     }
     
-    public function run(): int 
+    public function run(): void
     {
-        if (!$this->ready) {
-            return 1;
-        }
-
-        $exitCode = 0;
-
         try {
-            $this->logger->debug('Application started.');
-            $this->requestLogger->logClientRequest();
-
-            $route = $this->router->getRoute($this->request);
-            /** @var ControllerInterface $controller */
-            $controller = $this->container->get($route->getControllerId());
-            $response = $controller->runAction($route->getActionId(), $route->getRequest());
-            $this->responseSender->send($response);
-        } catch (\Exception $exception) {
-            $exitCode = 1;
-            $this->logger->error($exception);
-
-            $response = $this->responseFactory->createExceptionResponse($exception);
-            $this->responseSender->send($response);
+            $this->loadServicesAndProcessRequest();
+        } catch (\Throwable $exception) {
+            header('HTTP/1.1 500 Internal server error');
+            echo 'Application fatal error.';
         }
+    }
 
-        $this->logger->debug(sprintf(
+    private function loadServicesAndProcessRequest(): void
+    {
+        /** @var CoreServicesContainerInterface $coreServices */
+        $coreServices = $this->container->get(CoreServicesContainerInterface::class);
+
+        $logger = $coreServices->getLogger();
+        $logger->debug('Application started.');
+
+        $serviceLoader = $coreServices->getServiceLoader();
+        $request = $coreServices->getRequest();
+        $requestHandler = $coreServices->getRequestHandler();
+        $responseSender = $coreServices->getResponseSender();
+
+        $serviceLoader->loadServices($this->container);
+        $response = $requestHandler->handleRequest($request);
+        $responseSender->send($response);
+
+        $logger->debug(sprintf(
             'Application ended. Response %d %s was sent.',
             $response->getStatusCode()->getValue(),
             $response->getReasonPhrase()
         ));
-
-        return $exitCode;
-    }
-
-    public static function onShutdown(LoggerInterface $logger = null, array $error = null): void
-    {
-        $logger = $logger ?? new NullLogger();
-
-        $error = $error ?? error_get_last();
-
-        if ($error !== null) {
-            $message = implode(PHP_EOL, array_map(
-                function($value, $key) {
-                    return sprintf('%s: %s', ucfirst($key), $value);
-                },
-                $error,
-                array_keys($error)
-            ));
-
-            $logger->critical($message);
-        }
     }
 }
