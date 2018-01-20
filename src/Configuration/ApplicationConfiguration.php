@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Configuration;
 
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
@@ -17,7 +18,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class ApplicationConfiguration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root('application');
+
+        return $treeBuilder;
     }
 }

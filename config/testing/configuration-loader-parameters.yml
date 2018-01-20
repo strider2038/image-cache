@@ -1,0 +1,16 @@
+access_control_token: 'test-access-control-token'
+cached_image_quality: 65
+image_sources:
+    filesystem_source:
+        type: 'filesystem'
+        cache_directory: '/fs'
+        storage_directory: '/image-storage'
+    yandex_disk_source:
+        type: 'webdav'
+        cache_directory: '/yd'
+        storage_directory: '/imgcache'
+        driver_uri: 'https://webdav.yandex.ru/v1'
+    yandex_map_source:
+        type: 'geomap'
+        cache_directory: '/map'
+        driver: 'yandex'

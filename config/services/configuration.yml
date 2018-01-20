@@ -1,0 +1,19 @@
+services:
+    file_locator:
+        class: Symfony\Component\Config\FileLocator
+        arguments:
+            - ['%application_directory%']
+    configuration_loader:
+        class: Strider2038\ImgCache\Configuration\ConfigurationLoader
+        arguments:
+            - '@configuration_file_parser'
+            - '@configuration_processor'
+            - '@configuration_factory'
+    configuration_file_parser:
+        class: Strider2038\ImgCache\Utility\YamlFileParser
+        arguments:
+            - '@file_locator'
+    configuration_processor:
+        class: Symfony\Component\Config\Definition\Processor
+    configuration_factory:
+        class: Strider2038\ImgCache\Configuration\ConfigurationFactory

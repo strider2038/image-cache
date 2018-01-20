@@ -41,11 +41,7 @@ class ConfigurationLoaderTest extends TestCase
     /** @test */
     public function loadConfiguration_noParameters_configurationLoadedFromFileAndProcessedAndConfigurationClassCreatedAndReturned(): void
     {
-        $loader = new ConfigurationLoader(
-            $this->configurationFileParser,
-            $this->configurationProcessor,
-            $this->configurationFactory
-        );
+        $loader = $this->createConfigurationLoader();
         $configurationArray = $this->givenConfigurationFileParser_parseConfigurationFile_returnsConfigurationArray();
         $processedConfiguration = $this->givenConfigurationProcessor_processConfiguration_returnsProcessedConfiguration();
         $expectedConfiguration = $this->givenConfigurationFactory_createConfiguration_returnsConfiguration();
@@ -59,6 +55,15 @@ class ConfigurationLoaderTest extends TestCase
         );
         $this->assertConfigurationFactory_createConfiguration_isCalledOnceWithArray($processedConfiguration);
         $this->assertSame($expectedConfiguration, $configuration);
+    }
+
+    private function createConfigurationLoader(): ConfigurationLoader
+    {
+        return new ConfigurationLoader(
+            $this->configurationFileParser,
+            $this->configurationProcessor,
+            $this->configurationFactory
+        );
     }
 
     private function givenConfigurationFileParser_parseConfigurationFile_returnsConfigurationArray(): array
@@ -92,7 +97,7 @@ class ConfigurationLoaderTest extends TestCase
         array $configurationArray
     ): void {
         \Phake::verify($this->configurationProcessor, \Phake::times(1))
-            ->processConfiguration(\Phake::capture($configurationClass), $configurationArray);
+            ->processConfiguration(\Phake::capture($configurationClass), [$configurationArray]);
         $this->assertInstanceOf($configurationClassName, $configurationClass);
     }
 

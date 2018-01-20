@@ -10,6 +10,7 @@
 
 namespace Strider2038\ImgCache\Utility;
 
+use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -17,8 +18,18 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileParser implements ConfigurationFileParserInterface
 {
+    /** @var FileLocatorInterface */
+    private $fileLocator;
+
+    public function __construct(FileLocatorInterface $fileLocator)
+    {
+        $this->fileLocator = $fileLocator;
+    }
+
     public function parseConfigurationFile(string $filename): array
     {
-        return Yaml::parseFile($filename);
+        $absoluteFilename = $this->fileLocator->locate($filename);
+
+        return Yaml::parseFile($absoluteFilename);
     }
 }

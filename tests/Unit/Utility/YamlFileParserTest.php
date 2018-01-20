@@ -12,17 +12,41 @@ namespace Strider2038\ImgCache\Tests\Unit\Utility;
 
 use Strider2038\ImgCache\Tests\Support\FileTestCase;
 use Strider2038\ImgCache\Utility\YamlFileParser;
+use Symfony\Component\Config\FileLocatorInterface;
 
 class YamlFileParserTest extends FileTestCase
 {
+    private const FILENAME = 'filename';
+
+    /** @var FileLocatorInterface */
+    private $fileLocator;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fileLocator = \Phake::mock(FileLocatorInterface::class);
+    }
+
     /** @test */
     public function parseConfigurationFile_givenYamlFile_fileParsedAndArrayReturned(): void
     {
-        $parser = new YamlFileParser();
-        $filename = $this->givenYamlFile();
+        $parser = new YamlFileParser($this->fileLocator);
+        $absoluteFilename = $this->givenYamlFile();
+        $this->givenFileLocator_locate_returnsAbsoluteFilename($absoluteFilename);
 
-        $contents = $parser->parseConfigurationFile($filename);
+        $contents = $parser->parseConfigurationFile(self::FILENAME);
 
+        $this->assertFileLocator_locate_isCalledOnceWithFilename(self::FILENAME);
         $this->assertEquals(['section' => ['value']], $contents);
+    }
+
+    private function givenFileLocator_locate_returnsAbsoluteFilename(string $absoluteFilename): void
+    {
+        \Phake::when($this->fileLocator)->locate(\Phake::anyParameters())->thenReturn($absoluteFilename);
+    }
+
+    private function assertFileLocator_locate_isCalledOnceWithFilename(string $filename): void
+    {
+        \Phake::verify($this->fileLocator, \Phake::times(1))->locate($filename);
     }
 }

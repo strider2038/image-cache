@@ -1,0 +1,14 @@
+imports:
+    - { resource: 'services/configuration.yml' }
+
+parameters:
+    configuration_filename: 'config/testing/configuration-loader-parameters.yml'
+
+services:
+    configuration_loader:
+        class: Strider2038\ImgCache\Configuration\ConfigurationLoader
+        arguments:
+            - '@configuration_file_parser'
+            - '@configuration_processor'
+            - '@configuration_factory'
+            - '%configuration_filename%'
