@@ -42,12 +42,11 @@ class ServiceLoaderTest extends TestCase
     }
 
     /** @test */
-    public function loadServices_given_expected(): void
+    public function loadServices_givenContainer_servicesInitializedAndConfigurationLoadedAndSetToContainer(): void
     {
         $serviceLoader = $this->createServiceLoader();
         $container = \Phake::mock(ContainerInterface::class);
-        $configuration = \Phake::mock(Configuration::class);
-        \Phake::when($this->configurationLoader)->loadConfiguration()->thenReturn($configuration);
+        $configuration = $this->givenConfigurationLoader_loadConfiguration_returnsConfiguration();
 
         $serviceLoader->loadServices($container);
 
@@ -65,6 +64,13 @@ class ServiceLoaderTest extends TestCase
             $this->configurationLoader,
             $this->configurationSetter
         );
+    }
+
+    private function givenConfigurationLoader_loadConfiguration_returnsConfiguration(): mixed
+    {
+        $configuration = \Phake::mock(Configuration::class);
+        \Phake::when($this->configurationLoader)->loadConfiguration()->thenReturn($configuration);
+        return $configuration;
     }
 
     private function assertErrorHandler_register_isCalledOnce(): void

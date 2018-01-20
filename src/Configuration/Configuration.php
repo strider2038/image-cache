@@ -15,5 +15,37 @@ namespace Strider2038\ImgCache\Configuration;
  */
 class Configuration
 {
+    /** @var string */
+    private $accessControlToken;
 
+    /** @var int */
+    private $cachedImageQuality;
+
+    /** @var ImageSourceCollection */
+    private $sourceCollection;
+
+    public function __construct(
+        string $accessControlToken,
+        int $cachedImageQuality,
+        ImageSourceCollection $sourceCollection
+    ) {
+        $this->accessControlToken = $accessControlToken;
+        $this->cachedImageQuality = $cachedImageQuality;
+        $this->sourceCollection = $sourceCollection;
+    }
+
+    public function getAccessControlToken(): string
+    {
+        return $this->accessControlToken;
+    }
+
+    public function getCachedImageQuality(): int
+    {
+        return $this->cachedImageQuality;
+    }
+
+    public function getSourceCollection(): ImageSourceCollection
+    {
+        return $this->sourceCollection;
+    }
 }
