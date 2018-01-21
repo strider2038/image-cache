@@ -10,6 +10,9 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
+use Strider2038\ImgCache\Exception\InvalidConfigurationException;
+use Strider2038\ImgCache\Utility\EntityValidatorInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -41,8 +44,16 @@ class ImageSourceFactory implements ImageSourceFactoryInterface
         ],
     ];
 
+    /** @var EntityValidatorInterface */
+    private $validator;
+
     /** @var array */
     private $configuration;
+
+    public function __construct(EntityValidatorInterface $validator)
+    {
+        $this->validator = $validator;
+    }
 
     public function createImageSourceByConfiguration(array $configuration): AbstractImageSource
     {
@@ -51,7 +62,11 @@ class ImageSourceFactory implements ImageSourceFactoryInterface
         $className = $this->getClassNameFromConfiguration();
         $arguments = $this->getConstructorArgumentsFromConfiguration($className);
 
-        return $this->createClass($className, $arguments);
+        /** @var AbstractImageSource $imageSource */
+        $imageSource = $this->createClass($className, $arguments);
+        $this->validator->validateWithException($imageSource, InvalidConfigurationException::class);
+
+        return $imageSource;
     }
 
     private function getClassNameFromConfiguration(): string

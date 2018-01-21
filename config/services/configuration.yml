@@ -17,3 +17,9 @@ services:
         class: Symfony\Component\Config\Definition\Processor
     configuration_factory:
         class: Strider2038\ImgCache\Configuration\ConfigurationFactory
+        arguments:
+            - '@image_source_factory'
+    image_source_factory:
+        class: Strider2038\ImgCache\Configuration\ImageSource\ImageSourceFactory
+        arguments:
+            - '@entity_validator'

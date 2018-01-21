@@ -10,12 +10,22 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
+use Strider2038\ImgCache\Core\EntityInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-abstract class AbstractImageSource
+abstract class AbstractImageSource implements EntityInterface
 {
-    /** @var string */
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Regex(
+     *     pattern="/^\/.*$/i",
+     *     message="Cache directory name must start with slash"
+     * )
+     * @var string
+     */
     private $cacheDirectory;
 
     public function __construct(string $cacheDirectory)

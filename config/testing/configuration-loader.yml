@@ -1,5 +1,6 @@
 imports:
     - { resource: 'services/configuration.yml' }
+    - { resource: 'services/utilities.yml' }
 
 parameters:
     configuration_filename: 'config/testing/configuration-loader-parameters.yml'

@@ -10,15 +10,24 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class WebDAVImageSource extends FilesystemImageSource
 {
-    /** @var string */
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Url()
+     * @var string
+     */
     private $driverUri;
 
-    /** @var string */
+    /**
+     * @Assert\NotBlank()
+     * @var string
+     */
     private $oauthToken;
 
     public function __construct(
@@ -31,6 +40,11 @@ class WebDAVImageSource extends FilesystemImageSource
         parent::__construct($cacheDirectory, $storageDirectory, $processorType);
         $this->driverUri = $driverUri;
         $this->oauthToken = $oauthToken;
+    }
+
+    public function getId(): string
+    {
+        return 'WebDAV image source';
     }
 
     public function getDriverUri(): string
