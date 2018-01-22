@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ConfigurationSetterInterface
+interface SettingsInjectorInterface
 {
-    public function setConfigurationToContainer(Configuration $configuration, ContainerInterface $container): void;
+    public function injectSettingsToContainer(ContainerInterface $container): void;
 }

@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Configuration;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ConfigurationSetterInterface
+interface ImageSourceInjectorFactoryInterface
 {
-    public function setConfigurationToContainer(Configuration $configuration, ContainerInterface $container): void;
+    public function createSettingsInjectorForImageSource(AbstractImageSource $imageSource): SettingsInjectorInterface;
 }

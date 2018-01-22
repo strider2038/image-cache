@@ -38,6 +38,7 @@ Image caching microservice with connection to cloud hostings
     - refactoring controller and actions to request handlers 
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
+- [ ] Simplify nginx configuration
 - [ ] Support for building docker containers in Travis
 - [ ] Fix tests codestyle
 - [ ] Acceptance testing
