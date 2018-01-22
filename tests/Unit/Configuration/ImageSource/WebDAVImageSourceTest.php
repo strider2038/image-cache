@@ -20,8 +20,8 @@ use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class WebDAVImageSourceTest extends TestCase
 {
-    private const CACHE_DIRECTORY = '/cache_directory';
-    private const STORAGE_DIRECTORY = 'storage_directory';
+    private const CACHE_DIRECTORY = '/cache_directory/';
+    private const STORAGE_DIRECTORY = '/storage_directory/';
     private const PROCESSOR_TYPE = 'copy';
     private const DRIVER_URI = 'driver_uri';
     private const OAUTH_TOKEN = 'oauth_token';

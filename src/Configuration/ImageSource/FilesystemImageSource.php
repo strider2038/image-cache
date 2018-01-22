@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
+use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -18,8 +20,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FilesystemImageSource extends AbstractImageSource
 {
     /**
-     * @Assert\NotBlank()
-     * @var string
+     * @Assert\Valid()
+     * @var DirectoryNameInterface
      */
     private $storageDirectory;
 
@@ -38,7 +40,8 @@ class FilesystemImageSource extends AbstractImageSource
         string $processorType
     ) {
         parent::__construct($cacheDirectory);
-        $this->storageDirectory = $storageDirectory;
+        $storageDirectory = $storageDirectory === '' ? '' : rtrim($storageDirectory, '/') . '/';
+        $this->storageDirectory = new DirectoryName($storageDirectory);
         $this->processorType = $processorType;
     }
 

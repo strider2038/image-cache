@@ -21,7 +21,7 @@ use Strider2038\ImgCache\Utility\ViolationFormatter;
 class FilesystemImageSourceTest extends TestCase
 {
     private const CACHE_DIRECTORY = '/cache_directory';
-    private const STORAGE_DIRECTORY = 'storage_directory';
+    private const STORAGE_DIRECTORY = '/storage_directory/';
     private const PROCESSOR_TYPE = 'copy';
     private const IMAGE_STORAGE_SERVICE_ID = 'filesystem_storage';
     private const ENTITY_ID = 'filesystem image source';
@@ -48,7 +48,7 @@ class FilesystemImageSourceTest extends TestCase
             self::PROCESSOR_TYPE
         );
 
-        $this->assertEquals(self::CACHE_DIRECTORY, $source->getCacheDirectory());
+        $this->assertEquals(self::CACHE_DIRECTORY . '/', $source->getCacheDirectory());
         $this->assertEquals(self::STORAGE_DIRECTORY, $source->getStorageDirectory());
         $this->assertEquals(self::PROCESSOR_TYPE, $source->getProcessorType());
         $this->assertEquals(self::IMAGE_STORAGE_SERVICE_ID, $source->getImageStorageServiceId());
@@ -87,6 +87,7 @@ class FilesystemImageSourceTest extends TestCase
             [self::CACHE_DIRECTORY, self::STORAGE_DIRECTORY, 'thumbnail', 0],
             ['', '', '', 3],
             ['invalid', self::STORAGE_DIRECTORY, self::PROCESSOR_TYPE, 1],
+            [self::CACHE_DIRECTORY, 'invalid', self::PROCESSOR_TYPE, 1],
         ];
     }
 }

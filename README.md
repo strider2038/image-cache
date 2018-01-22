@@ -33,7 +33,9 @@ Image caching microservice with connection to cloud hostings
 - [x] Rotate transformation
 - [x] Flip and flop transformations
 - [x] Multipurpose interface to request geographical map images
-- [ ] Make user-friendly configuration of microservice 
+- [ ] Make user-friendly configuration of microservice
+    - configuration setter to container
+    - refactoring controller and actions to request handlers 
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
 - [ ] Support for building docker containers in Travis

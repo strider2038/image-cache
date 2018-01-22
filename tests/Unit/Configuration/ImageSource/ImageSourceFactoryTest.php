@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class ImageSourceFactoryTest extends TestCase
 {
-    private const CACHE_DIRECTORY = 'cache-directory';
+    private const CACHE_DIRECTORY = '/cache-directory/';
 
     /** @var EntityValidatorInterface */
     private $validator;

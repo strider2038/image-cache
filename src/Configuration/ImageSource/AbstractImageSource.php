@@ -11,6 +11,8 @@
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
 use Strider2038\ImgCache\Core\EntityInterface;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -19,23 +21,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 abstract class AbstractImageSource implements EntityInterface
 {
     /**
-     * @Assert\NotBlank()
-     * @Assert\Regex(
-     *     pattern="/^\/.*$/i",
-     *     message="Cache directory name must start with slash"
-     * )
-     * @var string
+     * @Assert\Valid()
+     * @var DirectoryNameInterface
      */
     private $cacheDirectory;
 
     public function __construct(string $cacheDirectory)
     {
-        $this->cacheDirectory = $cacheDirectory;
+        $cacheDirectory = $cacheDirectory === '' ? '' : rtrim($cacheDirectory, '/') . '/';
+        $this->cacheDirectory = new DirectoryName($cacheDirectory);
     }
 
     abstract public function getImageStorageServiceId(): string;
 
-    public function getCacheDirectory(): string
+    public function getCacheDirectory(): DirectoryNameInterface
     {
         return $this->cacheDirectory;
     }

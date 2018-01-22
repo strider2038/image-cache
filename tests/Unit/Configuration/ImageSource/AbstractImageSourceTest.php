@@ -15,13 +15,22 @@ use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 
 class AbstractImageSourceTest extends TestCase
 {
-    private const CACHE_DIRECTORY = 'cache_directory';
+    private const CACHE_DIRECTORY = '/cache_directory/';
 
     /** @test */
     public function construct_givenCacheDirectory_cacheDirectorySet(): void
     {
         $cacheDirectory = self::CACHE_DIRECTORY;
-        $source = new class($cacheDirectory) extends AbstractImageSource {};
+        $source = new class($cacheDirectory) extends AbstractImageSource {
+            public function getId(): string
+            {
+                return '';
+            }
+            public function getImageStorageServiceId(): string
+            {
+                return '';
+            }
+        };
 
         $this->assertEquals(self::CACHE_DIRECTORY, $source->getCacheDirectory());
     }

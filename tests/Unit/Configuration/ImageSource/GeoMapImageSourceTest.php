@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Utility\ViolationFormatter;
 
 class GeoMapImageSourceTest extends TestCase
 {
-    private const CACHE_DIRECTORY = '/cache_directory';
+    private const CACHE_DIRECTORY = '/cache_directory/';
     private const IMAGE_STORAGE_SERVICE_ID = 'geo_map_storage';
     private const DRIVER = 'driver';
     private const API_KEY = 'api_key';
