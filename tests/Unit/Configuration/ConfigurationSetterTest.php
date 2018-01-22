@@ -15,8 +15,8 @@ use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationSetter;
 use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
-use Strider2038\ImgCache\Configuration\ImageSourceInjectorFactoryInterface;
-use Strider2038\ImgCache\Configuration\SettingsInjectorInterface;
+use Strider2038\ImgCache\Configuration\Injection\ImageSourceInjectorFactoryInterface;
+use Strider2038\ImgCache\Configuration\Injection\SettingsInjectorInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
@@ -164,12 +164,12 @@ class ConfigurationSetterTest extends TestCase
     }
 
     private function assertSettingsInjector_injectSettingsToContainer_isCalledOnceWithContainer(
-        SettingsInjectorInterface $settingsInjector
+        \Strider2038\ImgCache\Configuration\Injection\SettingsInjectorInterface $settingsInjector
     ): void {
         \Phake::verify($settingsInjector, \Phake::times(1))->injectSettingsToContainer($this->container);
     }
 
-    private function givenImageSourceInjectorFactory_createSettingsInjectorForImageSource_returnsSettingsInjector(): SettingsInjectorInterface
+    private function givenImageSourceInjectorFactory_createSettingsInjectorForImageSource_returnsSettingsInjector(): \Strider2038\ImgCache\Configuration\Injection\SettingsInjectorInterface
     {
         $settingsInjector = \Phake::mock(SettingsInjectorInterface::class);
         \Phake::when($this->imageSourceInjectorFactory)

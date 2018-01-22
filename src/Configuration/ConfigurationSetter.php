@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Configuration;
 
 use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
+use Strider2038\ImgCache\Configuration\Injection\ImageSourceInjectorFactoryInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
