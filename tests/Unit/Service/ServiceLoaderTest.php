@@ -11,13 +11,13 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
 use Strider2038\ImgCache\Configuration\ConfigurationSetterInterface;
 use Strider2038\ImgCache\Core\ErrorHandlerInterface;
 use Strider2038\ImgCache\Service\ServiceLoader;
 use Strider2038\ImgCache\Utility\RequestLoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ServiceLoaderTest extends TestCase
 {
@@ -66,7 +66,7 @@ class ServiceLoaderTest extends TestCase
         );
     }
 
-    private function givenConfigurationLoader_loadConfiguration_returnsConfiguration(): mixed
+    private function givenConfigurationLoader_loadConfiguration_returnsConfiguration(): Configuration
     {
         $configuration = \Phake::mock(Configuration::class);
         \Phake::when($this->configurationLoader)->loadConfiguration()->thenReturn($configuration);

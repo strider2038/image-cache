@@ -10,12 +10,12 @@
 
 namespace Strider2038\ImgCache\Service;
 
-use Psr\Container\ContainerInterface;
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
 use Strider2038\ImgCache\Configuration\ConfigurationSetterInterface;
 use Strider2038\ImgCache\Core\ErrorHandlerInterface;
 use Strider2038\ImgCache\Core\ServiceLoaderInterface;
 use Strider2038\ImgCache\Utility\RequestLoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
