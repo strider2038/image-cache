@@ -1,0 +1,17 @@
+@startuml
+
+Application -> RequestHandler : handleRequest(request)
+
+RequestHandler -> AccessControl : canHandleRequest(request)
+RequestHandler <-- AccessControl : true
+
+RequestHandler -> ImageRequestHandlerFactory : createRequestHandlerByMethod(httpMethod)
+RequestHandler <-- ImageRequestHandlerFactory : imageRequestHandler
+
+RequestHandler -> imageRequestHandler : handleRequest(request)
+RequestHandler <-- imageRequestHandler : response
+
+Application <-- RequestHandler : response
+Application -> ResponseSender : sendResponse(response)
+
+@enduml
