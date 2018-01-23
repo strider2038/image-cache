@@ -55,7 +55,7 @@ class FilesystemImageSource extends AbstractImageSource
         return 'filesystem_storage';
     }
 
-    public function getStorageDirectory(): string
+    public function getStorageDirectory(): DirectoryNameInterface
     {
         return $this->storageDirectory;
     }
