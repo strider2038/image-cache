@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Exception\ApplicationException;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 class Security implements SecurityInterface
 {

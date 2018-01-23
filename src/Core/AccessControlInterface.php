@@ -10,11 +10,12 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Core\Http\RequestInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
- * @deprecated
  */
-interface SecurityInterface 
+interface AccessControlInterface
 {
-    public function isAuthorized(): bool;
+    public function canHandleRequest(RequestInterface $request): bool;
 }
