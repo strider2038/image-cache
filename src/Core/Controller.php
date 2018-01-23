@@ -17,6 +17,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 abstract class Controller implements ControllerInterface
 {

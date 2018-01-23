@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 interface ControllerInterface {
     public function runAction(string $actionId, RequestInterface $request): ResponseInterface;

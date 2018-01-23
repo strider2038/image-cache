@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Core\Controller;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
 class ImageController extends Controller 
 {
