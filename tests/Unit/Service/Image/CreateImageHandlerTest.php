@@ -20,10 +20,10 @@ use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
-use Strider2038\ImgCache\Service\Image\CreateAction;
+use Strider2038\ImgCache\Service\Image\CreateImageHandler;
 use Strider2038\ImgCache\Tests\Support\Phake\ResponseFactoryTrait;
 
-class CreateActionTest extends TestCase
+class CreateImageHandlerTest extends TestCase
 {
     use ResponseFactoryTrait;
 
@@ -45,15 +45,15 @@ class CreateActionTest extends TestCase
     }
 
     /** @test */
-    public function processRequest_imageAlreadyExistsInStorage_conflictResponseWasReturned(): void
+    public function handleRequest_imageAlreadyExistsInStorage_conflictResponseWasReturned(): void
     {
-        $action = $this->createAction();
+        $handler = $this->createCreateImageHandler();
         $request = $this->givenRequest();
         $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
         $this->givenImageStorage_imageExists_returns(true);
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CONFLICT);
 
-        $response = $action->processRequest($request);
+        $response = $handler->handleRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertFilenameFactory_createImageFilenameFromRequest_isCalledOnceWithRequest($request);
@@ -63,9 +63,9 @@ class CreateActionTest extends TestCase
     }
 
     /** @test */
-    public function processRequest_imageDoesNotExistInStorage_imagePutToStorageAndCreatedResponseWasReturned(): void
+    public function handleRequest_imageDoesNotExistInStorage_imagePutToStorageAndCreatedResponseWasReturned(): void
     {
-        $action = $this->createAction();
+        $handler = $this->createCreateImageHandler();
         $request = $this->givenRequest();
         $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
         $this->givenImageStorage_imageExists_returns(false);
@@ -73,7 +73,7 @@ class CreateActionTest extends TestCase
         $image = $this->givenImageFactory_createImageFromStream_returnsImage();
         $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
 
-        $response = $action->processRequest($request);
+        $response = $handler->handleRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertFilenameFactory_createImageFilenameFromRequest_isCalledOnceWithRequest($request);
@@ -85,9 +85,9 @@ class CreateActionTest extends TestCase
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
     }
 
-    private function createAction(): CreateAction
+    private function createCreateImageHandler(): CreateImageHandler
     {
-        return new CreateAction(
+        return new CreateImageHandler(
             $this->responseFactory,
             $this->filenameFactory,
             $this->imageStorage,

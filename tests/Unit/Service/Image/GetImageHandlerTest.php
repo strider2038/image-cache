@@ -20,10 +20,10 @@ use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
-use Strider2038\ImgCache\Service\Image\GetAction;
+use Strider2038\ImgCache\Service\Image\GetImageHandlerAction;
 use Strider2038\ImgCache\Tests\Support\Phake\ResponseFactoryTrait;
 
-class GetActionTest extends TestCase
+class GetImageHandlerTest extends TestCase
 {
     use ResponseFactoryTrait;
 
@@ -47,9 +47,9 @@ class GetActionTest extends TestCase
     }
 
     /** @test */
-    public function processRequest_imageExistsInStorage_imageIsCachedAndFileResponseWasReturned(): void
+    public function handlerRequest_imageExistsInStorage_imageIsCachedAndFileResponseWasReturned(): void
     {
-        $action = $this->createAction();
+        $handler = $this->createGetImageHandler();
         $request = $this->givenRequest();
         $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
         $storedImage = $this->givenImage();
@@ -58,7 +58,7 @@ class GetActionTest extends TestCase
         $this->givenImageCache_getImage_returnsImageFile($cachedImage);
         $this->givenResponseFactory_createFileResponse_returnsResponse();
 
-        $response = $action->processRequest($request);
+        $response = $handler->handleRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertFilenameFactory_createImageFilenameFromRequest_isCalledOnceWithRequest($request);
@@ -71,9 +71,9 @@ class GetActionTest extends TestCase
         );
     }
 
-    private function createAction(): GetAction
+    private function createGetImageHandler(): GetImageHandlerAction
     {
-        return new GetAction(
+        return new GetImageHandlerAction(
             $this->responseFactory,
             $this->filenameFactory,
             $this->imageStorage,

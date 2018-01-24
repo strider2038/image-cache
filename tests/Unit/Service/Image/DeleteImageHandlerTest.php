@@ -13,18 +13,15 @@ namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
-use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Imaging\Image\Image;
-use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
-use Strider2038\ImgCache\Service\Image\ReplaceAction;
+use Strider2038\ImgCache\Service\Image\DeleteImageHandler;
 use Strider2038\ImgCache\Tests\Support\Phake\ResponseFactoryTrait;
 
-class ReplaceActionTest extends TestCase
+class DeleteImageHandlerTest extends TestCase
 {
     use ResponseFactoryTrait;
 
@@ -39,55 +36,25 @@ class ReplaceActionTest extends TestCase
     /** @var ImageCacheInterface */
     private $imageCache;
 
-    /** @var ImageFactoryInterface */
-    private $imageFactory;
-
     protected function setUp(): void
     {
         $this->givenResponseFactory();
         $this->filenameFactory = \Phake::mock(ImageFilenameFactoryInterface::class);
         $this->imageStorage = \Phake::mock(ImageStorageInterface::class);
         $this->imageCache = \Phake::mock(ImageCacheInterface::class);
-        $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
     }
 
     /** @test */
-    public function processRequest_fileDoesNotExistInStorage_imagePutToStorageAndCreatedResponseReturned(): void
+    public function handlerRequest_imageExistsInStorage_imageDeletedFromStorageAndFromCacheAndOkResponseReturned(): void
     {
-        $action = $this->createAction();
-        $this->givenImageStorage_imageExists_returns(false);
-        $request = $this->givenRequest();
-        $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
-        $stream = $this->givenRequest_getBody_returnsStream($request);
-        $image = $this->givenImageFactory_createImageFromStream_returnsImage();
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
-
-        $response = $action->processRequest($request);
-
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertFilenameFactory_createImageFilenameFromRequest_isCalledOnceWithRequest($request);
-        $this->assertImageStorage_imageExists_isCalledOnceWithFilename($filename);
-        $this->assertImageStorage_deleteImage_isNeverCalled();
-        $this->assertImageCache_deleteImagesByMask_isNeverCalled();
-        $this->assertRequest_getBody_isCalledOnceWithRequest($request);
-        $this->assertImageFactory_createImageFromStream_isCalledOnceWith($stream);
-        $this->assertImageStorage_putImage_isCalledOnceWithFilenameAndImage($filename, $image);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
-    }
-
-    /** @test */
-    public function processRequest_fileExistsInStorage_imageReplacedInStorageAndCreatedResponseReturned(): void
-    {
-        $action = $this->createAction();
+        $handler = $this->createDeleteImageHandler();
         $request = $this->givenRequest();
         $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
         $this->givenImageStorage_imageExists_returns(true);
         $this->givenImageStorage_getImageFileNameMask_returnsFileNameMask();
-        $stream = $this->givenRequest_getBody_returnsStream($request);
-        $image = $this->givenImageFactory_createImageFromStream_returnsImage();
-        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::CREATED);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::OK);
 
-        $response = $action->processRequest($request);
+        $response = $handler->handleRequest($request);
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertFilenameFactory_createImageFilenameFromRequest_isCalledOnceWithRequest($request);
@@ -95,20 +62,37 @@ class ReplaceActionTest extends TestCase
         $this->assertImageStorage_deleteImage_isCalledOnceWithFilename($filename);
         $this->assertImageStorage_getImageFileNameMask_isCalledOnceWithFilename($filename);
         $this->assertImageCache_deleteImagesByMask_isCalledOnceWithFileNameMask();
-        $this->assertRequest_getBody_isCalledOnceWithRequest($request);
-        $this->assertImageFactory_createImageFromStream_isCalledOnceWith($stream);
-        $this->assertImageStorage_putImage_isCalledOnceWithFilenameAndImage($filename, $image);
-        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::OK);
+        $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
     }
 
-    private function createAction(): ReplaceAction
+    /** @test */
+    public function handlerRequest_imageDoesNotExistInStorage_notFoundResponseReturned(): void
     {
-        return new ReplaceAction(
+        $handler = $this->createDeleteImageHandler();
+        $request = $this->givenRequest();
+        $filename = $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
+        $this->givenImageStorage_imageExists_returns(false);
+        $this->givenResponseFactory_createMessageResponse_returnsResponseWithCode(HttpStatusCodeEnum::NOT_FOUND);
+
+        $response = $handler->handleRequest($request);
+
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertFilenameFactory_createImageFilenameFromRequest_isCalledOnceWithRequest($request);
+        $this->assertImageStorage_imageExists_isCalledOnceWithFilename($filename);
+        $this->assertImageStorage_deleteImage_isNeverCalled();
+        $this->assertImageCache_deleteImagesByMask_isNeverCalled();
+        $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::NOT_FOUND);
+        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
+    }
+
+    private function createDeleteImageHandler(): DeleteImageHandler
+    {
+        return new DeleteImageHandler(
             $this->responseFactory,
             $this->filenameFactory,
             $this->imageStorage,
-            $this->imageCache,
-            $this->imageFactory
+            $this->imageCache
         );
     }
 
@@ -133,22 +117,6 @@ class ReplaceActionTest extends TestCase
         return $filename;
     }
 
-    private function givenRequest_getBody_returnsStream(RequestInterface $request): StreamInterface
-    {
-        $stream = \Phake::mock(StreamInterface::class);
-        \Phake::when($request)->getBody()->thenReturn($stream);
-
-        return $stream;
-    }
-
-    private function givenImageFactory_createImageFromStream_returnsImage(): Image
-    {
-        $image = \Phake::mock(Image::class);
-        \Phake::when($this->imageFactory)->createImageFromStream(\Phake::anyParameters())->thenReturn($image);
-
-        return $image;
-    }
-
     private function givenImageStorage_imageExists_returns(bool $value): void
     {
         \Phake::when($this->imageStorage)->imageExists(\Phake::anyParameters())->thenReturn($value);
@@ -157,23 +125,6 @@ class ReplaceActionTest extends TestCase
     private function givenImageStorage_getImageFileNameMask_returnsFileNameMask(): void
     {
         \Phake::when($this->imageStorage)->getImageFileNameMask(\Phake::anyParameters())->thenReturn(self::FILE_NAME_MASK);
-    }
-
-    private function assertRequest_getBody_isCalledOnceWithRequest(RequestInterface $request): void
-    {
-        \Phake::verify($request, \Phake::times(1))->getBody();
-    }
-
-    private function assertImageFactory_createImageFromStream_isCalledOnceWith(StreamInterface $stream): void
-    {
-        \Phake::verify($this->imageFactory, \Phake::times(1))->createImageFromStream($stream);
-    }
-
-    private function assertImageStorage_putImage_isCalledOnceWithFilenameAndImage(
-        ImageFilenameInterface $filename,
-        Image $image
-    ): void {
-        \Phake::verify($this->imageStorage, \Phake::times(1))->putImage($filename, $image);
     }
 
     private function assertImageStorage_imageExists_isCalledOnceWithFilename(ImageFilenameInterface $filename): void
