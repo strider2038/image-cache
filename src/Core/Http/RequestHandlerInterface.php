@@ -8,10 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Core;
-
-use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\Http\ResponseInterface;
+namespace Strider2038\ImgCache\Core\Http;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

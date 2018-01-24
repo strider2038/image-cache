@@ -10,10 +10,10 @@
 
 namespace Strider2038\ImgCache\Service\Image;
 
+use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
-use Strider2038\ImgCache\Core\RequestHandlerInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;

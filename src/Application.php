@@ -32,7 +32,7 @@ class Application
             $this->loadServicesAndProcessRequest();
         } catch (\Throwable $exception) {
             header('HTTP/1.1 500 Internal server error');
-            echo 'Application fatal error.';
+            echo 'Application fatal error: ' . $exception;
         }
     }
 

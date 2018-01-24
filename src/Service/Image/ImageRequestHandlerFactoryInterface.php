@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Service\Image;
 
-use Strider2038\ImgCache\Core\RequestHandlerInterface;
+use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 
 /**

@@ -12,16 +12,14 @@ namespace Strider2038\ImgCache\Core;
 
 use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\Http\ResponseInterface;
-use Strider2038\ImgCache\Exception\NotAllowedException;
+use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class NotAllowedRequestHandler implements RequestHandlerInterface
+interface HttpServicesContainerInterface
 {
-    public function handleRequest(RequestInterface $request): ResponseInterface
-    {
-        throw new NotAllowedException('Method not allowed');
-    }
+    public function getRequest(): RequestInterface;
+    public function getRequestHandler(): RequestHandlerInterface;
+    public function getResponseSender(): ResponseSenderInterface;
 }

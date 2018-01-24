@@ -10,9 +10,9 @@
 
 namespace Strider2038\ImgCache\Service\Image;
 
+use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
-use Strider2038\ImgCache\Core\RequestHandlerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>

@@ -11,9 +11,9 @@
 namespace Strider2038\ImgCache\Tests\Unit\Service\Image;
 
 use PHPUnit\Framework\TestCase;
+use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
-use Strider2038\ImgCache\Core\RequestHandlerInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Service\Image\ImageRequestHandler;
 use Strider2038\ImgCache\Service\Image\ImageRequestHandlerFactoryInterface;
