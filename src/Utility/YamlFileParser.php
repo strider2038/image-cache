@@ -30,6 +30,6 @@ class YamlFileParser implements ConfigurationFileParserInterface
     {
         $absoluteFilename = $this->fileLocator->locate($filename);
 
-        return Yaml::parseFile($absoluteFilename);
+        return Yaml::parseFile($absoluteFilename) ?? [];
     }
 }

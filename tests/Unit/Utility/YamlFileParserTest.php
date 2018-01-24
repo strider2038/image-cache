@@ -40,6 +40,27 @@ class YamlFileParserTest extends FileTestCase
         $this->assertEquals(['section' => ['value']], $contents);
     }
 
+    /** @test */
+    public function parseConfigurationFile_givenEmptyYamlFile_emptyArrayReturned(): void
+    {
+        $parser = new YamlFileParser($this->fileLocator);
+        $absoluteFilename = $this->givenEmptyYamlFile();
+        $this->givenFileLocator_locate_returnsAbsoluteFilename($absoluteFilename);
+
+        $contents = $parser->parseConfigurationFile(self::FILENAME);
+
+        $this->assertFileLocator_locate_isCalledOnceWithFilename(self::FILENAME);
+        $this->assertEmpty($contents);
+    }
+
+    private function givenEmptyYamlFile(): string
+    {
+        $absoluteFilename = $this->givenYamlFile();
+        file_put_contents($absoluteFilename, '');
+
+        return $absoluteFilename;
+    }
+
     private function givenFileLocator_locate_returnsAbsoluteFilename(string $absoluteFilename): void
     {
         \Phake::when($this->fileLocator)->locate(\Phake::anyParameters())->thenReturn($absoluteFilename);
