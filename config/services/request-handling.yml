@@ -1,0 +1,67 @@
+services:
+    service_loader:
+        class: Strider2038\ImgCache\Service\ServiceLoader
+        arguments:
+            - '@error_handler'
+            - '@request_logger'
+            - '@configuration_loader'
+            - '@configuration_setter'
+
+    http_request_handler:
+        class: Strider2038\ImgCache\Service\HttpRequestHandler
+        arguments:
+            - '@access_control'
+            - '@response_factory'
+            - '@image_request_handler'
+
+    access_control:
+        class: Strider2038\ImgCache\Core\ReadOnlyAccessControl
+
+    image_request_handler:
+        class: Strider2038\ImgCache\Service\Image\ImageRequestHandler
+        arguments:
+            - '@image_request_handler_factory'
+
+    image_request_handler_factory:
+        class: Strider2038\ImgCache\Service\Image\ImageRequestHandlerFactory
+        arguments:
+            - '@get_image_handler'
+            - '@create_image_handler'
+            - '@replace_image_handler'
+            - '@delete_image_handler'
+
+    get_image_handler:
+        class: Strider2038\ImgCache\Service\Image\GetImageHandlerAction
+        arguments:
+            - '@response_factory'
+            - '@image_filename_factory'
+            - '@image_storage_proxy'
+            - '@image_cache'
+
+    create_image_handler:
+        class: Strider2038\ImgCache\Service\Image\CreateImageHandler
+        arguments:
+            - '@response_factory'
+            - '@image_filename_factory'
+            - '@image_storage_proxy'
+            - '@image_factory'
+
+    replace_image_handler:
+        class: Strider2038\ImgCache\Service\Image\ReplaceImageHandler
+        arguments:
+            - '@response_factory'
+            - '@image_filename_factory'
+            - '@image_storage_proxy'
+            - '@image_cache'
+            - '@image_factory'
+
+    delete_image_handler:
+        class: Strider2038\ImgCache\Service\Image\DeleteImageHandler
+        arguments:
+            - '@response_factory'
+            - '@image_filename_factory'
+            - '@image_storage_proxy'
+            - '@image_cache'
+
+    image_storage_proxy:
+        synthetic: true

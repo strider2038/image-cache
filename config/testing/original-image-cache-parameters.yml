@@ -1,0 +1,6 @@
+image_sources:
+    filesystem_source:
+        type: 'filesystem'
+        cache_directory: '/'
+        storage_directory: '/imgcache/tests/assets'
+        processor_type: 'copy'

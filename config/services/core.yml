@@ -18,6 +18,9 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
+    error_handler:
+        class: Strider2038\ImgCache\Core\ErrorHandler
+
     # core http components
     request_factory:
         class: Strider2038\ImgCache\Core\Http\RequestFactory
@@ -41,3 +44,16 @@ services:
             - '@stream_factory'
             - '@file_operations'
             - '%app.debug%'
+
+    Strider2038\ImgCache\Core\CoreServicesContainerInterface:
+        class: Strider2038\ImgCache\Core\CoreServicesContainer
+        arguments:
+            - '@logger'
+            - '@service_loader'
+
+    Strider2038\ImgCache\Core\HttpServicesContainerInterface:
+        class: Strider2038\ImgCache\Core\HttpServicesContainer
+        arguments:
+            - '@request'
+            - '@http_request_handler'
+            - '@response_sender'

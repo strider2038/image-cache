@@ -1,12 +1,9 @@
 imports:
   - { resource: 'services/core.yml' }
-  - { resource: 'services/security.yml' }
+  - { resource: 'services/configuration.yml' }
   - { resource: 'services/utilities.yml' }
-  - { resource: 'services/routing.yml' }
   - { resource: 'services/imaging.yml' }
-  - { resource: 'services/filesystem-storage.yml' }
-  - { resource: 'services/geo-map.yml' }
-  - { resource: 'services/yandex-map-storage.yml' }
-  - { resource: 'services/yandex-disk-storage.yml' }
+  - { resource: 'services/request-handling.yml' }
+  - { resource: 'services/image-cache.yml' }
   - { resource: 'services/parameters.yml' }
   - { resource: 'local.yml', ignore_errors: true }
