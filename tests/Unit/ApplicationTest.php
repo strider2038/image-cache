@@ -11,6 +11,8 @@ use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
+use Strider2038\ImgCache\Core\HttpServicesContainer;
+use Strider2038\ImgCache\Core\HttpServicesContainerInterface;
 use Strider2038\ImgCache\Core\ServiceLoaderInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -54,12 +56,14 @@ class ApplicationTest extends TestCase
     public function run_givenContainerWithCoreServices_servicesLoadedAndRequestHandledAndResponseSent(): void
     {
         $application = $this->createApplication();
-        $this->givenContainer_get_returnsCoreServices();
+        $this->givenContainer_get_returnsCoreServices(CoreServicesContainerInterface::class);
+        $this->givenContainer_get_returnsHttpServices(HttpServicesContainerInterface::class);
         $response = $this->givenRequestHandler_handleRequest_returnsResponse();
 
         $application->run();
 
         $this->assertContainer_get_isCalledOnceWithServiceId(CoreServicesContainerInterface::class);
+        $this->assertContainer_get_isCalledOnceWithServiceId(HttpServicesContainerInterface::class);
         $this->assertLogger_debug_isCalledTimes($this->logger, 2);
         $this->assertServiceLoader_loadServices_isCalledOnceWithContainer($this->container);
         $this->assertRequestHandler_handleRequest_isCalledOnceWithRequest($this->request);
@@ -92,16 +96,23 @@ class ApplicationTest extends TestCase
         return new Application($this->container);
     }
 
-    private function givenContainer_get_returnsCoreServices(): void
+    private function givenContainer_get_returnsCoreServices(string $id): void
     {
         $coreServices = new CoreServicesContainer(
             $this->logger,
-            $this->serviceLoader,
+            $this->serviceLoader
+        );
+        \Phake::when($this->container)->get($id)->thenReturn($coreServices);
+    }
+
+    private function givenContainer_get_returnsHttpServices(string $id): void
+    {
+        $coreServices = new HttpServicesContainer(
             $this->request,
             $this->requestHandler,
             $this->responseSender
         );
-        \Phake::when($this->container)->get(\Phake::anyParameters())->thenReturn($coreServices);
+        \Phake::when($this->container)->get($id)->thenReturn($coreServices);
     }
 
     private function givenContainer_get_throwsException(): void

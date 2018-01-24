@@ -10,7 +10,9 @@
 
 namespace Strider2038\ImgCache;
 
+use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\CoreServicesContainerInterface;
+use Strider2038\ImgCache\Core\HttpServicesContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,6 +23,9 @@ class Application
     /** @var ContainerInterface */
     private $container;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -29,31 +34,39 @@ class Application
     public function run(): void
     {
         try {
-            $this->loadServicesAndProcessRequest();
+            $this->loadServices();
+            $this->processRequest();
         } catch (\Throwable $exception) {
             header('HTTP/1.1 500 Internal server error');
             echo 'Application fatal error: ' . $exception;
         }
     }
 
-    private function loadServicesAndProcessRequest(): void
+    private function loadServices(): void
     {
         /** @var CoreServicesContainerInterface $coreServices */
         $coreServices = $this->container->get(CoreServicesContainerInterface::class);
 
-        $logger = $coreServices->getLogger();
-        $logger->debug('Application started.');
+        $this->logger = $coreServices->getLogger();
+        $this->logger->debug('Application started.');
 
         $serviceLoader = $coreServices->getServiceLoader();
-        $request = $coreServices->getRequest();
-        $requestHandler = $coreServices->getRequestHandler();
-        $responseSender = $coreServices->getResponseSender();
-
         $serviceLoader->loadServices($this->container);
+    }
+
+    private function processRequest(): void
+    {
+        /** @var HttpServicesContainerInterface $httpServices */
+        $httpServices = $this->container->get(HttpServicesContainerInterface::class);
+
+        $request = $httpServices->getRequest();
+        $requestHandler = $httpServices->getRequestHandler();
+        $responseSender = $httpServices->getResponseSender();
+
         $response = $requestHandler->handleRequest($request);
         $responseSender->send($response);
 
-        $logger->debug(sprintf(
+        $this->logger->debug(sprintf(
             'Application ended. Response %d %s was sent.',
             $response->getStatusCode()->getValue(),
             $response->getReasonPhrase()
