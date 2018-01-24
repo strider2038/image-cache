@@ -83,7 +83,26 @@ class ApplicationTest extends TestCase
         $application->run();
 
         $this->assertEquals(500, http_response_code());
-        $this->expectOutputString('Application fatal error.');
+        $this->expectOutputRegex('/Application fatal error.*/');
+    }
+
+    /**
+     * @test
+     * @runInSeparateProcess
+     * @group separate
+     */
+    public function run_containerIsEmptyAndCustomFatalHandlerUsed_serverErrorReturned(): void
+    {
+        $this->givenContainer_get_throwsException();
+        $fatalErrorHandled = false;
+        $fatalHandler = function() use (&$fatalErrorHandled) {
+            $fatalErrorHandled = true;
+        };
+        $application = $this->createApplication($fatalHandler);
+
+        $application->run();
+
+        $this->assertTrue($fatalErrorHandled);
     }
 
     private function assertContainer_get_isCalledOnceWithServiceId(string $id): void
@@ -91,9 +110,9 @@ class ApplicationTest extends TestCase
         \Phake::verify($this->container, \Phake::times(1))->get($id);
     }
 
-    private function createApplication(): Application
+    private function createApplication(Callable $fatalHandler = null): Application
     {
-        return new Application($this->container);
+        return new Application($this->container, $fatalHandler);
     }
 
     private function givenContainer_get_returnsCoreServices(string $id): void

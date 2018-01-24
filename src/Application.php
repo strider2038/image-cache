@@ -22,13 +22,18 @@ class Application
 {
     /** @var ContainerInterface */
     private $container;
-
     /** @var LoggerInterface */
     private $logger;
+    /** @var Callable */
+    private $fatalHandler;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, Callable $fatalHandler = null)
     {
         $this->container = $container;
+        $this->fatalHandler = $fatalHandler ?? function (\Throwable $exception) {
+            header('HTTP/1.1 500 Internal server error');
+            echo 'Application fatal error: ' . $exception;
+        };
     }
     
     public function run(): void
@@ -37,8 +42,7 @@ class Application
             $this->loadServices();
             $this->processRequest();
         } catch (\Throwable $exception) {
-            header('HTTP/1.1 500 Internal server error');
-            echo 'Application fatal error: ' . $exception;
+            \call_user_func($this->fatalHandler, $exception);
         }
     }
 
