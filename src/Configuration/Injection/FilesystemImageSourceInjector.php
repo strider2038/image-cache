@@ -20,13 +20,13 @@ class FilesystemImageSourceInjector implements SettingsInjectorInterface
 {
     private const CACHE_DIRECTORY_ID = 'cache_directory_proxy';
     private const STORAGE_DIRECTORY_ID = 'storage_directory_proxy';
-    private const IMAGE_STORAGE_ID = 'image_storage_proxy';
-    private const STORAGE_DRIVER_ID = 'storage_driver_proxy';
-    private const IMAGE_EXTRACTOR_ID = 'image_extractor_proxy';
+    private const IMAGE_STORAGE_PROXY_ID = 'image_storage_proxy';
+    private const STORAGE_DRIVER_PROXY_ID = 'storage_driver_proxy';
+    private const IMAGE_EXTRACTOR_PROXY_ID = 'image_extractor_proxy';
+    private const FILESYSTEM_STORAGE_DRIVER_ID = 'filesystem_storage_driver';
 
     /** @var FilesystemImageSource */
     private $imageSource;
-
     /** @var ContainerInterface */
     private $container;
 
@@ -39,7 +39,7 @@ class FilesystemImageSourceInjector implements SettingsInjectorInterface
     {
         $this->container = $container;
         $this->injectParametersToContainer();
-        $this->resolveDependenciesInContainer();
+        $this->resolveProxyServicesInContainer();
     }
 
     private function injectParametersToContainer(): void
@@ -48,19 +48,34 @@ class FilesystemImageSourceInjector implements SettingsInjectorInterface
         $this->container->set(self::STORAGE_DIRECTORY_ID, $this->imageSource->getStorageDirectory());
     }
 
-    private function resolveDependenciesInContainer(): void
+    private function resolveProxyServicesInContainer(): void
     {
-        $this->container->set(self::IMAGE_STORAGE_ID, '@' . $this->imageSource->getImageStorageServiceId());
-        $this->container->set(self::STORAGE_DRIVER_ID, '@filesystem_storage_driver');
-        $this->container->set(self::IMAGE_EXTRACTOR_ID, $this->getImageExtractorServiceId());
+        $this->resolveProxyService(
+            self::FILESYSTEM_STORAGE_DRIVER_ID,
+            self::STORAGE_DRIVER_PROXY_ID
+        );
+        $this->resolveProxyService(
+            $this->getImageExtractorServiceId(),
+            self::IMAGE_EXTRACTOR_PROXY_ID
+        );
+        $this->resolveProxyService(
+            $this->imageSource->getImageStorageServiceId(),
+            self::IMAGE_STORAGE_PROXY_ID
+        );
+    }
+
+    private function resolveProxyService(string $serviceId, string $proxyServiceId): void
+    {
+        $service = $this->container->get($serviceId);
+        $this->container->set($proxyServiceId, $service);
     }
 
     private function getImageExtractorServiceId(): string
     {
-        $serviceId = '@filesystem_thumbnail_image_extractor';
+        $serviceId = 'filesystem_thumbnail_image_extractor';
 
         if ($this->imageSource->getProcessorType() === 'copy') {
-            $serviceId = '@filesystem_original_image_extractor';
+            $serviceId = 'filesystem_original_image_extractor';
         }
 
         return $serviceId;

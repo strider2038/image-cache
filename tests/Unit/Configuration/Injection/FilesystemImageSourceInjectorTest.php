@@ -13,6 +13,9 @@ namespace Strider2038\ImgCache\Tests\Unit\Configuration\Injection;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
 use Strider2038\ImgCache\Configuration\Injection\FilesystemImageSourceInjector;
+use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
+use Strider2038\ImgCache\Imaging\ImageStorageInterface;
+use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class FilesystemImageSourceInjectorTest extends TestCase
@@ -24,6 +27,8 @@ class FilesystemImageSourceInjectorTest extends TestCase
     private const IMAGE_STORAGE_ID = 'image_storage_proxy';
     private const STORAGE_DRIVER_ID = 'storage_driver_proxy';
     private const IMAGE_EXTRACTOR_ID = 'image_extractor_proxy';
+    private const FILESYSTEM_STORAGE_DRIVER_ID = 'filesystem_storage_driver';
+    private const FILESYSTEM_STORAGE_ID = 'filesystem_storage';
 
     /** @var ContainerInterface */
     private $container;
@@ -49,21 +54,36 @@ class FilesystemImageSourceInjectorTest extends TestCase
             $processorType
         );
         $injector = new FilesystemImageSourceInjector($imageSource);
+        $filesystemStorageDriver = $this->givenContainer_getWithId_returnsService(
+            self::FILESYSTEM_STORAGE_DRIVER_ID,
+            FilesystemStorageDriverInterface::class
+        );
+        $imageExtractor = $this->givenContainer_getWithId_returnsService(
+            $imageExtractorServiceId,
+            ImageExtractorInterface::class
+        );
+        $filesystemStorage = $this->givenContainer_getWithId_returnsService(
+            self::FILESYSTEM_STORAGE_ID,
+            ImageStorageInterface::class
+        );
 
         $injector->injectSettingsToContainer($this->container);
 
         $this->assertContainer_set_isCalledOnceWithIdAndValue(self::CACHE_DIRECTORY_ID, self::CACHE_DIRECTORY_VALUE);
         $this->assertContainer_set_isCalledOnceWithIdAndValue(self::STORAGE_DIRECTORY_ID, self::STORAGE_DIRECTORY_VALUE);
-        $this->assertContainer_set_isCalledOnceWithIdAndValue(self::IMAGE_STORAGE_ID, '@filesystem_storage');
-        $this->assertContainer_set_isCalledOnceWithIdAndValue(self::STORAGE_DRIVER_ID, '@filesystem_storage_driver');
-        $this->assertContainer_set_isCalledOnceWithIdAndValue(self::IMAGE_EXTRACTOR_ID, $imageExtractorServiceId);
+        $this->assertContainer_get_isCalledOnceWithId(self::FILESYSTEM_STORAGE_DRIVER_ID);
+        $this->assertContainer_set_isCalledOnceWithIdAndValue(self::STORAGE_DRIVER_ID, $filesystemStorageDriver);
+        $this->assertContainer_get_isCalledOnceWithId($imageExtractorServiceId);
+        $this->assertContainer_set_isCalledOnceWithIdAndValue(self::IMAGE_EXTRACTOR_ID, $imageExtractor);
+        $this->assertContainer_get_isCalledOnceWithId(self::FILESYSTEM_STORAGE_ID);
+        $this->assertContainer_set_isCalledOnceWithIdAndValue(self::IMAGE_STORAGE_ID, $filesystemStorage);
     }
 
     public function processorTypeAndServicesProvider(): array
     {
         return [
-            ['copy', '@filesystem_original_image_extractor'],
-            ['thumbnail', '@filesystem_thumbnail_image_extractor'],
+            ['copy', 'filesystem_original_image_extractor'],
+            ['thumbnail', 'filesystem_thumbnail_image_extractor'],
         ];
     }
 
@@ -72,8 +92,18 @@ class FilesystemImageSourceInjectorTest extends TestCase
         \Phake::verify($this->container, \Phake::times(1))->set($id, $value);
     }
 
-    private function assertContainer_setParameter_isCalledOnceWithNameAndValue(string $name, $value): void
+    private function assertContainer_get_isCalledOnceWithId(string $id): void
     {
-        \Phake::verify($this->container, \Phake::times(1))->setParameter($name, $value);
+        \Phake::verify($this->container, \Phake::times(1))->get($id);
+    }
+
+    private function givenContainer_getWithId_returnsService(string $serviceId, string $serviceClass)
+    {
+        $service = \Phake::mock($serviceClass);
+        \Phake::when($this->container)
+            ->get($serviceId)
+            ->thenReturn($service);
+
+        return $service;
     }
 }
