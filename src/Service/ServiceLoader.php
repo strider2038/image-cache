@@ -11,7 +11,7 @@
 namespace Strider2038\ImgCache\Service;
 
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
-use Strider2038\ImgCache\Configuration\ConfigurationSetterInterface;
+use Strider2038\ImgCache\Configuration\ContainerConfiguratorInterface;
 use Strider2038\ImgCache\Core\ErrorHandlerInterface;
 use Strider2038\ImgCache\Core\ServiceLoaderInterface;
 use Strider2038\ImgCache\Utility\RequestLoggerInterface;
@@ -24,26 +24,23 @@ class ServiceLoader implements ServiceLoaderInterface
 {
     /** @var ErrorHandlerInterface */
     private $errorHandler;
-
     /** @var RequestLoggerInterface */
     private $requestLogger;
-
     /** @var ConfigurationLoaderInterface */
     private $configurationLoader;
-
-    /** @var ConfigurationSetterInterface */
-    private $configurationSetter;
+    /** @var ContainerConfiguratorInterface */
+    private $containerConfigurator;
 
     public function __construct(
         ErrorHandlerInterface $errorHandler,
         RequestLoggerInterface $requestLogger,
         ConfigurationLoaderInterface $configurationLoader,
-        ConfigurationSetterInterface $configurationSetter
+        ContainerConfiguratorInterface $configurationSetter
     ) {
         $this->errorHandler = $errorHandler;
         $this->requestLogger = $requestLogger;
         $this->configurationLoader = $configurationLoader;
-        $this->configurationSetter = $configurationSetter;
+        $this->containerConfigurator = $configurationSetter;
     }
 
     public function loadServices(ContainerInterface $container): void
@@ -51,6 +48,6 @@ class ServiceLoader implements ServiceLoaderInterface
         $this->errorHandler->register();
         $this->requestLogger->logClientRequest();
         $configuration = $this->configurationLoader->loadConfiguration();
-        $this->configurationSetter->setConfigurationToContainer($configuration, $container);
+        $this->containerConfigurator->updateContainerByConfiguration($container, $configuration);
     }
 }

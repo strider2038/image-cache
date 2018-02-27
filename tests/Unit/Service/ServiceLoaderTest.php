@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Service;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
-use Strider2038\ImgCache\Configuration\ConfigurationSetterInterface;
+use Strider2038\ImgCache\Configuration\ContainerConfiguratorInterface;
 use Strider2038\ImgCache\Core\ErrorHandlerInterface;
 use Strider2038\ImgCache\Service\ServiceLoader;
 use Strider2038\ImgCache\Utility\RequestLoggerInterface;
@@ -23,22 +23,19 @@ class ServiceLoaderTest extends TestCase
 {
     /** @var ErrorHandlerInterface */
     private $errorHandler;
-
     /** @var RequestLoggerInterface */
     private $requestLogger;
-
     /** @var ConfigurationLoaderInterface */
     private $configurationLoader;
-
-    /** @var ConfigurationSetterInterface */
-    private $configurationSetter;
+    /** @var ContainerConfiguratorInterface */
+    private $containerConfigurator;
 
     protected function setUp(): void
     {
         $this->errorHandler = \Phake::mock(ErrorHandlerInterface::class);
         $this->requestLogger = \Phake::mock(RequestLoggerInterface::class);
         $this->configurationLoader = \Phake::mock(ConfigurationLoaderInterface::class);
-        $this->configurationSetter = \Phake::mock(ConfigurationSetterInterface::class);
+        $this->containerConfigurator = \Phake::mock(ContainerConfiguratorInterface::class);
     }
 
     /** @test */
@@ -53,7 +50,7 @@ class ServiceLoaderTest extends TestCase
         $this->assertErrorHandler_register_isCalledOnce();
         $this->assertRequestLogger_logClientRequest_isCalledOnce();
         $this->assertConfigurationLoader_loadConfiguration_isCalledOnce();
-        $this->assertConfigurationSetter_setConfigurationToContainer_isCalledOnceWithConfigurationAndContainer($configuration, $container);
+        $this->assertContainerConfigurator_updateContainerByConfiguration_isCalledOnceWithConfigurationAndContainer($configuration, $container);
     }
 
     private function createServiceLoader(): ServiceLoader
@@ -62,7 +59,7 @@ class ServiceLoaderTest extends TestCase
             $this->errorHandler,
             $this->requestLogger,
             $this->configurationLoader,
-            $this->configurationSetter
+            $this->containerConfigurator
         );
     }
 
@@ -88,11 +85,11 @@ class ServiceLoaderTest extends TestCase
         \Phake::verify($this->configurationLoader, \Phake::times(1))->loadConfiguration();
     }
 
-    private function assertConfigurationSetter_setConfigurationToContainer_isCalledOnceWithConfigurationAndContainer(
+    private function assertContainerConfigurator_updateContainerByConfiguration_isCalledOnceWithConfigurationAndContainer(
         Configuration $configuration,
         ContainerInterface $container
     ): void {
-        \Phake::verify($this->configurationSetter, \Phake::times(1))
-            ->setConfigurationToContainer($configuration, $container);
+        \Phake::verify($this->containerConfigurator, \Phake::times(1))
+            ->updateContainerByConfiguration($container, $configuration);
     }
 }

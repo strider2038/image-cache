@@ -12,7 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Configuration;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\Configuration;
-use Strider2038\ImgCache\Configuration\ConfigurationSetter;
+use Strider2038\ImgCache\Configuration\ContainerConfigurator;
 use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
 use Strider2038\ImgCache\Configuration\Injection\ImageSourceInjectorFactoryInterface;
@@ -22,7 +22,7 @@ use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ConfigurationSetterTest extends TestCase
+class ContainerConfiguratorTest extends TestCase
 {
     private const ACCESS_CONTROL_TOKEN_KEY = 'access_control.token';
     private const ACCESS_CONTROL_TOKEN_VALUE = 'access_control_token';
@@ -31,10 +31,8 @@ class ConfigurationSetterTest extends TestCase
 
     /** @var ContainerInterface */
     private $container;
-
     /** @var RequestInterface */
     private $request;
-
     /** @var ImageSourceInjectorFactoryInterface */
     private $imageSourceInjectorFactory;
 
@@ -46,9 +44,9 @@ class ConfigurationSetterTest extends TestCase
     }
 
     /** @test */
-    public function setConfigurationToContainer_givenConfiguration_propertiesSetToContainerAndDynamicDependebciesResolved(): void
+    public function updateContainerByConfiguration_givenConfiguration_propertiesSetToContainerAndDynamicDependebciesResolved(): void
     {
-        $configurationSetter = $this->createConfigurationSetter();
+        $containerConfigurator = $this->createContainerConfigurator();
         $imageSource = \Phake::mock(AbstractImageSource::class);
         $this->givenImageSource_getCacheDirectory_returnsCacheDirectory($imageSource, '/request/');
         $configuration = $this->givenConfigurationWithImageSource($imageSource);
@@ -56,7 +54,7 @@ class ConfigurationSetterTest extends TestCase
         $this->givenUri_getPath_returnsValue($uri, '/request/url');
         $settingsInjector = $this->givenImageSourceInjectorFactory_createSettingsInjectorForImageSource_returnsSettingsInjector();
 
-        $configurationSetter->setConfigurationToContainer($configuration, $this->container);
+        $containerConfigurator->updateContainerByConfiguration($this->container, $configuration);
 
         $this->assertParametersInjectedToContainer();
         $this->assertRequest_getUri_isCalledOnce();
@@ -72,9 +70,9 @@ class ConfigurationSetterTest extends TestCase
      * @expectedExceptionCode 404
      * @expectedExceptionMessage Image source was not recognized
      */
-    public function setConfigurationToContainer_givenConfiguration_dynamicDependenciesNotResolvedAndExceptionThrown(): void
+    public function updateContainerByConfiguration_givenConfiguration_dynamicDependenciesNotResolvedAndExceptionThrown(): void
     {
-        $configurationSetter = $this->createConfigurationSetter();
+        $containerConfigurator = $this->createContainerConfigurator();
         $imageSource = \Phake::mock(AbstractImageSource::class);
         $this->givenImageSource_getCacheDirectory_returnsCacheDirectory($imageSource, '/another-path/');
         $configuration = $this->givenConfigurationWithImageSource($imageSource);
@@ -82,12 +80,12 @@ class ConfigurationSetterTest extends TestCase
         $this->givenUri_getPath_returnsValue($uri, '/request/url');
         $this->givenImageSourceInjectorFactory_createSettingsInjectorForImageSource_returnsSettingsInjector();
 
-        $configurationSetter->setConfigurationToContainer($configuration, $this->container);
+        $containerConfigurator->updateContainerByConfiguration($this->container, $configuration);
     }
 
-    private function createConfigurationSetter(): ConfigurationSetter
+    private function createContainerConfigurator(): ContainerConfigurator
     {
-        return new ConfigurationSetter(
+        return new ContainerConfigurator(
             $this->request,
             $this->imageSourceInjectorFactory
         );
@@ -164,12 +162,12 @@ class ConfigurationSetterTest extends TestCase
     }
 
     private function assertSettingsInjector_injectSettingsToContainer_isCalledOnceWithContainer(
-        \Strider2038\ImgCache\Configuration\Injection\SettingsInjectorInterface $settingsInjector
+        SettingsInjectorInterface $settingsInjector
     ): void {
         \Phake::verify($settingsInjector, \Phake::times(1))->injectSettingsToContainer($this->container);
     }
 
-    private function givenImageSourceInjectorFactory_createSettingsInjectorForImageSource_returnsSettingsInjector(): \Strider2038\ImgCache\Configuration\Injection\SettingsInjectorInterface
+    private function givenImageSourceInjectorFactory_createSettingsInjectorForImageSource_returnsSettingsInjector(): SettingsInjectorInterface
     {
         $settingsInjector = \Phake::mock(SettingsInjectorInterface::class);
         \Phake::when($this->imageSourceInjectorFactory)

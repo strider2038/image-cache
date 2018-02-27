@@ -20,17 +20,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ConfigurationSetter implements ConfigurationSetterInterface
+class ContainerConfigurator implements ContainerConfiguratorInterface
 {
     private const ACCESS_CONTROL_TOKEN = 'access_control.token';
     private const IMAGE_PARAMETERS_QUALITY = 'image_parameters.quality';
 
     /** @var RequestInterface */
     private $request;
-
     /** @var ImageSourceInjectorFactoryInterface */
     private $imageSourceInjectorFactory;
-
     /** @var ContainerInterface */
     private $container;
 
@@ -45,7 +43,7 @@ class ConfigurationSetter implements ConfigurationSetterInterface
         $this->imageSourceInjectorFactory = $imageSourceInjectorFactory;
     }
 
-    public function setConfigurationToContainer(Configuration $configuration, ContainerInterface $container): void
+    public function updateContainerByConfiguration(ContainerInterface $container, Configuration $configuration): void
     {
         $this->container = $container;
         $this->imageSourceDetected = false;
