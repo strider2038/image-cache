@@ -53,6 +53,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Performance optimization: compiling to PHAR archive
 - [ ] Performance optimization: lazy services, validation cache
 - [ ] Cache mechanism for source accessor
+- [ ] Add log level to configuration
 - [ ] Support for phpDocumentor
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor HttpClientInterface to use object-based options
