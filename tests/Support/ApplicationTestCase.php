@@ -10,13 +10,13 @@
 
 namespace Strider2038\ImgCache\Tests\Support;
 
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\Http\Uri;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
+use Strider2038\ImgCache\DeprecatedApplication;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,7 +27,7 @@ class ApplicationTestCase extends FunctionalTestCase
 {
     /** @var ContainerInterface */
     private $container;
-    /** @var Application */
+    /** @var DeprecatedApplication */
     private $application;
     /** @var ResponseSenderInterface */
     private $responseSender;
@@ -40,7 +40,7 @@ class ApplicationTestCase extends FunctionalTestCase
         $this->responseSender = \Phake::mock(ResponseSenderInterface::class);
         $this->container->set('response_sender', $this->responseSender);
 
-        $this->application = new Application($this->container, function (\Throwable $exception) {
+        $this->application = new DeprecatedApplication($this->container, function (\Throwable $exception) {
             throw $exception;
         });
     }

@@ -17,8 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
-class Application
+class DeprecatedApplication
 {
     /** @var ContainerInterface */
     private $container;

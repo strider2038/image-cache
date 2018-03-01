@@ -4,7 +4,6 @@ namespace Strider2038\ImgCache\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Strider2038\ImgCache\Application;
 use Strider2038\ImgCache\Core\CoreServicesContainer;
 use Strider2038\ImgCache\Core\CoreServicesContainerInterface;
 use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
@@ -14,13 +13,15 @@ use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\HttpServicesContainer;
 use Strider2038\ImgCache\Core\HttpServicesContainerInterface;
 use Strider2038\ImgCache\Core\ServiceLoaderInterface;
+use Strider2038\ImgCache\DeprecatedApplication;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
+ * @deprecated
  */
-class ApplicationTest extends TestCase 
+class DeprecatedApplicationTest extends TestCase
 {
     use LoggerTrait;
 
@@ -110,9 +111,9 @@ class ApplicationTest extends TestCase
         \Phake::verify($this->container, \Phake::times(1))->get($id);
     }
 
-    private function createApplication(Callable $fatalHandler = null): Application
+    private function createApplication(Callable $fatalHandler = null): DeprecatedApplication
     {
-        return new Application($this->container, $fatalHandler);
+        return new DeprecatedApplication($this->container, $fatalHandler);
     }
 
     private function givenContainer_get_returnsCoreServices(string $id): void

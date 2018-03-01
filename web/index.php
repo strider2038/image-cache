@@ -14,5 +14,5 @@ $loader->load('config/main.yml');
 $container->setParameter('application.directory', $applicationDirectory);
 $container->setParameter('server_configuration', $_SERVER);
 
-$app = new \Strider2038\ImgCache\Application($container);
+$app = new \Strider2038\ImgCache\DeprecatedApplication($container);
 $app->run();
