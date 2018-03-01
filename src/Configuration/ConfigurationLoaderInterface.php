@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Configuration;
  */
 interface ConfigurationLoaderInterface
 {
-    public function loadConfiguration(): Configuration;
+    public function loadConfigurationFromFile(string $filename): Configuration;
 }

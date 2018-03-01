@@ -39,14 +39,14 @@ class ConfigurationLoaderTest extends TestCase
     }
 
     /** @test */
-    public function loadConfiguration_noParameters_configurationLoadedFromFileAndProcessedAndConfigurationClassCreatedAndReturned(): void
+    public function loadConfigurationFromFile_givenFilename_configurationLoadedFromFileAndProcessedAndConfigurationClassCreatedAndReturned(): void
     {
         $loader = $this->createConfigurationLoader();
         $configurationArray = $this->givenConfigurationFileParser_parseConfigurationFile_returnsConfigurationArray();
         $processedConfiguration = $this->givenConfigurationProcessor_processConfiguration_returnsProcessedConfiguration();
         $expectedConfiguration = $this->givenConfigurationFactory_createConfiguration_returnsConfiguration();
 
-        $configuration = $loader->loadConfiguration();
+        $configuration = $loader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
 
         $this->assertConfigurationFileParser_parseConfigurationFile_isCalledOnceWithFilename(self::CONFIGURATION_FILENAME);
         $this->assertConfigurationProcessor_processConfiguration_isCalledOnceWithInstanceOfApplicationConfigurationAndConfigurationArray(

@@ -18,10 +18,7 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class ConfigurationLoader implements ConfigurationLoaderInterface
 {
-    private const DEFAULT_CONFIGURATION_FILENAME = 'config/parameters.yml';
 
-    /** @var string */
-    private $configurationFilename;
 
     /** @var ConfigurationFileParserInterface */
     private $configurationFileParser;
@@ -35,18 +32,16 @@ class ConfigurationLoader implements ConfigurationLoaderInterface
     public function __construct(
         ConfigurationFileParserInterface $configurationFileParser,
         Processor $configurationProcessor,
-        ConfigurationFactoryInterface $configurationFactory,
-        string $configurationFilename = self::DEFAULT_CONFIGURATION_FILENAME
+        ConfigurationFactoryInterface $configurationFactory
     ) {
         $this->configurationFileParser = $configurationFileParser;
         $this->configurationProcessor = $configurationProcessor;
         $this->configurationFactory = $configurationFactory;
-        $this->configurationFilename = $configurationFilename;
     }
 
-    public function loadConfiguration(): Configuration
+    public function loadConfigurationFromFile(string $filename): Configuration
     {
-        $configurationArray = $this->configurationFileParser->parseConfigurationFile($this->configurationFilename);
+        $configurationArray = $this->configurationFileParser->parseConfigurationFile($filename);
 
         $applicationConfiguration = new ApplicationConfiguration();
         $processedConfiguration = $this->configurationProcessor->processConfiguration(

@@ -19,6 +19,7 @@ use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 
 class ConfigurationLoaderTest extends FunctionalTestCase
 {
+    private const CONFIGURATION_FILENAME = 'config/testing/configuration-loader-parameters.yml';
     private const ACCESS_CONTROL_TOKEN = 'test-access-control-token';
     private const CACHED_IMAGE_QUALITY = 65;
 
@@ -34,7 +35,7 @@ class ConfigurationLoaderTest extends FunctionalTestCase
     /** @test */
     public function loadConfiguration_noParameters_validConfigurationLoadedAndReturned(): void
     {
-        $configuration = $this->configurationLoader->loadConfiguration();
+        $configuration = $this->configurationLoader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
 
         $this->assertInstanceOf(Configuration::class, $configuration);
         $this->assertEquals(self::ACCESS_CONTROL_TOKEN, $configuration->getAccessControlToken());
