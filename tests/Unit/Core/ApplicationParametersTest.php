@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit;
+namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\ApplicationParameters;
+use Strider2038\ImgCache\Core\ApplicationParameters;
 
 class ApplicationParametersTest extends TestCase
 {
