@@ -10,6 +10,9 @@
 
 namespace Strider2038\ImgCache\Core;
 
+use Strider2038\ImgCache\Core\Service\ServiceContainerFactoryInterface;
+use Strider2038\ImgCache\Core\Service\ServiceRunnerInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */

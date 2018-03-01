@@ -15,8 +15,8 @@ use Psr\Container\ContainerInterface;
 use Strider2038\ImgCache\Core\Application;
 use Strider2038\ImgCache\Core\ApplicationParameters;
 use Strider2038\ImgCache\Core\ErrorHandlerInterface;
-use Strider2038\ImgCache\Core\ServiceContainerFactoryInterface;
-use Strider2038\ImgCache\Core\ServiceRunnerInterface;
+use Strider2038\ImgCache\Core\Service\ServiceContainerFactoryInterface;
+use Strider2038\ImgCache\Core\Service\ServiceRunnerInterface;
 
 class ApplicationTest extends TestCase
 {
@@ -29,7 +29,7 @@ class ApplicationTest extends TestCase
     /** @var ServiceContainerFactoryInterface */
     private $serviceContainerFactory;
 
-    /** @var ServiceRunnerInterface */
+    /** @var \Strider2038\ImgCache\Core\Service\ServiceRunnerInterface */
     private $serviceRunner;
 
     protected function setUp(): void
