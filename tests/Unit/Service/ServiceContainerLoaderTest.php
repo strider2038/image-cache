@@ -16,7 +16,6 @@ use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
 use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
 use Strider2038\ImgCache\Core\ApplicationParameters;
-use Strider2038\ImgCache\Core\Service\ContainerParametersSetterInterface;
 use Strider2038\ImgCache\Core\Service\FileContainerLoaderInterface;
 use Strider2038\ImgCache\Service\ServiceContainerLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
