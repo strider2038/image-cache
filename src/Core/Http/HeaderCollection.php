@@ -18,10 +18,9 @@ use Strider2038\ImgCache\Collection\StringList;
  */
 class HeaderCollection extends AbstractClassCollection
 {
-    /** @param StringList[] $elements */
-    public function __construct(array $elements = [])
+    protected function getElementClassName(): string
     {
-        parent::__construct($elements, StringList::class);
+        return StringList::class;
     }
 
     /** {@inheritDoc} */

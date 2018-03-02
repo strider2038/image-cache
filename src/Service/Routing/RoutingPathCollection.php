@@ -17,8 +17,8 @@ use Strider2038\ImgCache\Collection\AbstractClassCollection;
  */
 class RoutingPathCollection extends AbstractClassCollection
 {
-    public function __construct(array $elements = [])
+    protected function getElementClassName(): string
     {
-        parent::__construct($elements, RoutingPath::class);
+        return RoutingPath::class;
     }
 }

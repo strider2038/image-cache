@@ -17,9 +17,9 @@ use Strider2038\ImgCache\Collection\AbstractClassCollection;
  */
 class QueryParameterCollection extends AbstractClassCollection
 {
-    public function __construct(array $elements = [])
+    protected function getElementClassName(): string
     {
-        parent::__construct($elements, QueryParameterInterface::class);
+        return QueryParameterInterface::class;
     }
 
     public function toArray(): array
