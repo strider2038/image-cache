@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ContainerParametersSetterInterface
+interface FileContainerLoaderInterface
 {
-    public function setParametersToContainer(ContainerInterface $container, array $parameters): void;
+    public function loadContainerFromFile(string $filename): ContainerInterface;
 }

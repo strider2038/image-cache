@@ -14,9 +14,9 @@ use Psr\Container\ContainerInterface;
 use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
 use Strider2038\ImgCache\Core\ApplicationParameters;
-use Strider2038\ImgCache\Core\Service\ContainerParametersSetterInterface;
+use Strider2038\ImgCache\Core\Service\FileContainerLoaderInterface;
 use Strider2038\ImgCache\Core\Service\ServiceContainerLoaderInterface;
-use Strider2038\ImgCache\Core\Service\ServiceLoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
@@ -26,32 +26,27 @@ class ServiceContainerLoader implements ServiceContainerLoaderInterface
     private const CONTAINER_FILENAME = 'config/main.yml';
     private const CONFIGURATION_FILENAME = 'config/parameters.yml';
 
-    /** @var ServiceLoaderInterface */
-    private $serviceLoader;
+    /** @var FileContainerLoaderInterface */
+    private $containerLoader;
 
     /** @var ConfigurationLoaderInterface */
     private $configurationLoader;
 
-    /** @var ContainerParametersSetterInterface */
-    private $containerParametersSetter;
-
     public function __construct(
-        ServiceLoaderInterface $serviceLoader,
-        ConfigurationLoaderInterface $configurationLoader,
-        ContainerParametersSetterInterface $containerParametersSetter
+        FileContainerLoaderInterface $containerLoader,
+        ConfigurationLoaderInterface $configurationLoader
     ) {
-        $this->serviceLoader = $serviceLoader;
+        $this->containerLoader = $containerLoader;
         $this->configurationLoader = $configurationLoader;
-        $this->containerParametersSetter = $containerParametersSetter;
     }
 
     public function loadServiceContainerWithApplicationParameters(ApplicationParameters $parameters): ContainerInterface
     {
-        $container = $this->serviceLoader->loadContainerFromFile(self::CONTAINER_FILENAME);
+        $container = $this->containerLoader->loadContainerFromFile(self::CONTAINER_FILENAME);
         $configuration = $this->configurationLoader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
 
         $containerParameters = $this->createContainerParameters($parameters, $configuration);
-        $this->containerParametersSetter->setParametersToContainer($container, $containerParameters);
+        $this->setParametersToContainer($container, $containerParameters);
 
         return $container;
     }
@@ -66,5 +61,12 @@ class ServiceContainerLoader implements ServiceContainerLoaderInterface
             'cached_image_quality' => $configuration->getCachedImageQuality(),
             'image_sources' => $configuration->getSourceCollection(),
         ];
+    }
+
+    private function setParametersToContainer(SymfonyContainerInterface $container, array $parameters): void
+    {
+        foreach ($parameters as $name => $value) {
+            $container->setParameter($name, $value);
+        }
     }
 }

@@ -17,11 +17,11 @@ use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
 use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
 use Strider2038\ImgCache\Core\ApplicationParameters;
 use Strider2038\ImgCache\Core\Service\ContainerParametersSetterInterface;
-use Strider2038\ImgCache\Core\Service\ServiceLoaderInterface;
+use Strider2038\ImgCache\Core\Service\FileContainerLoaderInterface;
 use Strider2038\ImgCache\Service\ServiceContainerLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 
-class ServiceContainerFactoryTest extends TestCase
+class ServiceContainerLoaderTest extends TestCase
 {
     private const ROOT_DIRECTORY = 'root_directory';
     private const SERVER_CONFIGURATION = ['server_configuration'];
@@ -30,35 +30,31 @@ class ServiceContainerFactoryTest extends TestCase
     private const ACCESS_CONTROL_TOKEN = 'access_control_token';
     private const CACHED_IMAGE_QUALITY = 85;
 
-    /** @var ServiceLoaderInterface */
-    private $serviceLoader;
+    /** @var FileContainerLoaderInterface */
+    private $containerLoader;
 
     /** @var ConfigurationLoaderInterface */
     private $configurationLoader;
 
-    /** @var ContainerParametersSetterInterface */
-    private $containerParametersSetter;
-
     protected function setUp(): void
     {
-        $this->serviceLoader = \Phake::mock(ServiceLoaderInterface::class);
+        $this->containerLoader = \Phake::mock(FileContainerLoaderInterface::class);
         $this->configurationLoader = \Phake::mock(ConfigurationLoaderInterface::class);
-        $this->containerParametersSetter = \Phake::mock(ContainerParametersSetterInterface::class);
     }
 
     /** @test */
-    public function createServiceContainerByApplicationParameters_givenParameters_serviceContainerAndConfigurationLoadedAndContainerParametersSet(): void
+    public function loadServiceContainerWithApplicationParameters_givenParameters_serviceContainerAndConfigurationLoadedAndContainerParametersSet(): void
     {
         $factory = $this->createServiceContainerFactory();
         $applicationParameters = $this->givenApplicationParameters();
-        $createdContainer = $this->givenServiceLoader_loadContainerFromFile_returnsContainer();
+        $createdContainer = $this->givenContainerLoader_loadContainerFromFile_returnsContainer();
         $configuration = $this->givenConfigurationLoader_loadConfigurationFromFile_returnsConfiguration();
 
         $container = $factory->loadServiceContainerWithApplicationParameters($applicationParameters);
 
         $this->assertInstanceOf(PsrContainerInterface::class, $container);
         $this->assertSame($createdContainer, $container);
-        $this->assertServiceLoader_loadContainerFromFile_isCalledOnceWithFilename(self::CONTAINER_FILENAME);
+        $this->assertContainerLoader_loadContainerFromFile_isCalledOnceWithFilename(self::CONTAINER_FILENAME);
         $this->assertConfigurationLoader_loadConfigurationFromFile_isCalledOnceWithFilename(self::CONFIGURATION_FILENAME);
         $this->assertContainerParametersSetter_setParametersToContainer_isCalledOnceWithContainerAndValidParameters($container);
     }
@@ -66,9 +62,8 @@ class ServiceContainerFactoryTest extends TestCase
     private function createServiceContainerFactory(): ServiceContainerLoader
     {
         return new ServiceContainerLoader(
-            $this->serviceLoader,
-            $this->configurationLoader,
-            $this->containerParametersSetter
+            $this->containerLoader,
+            $this->configurationLoader
         );
     }
 
@@ -80,16 +75,16 @@ class ServiceContainerFactoryTest extends TestCase
         );
     }
 
-    private function assertServiceLoader_loadContainerFromFile_isCalledOnceWithFilename(string $containerFilename): void
+    private function assertContainerLoader_loadContainerFromFile_isCalledOnceWithFilename(string $containerFilename): void
     {
-        \Phake::verify($this->serviceLoader, \Phake::times(1))
+        \Phake::verify($this->containerLoader, \Phake::times(1))
             ->loadContainerFromFile($containerFilename);
     }
 
-    private function givenServiceLoader_loadContainerFromFile_returnsContainer(): SymfonyContainerInterface
+    private function givenContainerLoader_loadContainerFromFile_returnsContainer(): SymfonyContainerInterface
     {
         $serviceContainer = \Phake::mock(SymfonyContainerInterface::class);
-        \Phake::when($this->serviceLoader)
+        \Phake::when($this->containerLoader)
             ->loadContainerFromFile(\Phake::anyParameters())
             ->thenReturn($serviceContainer);
 
@@ -120,14 +115,32 @@ class ServiceContainerFactoryTest extends TestCase
     private function assertContainerParametersSetter_setParametersToContainer_isCalledOnceWithContainerAndValidParameters(
         SymfonyContainerInterface $container
     ): void {
-        \Phake::verify($this->containerParametersSetter, \Phake::times(1))
-            ->setParametersToContainer($container, \Phake::capture($parameters));
-        $this->assertArraySubset(['application.directory' => self::ROOT_DIRECTORY], $parameters);
-        $this->assertArrayHasKey('application.start_up_time', $parameters);
-        $this->assertArraySubset(['server_configuration' => self::SERVER_CONFIGURATION], $parameters);
-        $this->assertArraySubset(['access_control_token' => self::ACCESS_CONTROL_TOKEN], $parameters);
-        $this->assertArraySubset(['cached_image_quality' => self::CACHED_IMAGE_QUALITY], $parameters);
-        $this->assertArrayHasKey('image_sources', $parameters);
-        $this->assertInstanceOf(ImageSourceCollection::class, $parameters['image_sources']);
+        $this->assertContainer_setParameter_isCalledOnceWithNameAndValue($container, 'application.directory', self::ROOT_DIRECTORY);
+        $startUpTime = $this->assertContainer_setParameter_isCalledOnceWithNameAndCapturedValue($container, 'application.start_up_time');
+        $this->assertGreaterThan(0, $startUpTime);
+        $this->assertContainer_setParameter_isCalledOnceWithNameAndValue($container, 'server_configuration', self::SERVER_CONFIGURATION);
+        $this->assertContainer_setParameter_isCalledOnceWithNameAndValue($container, 'access_control_token', self::ACCESS_CONTROL_TOKEN);
+        $this->assertContainer_setParameter_isCalledOnceWithNameAndValue($container, 'cached_image_quality', self::CACHED_IMAGE_QUALITY);
+        $imageSources = $this->assertContainer_setParameter_isCalledOnceWithNameAndCapturedValue($container, 'image_sources');
+        $this->assertInstanceOf(ImageSourceCollection::class, $imageSources);
+    }
+
+    private function assertContainer_setParameter_isCalledOnceWithNameAndValue(
+        SymfonyContainerInterface $container,
+        string $name,
+        $value
+    ): void {
+        \Phake::verify($container, \Phake::times(1))
+            ->setParameter($name, $value);
+    }
+
+    private function assertContainer_setParameter_isCalledOnceWithNameAndCapturedValue(
+        SymfonyContainerInterface $container,
+        string $name
+    ) {
+        \Phake::verify($container, \Phake::times(1))
+            ->setParameter($name, \Phake::capture($value));
+
+        return $value;
     }
 }
