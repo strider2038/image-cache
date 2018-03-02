@@ -18,8 +18,6 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class ConfigurationLoader implements ConfigurationLoaderInterface
 {
-
-
     /** @var ConfigurationFileParserInterface */
     private $configurationFileParser;
 
