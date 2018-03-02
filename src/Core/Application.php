@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Core;
 
-use Strider2038\ImgCache\Core\Service\ServiceContainerFactoryInterface;
+use Strider2038\ImgCache\Core\Service\ServiceContainerLoaderInterface;
 use Strider2038\ImgCache\Core\Service\ServiceRunnerInterface;
 
 /**
@@ -24,8 +24,8 @@ class Application
     /** @var ErrorHandlerInterface */
     private $errorHandler;
 
-    /** @var ServiceContainerFactoryInterface */
-    private $serviceContainerFactory;
+    /** @var ServiceContainerLoaderInterface */
+    private $serviceContainerLoader;
 
     /** @var ServiceRunnerInterface */
     private $serviceRunner;
@@ -33,19 +33,19 @@ class Application
     public function __construct(
         ApplicationParameters $parameters,
         ErrorHandlerInterface $errorHandler,
-        ServiceContainerFactoryInterface $serviceContainerFactory,
+        ServiceContainerLoaderInterface $serviceContainerLoader,
         ServiceRunnerInterface $serviceRunner
     ) {
         $this->parameters = $parameters;
         $this->errorHandler = $errorHandler;
-        $this->serviceContainerFactory = $serviceContainerFactory;
+        $this->serviceContainerLoader = $serviceContainerLoader;
         $this->serviceRunner = $serviceRunner;
     }
 
     public function run(): void
     {
         $this->errorHandler->register();
-        $serviceContainer = $this->serviceContainerFactory->createServiceContainerByApplicationParameters($this->parameters);
+        $serviceContainer = $this->serviceContainerLoader->loadServiceContainerWithApplicationParameters($this->parameters);
         $this->serviceRunner->runServices($serviceContainer);
     }
 }

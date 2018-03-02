@@ -16,7 +16,7 @@ use Strider2038\ImgCache\Core\ApplicationParameters;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ServiceContainerFactoryInterface
+interface ServiceContainerLoaderInterface
 {
-    public function createServiceContainerByApplicationParameters(ApplicationParameters $parameters): ContainerInterface;
+    public function loadServiceContainerWithApplicationParameters(ApplicationParameters $parameters): ContainerInterface;
 }

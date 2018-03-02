@@ -15,13 +15,13 @@ use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
 use Strider2038\ImgCache\Core\ApplicationParameters;
 use Strider2038\ImgCache\Core\Service\ContainerParametersSetterInterface;
-use Strider2038\ImgCache\Core\Service\ServiceContainerFactoryInterface;
+use Strider2038\ImgCache\Core\Service\ServiceContainerLoaderInterface;
 use Strider2038\ImgCache\Core\Service\ServiceLoaderInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ServiceContainerFactory implements ServiceContainerFactoryInterface
+class ServiceContainerLoader implements ServiceContainerLoaderInterface
 {
     private const CONTAINER_FILENAME = 'config/main.yml';
     private const CONFIGURATION_FILENAME = 'config/parameters.yml';
@@ -45,7 +45,7 @@ class ServiceContainerFactory implements ServiceContainerFactoryInterface
         $this->containerParametersSetter = $containerParametersSetter;
     }
 
-    public function createServiceContainerByApplicationParameters(ApplicationParameters $parameters): ContainerInterface
+    public function loadServiceContainerWithApplicationParameters(ApplicationParameters $parameters): ContainerInterface
     {
         $container = $this->serviceLoader->loadContainerFromFile(self::CONTAINER_FILENAME);
         $configuration = $this->configurationLoader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);

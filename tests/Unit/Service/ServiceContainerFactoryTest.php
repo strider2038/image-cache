@@ -18,7 +18,7 @@ use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
 use Strider2038\ImgCache\Core\ApplicationParameters;
 use Strider2038\ImgCache\Core\Service\ContainerParametersSetterInterface;
 use Strider2038\ImgCache\Core\Service\ServiceLoaderInterface;
-use Strider2038\ImgCache\Service\ServiceContainerFactory;
+use Strider2038\ImgCache\Service\ServiceContainerLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 
 class ServiceContainerFactoryTest extends TestCase
@@ -54,7 +54,7 @@ class ServiceContainerFactoryTest extends TestCase
         $createdContainer = $this->givenServiceLoader_loadContainerFromFile_returnsContainer();
         $configuration = $this->givenConfigurationLoader_loadConfigurationFromFile_returnsConfiguration();
 
-        $container = $factory->createServiceContainerByApplicationParameters($applicationParameters);
+        $container = $factory->loadServiceContainerWithApplicationParameters($applicationParameters);
 
         $this->assertInstanceOf(PsrContainerInterface::class, $container);
         $this->assertSame($createdContainer, $container);
@@ -63,9 +63,9 @@ class ServiceContainerFactoryTest extends TestCase
         $this->assertContainerParametersSetter_setParametersToContainer_isCalledOnceWithContainerAndValidParameters($container);
     }
 
-    private function createServiceContainerFactory(): ServiceContainerFactory
+    private function createServiceContainerFactory(): ServiceContainerLoader
     {
-        return new ServiceContainerFactory(
+        return new ServiceContainerLoader(
             $this->serviceLoader,
             $this->configurationLoader,
             $this->containerParametersSetter

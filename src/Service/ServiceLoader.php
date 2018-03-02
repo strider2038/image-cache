@@ -47,7 +47,7 @@ class ServiceLoader implements ServiceLoaderInterface
     {
         $this->errorHandler->register();
         $this->requestLogger->logClientRequest();
-        $configuration = $this->configurationLoader->loadConfiguration();
+        $configuration = $this->configurationLoader->loadConfigurationFromFile();
         $this->containerConfigurator->updateContainerByConfiguration($container, $configuration);
     }
 }
