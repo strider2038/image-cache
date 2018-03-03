@@ -11,11 +11,12 @@
 namespace Strider2038\ImgCache\Utility;
 
 use Psr\Log\LoggerInterface;
+use Strider2038\ImgCache\Core\Service\ApplicationServiceInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class RequestLogger implements RequestLoggerInterface
+class ClientRequestLogger implements ApplicationServiceInterface
 {
     /** @var LoggerInterface */
     private $logger;
@@ -29,7 +30,7 @@ class RequestLogger implements RequestLoggerInterface
         $this->serverConfiguration = $serverConfiguration;
     }
 
-    public function logClientRequest(): void
+    public function run(): void
     {
         $this->logger->info(sprintf(
             'Processing request %s %s from ip %s, referrer "%s", user agent "%s" by server "%s"',

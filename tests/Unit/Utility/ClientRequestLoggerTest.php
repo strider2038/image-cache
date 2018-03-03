@@ -12,9 +12,9 @@ namespace Strider2038\ImgCache\Tests\Unit\Utility;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Strider2038\ImgCache\Utility\RequestLogger;
+use Strider2038\ImgCache\Utility\ClientRequestLogger;
 
-class RequestLoggerTest extends TestCase
+class ClientRequestLoggerTest extends TestCase
 {
     private const REQUEST_METHOD = 'request_method';
     private const REQUEST_URI = 'request_uri';
@@ -32,9 +32,9 @@ class RequestLoggerTest extends TestCase
     }
 
     /** @test */
-    public function logCurrentRequest_givenLoggerAndServerConfiguration_logInfoIsCalled(): void
+    public function run_givenLoggerAndServerConfiguration_logInfoIsCalled(): void
     {
-        $requestLogger = new RequestLogger($this->logger, [
+        $requestLogger = new ClientRequestLogger($this->logger, [
             'REQUEST_METHOD' => self::REQUEST_METHOD,
             'REQUEST_URI' => self::REQUEST_URI,
             'REMOTE_ADDR' => self::REMOTE_ADDRESS,
@@ -43,7 +43,7 @@ class RequestLoggerTest extends TestCase
             'SERVER_NAME' => self::SERVER_NAME,
         ]);
 
-        $requestLogger->logClientRequest();
+        $requestLogger->run();
 
         $message = $this->assertLogger_info_isCalledOnceAndReturnsMessage();
         $this->assertMessageHasSubstring($message, self::REQUEST_METHOD);
