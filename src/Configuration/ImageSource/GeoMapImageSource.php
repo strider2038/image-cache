@@ -10,20 +10,12 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
-use Symfony\Component\Validator\Constraints as Assert;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class GeoMapImageSource extends AbstractImageSource
 {
-    /**
-     * @Assert\Choice(
-     *     choices={"yandex"},
-     *     strict=true
-     * )
-     * @var string
-     */
+    /** @var string */
     private $driver;
 
     /** @var string */
@@ -37,16 +29,6 @@ class GeoMapImageSource extends AbstractImageSource
         parent::__construct($cacheDirectory);
         $this->driver = $driver;
         $this->apiKey = $apiKey;
-    }
-
-    public function getId(): string
-    {
-        return 'geographical map image source';
-    }
-
-    public function getImageStorageServiceId(): string
-    {
-        return 'geo_map_storage';
     }
 
     public function getDriver(): string

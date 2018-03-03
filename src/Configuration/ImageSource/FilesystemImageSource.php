@@ -12,26 +12,16 @@ namespace Strider2038\ImgCache\Configuration\ImageSource;
 
 use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class FilesystemImageSource extends AbstractImageSource
 {
-    /**
-     * @Assert\Valid()
-     * @var DirectoryNameInterface
-     */
+    /** @var DirectoryNameInterface */
     private $storageDirectory;
 
-    /**
-     * @Assert\Choice(
-     *     choices={"copy", "thumbnail"},
-     *     strict=true
-     * )
-     * @var string
-     */
+    /** @var string */
     private $processorType;
 
     public function __construct(
@@ -43,16 +33,6 @@ class FilesystemImageSource extends AbstractImageSource
         $storageDirectory = $storageDirectory === '' ? '' : rtrim($storageDirectory, '/') . '/';
         $this->storageDirectory = new DirectoryName($storageDirectory);
         $this->processorType = $processorType;
-    }
-
-    public function getId(): string
-    {
-        return 'filesystem image source';
-    }
-
-    public function getImageStorageServiceId(): string
-    {
-        return 'filesystem_storage';
     }
 
     public function getStorageDirectory(): DirectoryNameInterface
