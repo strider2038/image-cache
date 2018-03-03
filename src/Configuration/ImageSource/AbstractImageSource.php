@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
-use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 
 /**
@@ -21,10 +20,9 @@ abstract class AbstractImageSource
     /** @var DirectoryNameInterface */
     private $cacheDirectory;
 
-    public function __construct(string $cacheDirectory)
+    public function __construct(DirectoryNameInterface $cacheDirectory)
     {
-        $cacheDirectory = $cacheDirectory === '' ? '' : rtrim($cacheDirectory, '/') . '/';
-        $this->cacheDirectory = new DirectoryName($cacheDirectory);
+        $this->cacheDirectory = $cacheDirectory;
     }
 
     public function getCacheDirectory(): DirectoryNameInterface

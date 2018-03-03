@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Configuration\ImageSource;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 
 class GeoMapImageSourceTest extends TestCase
 {
@@ -23,7 +24,7 @@ class GeoMapImageSourceTest extends TestCase
     public function construct_givenParameters_parametersSetAndAccessible(): void
     {
         $source = new GeoMapImageSource(
-            self::CACHE_DIRECTORY,
+            new DirectoryName(self::CACHE_DIRECTORY),
             self::DRIVER,
             self::API_KEY
         );

@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -22,7 +24,7 @@ class GeoMapImageSource extends AbstractImageSource
     private $apiKey;
 
     public function __construct(
-        string $cacheDirectory,
+        DirectoryNameInterface $cacheDirectory,
         string $driver,
         string $apiKey
     ) {

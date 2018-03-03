@@ -12,6 +12,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Configuration\ImageSource;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 
 class WebDAVImageSourceTest extends TestCase
 {
@@ -25,8 +26,8 @@ class WebDAVImageSourceTest extends TestCase
     public function construct_givenParameters_parametersSetAndAccessible(): void
     {
         $source = new WebDAVImageSource(
-            self::CACHE_DIRECTORY,
-            self::STORAGE_DIRECTORY,
+            new DirectoryName(self::CACHE_DIRECTORY),
+            new DirectoryName(self::STORAGE_DIRECTORY),
             self::PROCESSOR_TYPE,
             self::DRIVER_URI,
             self::OAUTH_TOKEN
@@ -34,7 +35,7 @@ class WebDAVImageSourceTest extends TestCase
 
         $this->assertEquals(self::CACHE_DIRECTORY, $source->getCacheDirectory());
         $this->assertEquals(self::STORAGE_DIRECTORY, $source->getStorageDirectory());
-        $this->assertEquals(self::PROCESSOR_TYPE, $source->getProcessorType());
+        $this->assertEquals(self::PROCESSOR_TYPE, $source->getProcessorType()->getValue());
         $this->assertEquals(self::DRIVER_URI, $source->getDriverUri());
         $this->assertEquals(self::OAUTH_TOKEN, $source->getOauthToken());
     }

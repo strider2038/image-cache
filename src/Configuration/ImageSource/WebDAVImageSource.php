@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
+
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
@@ -22,8 +24,8 @@ class WebDAVImageSource extends FilesystemImageSource
     private $oauthToken;
 
     public function __construct(
-        string $cacheDirectory,
-        string $storageDirectory,
+        DirectoryNameInterface $cacheDirectory,
+        DirectoryNameInterface $storageDirectory,
         string $processorType,
         string $driverUri,
         string $oauthToken

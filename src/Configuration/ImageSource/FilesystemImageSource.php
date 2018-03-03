@@ -10,7 +10,7 @@
 
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
-use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
+use Strider2038\ImgCache\Enum\ImageProcessorTypeEnum;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 
 /**
@@ -21,18 +21,17 @@ class FilesystemImageSource extends AbstractImageSource
     /** @var DirectoryNameInterface */
     private $storageDirectory;
 
-    /** @var string */
+    /** @var ImageProcessorTypeEnum */
     private $processorType;
 
     public function __construct(
-        string $cacheDirectory,
-        string $storageDirectory,
+        DirectoryNameInterface $cacheDirectory,
+        DirectoryNameInterface $storageDirectory,
         string $processorType
     ) {
         parent::__construct($cacheDirectory);
-        $storageDirectory = $storageDirectory === '' ? '' : rtrim($storageDirectory, '/') . '/';
-        $this->storageDirectory = new DirectoryName($storageDirectory);
-        $this->processorType = $processorType;
+        $this->storageDirectory = $storageDirectory;
+        $this->processorType = new ImageProcessorTypeEnum($processorType);
     }
 
     public function getStorageDirectory(): DirectoryNameInterface
@@ -40,7 +39,7 @@ class FilesystemImageSource extends AbstractImageSource
         return $this->storageDirectory;
     }
 
-    public function getProcessorType(): string
+    public function getProcessorType(): ImageProcessorTypeEnum
     {
         return $this->processorType;
     }

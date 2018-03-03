@@ -15,6 +15,8 @@ use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceFactory;
 use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
+use Strider2038\ImgCache\Enum\ImageProcessorTypeEnum;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 
 class ImageSourceFactoryTest extends TestCase
 {
@@ -44,18 +46,18 @@ class ImageSourceFactoryTest extends TestCase
             [
                 [
                     'type' => 'filesystem',
-                    'cache_directory' => self::CACHE_DIRECTORY,
-                    'storage_directory' => '',
-                    'processor_type' => '',
+                    'cache_directory' => new DirectoryName(self::CACHE_DIRECTORY),
+                    'storage_directory' => new DirectoryName(''),
+                    'processor_type' => new ImageProcessorTypeEnum(ImageProcessorTypeEnum::THUMBNAIL),
                 ],
                 FilesystemImageSource::class,
             ],
             [
                 [
                     'type' => 'webdav',
-                    'cache_directory' => self::CACHE_DIRECTORY,
-                    'storage_directory' => '',
-                    'processor_type' => '',
+                    'cache_directory' => new DirectoryName(self::CACHE_DIRECTORY),
+                    'storage_directory' => new DirectoryName(''),
+                    'processor_type' => new ImageProcessorTypeEnum(ImageProcessorTypeEnum::THUMBNAIL),
                     'driver_uri' => '',
                     'oauth_token' => '',
                 ],
@@ -64,7 +66,7 @@ class ImageSourceFactoryTest extends TestCase
             [
                 [
                     'type' => 'geomap',
-                    'cache_directory' => self::CACHE_DIRECTORY,
+                    'cache_directory' => new DirectoryName(self::CACHE_DIRECTORY),
                     'driver' => '',
                     'api_key' => '',
                 ],
