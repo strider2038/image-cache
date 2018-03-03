@@ -15,20 +15,10 @@ use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceFactory;
 use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
-use Strider2038\ImgCache\Exception\InvalidConfigurationException;
-use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class ImageSourceFactoryTest extends TestCase
 {
     private const CACHE_DIRECTORY = '/cache-directory/';
-
-    /** @var EntityValidatorInterface */
-    private $validator;
-
-    protected function setUp(): void
-    {
-        $this->validator = \Phake::mock(EntityValidatorInterface::class);
-    }
 
     /**
      * @test
@@ -40,16 +30,12 @@ class ImageSourceFactoryTest extends TestCase
         array $configurationArray,
         string $imageSourceClass
     ): void {
-        $factory = new ImageSourceFactory($this->validator);
+        $factory = new ImageSourceFactory();
 
         $imageSource = $factory->createImageSourceByConfiguration($configurationArray);
 
         $this->assertInstanceOf($imageSourceClass, $imageSource);
         $this->assertEquals(self::CACHE_DIRECTORY, $imageSource->getCacheDirectory());
-        $this->assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
-            $imageSourceClass,
-            InvalidConfigurationException::class
-        );
     }
 
     public function configurationAndImageSourceClassProvider(): array
@@ -85,15 +71,5 @@ class ImageSourceFactoryTest extends TestCase
                 GeoMapImageSource::class,
             ],
         ];
-    }
-
-    private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
-        string $entityClass,
-        string $exceptionClass
-    ): void {
-        \Phake::verify($this->validator, \Phake::times(1))
-            ->validateWithException(\Phake::capture($entity), \Phake::capture($exception));
-        $this->assertInstanceOf($entityClass, $entity);
-        $this->assertEquals($exceptionClass, $exception);
     }
 }
