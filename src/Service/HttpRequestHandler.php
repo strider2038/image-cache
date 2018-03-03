@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Service;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Core\AccessControlInterface;
 use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
@@ -31,6 +33,9 @@ class HttpRequestHandler implements RequestHandlerInterface
     /** @var RequestHandlerInterface */
     private $concreteRequestHandler;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         AccessControlInterface $accessControl,
         ResponseFactoryInterface $responseFactory,
@@ -39,14 +44,32 @@ class HttpRequestHandler implements RequestHandlerInterface
         $this->accessControl = $accessControl;
         $this->responseFactory = $responseFactory;
         $this->concreteRequestHandler = $concreteRequestHandler;
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function handleRequest(RequestInterface $request): ResponseInterface
     {
         if ($this->accessControl->canHandleRequest($request)) {
-            $response = $this->concreteRequestHandler->handleRequest($request);
+            $response = $this->handleRequestByConcreteHandler($request);
         } else {
             $response = $this->createForbiddenResponse();
+        }
+
+        return $response;
+    }
+
+    private function handleRequestByConcreteHandler(RequestInterface $request): ResponseInterface
+    {
+        try {
+            $response = $this->concreteRequestHandler->handleRequest($request);
+        } catch (\Throwable $exception) {
+            $this->logger->error($exception);
+            $response = $this->responseFactory->createExceptionResponse($exception);
         }
 
         return $response;
