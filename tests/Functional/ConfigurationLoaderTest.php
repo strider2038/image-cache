@@ -10,14 +10,20 @@
 
 namespace Strider2038\ImgCache\Tests\Functional;
 
+use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\Configuration;
+use Strider2038\ImgCache\Configuration\ConfigurationFactory;
+use Strider2038\ImgCache\Configuration\ConfigurationLoader;
 use Strider2038\ImgCache\Configuration\ConfigurationLoaderInterface;
+use Strider2038\ImgCache\Configuration\ConfigurationTreeGenerator;
 use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
+use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceFactory;
 use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
-use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
+use Strider2038\ImgCache\Utility\ConfigurationFileParserInterface;
+use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationLoaderTest extends FunctionalTestCase
+class ConfigurationLoaderTest extends TestCase
 {
     private const CONFIGURATION_FILENAME = 'config/testing/configuration-loader-parameters.yml';
     private const ACCESS_CONTROL_TOKEN = 'test-access-control-token';
@@ -26,21 +32,138 @@ class ConfigurationLoaderTest extends FunctionalTestCase
     /** @var ConfigurationLoaderInterface */
     private $configurationLoader;
 
+    /** @var ConfigurationFileParserInterface */
+    private $configurationFileParser;
+
     protected function setUp(): void
     {
-        $container = $this->loadContainer('configuration-loader.yml');
-        $this->configurationLoader = $container->get('configuration_loader');
+        $this->configurationFileParser = \Phake::mock(ConfigurationFileParserInterface::class);
+        $this->configurationLoader = new ConfigurationLoader(
+            $this->configurationFileParser,
+            new ConfigurationTreeGenerator(),
+            new Processor(),
+            new ConfigurationFactory(
+                new ImageSourceFactory()
+            )
+        );
     }
 
     /** @test */
-    public function loadConfiguration_noParameters_validConfigurationLoadedAndReturned(): void
+    public function loadConfiguration_validConfigurationArrayLoaded_configurationCreatedAndReturned(): void
     {
+        $configurationArray = $this->givenConfigurationArray();
+        $this->givenConfigurationFileParser_parseConfigurationFile_returnsArray($configurationArray);
+
         $configuration = $this->configurationLoader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
 
         $this->assertInstanceOf(Configuration::class, $configuration);
         $this->assertEquals(self::ACCESS_CONTROL_TOKEN, $configuration->getAccessControlToken());
         $this->assertEquals(self::CACHED_IMAGE_QUALITY, $configuration->getCachedImageQuality());
         $this->assertImageSourcesInConfigurationAreValid($configuration);
+    }
+
+    /**
+     * @test
+     * @dataProvider invalidConfigurationArray
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @param array $configurationArray
+     */
+    public function loadConfiguration_invalidConfigurationArrayLoaded_invalidConfigurationExceptionThrown(
+        array $configurationArray
+    ): void {
+        $this->givenConfigurationFileParser_parseConfigurationFile_returnsArray($configurationArray);
+
+        $this->configurationLoader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
+    }
+
+    public function invalidConfigurationArray(): array
+    {
+        return [
+            [
+                [
+                    'image_sources' => []
+                ],
+            ],
+            [
+                [
+                    'image_sources' => [
+                        'filesystem_source' => [
+                            'type' => 'filesystem',
+                            'cache_directory' => '',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'image_sources' => [
+                        'filesystem_source' => [
+                            'type' => 'filesystem',
+                            'cache_directory' => '/$invalid_directory',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'image_sources' => [
+                        'filesystem_source' => [
+                            'type' => 'filesystem',
+                            'cache_directory' => '/valid_directory',
+                            'storage_directory' => '/$invalid_directory',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'image_sources' => [
+                        'geo_map_source' => [
+                            'type' => 'geomap',
+                            'cache_directory' => '/valid_directory',
+                            'driver_uri' => '',
+                            'oauth_token' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private function givenConfigurationArray(): array
+    {
+        return [
+            'access_control_token' => self::ACCESS_CONTROL_TOKEN,
+            'cached_image_quality' => self::CACHED_IMAGE_QUALITY,
+            'image_sources' => [
+                'filesystem_source' => [
+                    'type' => 'filesystem',
+                    'cache_directory' => '/fs',
+                    'storage_directory' => '/image-storage',
+                ],
+                'yandex_disk_source' => [
+                    'type' => 'webdav',
+                    'cache_directory' => '/yd',
+                    'storage_directory' => '/imgcache',
+                    'driver_uri' => 'https://webdav.yandex.ru/v1',
+                    'oauth_token' => 'test-oauth-token',
+                ],
+                'yandex_map_source' => [
+                    'type' => 'geomap',
+                    'cache_directory' => '/map',
+                    'driver' => 'yandex',
+                    'driver_uri' => 'https://example.com',
+                    'oauth_token' => 'token',
+                ],
+            ],
+        ];
+    }
+
+    private function givenConfigurationFileParser_parseConfigurationFile_returnsArray(array $configurationArray): void
+    {
+        \Phake::when($this->configurationFileParser)
+            ->parseConfigurationFile(\Phake::anyParameters())
+            ->thenReturn($configurationArray);
     }
 
     private function assertImageSourcesInConfigurationAreValid(Configuration $configuration): void

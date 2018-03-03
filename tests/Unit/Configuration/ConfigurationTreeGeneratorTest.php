@@ -11,15 +11,15 @@
 namespace Strider2038\ImgCache\Tests\Unit\Configuration;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Configuration\ApplicationConfiguration;
+use Strider2038\ImgCache\Configuration\ConfigurationTreeGenerator;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class ApplicationConfigurationTest extends TestCase
+class ConfigurationTreeGeneratorTest extends TestCase
 {
     /** @test */
     public function getConfigTreeBuilder_noParameters_treeBuilderReturned(): void
     {
-        $configuration = new ApplicationConfiguration();
+        $configuration = new ConfigurationTreeGenerator();
 
         $treeBuilder = $configuration->getConfigTreeBuilder();
 

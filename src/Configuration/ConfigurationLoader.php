@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Configuration;
 
 use Strider2038\ImgCache\Utility\ConfigurationFileParserInterface;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
@@ -19,36 +20,44 @@ use Symfony\Component\Config\Definition\Processor;
 class ConfigurationLoader implements ConfigurationLoaderInterface
 {
     /** @var ConfigurationFileParserInterface */
-    private $configurationFileParser;
+    private $fileParser;
+
+    /** @var ConfigurationInterface */
+    private $treeGenerator;
 
     /** @var Processor */
-    private $configurationProcessor;
+    private $processor;
 
     /** @var ConfigurationFactoryInterface */
     private $configurationFactory;
 
     public function __construct(
-        ConfigurationFileParserInterface $configurationFileParser,
-        Processor $configurationProcessor,
+        ConfigurationFileParserInterface $fileParser,
+        ConfigurationInterface $treeGenerator,
+        Processor $processor,
         ConfigurationFactoryInterface $configurationFactory
     ) {
-        $this->configurationFileParser = $configurationFileParser;
-        $this->configurationProcessor = $configurationProcessor;
+        $this->fileParser = $fileParser;
+        $this->treeGenerator = $treeGenerator;
+        $this->processor = $processor;
         $this->configurationFactory = $configurationFactory;
     }
 
     public function loadConfigurationFromFile(string $filename): Configuration
     {
-        $configurationArray = $this->configurationFileParser->parseConfigurationFile($filename);
+        $configurationArray = $this->fileParser->parseConfigurationFile($filename);
+        $processedConfiguration = $this->processConfiguration($configurationArray);
 
-        $applicationConfiguration = new ApplicationConfiguration();
-        $processedConfiguration = $this->configurationProcessor->processConfiguration(
-            $applicationConfiguration,
+        return $this->configurationFactory->createConfiguration($processedConfiguration);
+    }
+
+    private function processConfiguration(array $configurationArray): array
+    {
+        return $this->processor->processConfiguration(
+            $this->treeGenerator,
             [
                 $configurationArray
             ]
         );
-
-        return $this->configurationFactory->createConfiguration($processedConfiguration);
     }
 }

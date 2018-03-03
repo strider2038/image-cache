@@ -11,11 +11,11 @@
 namespace Strider2038\ImgCache\Tests\Unit\Configuration;
 
 use PHPUnit\Framework\TestCase;
-use Strider2038\ImgCache\Configuration\ApplicationConfiguration;
 use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Configuration\ConfigurationFactoryInterface;
 use Strider2038\ImgCache\Configuration\ConfigurationLoader;
 use Strider2038\ImgCache\Utility\ConfigurationFileParserInterface;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationLoaderTest extends TestCase
@@ -23,18 +23,22 @@ class ConfigurationLoaderTest extends TestCase
     private const CONFIGURATION_FILENAME = 'config/parameters.yml';
 
     /** @var ConfigurationFileParserInterface */
-    private $configurationFileParser;
+    private $fileParser;
+
+    /** @var ConfigurationInterface */
+    private $treeGenerator;
 
     /** @var Processor */
-    private $configurationProcessor;
+    private $processor;
 
     /** @var ConfigurationFactoryInterface */
     private $configurationFactory;
 
     protected function setUp(): void
     {
-        $this->configurationFileParser = \Phake::mock(ConfigurationFileParserInterface::class);
-        $this->configurationProcessor = \Phake::mock(Processor::class);
+        $this->fileParser = \Phake::mock(ConfigurationFileParserInterface::class);
+        $this->treeGenerator = \Phake::mock(ConfigurationInterface::class);
+        $this->processor = \Phake::mock(Processor::class);
         $this->configurationFactory = \Phake::mock(ConfigurationFactoryInterface::class);
     }
 
@@ -49,8 +53,7 @@ class ConfigurationLoaderTest extends TestCase
         $configuration = $loader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
 
         $this->assertConfigurationFileParser_parseConfigurationFile_isCalledOnceWithFilename(self::CONFIGURATION_FILENAME);
-        $this->assertConfigurationProcessor_processConfiguration_isCalledOnceWithInstanceOfApplicationConfigurationAndConfigurationArray(
-            ApplicationConfiguration::class,
+        $this->assertConfigurationProcessor_processConfiguration_isCalledOnceWithTreeGeneratorAndConfigurationArray(
             $configurationArray
         );
         $this->assertConfigurationFactory_createConfiguration_isCalledOnceWithArray($processedConfiguration);
@@ -60,8 +63,9 @@ class ConfigurationLoaderTest extends TestCase
     private function createConfigurationLoader(): ConfigurationLoader
     {
         return new ConfigurationLoader(
-            $this->configurationFileParser,
-            $this->configurationProcessor,
+            $this->fileParser,
+            $this->treeGenerator,
+            $this->processor,
             $this->configurationFactory
         );
     }
@@ -69,7 +73,7 @@ class ConfigurationLoaderTest extends TestCase
     private function givenConfigurationFileParser_parseConfigurationFile_returnsConfigurationArray(): array
     {
         $configurationArray = ['configuration_array'];
-        \Phake::when($this->configurationFileParser)
+        \Phake::when($this->fileParser)
             ->parseConfigurationFile(\Phake::anyParameters())
             ->thenReturn($configurationArray);
 
@@ -79,7 +83,7 @@ class ConfigurationLoaderTest extends TestCase
     private function givenConfigurationProcessor_processConfiguration_returnsProcessedConfiguration(): array
     {
         $processedConfiguration = ['processed_configuration'];
-        \Phake::when($this->configurationProcessor)
+        \Phake::when($this->processor)
             ->processConfiguration(\Phake::anyParameters())
             ->thenReturn($processedConfiguration);
 
@@ -88,17 +92,15 @@ class ConfigurationLoaderTest extends TestCase
 
     private function assertConfigurationFileParser_parseConfigurationFile_isCalledOnceWithFilename(string $filename): void
     {
-        \Phake::verify($this->configurationFileParser, \Phake::times(1))
+        \Phake::verify($this->fileParser, \Phake::times(1))
             ->parseConfigurationFile($filename);
     }
 
-    private function assertConfigurationProcessor_processConfiguration_isCalledOnceWithInstanceOfApplicationConfigurationAndConfigurationArray(
-        string $configurationClassName,
+    private function assertConfigurationProcessor_processConfiguration_isCalledOnceWithTreeGeneratorAndConfigurationArray(
         array $configurationArray
     ): void {
-        \Phake::verify($this->configurationProcessor, \Phake::times(1))
-            ->processConfiguration(\Phake::capture($configurationClass), [$configurationArray]);
-        $this->assertInstanceOf($configurationClassName, $configurationClass);
+        \Phake::verify($this->processor, \Phake::times(1))
+            ->processConfiguration($this->treeGenerator, [$configurationArray]);
     }
 
     private function assertConfigurationFactory_createConfiguration_isCalledOnceWithArray(
