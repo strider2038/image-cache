@@ -19,7 +19,7 @@ class ResponseSender implements ResponseSenderInterface
 {
     const CHUNK_SIZE = 8 * 1024 * 1024;
 
-    public function send(ResponseInterface $response): void
+    public function sendResponse(ResponseInterface $response): void
     {
         header(sprintf(
             'HTTP/%s %d %s',

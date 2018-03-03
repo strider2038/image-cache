@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Core\Http;
  */
 interface ResponseSenderInterface
 {
-    public function send(ResponseInterface $response): void;
+    public function sendResponse(ResponseInterface $response): void;
 }

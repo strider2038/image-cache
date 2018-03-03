@@ -69,7 +69,7 @@ class DeprecatedApplication
         $responseSender = $httpServices->getResponseSender();
 
         $response = $requestHandler->handleRequest($request);
-        $responseSender->send($response);
+        $responseSender->sendResponse($response);
 
         $this->logger->debug(sprintf(
             'Application ended. Response %d %s was sent.',

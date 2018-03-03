@@ -29,7 +29,7 @@ class ResponseSenderTest extends TestCase
      * @runInSeparateProcess
      * @group separate
      */
-    public function send_givenEmptyResponseWithHeaders_headerIsSent(): void {
+    public function sendResponse_givenEmptyResponseWithHeaders_headerIsSent(): void {
         $sender = new ResponseSender();
         $response = \Phake::mock(ResponseInterface::class);
         \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
@@ -39,7 +39,7 @@ class ResponseSenderTest extends TestCase
         \Phake::when($response)->getHeaders()->thenReturn($headers);
         \Phake::when($response)->getBody()->thenReturn(new NullStream());
 
-        $sender->send($response);
+        $sender->sendResponse($response);
 
         $this->assertEquals(HttpStatusCodeEnum::OK, http_response_code());
         $actualHeaders = xdebug_get_headers();
@@ -51,7 +51,7 @@ class ResponseSenderTest extends TestCase
      * @runInSeparateProcess
      * @group separate
      */
-    public function send_givenStringStream_contentIsSent(): void {
+    public function sendResponse_givenStringStream_contentIsSent(): void {
         $sender = new ResponseSender();
         $response = \Phake::mock(ResponseInterface::class);
         \Phake::when($response)->getStatusCode()->thenReturn(new HttpStatusCodeEnum(HttpStatusCodeEnum::OK));
@@ -60,7 +60,7 @@ class ResponseSenderTest extends TestCase
         $body = new StringStream(self::CONTENTS);
         \Phake::when($response)->getBody()->thenReturn($body);
 
-        $sender->send($response);
+        $sender->sendResponse($response);
 
         $this->expectOutputString(self::CONTENTS);
     }
