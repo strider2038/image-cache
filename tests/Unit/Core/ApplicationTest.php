@@ -44,13 +44,14 @@ class ApplicationTest extends TestCase
     public function run_givenParametersAndServices_errorHandlerRegisteredAndServiceContainerCreatedAndServicesInContainerRun(): void
     {
         $application = new Application(
+            $this->parameters,
             $this->errorHandler,
             $this->serviceContainerLoader,
             $this->serviceRunner
         );
         $serviceContainer = $this->givenServiceContainerLoader_loadServiceContainerWithApplicationParameters_returnsServiceContainer();
 
-        $application->run($this->parameters);
+        $application->run();
 
         $this->assertErrorHandler_register_isCalledOnce();
         $this->assertServiceContainerFactory_loadServiceContainerWithApplicationParameters_isCalledOnceWithParameters();
