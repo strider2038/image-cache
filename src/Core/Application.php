@@ -18,9 +18,6 @@ use Strider2038\ImgCache\Core\Service\ServiceRunnerInterface;
  */
 class Application
 {
-    /** @var ApplicationParameters */
-    private $parameters;
-
     /** @var ErrorHandlerInterface */
     private $errorHandler;
 
@@ -31,21 +28,19 @@ class Application
     private $serviceRunner;
 
     public function __construct(
-        ApplicationParameters $parameters,
         ErrorHandlerInterface $errorHandler,
         ServiceContainerLoaderInterface $serviceContainerLoader,
         ServiceRunnerInterface $serviceRunner
     ) {
-        $this->parameters = $parameters;
         $this->errorHandler = $errorHandler;
         $this->serviceContainerLoader = $serviceContainerLoader;
         $this->serviceRunner = $serviceRunner;
     }
 
-    public function run(): void
+    public function run(ApplicationParameters $parameters): void
     {
         $this->errorHandler->register();
-        $serviceContainer = $this->serviceContainerLoader->loadServiceContainerWithApplicationParameters($this->parameters);
+        $serviceContainer = $this->serviceContainerLoader->loadServiceContainerWithApplicationParameters($parameters);
         $this->serviceRunner->runServices($serviceContainer);
     }
 }
