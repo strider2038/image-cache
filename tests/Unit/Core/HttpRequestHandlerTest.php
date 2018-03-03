@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Unit\Service;
+namespace Strider2038\ImgCache\Tests\Unit\Core;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -17,9 +17,9 @@ use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Core\HttpRequestHandler;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Exception\ApplicationException;
-use Strider2038\ImgCache\Service\HttpRequestHandler;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
 class HttpRequestHandlerTest extends TestCase

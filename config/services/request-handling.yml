@@ -8,7 +8,7 @@ services:
             - '@configuration_setter'
 
     http_request_handler:
-        class: Strider2038\ImgCache\Service\HttpRequestHandler
+        class: Strider2038\ImgCache\Core\HttpRequestHandler
         arguments:
             - '@access_control'
             - '@response_factory'

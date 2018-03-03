@@ -8,11 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Service;
+namespace Strider2038\ImgCache\Core;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Strider2038\ImgCache\Core\AccessControlInterface;
 use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
