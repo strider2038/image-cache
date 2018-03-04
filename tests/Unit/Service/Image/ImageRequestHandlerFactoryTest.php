@@ -49,7 +49,7 @@ class ImageRequestHandlerFactoryTest extends TestCase
         $factory = $this->createFactory();
         $method = new HttpMethodEnum($httpMethod);
 
-        $handler = $factory->createRequestHandlerByHttpMethod($method);
+        $handler = $factory->createRequestHandlerByParameters($method);
 
         $this->assertInstanceOf($requestHandlerClass, $handler);
     }
@@ -64,7 +64,7 @@ class ImageRequestHandlerFactoryTest extends TestCase
         $factory = new ImageRequestHandlerFactory($this->getAction);
         $method = new HttpMethodEnum($httpMethod);
 
-        $handler = $factory->createRequestHandlerByHttpMethod($method);
+        $handler = $factory->createRequestHandlerByParameters($method);
 
         $this->assertInstanceOf(NotAllowedRequestHandler::class, $handler);
     }
@@ -80,7 +80,7 @@ class ImageRequestHandlerFactoryTest extends TestCase
         $factory = $this->createFactory();
         $method = new HttpMethodEnum(HttpMethodEnum::PATCH);
 
-        $factory->createRequestHandlerByHttpMethod($method);
+        $factory->createRequestHandlerByParameters($method);
     }
 
     public function httpMethodAndHandlerClassProvider(): array

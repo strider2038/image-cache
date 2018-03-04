@@ -10,12 +10,13 @@
 
 namespace Strider2038\ImgCache\Service\Image;
 
-use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
+use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface ImageRequestHandlerFactoryInterface
+interface ImageRequestTransformerInterface
 {
-    public function createRequestHandlerByParameters(ImageHandlerParameters $parameters): RequestHandlerInterface;
+    public function transformRequestForImageSource(RequestInterface $request, AbstractImageSource $imageSource): RequestInterface;
 }
