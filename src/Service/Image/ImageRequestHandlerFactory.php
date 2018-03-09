@@ -74,7 +74,9 @@ class ImageRequestHandlerFactory implements ImageRequestHandlerFactoryInterface
         $this->createImageStorageForImageSource();
         $this->createImageCacheWithRootDirectoryFromImageSource();
 
-        return $this->$createHandlerFactoryMethod();
+        $concreteFactory = $this->createConcreteImageRequestHandlerFactory();
+
+        return $concreteFactory->$createHandlerFactoryMethod();
     }
 
     private function createImageStorageForImageSource(): void
@@ -101,44 +103,14 @@ class ImageRequestHandlerFactory implements ImageRequestHandlerFactoryInterface
         return self::FACTORY_METHOD_NAME_MAP[$httpMethod];
     }
 
-    private function createGetImageHandler(): GetImageHandler
+    private function createConcreteImageRequestHandlerFactory(): ConcreteImageRequestHandlerFactory
     {
-        return new GetImageHandler(
-            $this->responseFactory,
-            $this->filenameFactory,
-            $this->imageStorage,
-            $this->imageCache
-        );
-    }
-
-    private function createCreateImageHandler(): CreateImageHandler
-    {
-        return new CreateImageHandler(
-            $this->responseFactory,
-            $this->filenameFactory,
-            $this->imageStorage,
-            $this->imageFactory
-        );
-    }
-
-    private function createReplaceImageHandler(): ReplaceImageHandler
-    {
-        return new ReplaceImageHandler(
-            $this->responseFactory,
-            $this->filenameFactory,
+        return new ConcreteImageRequestHandlerFactory(
             $this->imageStorage,
             $this->imageCache,
-            $this->imageFactory
-        );
-    }
-
-    private function createDeleteImageHandler(): DeleteImageHandler
-    {
-        return new DeleteImageHandler(
             $this->responseFactory,
             $this->filenameFactory,
-            $this->imageStorage,
-            $this->imageCache
+            $this->imageFactory
         );
     }
 }
