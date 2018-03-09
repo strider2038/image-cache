@@ -20,7 +20,7 @@ use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
-use Strider2038\ImgCache\Service\Image\GetImageHandlerAction;
+use Strider2038\ImgCache\Service\Image\GetImageHandler;
 use Strider2038\ImgCache\Tests\Support\Phake\ResponseFactoryTrait;
 
 class GetImageHandlerTest extends TestCase
@@ -71,9 +71,9 @@ class GetImageHandlerTest extends TestCase
         );
     }
 
-    private function createGetImageHandler(): GetImageHandlerAction
+    private function createGetImageHandler(): GetImageHandler
     {
-        return new GetImageHandlerAction(
+        return new GetImageHandler(
             $this->responseFactory,
             $this->filenameFactory,
             $this->imageStorage,

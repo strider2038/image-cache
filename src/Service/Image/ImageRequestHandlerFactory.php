@@ -10,59 +10,135 @@
 
 namespace Strider2038\ImgCache\Service\Image;
 
-use Strider2038\ImgCache\Core\ActionInterface;
+use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
-use Strider2038\ImgCache\Core\NotAllowedRequestHandler;
+use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Strider2038\ImgCache\Exception\InvalidRouteException;
+use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
+use Strider2038\ImgCache\Imaging\ImageCacheFactoryInterface;
+use Strider2038\ImgCache\Imaging\ImageCacheInterface;
+use Strider2038\ImgCache\Imaging\ImageStorageFactoryInterface;
+use Strider2038\ImgCache\Imaging\ImageStorageInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ImageRequestHandlerFactory implements ImageRequestHandlerFactoryInterface
 {
-    /** @var ActionInterface */
-    private $getAction;
-    /** @var ActionInterface */
-    private $createAction;
-    /** @var ActionInterface */
-    private $replaceAction;
-    /** @var ActionInterface */
-    private $deleteAction;
+    private const FACTORY_METHOD_NAME_MAP = [
+        HttpMethodEnum::GET => 'createGetImageHandler',
+        HttpMethodEnum::POST => 'createCreateImageHandler',
+        HttpMethodEnum::PUT => 'createReplaceImageHandler',
+        HttpMethodEnum::DELETE => 'createDeleteImageHandler',
+    ];
+
+    /** @var ImageStorageFactoryInterface */
+    private $imageStorageFactory;
+    /** @var ImageCacheFactoryInterface */
+    private $imageCacheFactory;
+    /** @var ResponseFactoryInterface */
+    private $responseFactory;
+    /** @var ImageFilenameFactoryInterface */
+    private $filenameFactory;
+    /** @var ImageFactoryInterface */
+    private $imageFactory;
+
+    /** @var AbstractImageSource */
+    private $imageSource;
+    /** @var ImageStorageInterface */
+    private $imageStorage;
+    /** @var ImageCacheInterface */
+    private $imageCache;
 
     public function __construct(
-        GetImageHandlerAction $getAction,
-        CreateImageHandler $createAction = null,
-        ReplaceImageHandler $replaceAction = null,
-        DeleteImageHandler $deleteAction = null
+        ImageStorageFactoryInterface $imageStorageFactory,
+        ImageCacheFactoryInterface $imageCacheFactory,
+        ResponseFactoryInterface $responseFactory,
+        ImageFilenameFactoryInterface $filenameFactory,
+        ImageFactoryInterface $imageFactory
     ) {
-        $this->getAction = $getAction;
-        $this->createAction = $createAction ?? new NotAllowedRequestHandler();
-        $this->replaceAction = $replaceAction ?? new NotAllowedRequestHandler();
-        $this->deleteAction = $deleteAction ?? new NotAllowedRequestHandler();
+        $this->imageStorageFactory = $imageStorageFactory;
+        $this->imageCacheFactory = $imageCacheFactory;
+        $this->responseFactory = $responseFactory;
+        $this->filenameFactory = $filenameFactory;
+        $this->imageFactory = $imageFactory;
     }
 
-    public function createRequestHandlerByHttpMethod(HttpMethodEnum $method): RequestHandlerInterface
+    public function createRequestHandlerByParameters(ImageHandlerParameters $parameters): RequestHandlerInterface
     {
-        $httpMethod = $method->getValue();
-        $map = $this->getActionsMap();
+        $createHandlerFactoryMethod = $this->getFactoryMethodByRequestHttpMethod($parameters);
 
-        if (array_key_exists($httpMethod, $map)) {
-            $handler = $map[$httpMethod];
-        } else {
-            throw new InvalidRouteException(sprintf('Handler for http method "%s" not found', $httpMethod));
+        $this->imageSource = $parameters->getImageSource();
+        $this->createImageStorageForImageSource();
+        $this->createImageCacheWithRootDirectoryFromImageSource();
+
+        return $this->$createHandlerFactoryMethod();
+    }
+
+    private function createImageStorageForImageSource(): void
+    {
+        $this->imageStorage = $this->imageStorageFactory->createImageStorageForImageSource($this->imageSource);
+    }
+
+    private function createImageCacheWithRootDirectoryFromImageSource(): void
+    {
+        $cacheDirectory = $this->imageSource->getCacheDirectory();
+        $this->imageCache = $this->imageCacheFactory->createImageCacheWithRootDirectory($cacheDirectory);
+    }
+
+    private function getFactoryMethodByRequestHttpMethod(ImageHandlerParameters $parameters): string
+    {
+        $httpMethod = $parameters->getHttpMethod()->getValue();
+
+        if (!array_key_exists($httpMethod, self::FACTORY_METHOD_NAME_MAP)) {
+            throw new InvalidRouteException(
+                sprintf('Handler for http method "%s" not found.', $httpMethod)
+            );
         }
 
-        return $handler;
+        return self::FACTORY_METHOD_NAME_MAP[$httpMethod];
     }
 
-    private function getActionsMap(): array
+    private function createGetImageHandler(): GetImageHandler
     {
-        return [
-            HttpMethodEnum::GET => $this->getAction,
-            HttpMethodEnum::POST => $this->createAction,
-            HttpMethodEnum::PUT => $this->replaceAction,
-            HttpMethodEnum::DELETE => $this->deleteAction
-        ];
+        return new GetImageHandler(
+            $this->responseFactory,
+            $this->filenameFactory,
+            $this->imageStorage,
+            $this->imageCache
+        );
+    }
+
+    private function createCreateImageHandler(): CreateImageHandler
+    {
+        return new CreateImageHandler(
+            $this->responseFactory,
+            $this->filenameFactory,
+            $this->imageStorage,
+            $this->imageFactory
+        );
+    }
+
+    private function createReplaceImageHandler(): ReplaceImageHandler
+    {
+        return new ReplaceImageHandler(
+            $this->responseFactory,
+            $this->filenameFactory,
+            $this->imageStorage,
+            $this->imageCache,
+            $this->imageFactory
+        );
+    }
+
+    private function createDeleteImageHandler(): DeleteImageHandler
+    {
+        return new DeleteImageHandler(
+            $this->responseFactory,
+            $this->filenameFactory,
+            $this->imageStorage,
+            $this->imageCache
+        );
     }
 }

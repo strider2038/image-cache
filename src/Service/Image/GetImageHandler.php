@@ -24,7 +24,7 @@ use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
  * if resource is found and response with status code 404 when not found.
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class GetImageHandlerAction implements RequestHandlerInterface
+class GetImageHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     private $responseFactory;

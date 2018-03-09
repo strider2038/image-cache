@@ -24,7 +24,7 @@ use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 class ImageCache implements ImageCacheInterface
 {
     /**
-     * Web directory that contains image files
+     * Web directory containing image files
      * @var DirectoryNameInterface
      */
     private $webDirectory;
