@@ -28,10 +28,8 @@ class ImageCache implements ImageCacheInterface
      * @var DirectoryNameInterface
      */
     private $webDirectory;
-
     /** @var FileOperationsInterface */
     private $fileOperations;
-
     /** @var ImageProcessorInterface */
     private $imageProcessor;
 
