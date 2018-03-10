@@ -1,6 +1,0 @@
-services:
-    security:
-        class: Strider2038\ImgCache\Core\Security
-        arguments:
-            - '@request'
-            - '%security.access_token%'

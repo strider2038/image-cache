@@ -1,9 +1,35 @@
 imports:
   - { resource: 'services/core.yml' }
-  - { resource: 'services/configuration.yml' }
+  - { resource: 'services/request-handling.yml' }
   - { resource: 'services/utilities.yml' }
   - { resource: 'services/imaging.yml' }
-  - { resource: 'services/request-handling.yml' }
-  - { resource: 'services/image-cache.yml' }
-  - { resource: 'services/parameters.yml' }
-  - { resource: 'local.yml', ignore_errors: true }
+  - { resource: 'services/filesystem-storage.yml' }
+  - { resource: 'services/geo-map-storage.yml' }
+#  - { resource: 'services/image-cache.yml' }
+#  - { resource: 'services/parameters.yml' }
+#  - { resource: 'local.yml', ignore_errors: true }
+
+parameters:
+    # dynamic parameters loaded at application creation
+    application.directory: ~
+    application.start_up_time: ~
+    server_configuration: ~
+
+    # dynamic parameters loaded from parameters.yml
+    access_control_token: ~
+    cached_image_quality: ~
+    image_sources: ~
+
+    # static parameters
+    log.directory: '%application.directory%/runtime'
+    log.name: 'app.log'
+    log.level: 100
+    service_running_sequence_ids:
+        - 'client_request_logger'
+        - 'client_request_processor'
+
+services:
+    service_running_sequence:
+        class: Strider2038\ImgCache\Collection\StringList
+        arguments:
+            - '%service_running_sequence_ids%'

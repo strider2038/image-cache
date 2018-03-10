@@ -7,6 +7,9 @@ parameters:
         - '/^(sc|scale)(?P<scale>[0-9]*\.?[0-9]+)$/'
 
 services:
+    geo_map_image_storage_factory:
+        class: Strider2038\ImgCache\Imaging\GeoMapImageStorageFactory
+
     geo_map_parsing_patterns:
         class: Strider2038\ImgCache\Collection\StringList
         arguments:

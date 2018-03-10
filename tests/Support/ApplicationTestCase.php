@@ -80,7 +80,8 @@ class ApplicationTestCase extends FunctionalTestCase
 
     private function captureResponse(ResponseSenderInterface $responseSender): ResponseInterface
     {
-        \Phake::verify($responseSender, \Phake::times(1))->send(\Phake::capture($response));
+        \Phake::verify($responseSender, \Phake::times(1))
+            ->sendResponse(\Phake::capture($response));
 
         return $response;
     }
