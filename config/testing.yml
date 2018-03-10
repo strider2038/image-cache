@@ -1,0 +1,5 @@
+imports:
+  - { resource: 'main.yml' }
+
+parameters:
+    web_directory: '%application.directory%/runtime/tests/web'

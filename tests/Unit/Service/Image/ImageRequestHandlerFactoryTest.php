@@ -20,7 +20,6 @@ use Strider2038\ImgCache\Imaging\ImageCacheFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
-use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
 use Strider2038\ImgCache\Service\Image\CreateImageHandler;
 use Strider2038\ImgCache\Service\Image\DeleteImageHandler;
@@ -31,6 +30,8 @@ use Strider2038\ImgCache\Service\Image\ReplaceImageHandler;
 
 class ImageRequestHandlerFactoryTest extends TestCase
 {
+    private const CACHE_DIRECTORY = 'cache_directory';
+
     /** @var ImageStorageFactoryInterface */
     private $imageStorageFactory;
 
@@ -69,15 +70,15 @@ class ImageRequestHandlerFactoryTest extends TestCase
         $imageSource = \Phake::mock(AbstractImageSource::class);
         $parameters = $this->givenImageHandlerParameters($httpMethod, $imageSource);
         $this->givenImageStorageFactory_createImageStorageForImageSource_returnsImageStorage();
-        $cacheDirectory = $this->givenImageSource_getCacheDirectory_returnsDirectoryName($imageSource);
-        $this->givenImageCacheFactory_createImageStorageForImageSource_returnsImageCache();
+        $this->givenImageSource_getCacheDirectory_returnsDirectoryName($imageSource);
+        $this->givenImageCacheFactory_createImageCacheForWebDirectory_returnsImageCache();
 
         $handler = $factory->createRequestHandlerByParameters($parameters);
 
         $this->assertInstanceOf(RequestHandlerInterface::class, $handler);
         $this->assertImageStorageFactory_createImageStorageForImageSource_isCalledOnceWithImageSource($imageSource);
         $this->assertImageSource_getCacheDirectory_isCalledOnce($imageSource);
-        $this->assertImageCacheFactory_createImageCacheWithRootDirectory_isCalledOnceWithDirectoryName($cacheDirectory);
+        $this->assertImageCacheFactory_createImageCacheForWebDirectory_isCalledOnceWithDirectoryName(self::CACHE_DIRECTORY);
         $this->assertInstanceOf($handlerClassName, $handler);
     }
 
@@ -131,22 +132,19 @@ class ImageRequestHandlerFactoryTest extends TestCase
             ->getCacheDirectory();
     }
 
-    private function assertImageCacheFactory_createImageCacheWithRootDirectory_isCalledOnceWithDirectoryName(
-        DirectoryNameInterface $directoryName
+    private function assertImageCacheFactory_createImageCacheForWebDirectory_isCalledOnceWithDirectoryName(
+        string $directoryName
     ): void {
         \Phake::verify($this->imageCacheFactory, \Phake::times(1))
-            ->createImageCacheWithRootDirectory($directoryName);
+            ->createImageCacheForWebDirectory($directoryName);
     }
 
     private function givenImageSource_getCacheDirectory_returnsDirectoryName(
         AbstractImageSource $imageSource
-    ): DirectoryNameInterface {
-        $cacheDirectory = \Phake::mock(DirectoryNameInterface::class);
+    ): void {
         \Phake::when($imageSource)
             ->getCacheDirectory()
-            ->thenReturn($cacheDirectory);
-
-        return $cacheDirectory;
+            ->thenReturn(self::CACHE_DIRECTORY);
     }
 
     private function givenImageHandlerParameters(string $httpMethod, AbstractImageSource $imageSource): ImageHandlerParameters
@@ -157,11 +155,11 @@ class ImageRequestHandlerFactoryTest extends TestCase
         );
     }
 
-    private function givenImageCacheFactory_createImageStorageForImageSource_returnsImageCache(): void
+    private function givenImageCacheFactory_createImageCacheForWebDirectory_returnsImageCache(): void
     {
         $imageCache = \Phake::mock(ImageCacheInterface::class);
         \Phake::when($this->imageCacheFactory)
-            ->createImageCacheWithRootDirectory(\Phake::anyParameters())
+            ->createImageCacheForWebDirectory(\Phake::anyParameters())
             ->thenReturn($imageCache);
     }
 

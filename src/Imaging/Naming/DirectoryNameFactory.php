@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Imaging\Naming;
 
-use Strider2038\ImgCache\Core\FileOperationsInterface;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
@@ -22,27 +21,15 @@ class DirectoryNameFactory implements DirectoryNameFactoryInterface
     /** @var EntityValidatorInterface */
     private $validator;
 
-    /** @var FileOperationsInterface */
-    private $fileOperations;
-
-    public function __construct(
-        EntityValidatorInterface $validator,
-        FileOperationsInterface $fileOperations
-    ) {
+    public function __construct(EntityValidatorInterface $validator)
+    {
         $this->validator = $validator;
-        $this->fileOperations = $fileOperations;
     }
 
-    public function createDirectoryName(string $directoryName, bool $checkExistence = false): DirectoryNameInterface
+    public function createDirectoryName(string $directoryName): DirectoryNameInterface
     {
         $name = new DirectoryName(rtrim($directoryName, '/') . '/');
         $this->validator->validateWithException($name, InvalidConfigurationException::class);
-
-        if ($checkExistence && !$this->fileOperations->isDirectory($directoryName)) {
-            throw new InvalidConfigurationException(
-                sprintf('Directory "%s" does not exist.', $directoryName)
-            );
-        }
 
         return $name;
     }

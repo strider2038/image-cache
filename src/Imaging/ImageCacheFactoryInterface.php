@@ -10,12 +10,10 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
-use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
-
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 interface ImageCacheFactoryInterface
 {
-    public function createImageCacheWithRootDirectory(DirectoryNameInterface $rootDirectory): ImageCacheInterface;
+    public function createImageCacheForWebDirectory(string $webDirectory): ImageCacheInterface;
 }

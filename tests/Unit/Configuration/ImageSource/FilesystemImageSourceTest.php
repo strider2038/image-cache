@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Tests\Unit\Configuration\ImageSource;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
-use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 
 class FilesystemImageSourceTest extends TestCase
 {
@@ -24,8 +23,8 @@ class FilesystemImageSourceTest extends TestCase
     public function construct_givenParameters_parametersSetAndAccessible(): void
     {
         $source = new FilesystemImageSource(
-            new DirectoryName(self::CACHE_DIRECTORY),
-            new DirectoryName(self::STORAGE_DIRECTORY),
+            self::CACHE_DIRECTORY,
+            self::STORAGE_DIRECTORY,
             self::PROCESSOR_TYPE
         );
 

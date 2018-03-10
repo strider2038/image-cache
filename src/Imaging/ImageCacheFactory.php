@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Core\FileOperationsInterface;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Processing\ImageProcessorInterface;
 
@@ -23,21 +24,38 @@ class ImageCacheFactory implements ImageCacheFactoryInterface
     private $fileOperations;
     /** @var ImageProcessorInterface */
     private $imageProcessor;
+    /** @var DirectoryNameFactoryInterface */
+    private $directoryNameFactory;
+    /** @var string */
+    private $rootDirectory;
 
     public function __construct(
         FileOperationsInterface $fileOperations,
-        ImageProcessorInterface $imageProcessor
+        ImageProcessorInterface $imageProcessor,
+        DirectoryNameFactoryInterface $directoryNameFactory,
+        string $rootDirectory
     ) {
         $this->fileOperations = $fileOperations;
         $this->imageProcessor = $imageProcessor;
+        $this->directoryNameFactory = $directoryNameFactory;
+        $this->rootDirectory = $rootDirectory;
     }
 
-    public function createImageCacheWithRootDirectory(DirectoryNameInterface $rootDirectory): ImageCacheInterface
+    public function createImageCacheForWebDirectory(string $webDirectory): ImageCacheInterface
     {
+        $absoluteDirectoryName = $this->createAbsoluteDirectoryName($webDirectory);
+
         return new ImageCache(
-            $rootDirectory,
+            $absoluteDirectoryName,
             $this->fileOperations,
             $this->imageProcessor
         );
+    }
+
+    private function createAbsoluteDirectoryName(string $webDirectory): DirectoryNameInterface
+    {
+        $directoryName = $this->rootDirectory . $webDirectory;
+
+        return $this->directoryNameFactory->createDirectoryName($directoryName);
     }
 }

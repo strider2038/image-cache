@@ -11,22 +11,20 @@
 namespace Strider2038\ImgCache\Configuration\ImageSource;
 
 use Strider2038\ImgCache\Enum\ImageProcessorTypeEnum;
-use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class FilesystemImageSource extends AbstractImageSource
 {
-    /** @var DirectoryNameInterface */
+    /** @var string */
     private $storageDirectory;
-
     /** @var ImageProcessorTypeEnum */
     private $processorType;
 
     public function __construct(
-        DirectoryNameInterface $cacheDirectory,
-        DirectoryNameInterface $storageDirectory,
+        string $cacheDirectory,
+        string $storageDirectory,
         string $processorType
     ) {
         parent::__construct($cacheDirectory);
@@ -34,7 +32,7 @@ class FilesystemImageSource extends AbstractImageSource
         $this->processorType = new ImageProcessorTypeEnum($processorType);
     }
 
-    public function getStorageDirectory(): DirectoryNameInterface
+    public function getStorageDirectory(): string
     {
         return $this->storageDirectory;
     }

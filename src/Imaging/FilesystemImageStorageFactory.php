@@ -19,6 +19,7 @@ use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Insertion\SourceImageWriter;
 use Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\PlainFilenameParser;
 use Strider2038\ImgCache\Imaging\Parsing\Filename\ThumbnailFilenameParser;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\FilesystemStorageAccessor;
@@ -40,6 +41,8 @@ class FilesystemImageStorageFactory
     private $imageFactory;
     /** @var ThumbnailImageCreatorInterface */
     private $thumbnailImageCreator;
+    /** @var DirectoryNameFactoryInterface */
+    private $directoryNameFactory;
 
     /** @var FilesystemStorageDriverInterface */
     private $storageDriver;
@@ -48,18 +51,21 @@ class FilesystemImageStorageFactory
         FilesystemStorageDriverFactory $filesystemStorageDriverFactory,
         EntityValidatorInterface $validator,
         ImageFactoryInterface $imageFactory,
-        ThumbnailImageCreatorInterface $thumbnailImageCreator
+        ThumbnailImageCreatorInterface $thumbnailImageCreator,
+        DirectoryNameFactoryInterface $directoryNameFactory
     ) {
         $this->filesystemStorageDriverFactory = $filesystemStorageDriverFactory;
         $this->validator = $validator;
         $this->imageFactory = $imageFactory;
         $this->thumbnailImageCreator = $thumbnailImageCreator;
+        $this->directoryNameFactory = $directoryNameFactory;
     }
 
     public function createImageStorageForImageSource(FilesystemImageSource $imageSource): ImageStorageInterface
     {
         $this->createStorageDriverForImageSource($imageSource);
-        $storageAccessor = $this->createStorageAccessorWithStorageDriverAndRootDirectory($imageSource);
+        $storageRootDirectory = $imageSource->getStorageDirectory();
+        $storageAccessor = $this->createStorageAccessorWithStorageDriverAndRootDirectory($storageRootDirectory);
         $processorType = $imageSource->getProcessorType();
 
         return $this->createImageStorageByProcessorTypeWithStorageAccessor($processorType, $storageAccessor);
@@ -77,12 +83,14 @@ class FilesystemImageStorageFactory
         }
     }
 
-    private function createStorageAccessorWithStorageDriverAndRootDirectory(FilesystemImageSource $imageSource): FilesystemStorageAccessor
+    private function createStorageAccessorWithStorageDriverAndRootDirectory(string $storageRootDirectory): FilesystemStorageAccessor
     {
+        $directoryName = $this->directoryNameFactory->createDirectoryName($storageRootDirectory);
+
         return new FilesystemStorageAccessor(
             $this->storageDriver,
             $this->imageFactory,
-            new StorageFilenameFactory($imageSource->getStorageDirectory())
+            new StorageFilenameFactory($directoryName)
         );
     }
 

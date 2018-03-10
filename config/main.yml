@@ -21,6 +21,7 @@ parameters:
     image_sources: ~
 
     # static parameters
+    web_directory: '%application.directory%/web'
     log.directory: '%application.directory%/runtime'
     log.name: 'app.log'
     log.level: 100

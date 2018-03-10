@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class TestingServiceContainerLoader implements ServiceContainerLoaderInterface
 {
-    private const CONTAINER_FILENAME = 'config/main.yml';
+    private const CONTAINER_FILENAME = 'config/testing.yml';
     private const CONFIGURATION_FILENAME_PREFIX = 'config/testing/';
 
     /** @var string */

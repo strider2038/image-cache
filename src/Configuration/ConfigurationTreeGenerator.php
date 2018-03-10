@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Configuration;
 
-use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -61,7 +60,7 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                                             $value = sprintf('/%s/', trim($value, '/'));
                                         }
 
-                                        return new DirectoryName($value);
+                                        return $value;
                                     })
                                 ->end()
                             ->end()
@@ -80,7 +79,7 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                                             $value = sprintf('/%s/', trim($value, '/'));
                                         }
 
-                                        return new DirectoryName($value);
+                                        return $value;
                                     })
                                 ->end()
                             ->end()

@@ -20,6 +20,8 @@ services:
         arguments:
             - '@file_operations'
             - '@image_processor'
+            - '@directory_name_factory'
+            - '%web_directory%'
 
     # imaging/extraction
     thumbnail_image_creator:

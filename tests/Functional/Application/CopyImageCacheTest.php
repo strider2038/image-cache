@@ -17,7 +17,7 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Tests\Support\ApplicationTestCase;
 
-class OriginalImageCacheTest extends ApplicationTestCase
+class CopyImageCacheTest extends ApplicationTestCase
 {
     private const FILE_NOT_EXIST = '/not-exist.jpg';
     private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
@@ -31,7 +31,7 @@ class OriginalImageCacheTest extends ApplicationTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->setConfigurationFilename('application/original-image-cache-parameters.yml');
+        $this->setConfigurationFilename('application/copy-image-cache-parameters.yml');
     }
 
     /** @test */

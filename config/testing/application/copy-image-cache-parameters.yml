@@ -2,5 +2,5 @@ image_sources:
     filesystem_source:
         type: 'filesystem'
         cache_directory: '/'
-        storage_directory: '/imgcache/tests/assets'
+        storage_directory: '/imgcache/runtime/tests/filesource'
         processor_type: 'copy'

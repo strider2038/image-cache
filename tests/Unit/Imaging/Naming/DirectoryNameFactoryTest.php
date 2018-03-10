@@ -41,7 +41,6 @@ class DirectoryNameFactoryTest extends TestCase
      * @dataProvider directoryNameProvider
      * @param string $name
      * @param string $expectedFilenameValue
-     * @throws \Strider2038\ImgCache\Exception\InvalidConfigurationException
      */
     public function createDirectoryName_givenName_DirectoryNameCreatedAndReturned(
         string $name,
@@ -67,20 +66,6 @@ class DirectoryNameFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\InvalidConfigurationException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessageRegExp /Directory .* does not exist/
-     */
-    public function createDirectoryName_givenNotExistingNameAndCheckExistenceIsTrue_invalidConfigurationExceptionThrown(): void
-    {
-        $factory = $this->createDirectoryNameFactory();
-        $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::DIRECTORY_NAME, false);
-
-        $factory->createDirectoryName(self::DIRECTORY_NAME, true);
-    }
-
     private function assertValidator_validateWithException_isCalledOnceWithEntityClassAndExceptionClass(
         string $entityClass,
         string $exceptionClass
@@ -93,9 +78,6 @@ class DirectoryNameFactoryTest extends TestCase
 
     private function createDirectoryNameFactory(): DirectoryNameFactory
     {
-        return new DirectoryNameFactory(
-            $this->validator,
-            $this->fileOperations
-        );
+        return new DirectoryNameFactory($this->validator);
     }
 }

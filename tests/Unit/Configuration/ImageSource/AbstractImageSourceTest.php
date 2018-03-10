@@ -12,7 +12,6 @@ namespace Strider2038\ImgCache\Tests\Unit\Configuration\ImageSource;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
-use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 
 class AbstractImageSourceTest extends TestCase
 {
@@ -21,7 +20,7 @@ class AbstractImageSourceTest extends TestCase
     /** @test */
     public function construct_givenCacheDirectory_cacheDirectorySet(): void
     {
-        $cacheDirectory = new DirectoryName(self::CACHE_DIRECTORY);
+        $cacheDirectory = self::CACHE_DIRECTORY;
         $source = new class($cacheDirectory) extends AbstractImageSource {};
 
         $this->assertEquals(self::CACHE_DIRECTORY, $source->getCacheDirectory());

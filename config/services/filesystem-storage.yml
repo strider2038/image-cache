@@ -6,6 +6,7 @@ services:
             - '@entity_validator'
             - '@image_factory'
             - '@thumbnail_image_creator'
+            - '@directory_name_factory'
 
     filesystem_storage_driver_factory:
         class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverFactory

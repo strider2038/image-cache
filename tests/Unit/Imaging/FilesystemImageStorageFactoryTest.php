@@ -18,14 +18,18 @@ use Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageCreatorInterface;
 use Strider2038\ImgCache\Imaging\FilesystemImageStorageFactory;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorage;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverFactory;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class FilesystemImageStorageFactoryTest extends TestCase
 {
+    private const STORAGE_DIRECTORY = 'storage_directory';
+    private const CACHE_DIRECTORY = 'cache_directory';
     private const WEBDAV_DRIVER_URI = 'driver_uri';
     private const WEBDAV_OAUTH_TOKEN = 'oauth_token';
+
     /** @var FilesystemStorageDriverFactory */
     private $filesystemStorageDriverFactory;
     /** @var EntityValidatorInterface */
@@ -34,6 +38,8 @@ class FilesystemImageStorageFactoryTest extends TestCase
     private $imageFactory;
     /** @var ThumbnailImageCreatorInterface */
     private $thumbnailImageCreator;
+    /** @var DirectoryNameFactoryInterface */
+    private $directoryNameFactory;
 
     protected function setUp(): void
     {
@@ -41,6 +47,7 @@ class FilesystemImageStorageFactoryTest extends TestCase
         $this->validator = \Phake::mock(EntityValidatorInterface::class);
         $this->imageFactory = \Phake::mock(ImageFactoryInterface::class);
         $this->thumbnailImageCreator = \Phake::mock(ThumbnailImageCreatorInterface::class);
+        $this->directoryNameFactory = \Phake::mock(DirectoryNameFactoryInterface::class);
     }
 
     /**
@@ -53,11 +60,13 @@ class FilesystemImageStorageFactoryTest extends TestCase
     ): void {
         $imageStorageFactory = $this->createFilesystemImageStorageFactory();
         $imageSource = $this->givenFilesystemImageSourceWithProcessorType($processorType);
+        $this->givenDirectoryNameFactory_createDirectoryName_returnsDirectoryName();
 
         $imageStorage = $imageStorageFactory->createImageStorageForImageSource($imageSource);
 
         $this->assertInstanceOf(ImageStorage::class, $imageStorage);
         $this->assertFilesystemStorageDriverFactory_createFilesystemStorageDriver_isCalledOnce();
+        $this->assertDirectoryNameFactory_createDirectoryName_isCalledOnceWithString(self::STORAGE_DIRECTORY);
     }
 
     public function ProcessorTypeProvider(): array
@@ -73,6 +82,7 @@ class FilesystemImageStorageFactoryTest extends TestCase
     {
         $imageStorageFactory = $this->createFilesystemImageStorageFactory();
         $imageSource = $this->givenWebDAVImageSource();
+        $this->givenDirectoryNameFactory_createDirectoryName_returnsDirectoryName();
 
         $imageStorage = $imageStorageFactory->createImageStorageForImageSource($imageSource);
 
@@ -81,6 +91,7 @@ class FilesystemImageStorageFactoryTest extends TestCase
             self::WEBDAV_DRIVER_URI,
             self::WEBDAV_OAUTH_TOKEN
         );
+        $this->assertDirectoryNameFactory_createDirectoryName_isCalledOnceWithString(self::STORAGE_DIRECTORY);
     }
 
     private function createFilesystemImageStorageFactory(): FilesystemImageStorageFactory
@@ -89,15 +100,16 @@ class FilesystemImageStorageFactoryTest extends TestCase
             $this->filesystemStorageDriverFactory,
             $this->validator,
             $this->imageFactory,
-            $this->thumbnailImageCreator
+            $this->thumbnailImageCreator,
+            $this->directoryNameFactory
         );
     }
 
     private function givenFilesystemImageSourceWithProcessorType(string $processorType): FilesystemImageSource
     {
         return new FilesystemImageSource(
-            \Phake::mock(DirectoryNameInterface::class),
-            \Phake::mock(DirectoryNameInterface::class),
+           self::CACHE_DIRECTORY,
+            self::STORAGE_DIRECTORY,
             $processorType
         );
     }
@@ -105,8 +117,8 @@ class FilesystemImageStorageFactoryTest extends TestCase
     private function givenWebDAVImageSource(): WebDAVImageSource
     {
         return new WebDAVImageSource(
-            \Phake::mock(DirectoryNameInterface::class),
-            \Phake::mock(DirectoryNameInterface::class),
+           self::CACHE_DIRECTORY,
+            self::STORAGE_DIRECTORY,
             ImageProcessorTypeEnum::COPY,
             self::WEBDAV_DRIVER_URI,
             self::WEBDAV_OAUTH_TOKEN
@@ -125,5 +137,18 @@ class FilesystemImageStorageFactoryTest extends TestCase
     ): void {
         \Phake::verify($this->filesystemStorageDriverFactory, \Phake::times(1))
             ->createWebDAVStorageDriver($uri, $oauthToken);
+    }
+
+    private function givenDirectoryNameFactory_createDirectoryName_returnsDirectoryName(): void
+    {
+        \Phake::when($this->directoryNameFactory)
+            ->createDirectoryName(\Phake::anyParameters())
+            ->thenReturn(\Phake::mock(DirectoryNameInterface::class));
+    }
+
+    private function assertDirectoryNameFactory_createDirectoryName_isCalledOnceWithString(string $directoryName): void
+    {
+        \Phake::verify($this->directoryNameFactory, \Phake::times(1))
+            ->createDirectoryName($directoryName);
     }
 }

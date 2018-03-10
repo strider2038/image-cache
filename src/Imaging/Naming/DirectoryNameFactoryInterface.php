@@ -15,5 +15,5 @@ namespace Strider2038\ImgCache\Imaging\Naming;
  */
 interface DirectoryNameFactoryInterface
 {
-    public function createDirectoryName(string $directoryName, bool $checkExistence = false): DirectoryNameInterface;
+    public function createDirectoryName(string $directoryName): DirectoryNameInterface;
 }

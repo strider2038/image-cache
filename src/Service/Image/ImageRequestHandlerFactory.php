@@ -72,7 +72,7 @@ class ImageRequestHandlerFactory implements ImageRequestHandlerFactoryInterface
 
         $this->imageSource = $parameters->getImageSource();
         $this->createImageStorageForImageSource();
-        $this->createImageCacheWithRootDirectoryFromImageSource();
+        $this->createImageCacheWithWebDirectoryFromImageSource();
 
         $concreteFactory = $this->createConcreteImageRequestHandlerFactory();
 
@@ -84,10 +84,10 @@ class ImageRequestHandlerFactory implements ImageRequestHandlerFactoryInterface
         $this->imageStorage = $this->imageStorageFactory->createImageStorageForImageSource($this->imageSource);
     }
 
-    private function createImageCacheWithRootDirectoryFromImageSource(): void
+    private function createImageCacheWithWebDirectoryFromImageSource(): void
     {
         $cacheDirectory = $this->imageSource->getCacheDirectory();
-        $this->imageCache = $this->imageCacheFactory->createImageCacheWithRootDirectory($cacheDirectory);
+        $this->imageCache = $this->imageCacheFactory->createImageCacheForWebDirectory($cacheDirectory);
     }
 
     private function getFactoryMethodByRequestHttpMethod(ImageHandlerParameters $parameters): string
