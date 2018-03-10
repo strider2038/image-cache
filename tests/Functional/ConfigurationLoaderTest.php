@@ -62,6 +62,28 @@ class ConfigurationLoaderTest extends TestCase
         $this->assertImageSourcesInConfigurationAreValid($configuration);
     }
 
+    /** @test */
+    public function loadConfiguration_validConfigurationArrayWithEmptyDirectoriesLoaded_configurationCreatedAndReturned(): void
+    {
+        $configurationArray = [
+            'image_sources' => [
+                'filesystem_source' => [
+                    'type' => 'filesystem',
+                    'cache_directory' => '/',
+                    'storage_directory' => '/',
+                ],
+            ]
+        ];
+        $this->givenConfigurationFileParser_parseConfigurationFile_returnsArray($configurationArray);
+
+        $configuration = $this->configurationLoader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
+
+        /** @var FilesystemImageSource $filesystemSource */
+        $filesystemSource = $configuration->getSourceCollection()->first();
+        $this->assertEquals('/', $filesystemSource->getCacheDirectory());
+        $this->assertEquals('/', $filesystemSource->getStorageDirectory());
+    }
+
     /**
      * @test
      * @dataProvider invalidConfigurationArray

@@ -57,7 +57,11 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                                 ->validate()
                                     ->always()
                                     ->then(function ($value) {
-                                        return new DirectoryName(sprintf('/%s/', trim($value, '/')));
+                                        if ($value !== '/') {
+                                            $value = sprintf('/%s/', trim($value, '/'));
+                                        }
+
+                                        return new DirectoryName($value);
                                     })
                                 ->end()
                             ->end()
@@ -72,7 +76,11 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                                 ->validate()
                                     ->always()
                                     ->then(function (string $value) {
-                                        return new DirectoryName(sprintf('/%s/', trim($value, '/')));
+                                        if ($value !== '/') {
+                                            $value = sprintf('/%s/', trim($value, '/'));
+                                        }
+
+                                        return new DirectoryName($value);
                                     })
                                 ->end()
                             ->end()
