@@ -29,7 +29,6 @@ class GuzzleClientAdapter implements HttpClientInterface
 {
     /** @var ClientInterface */
     private $client;
-
     /** @var StreamFactoryInterface */
     private $streamFactory;
 
