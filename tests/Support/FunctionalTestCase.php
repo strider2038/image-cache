@@ -24,9 +24,9 @@ class FunctionalTestCase extends TestCase
     protected const MIME_TYPE_JPEG = 'image/jpeg';
     protected const MIME_TYPE_PNG = 'image/png';
 
-    private const APPLICATION_DIRECTORY = __DIR__ . '/../..';
-    private const CONFIGURATION_DIRECTORY = self::APPLICATION_DIRECTORY . '/config';
-    private const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
+    protected const APPLICATION_DIRECTORY = __DIR__ . '/../..';
+    protected const CONFIGURATION_DIRECTORY = self::APPLICATION_DIRECTORY . '/config';
+    protected const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
 
     protected const FILESOURCE_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/filesource';
     protected const WEB_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/web';

@@ -10,49 +10,56 @@
 
 namespace Strider2038\ImgCache\Tests\Support;
 
+use Strider2038\ImgCache\Core\Application;
+use Strider2038\ImgCache\Core\ApplicationParameters;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\Http\Uri;
+use Strider2038\ImgCache\Core\NullErrorHandler;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
-use Strider2038\ImgCache\DeprecatedApplication;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
 class ApplicationTestCase extends FunctionalTestCase
 {
-    /** @var ContainerInterface */
-    private $container;
-    /** @var DeprecatedApplication */
-    private $application;
-    /** @var ResponseSenderInterface */
-    private $responseSender;
+    /** @var string */
+    private $configurationFilename;
 
-    protected function loadApplicationWithConfiguration(string $configurationFilename): void
+    protected function setConfigurationFilename(string $configurationFilename): void
     {
-        $this->container = $this->loadContainer('test.yml');
-        $this->container->setParameter('configuration_filename', $configurationFilename);
-
-        $this->responseSender = \Phake::mock(ResponseSenderInterface::class);
-        $this->container->set('response_sender', $this->responseSender);
-
-        $this->application = new DeprecatedApplication($this->container, function (\Throwable $exception) {
-            throw $exception;
-        });
+        $this->configurationFilename = $configurationFilename;
     }
 
     protected function sendRequest(string $httpMethod, string $uri, StreamInterface $stream = null): ResponseInterface
     {
+        $responseSender = \Phake::mock(ResponseSenderInterface::class);
         $request = $this->createRequest($httpMethod, $uri, $stream);
-        $this->container->set('request', $request);
 
-        $this->application->run();
+        $application = $this->createApplication($responseSender, $request);
+        $application->run();
 
-        return $this->captureResponse();
+        return $this->captureResponse($responseSender);
+    }
+
+    protected function createApplication(ResponseSenderInterface $responseSender, RequestInterface $request): Application
+    {
+        return new Application(
+            new ApplicationParameters(
+                self::APPLICATION_DIRECTORY,
+                []
+            ),
+            new NullErrorHandler(),
+            new TestingServiceContainerLoader($this->configurationFilename),
+            new TestingSequentialServiceRunner(function (ContainerBuilder $container) use ($responseSender, $request) {
+                $container->set('response_sender', $responseSender);
+                $container->set('request', $request);
+            })
+        );
     }
 
     protected function sendGET(string $uri, StreamInterface $stream = null): ResponseInterface
@@ -71,9 +78,9 @@ class ApplicationTestCase extends FunctionalTestCase
         return $request;
     }
 
-    private function captureResponse(): ResponseInterface
+    private function captureResponse(ResponseSenderInterface $responseSender): ResponseInterface
     {
-        \Phake::verify($this->responseSender, \Phake::times(1))->send(\Phake::capture($response));
+        \Phake::verify($responseSender, \Phake::times(1))->send(\Phake::capture($response));
 
         return $response;
     }

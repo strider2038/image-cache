@@ -31,7 +31,7 @@ class OriginalImageCacheTest extends ApplicationTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loadApplicationWithConfiguration('config/testing/original-image-cache-parameters.yml');
+        $this->setConfigurationFilename('application/original-image-cache-parameters.yml');
     }
 
     /** @test */
