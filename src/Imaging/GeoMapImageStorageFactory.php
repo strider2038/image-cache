@@ -8,14 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Configuration\Injection;
+namespace Strider2038\ImgCache\Imaging;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-interface SettingsInjectorInterface
+class GeoMapImageStorageFactory
 {
-    public function injectSettingsToContainer(ContainerInterface $container): void;
+    public function createImageStorageForImageSource(GeoMapImageSource $imageSource): ImageStorageInterface
+    {
+
+    }
 }
