@@ -13,7 +13,6 @@ namespace Strider2038\ImgCache\Imaging;
 use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
-use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 
 /**
@@ -23,18 +22,14 @@ class ImageStorageFactory implements ImageStorageFactoryInterface
 {
     /** @var FilesystemImageStorageFactory */
     private $filesystemImageStorageFactory;
-    /** @var WebDAVImageStorageFactory */
-    private $webdavImageStorageFactory;
     /** @var GeoMapImageStorageFactory */
     private $geoMapImageStorageFactory;
 
     public function __construct(
         FilesystemImageStorageFactory $filesystemImageStorageFactory,
-        WebDAVImageStorageFactory $webdavImageStorageFactory,
         GeoMapImageStorageFactory $geoMapImageStorageFactory
     ) {
         $this->filesystemImageStorageFactory = $filesystemImageStorageFactory;
-        $this->webdavImageStorageFactory = $webdavImageStorageFactory;
         $this->geoMapImageStorageFactory = $geoMapImageStorageFactory;
     }
 
@@ -58,9 +53,7 @@ class ImageStorageFactory implements ImageStorageFactoryInterface
     {
         $imageStorage = null;
 
-        if ($imageSource instanceof WebDAVImageSource) {
-            $imageStorage = $this->webdavImageStorageFactory->createImageStorageForImageSource($imageSource);
-        } else if ($imageSource instanceof FilesystemImageSource) {
+        if ($imageSource instanceof FilesystemImageSource) {
             $imageStorage = $this->filesystemImageStorageFactory->createImageStorageForImageSource($imageSource);
         } else if ($imageSource instanceof GeoMapImageSource) {
             $imageStorage = $this->geoMapImageStorageFactory->createImageStorageForImageSource($imageSource);

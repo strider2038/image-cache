@@ -27,10 +27,10 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
     private $resourceChecker;
 
     public function __construct(
-        ResourceManipulatorInterface $clientAdapter,
+        ResourceManipulatorInterface $resourceManipulator,
         ResourceCheckerInterface $resourceChecker
     ) {
-        $this->resourceManipulator = $clientAdapter;
+        $this->resourceManipulator = $resourceManipulator;
         $this->resourceChecker = $resourceChecker;
     }
 

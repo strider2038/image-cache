@@ -8,16 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Imaging;
-
-use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
+namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class WebDAVImageStorageFactory
+class FilesystemStorageDriverFactory
 {
-    public function createImageStorageForImageSource(WebDAVImageSource $imageSource): ImageStorageInterface
+    public function createFilesystemStorageDriver(): FilesystemStorageDriver
+    {
+
+    }
+
+    public function createWebDAVStorageDriver(string $uri, string $oauthToken): WebDAVStorageDriver
     {
 
     }

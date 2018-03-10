@@ -14,26 +14,21 @@ use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\ImageSource\AbstractImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
-use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
 use Strider2038\ImgCache\Imaging\FilesystemImageStorageFactory;
 use Strider2038\ImgCache\Imaging\GeoMapImageStorageFactory;
 use Strider2038\ImgCache\Imaging\ImageStorageFactory;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
-use Strider2038\ImgCache\Imaging\WebDAVImageStorageFactory;
 
 class ImageStorageFactoryTest extends TestCase
 {
     /** @var FilesystemImageStorageFactory */
     private $filesystemImageStorageFactory;
-    /** @var WebDAVImageStorageFactory */
-    private $webdavImageStorageFactory;
     /** @var GeoMapImageStorageFactory */
     private $geoMapImageStorageFactory;
 
     protected function setUp(): void
     {
         $this->filesystemImageStorageFactory = \Phake::mock(FilesystemImageStorageFactory::class);
-        $this->webdavImageStorageFactory = \Phake::mock(WebDAVImageStorageFactory::class);
         $this->geoMapImageStorageFactory = \Phake::mock(GeoMapImageStorageFactory::class);
     }
 
@@ -67,10 +62,6 @@ class ImageStorageFactoryTest extends TestCase
                 FilesystemImageSource::class
             ],
             [
-                'webdavImageStorageFactory',
-                WebDAVImageSource::class
-            ],
-            [
                 'geoMapImageStorageFactory',
                 GeoMapImageSource::class
             ],
@@ -95,7 +86,6 @@ class ImageStorageFactoryTest extends TestCase
     {
         return new ImageStorageFactory(
             $this->filesystemImageStorageFactory,
-            $this->webdavImageStorageFactory,
             $this->geoMapImageStorageFactory
         );
     }
