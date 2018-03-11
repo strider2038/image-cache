@@ -16,7 +16,7 @@ use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class BearerAccessControl implements AccessControlInterface
+class BearerWriteAccessControl implements AccessControlInterface
 {
     /** @var string */
     private $token;
@@ -28,6 +28,10 @@ class BearerAccessControl implements AccessControlInterface
 
     public function canHandleRequest(RequestInterface $request): bool
     {
+        if ($request->getMethod()->isReadMethod()) {
+            return true;
+        }
+
         $authorizationHeaderName = new HttpHeaderEnum(HttpHeaderEnum::AUTHORIZATION);
         $authorizationHeaderValue = $request->getHeaderLine($authorizationHeaderName);
 

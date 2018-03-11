@@ -37,7 +37,7 @@ class AccessControlFactory
             $accessControl = new ReadOnlyAccessControl();
             $this->logger->debug('Read only access control is used.');
         } else {
-            $accessControl = new BearerAccessControl($token);
+            $accessControl = new BearerWriteAccessControl($token);
             $this->logger->debug('Bearer token access control is used.');
             if (\strlen($token) < 16) {
                 $this->logger->warning('Token is not secure. The recommended length of the token must be more than 16 characters.');

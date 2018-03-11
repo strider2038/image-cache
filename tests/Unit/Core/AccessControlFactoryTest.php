@@ -13,7 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Strider2038\ImgCache\Core\AccessControlFactory;
-use Strider2038\ImgCache\Core\BearerAccessControl;
+use Strider2038\ImgCache\Core\BearerWriteAccessControl;
 use Strider2038\ImgCache\Core\ReadOnlyAccessControl;
 use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 
@@ -42,25 +42,25 @@ class AccessControlFactoryTest extends TestCase
     }
 
     /** @test */
-    public function createAccessControlByToken_givenTokenIsLong_bearerAccessControlCreatedAndReturned(): void
+    public function createAccessControlByToken_givenTokenIsLong_bearerWriteAccessControlCreatedAndReturned(): void
     {
         $factory = $this->createAccessControlFactory();
 
         $accessControl = $factory->createAccessControlByToken('token_123456789123456789');
 
-        $this->assertInstanceOf(BearerAccessControl::class, $accessControl);
+        $this->assertInstanceOf(BearerWriteAccessControl::class, $accessControl);
         $this->assertLogger_debug_isCalledTimes($this->logger, 1);
         $this->assertLogger_warning_isNeverCalled($this->logger);
     }
 
     /** @test */
-    public function createAccessControlByToken_givenTokenIsShort_bearerAccessControlCreatedAndReturnedAndWarningSendToLogger(): void
+    public function createAccessControlByToken_givenTokenIsShort_bearerWriteAccessControlCreatedAndReturnedAndWarningSendToLogger(): void
     {
         $factory = $this->createAccessControlFactory();
 
         $accessControl = $factory->createAccessControlByToken('token');
 
-        $this->assertInstanceOf(BearerAccessControl::class, $accessControl);
+        $this->assertInstanceOf(BearerWriteAccessControl::class, $accessControl);
         $this->assertLogger_debug_isCalledTimes($this->logger, 1);
         $this->assertLogger_warning_isCalledOnce($this->logger);
     }
