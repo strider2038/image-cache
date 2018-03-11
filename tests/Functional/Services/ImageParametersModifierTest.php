@@ -24,7 +24,7 @@ class ImageParametersModifierTest extends FunctionalTestCase
 
     protected function setUp(): void
     {
-        $container = $this->loadContainer('image-parameters-modifier.yml');
+        $container = $this->loadContainer('services/image-parameters-modifier.yml');
         $this->imageParametersModifier = $container->get('image_parameters_modifier');
     }
 

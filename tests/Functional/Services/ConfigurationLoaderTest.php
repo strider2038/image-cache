@@ -25,7 +25,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationLoaderTest extends TestCase
 {
-    private const CONFIGURATION_FILENAME = 'config/testing/configuration-loader-parameters.yml';
+    private const CONFIGURATION_FILENAME = 'configuration-loader-parameters';
     private const ACCESS_CONTROL_TOKEN = 'test-access-control-token';
     private const CACHED_IMAGE_QUALITY = 65;
 

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Functional;
+namespace Strider2038\ImgCache\Tests\Functional\Services;
 
 use Strider2038\ImgCache\Imaging\Parsing\GeoMap\GeoMapParametersParserInterface;
 use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
@@ -23,7 +23,7 @@ class GeoMapParametersParserTest extends FunctionalTestCase
 
     protected function setUp(): void
     {
-        $container = $this->loadContainer('geo-map-parameters-parser.yml');
+        $container = $this->loadContainer('services/geo-map-parameters-parser.yml');
         $this->geoMapParametersParser = $container->get('geo_map_parameters_parser');
     }
 

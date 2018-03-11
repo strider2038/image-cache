@@ -34,14 +34,13 @@ class ImagickImageProcessorTest extends FunctionalTestCase
 
     /** @var ImageProcessor */
     private $imageProcessor;
-
     /** @var ImageFactory */
     private $imageFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $container = $this->loadContainer('imagick-image-processor.yml');
+        $container = $this->loadContainer('services/imagick-image-processor.yml');
         $this->imageProcessor = $container->get('image_processor');
         $this->imageFactory = $container->get('image_factory');
     }

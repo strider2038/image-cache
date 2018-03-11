@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Functional;
+namespace Strider2038\ImgCache\Tests\Functional\Application;
 
 use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;

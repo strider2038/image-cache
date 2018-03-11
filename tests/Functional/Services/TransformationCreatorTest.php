@@ -29,7 +29,7 @@ class TransformationCreatorTest extends FunctionalTestCase
 
     protected function setUp(): void
     {
-        $container = $this->loadContainer('transformation-creator.yml');
+        $container = $this->loadContainer('services/transformation-creator.yml');
         $this->transformationCreator = $container->get('transformation_creator');
     }
 
