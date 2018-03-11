@@ -139,8 +139,8 @@ class ConfigurationLoaderTest extends TestCase
             [
                 [
                     'image_sources' => [
-                        'geo_map_source' => [
-                            'type' => 'geomap',
+                        'webdav_source' => [
+                            'type' => 'webdav',
                             'cache_directory' => '/valid_directory',
                             'driver_uri' => '',
                             'oauth_token' => '',

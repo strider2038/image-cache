@@ -1,0 +1,6 @@
+access_control_token: 'test-token'
+image_sources:
+    geo_map_source:
+        type: 'geomap'
+        cache_directory: '/'
+        storage_directory: '/imgcache/runtime/tests/filesource'

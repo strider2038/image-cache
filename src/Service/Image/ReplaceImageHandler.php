@@ -30,16 +30,12 @@ class ReplaceImageHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     private $responseFactory;
-
     /** @var ImageFilenameFactoryInterface */
     private $filenameFactory;
-
     /** @var ImageStorageInterface */
     private $imageStorage;
-
     /** @var ImageCacheInterface */
     private $imageCache;
-
     /** @var ImageFactoryInterface */
     private $imageFactory;
 

@@ -104,7 +104,7 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                         ->validate()
                             ->ifTrue(function (array $imageSource) {
                                 return (
-                                    $imageSource['type'] === 'geomap'
+                                    $imageSource['type'] === 'webdav'
                                     && (
                                         $imageSource['driver_uri'] === ''
                                         || $imageSource['oauth_token'] === ''

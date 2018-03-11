@@ -9,6 +9,11 @@ parameters:
 services:
     geo_map_image_storage_factory:
         class: Strider2038\ImgCache\Imaging\GeoMapImageStorageFactory
+        arguments:
+            - '@geo_map_parameters_parser'
+            - '@entity_validator'
+            - '@image_factory'
+            - '@guzzle_client_factory'
 
     geo_map_parsing_patterns:
         class: Strider2038\ImgCache\Collection\StringList
