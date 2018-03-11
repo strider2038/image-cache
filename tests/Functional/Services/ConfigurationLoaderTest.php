@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Functional;
+namespace Strider2038\ImgCache\Tests\Functional\Services;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Configuration\Configuration;
@@ -31,7 +31,6 @@ class ConfigurationLoaderTest extends TestCase
 
     /** @var ConfigurationLoaderInterface */
     private $configurationLoader;
-
     /** @var ConfigurationFileParserInterface */
     private $configurationFileParser;
 

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Functional;
+namespace Strider2038\ImgCache\Tests\Functional\Services;
 
 use Strider2038\ImgCache\Imaging\Image\ImageParameters;
 use Strider2038\ImgCache\Imaging\Parsing\ImageParametersModifier;
