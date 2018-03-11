@@ -1,5 +1,9 @@
 imports:
   - { resource: 'main.yml' }
 
+services:
+    logger:
+        class: Psr\Log\NullLogger
+
 parameters:
     web_directory: '%application.directory%/runtime/tests/web'

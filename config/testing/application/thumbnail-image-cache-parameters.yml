@@ -1,0 +1,7 @@
+access_control_token: 'test-token'
+image_sources:
+    filesystem_source:
+        type: 'filesystem'
+        cache_directory: '/'
+        storage_directory: '/imgcache/runtime/tests/filesource'
+        processor_type: 'thumbnail'
