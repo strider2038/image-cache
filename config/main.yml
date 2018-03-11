@@ -5,9 +5,7 @@ imports:
   - { resource: 'services/imaging.yml' }
   - { resource: 'services/filesystem-storage.yml' }
   - { resource: 'services/geo-map-storage.yml' }
-#  - { resource: 'services/image-cache.yml' }
-#  - { resource: 'services/parameters.yml' }
-#  - { resource: 'local.yml', ignore_errors: true }
+  - { resource: 'local.yml', ignore_errors: true }
 
 parameters:
     # dynamic parameters loaded at application creation

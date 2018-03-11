@@ -1,3 +1,4 @@
+access_control_token: 'test-token'
 image_sources:
     filesystem_source:
         type: 'filesystem'

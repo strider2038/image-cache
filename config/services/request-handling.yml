@@ -15,8 +15,17 @@ services:
             - '@response_factory'
             - '@intermediate_request_handler'
 
+    access_control_factory:
+        class: Strider2038\ImgCache\Core\AccessControlFactory
+        calls:
+            - [setLogger, ['@logger']]
+
     access_control:
-        class: Strider2038\ImgCache\Core\ReadOnlyAccessControl
+        factory:
+            - '@access_control_factory'
+            - 'createAccessControlByToken'
+        arguments:
+            - '%access_control_token%'
 
     intermediate_request_handler:
         class: Strider2038\ImgCache\Service\Image\IntermediateRequestHandler

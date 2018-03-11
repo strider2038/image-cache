@@ -10,8 +10,10 @@
 
 namespace Strider2038\ImgCache\Tests\Support;
 
+use Strider2038\ImgCache\Collection\StringList;
 use Strider2038\ImgCache\Core\Application;
 use Strider2038\ImgCache\Core\ApplicationParameters;
+use Strider2038\ImgCache\Core\Http\HeaderCollection;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
@@ -19,6 +21,7 @@ use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\Http\Uri;
 use Strider2038\ImgCache\Core\NullErrorHandler;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
+use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -29,10 +32,19 @@ class ApplicationTestCase extends FunctionalTestCase
 {
     /** @var string */
     private $configurationFilename;
+    /** @var string */
+    private $bearerAccessToken;
+    /** @var ResponseInterface|null */
+    private $response;
 
     protected function setConfigurationFilename(string $configurationFilename): void
     {
         $this->configurationFilename = $configurationFilename;
+    }
+
+    protected function setBearerAccessToken(string $bearerAccessToken): void
+    {
+        $this->bearerAccessToken = $bearerAccessToken;
     }
 
     protected function sendRequest(string $httpMethod, string $uri, StreamInterface $stream = null): ResponseInterface
@@ -43,7 +55,7 @@ class ApplicationTestCase extends FunctionalTestCase
         $application = $this->createApplication($responseSender, $request);
         $application->run();
 
-        return $this->captureResponse($responseSender);
+        return $this->response = $this->captureResponse($responseSender);
     }
 
     protected function createApplication(ResponseSenderInterface $responseSender, RequestInterface $request): Application
@@ -67,6 +79,33 @@ class ApplicationTestCase extends FunctionalTestCase
         return $this->sendRequest(HttpMethodEnum::GET, $uri, $stream);
     }
 
+    protected function sendPOST(string $uri, StreamInterface $stream = null): ResponseInterface
+    {
+        return $this->sendRequest(HttpMethodEnum::POST, $uri, $stream);
+    }
+
+    protected function sendPUT(string $uri, StreamInterface $stream = null): ResponseInterface
+    {
+        return $this->sendRequest(HttpMethodEnum::PUT, $uri, $stream);
+    }
+
+    protected function sendDELETE(string $uri, StreamInterface $stream = null): ResponseInterface
+    {
+        return $this->sendRequest(HttpMethodEnum::DELETE, $uri, $stream);
+    }
+
+    protected function assertResponseHasStatusCode(int $statusCode): void
+    {
+        $responseStatusCode = $this->response->getStatusCode()->getValue();
+        $message = '';
+
+        if ($responseStatusCode >= 300) {
+            $message = 'Response body: ' . $this->response->getBody()->getContents();
+        }
+
+        $this->assertEquals($statusCode, $responseStatusCode, $message);
+    }
+
     private function createRequest(string $httpMethod, string $uri, StreamInterface $stream = null): RequestInterface
     {
         $request = new Request(new HttpMethodEnum($httpMethod), new Uri($uri));
@@ -74,6 +113,14 @@ class ApplicationTestCase extends FunctionalTestCase
         if ($stream) {
             $request->setBody($stream);
         }
+
+        $request->setHeaders(
+            new HeaderCollection([
+                HttpHeaderEnum::AUTHORIZATION => new StringList([
+                    'Bearer ' . $this->bearerAccessToken,
+                ])
+            ])
+        );
 
         return $request;
     }

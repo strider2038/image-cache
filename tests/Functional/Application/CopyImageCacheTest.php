@@ -10,7 +10,6 @@
 
 namespace Strider2038\ImgCache\Tests\Functional\Application;
 
-use Strider2038\ImgCache\Core\Http\UriInterface;
 use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -32,14 +31,15 @@ class CopyImageCacheTest extends ApplicationTestCase
     {
         parent::setUp();
         $this->setConfigurationFilename('application/copy-image-cache-parameters.yml');
+        $this->setBearerAccessToken('test-token');
     }
 
     /** @test */
-    public function GET_givenImageNotExistInStorage_notFoundExceptionThrown(): void
+    public function GET_givenImageDoesNotExistInStorage_notFoundResponseReturned(): void
     {
-        $response = $this->sendGET(self::FILE_NOT_EXIST);
+        $this->sendGET(self::FILE_NOT_EXIST);
 
-        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::NOT_FOUND);
     }
 
     /** @test */
@@ -47,95 +47,82 @@ class CopyImageCacheTest extends ApplicationTestCase
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
 
-        $response = $this->sendGET(self::IMAGE_JPEG_CACHE_KEY);
+        $this->sendGET(self::IMAGE_JPEG_CACHE_KEY);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
     }
 
     /** @test */
     public function GET_givenImageInSubdirectoryRequested_createdResponseReturned(): void
     {
-        $this->markTestSkipped();
         $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
-        $response = $this->controller->runAction('get', $this->request);
+        $this->sendGET(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     */
-    public function GET_imageDoesNotExistInStorage_notFoundExceptionThrown(): void
+    /** @test */
+    public function POST_givenBearerTokenIsInvalid_notAllowedResponseReturned(): void
     {
-        $this->markTestSkipped();
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
+        $this->setBearerAccessToken('');
+        $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
 
-        $response = $this->controller->runAction('get', $this->request);
+        $this->sendPOST(self::IMAGE_JPEG_CACHE_KEY, $stream);
 
-        $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::FORBIDDEN);
     }
 
     /** @test */
-    public function PUT_givenStream_imageIsCreated(): void
+    public function POST_givenStream_imageCreated(): void
     {
-        $this->markTestSkipped();
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
-        $this->givenRequest_getBody_returns($stream);
 
-        $response = $this->controller->runAction('replace', $this->request);
+        $this->sendPOST(self::IMAGE_JPEG_CACHE_KEY, $stream);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
+        $this->assertFileExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+    }
+
+    /** @test */
+    public function PUT_givenStream_imageCreated(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
+        $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
+
+        $this->sendPUT(self::IMAGE_JPEG_CACHE_KEY, $stream);
+
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
     }
 
     /** @test */
     public function PUT_givenStream_imageIsCreatedInSubdirectory(): void
     {
-        $this->markTestSkipped();
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
-        $this->givenRequest_getBody_returns($stream);
 
-        $response = $this->controller->runAction('replace', $this->request);
+        $this->sendPUT(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY, $stream);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
     }
 
     /** @test */
     public function DELETE_imageExistsInStorageAndCache_imageIsDeleted(): void
     {
-        $this->markTestSkipped();
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_CACHE_KEY);
 
-        $response = $this->controller->runAction('delete', $this->request);
+        $this->sendDELETE(self::IMAGE_JPEG_CACHE_KEY);
 
-        $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::OK);
         $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
-    }
-
-    private function givenRequest_getUri_getPath_returnsPath(string $path): void
-    {
-        $uri = \Phake::mock(UriInterface::class);
-        \Phake::when($this->request)->getUri()->thenReturn($uri);
-        \Phake::when($uri)->getPath()->thenReturn($path);
-    }
-
-    private function givenRequest_getBody_returns(StreamInterface $stream): void
-    {
-        \Phake::when($this->request)->getBody()->thenReturn($stream);
     }
 
     private function givenStream(string $filename): StreamInterface

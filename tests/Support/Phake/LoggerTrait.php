@@ -39,6 +39,17 @@ trait LoggerTrait
         \Phake::verify($logger, \Phake::times($times))->info(\Phake::anyParameters());
     }
 
+    public function assertLogger_warning_isCalledOnce(LoggerInterface $logger, string $message = null): void
+    {
+        $params = $message ?? \Phake::anyParameters();
+        \Phake::verify($logger, \Phake::times(1))->warning($params);
+    }
+
+    public function assertLogger_warning_isNeverCalled(LoggerInterface $logger): void
+    {
+        \Phake::verify($logger, \Phake::times(0))->warning(\Phake::anyParameters());
+    }
+
     public function assertLogger_error_isCalledOnce(LoggerInterface $logger, string $message = null): void
     {
         $params = $message ?? \Phake::anyParameters();
