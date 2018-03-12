@@ -82,9 +82,10 @@ class RequestFactory implements RequestFactoryInterface
     private function getRequestBody(): StreamInterface
     {
         $mode = new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY);
-        $bodyStream = $this->streamFactory->createStreamByParameters($this->streamSource, $mode);
+        $inputStream = $this->streamFactory->createStreamByParameters($this->streamSource, $mode);
+        $contents = $inputStream->getContents();
 
-        return $bodyStream;
+        return $this->streamFactory->createStreamFromData($contents);
     }
 
     private function getHeaders(array $serverConfiguration): HeaderCollection
