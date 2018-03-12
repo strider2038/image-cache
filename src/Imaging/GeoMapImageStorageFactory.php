@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
 use Strider2038\ImgCache\Core\QueryParameter;
 use Strider2038\ImgCache\Core\QueryParameterCollection;
@@ -17,9 +19,11 @@ use Strider2038\ImgCache\Imaging\Extraction\GeoMapExtractor;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\Parsing\GeoMap\GeoMapParametersParserInterface;
 use Strider2038\ImgCache\Imaging\Storage\Accessor\GeoMapStorageAccessor;
+use Strider2038\ImgCache\Imaging\Storage\Converter\GeoMapParametersConverterInterface;
 use Strider2038\ImgCache\Imaging\Storage\Converter\YandexMapParametersConverter;
 use Strider2038\ImgCache\Imaging\Storage\Data\YandexMapParametersFactory;
 use Strider2038\ImgCache\Imaging\Storage\Driver\ApiStorageDriver;
+use Strider2038\ImgCache\Imaging\Storage\Driver\ApiStorageDriverInterface;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Strider2038\ImgCache\Utility\HttpClientFactoryInterface;
 
@@ -38,6 +42,13 @@ class GeoMapImageStorageFactory
     private $imageFactory;
     /** @var HttpClientFactoryInterface */
     private $httpClientFactory;
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var GeoMapParametersConverterInterface */
+    private $parametersConverter;
+    /** @var ApiStorageDriverInterface */
+    private $storageDriver;
 
     public function __construct(
         GeoMapParametersParserInterface $parametersParser,
@@ -49,36 +60,53 @@ class GeoMapImageStorageFactory
         $this->validator = $validator;
         $this->imageFactory = $imageFactory;
         $this->httpClientFactory = $httpClientFactory;
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function createImageStorageForImageSource(GeoMapImageSource $imageSource): ImageStorageInterface
     {
-        $parametersConverter = new YandexMapParametersConverter(
+        $this->createParametersConverter();
+        $this->createStorageDriverForImageSource($imageSource);
+
+        return new ImageStorage(
+            new GeoMapExtractor(
+                $this->parametersParser,
+                new GeoMapStorageAccessor(
+                    $this->parametersConverter,
+                    $this->storageDriver,
+                    $this->imageFactory
+                )
+            )
+        );
+    }
+
+    private function createParametersConverter(): void
+    {
+        $this->parametersConverter = new YandexMapParametersConverter(
             new YandexMapParametersFactory(
                 $this->validator
             )
         );
+    }
 
+    private function createStorageDriverForImageSource(GeoMapImageSource $imageSource): void
+    {
         $httpClient = $this->httpClientFactory->createClient([
             'base_uri' => self::YANDEX_MAP_BASE_URI
         ]);
 
-        $storageDriver = new ApiStorageDriver(
+        $this->storageDriver = new ApiStorageDriver(
             $httpClient,
             new QueryParameterCollection([
                 new QueryParameter('key', $imageSource->getApiKey())
             ])
         );
 
-        return new ImageStorage(
-            new GeoMapExtractor(
-                $this->parametersParser,
-                new GeoMapStorageAccessor(
-                    $parametersConverter,
-                    $storageDriver,
-                    $this->imageFactory
-                )
-            )
-        );
+        $this->storageDriver->setLogger($this->logger);
     }
 }

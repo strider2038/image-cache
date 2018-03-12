@@ -14,6 +14,8 @@ services:
             - '@access_control'
             - '@response_factory'
             - '@intermediate_request_handler'
+        calls:
+            - [setLogger, ['@logger']]
 
     access_control_factory:
         class: Strider2038\ImgCache\Core\AccessControlFactory

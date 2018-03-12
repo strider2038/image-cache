@@ -21,10 +21,13 @@ use Strider2038\ImgCache\Imaging\ImageStorage;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameFactoryInterface;
 use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverFactory;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 
 class FilesystemImageStorageFactoryTest extends TestCase
 {
+    use LoggerTrait;
+
     private const STORAGE_DIRECTORY = 'storage_directory';
     private const CACHE_DIRECTORY = 'cache_directory';
     private const WEBDAV_DRIVER_URI = 'driver_uri';
@@ -96,13 +99,17 @@ class FilesystemImageStorageFactoryTest extends TestCase
 
     private function createFilesystemImageStorageFactory(): FilesystemImageStorageFactory
     {
-        return new FilesystemImageStorageFactory(
+        $factory = new FilesystemImageStorageFactory(
             $this->filesystemStorageDriverFactory,
             $this->validator,
             $this->imageFactory,
             $this->thumbnailImageCreator,
             $this->directoryNameFactory
         );
+
+        $factory->setLogger($this->givenLogger());
+
+        return $factory;
     }
 
     private function givenFilesystemImageSourceWithProcessorType(string $processorType): FilesystemImageSource

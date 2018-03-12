@@ -28,10 +28,8 @@ class ApiStorageDriver implements ApiStorageDriverInterface
 {
     /** @var HttpClientInterface */
     private $client;
-
     /** @var QueryParameterCollection */
     private $additionalQueryParameters;
-
     /** @var LoggerInterface */
     private $logger;
 

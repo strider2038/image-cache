@@ -10,6 +10,8 @@
 
 namespace Strider2038\ImgCache\Imaging;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
 use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
 use Strider2038\ImgCache\Enum\ImageProcessorTypeEnum;
@@ -43,6 +45,8 @@ class FilesystemImageStorageFactory
     private $thumbnailImageCreator;
     /** @var DirectoryNameFactoryInterface */
     private $directoryNameFactory;
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var FilesystemStorageDriverInterface */
     private $storageDriver;
@@ -59,6 +63,12 @@ class FilesystemImageStorageFactory
         $this->imageFactory = $imageFactory;
         $this->thumbnailImageCreator = $thumbnailImageCreator;
         $this->directoryNameFactory = $directoryNameFactory;
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function createImageStorageForImageSource(FilesystemImageSource $imageSource): ImageStorageInterface
@@ -87,11 +97,14 @@ class FilesystemImageStorageFactory
     {
         $directoryName = $this->directoryNameFactory->createDirectoryName($storageRootDirectory);
 
-        return new FilesystemStorageAccessor(
+        $storageAccessor = new FilesystemStorageAccessor(
             $this->storageDriver,
             $this->imageFactory,
             new StorageFilenameFactory($directoryName)
         );
+        $storageAccessor->setLogger($this->logger);
+
+        return $storageAccessor;
     }
 
     private function createImageStorageByProcessorTypeWithStorageAccessor(

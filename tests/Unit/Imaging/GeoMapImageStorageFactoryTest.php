@@ -16,12 +16,15 @@ use Strider2038\ImgCache\Imaging\GeoMapImageStorageFactory;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorage;
 use Strider2038\ImgCache\Imaging\Parsing\GeoMap\GeoMapParametersParserInterface;
+use Strider2038\ImgCache\Tests\Support\Phake\LoggerTrait;
 use Strider2038\ImgCache\Utility\EntityValidatorInterface;
 use Strider2038\ImgCache\Utility\HttpClientFactoryInterface;
 use Strider2038\ImgCache\Utility\HttpClientInterface;
 
 class GeoMapImageStorageFactoryTest extends TestCase
 {
+    use LoggerTrait;
+
     private const CACHE_DIRECTORY = 'cache_directory';
     private const DRIVER = 'yandex';
     private const API_KEY = 'api_key';
@@ -59,12 +62,15 @@ class GeoMapImageStorageFactoryTest extends TestCase
 
     private function createGeoMapImageStorageFactory(): GeoMapImageStorageFactory
     {
-        return new GeoMapImageStorageFactory(
+        $factory = new GeoMapImageStorageFactory(
             $this->parametersParser,
             $this->validator,
             $this->imageFactory,
             $this->httpClientFactory
         );
+        $factory->setLogger($this->givenLogger());
+
+        return $factory;
     }
 
     private function givenGeoMapImageSource(): GeoMapImageSource

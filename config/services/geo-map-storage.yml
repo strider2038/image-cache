@@ -14,6 +14,8 @@ services:
             - '@entity_validator'
             - '@image_factory'
             - '@guzzle_client_factory'
+        calls:
+            - [setLogger, ['@logger']]
 
     geo_map_parsing_patterns:
         class: Strider2038\ImgCache\Collection\StringList

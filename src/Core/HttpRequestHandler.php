@@ -25,13 +25,10 @@ class HttpRequestHandler implements RequestHandlerInterface
 {
     /** @var AccessControlInterface */
     private $accessControl;
-
     /** @var ResponseFactoryInterface */
     private $responseFactory;
-
     /** @var RequestHandlerInterface */
     private $concreteRequestHandler;
-
     /** @var LoggerInterface */
     private $logger;
 
