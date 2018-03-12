@@ -10,7 +10,9 @@
 
 namespace Strider2038\ImgCache\Tests\Support;
 
+use Psr\Container\ContainerInterface;
 use Strider2038\ImgCache\Collection\StringList;
+use Strider2038\ImgCache\Configuration\Configuration;
 use Strider2038\ImgCache\Core\Application;
 use Strider2038\ImgCache\Core\ApplicationParameters;
 use Strider2038\ImgCache\Core\Http\HeaderCollection;
@@ -21,6 +23,7 @@ use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Http\ResponseSenderInterface;
 use Strider2038\ImgCache\Core\Http\Uri;
 use Strider2038\ImgCache\Core\NullErrorHandler;
+use Strider2038\ImgCache\Core\Service\SequentialServiceRunner;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpHeaderEnum;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
@@ -34,11 +37,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ApplicationTestCase extends FunctionalTestCase
 {
+    /** @var ContainerBuilder */
+    private $container;
     /** @var HttpClientInterface */
     private $httpClient;
+    /** @var ResponseSenderInterface */
+    private $responseSender;
 
-    /** @var string */
-    private $configurationFilename;
     /** @var string */
     private $bearerAccessToken;
     /** @var ResponseInterface|null */
@@ -47,12 +52,28 @@ class ApplicationTestCase extends FunctionalTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->httpClient = \Phake::mock(HttpClientInterface::class);
+        $this->container = $this->loadContainer('main.yml');
+        $this->registerFakeResponseSender();
     }
 
-    protected function setConfigurationFilename(string $configurationFilename): void
+    protected function registerFakeResponseSender(): void
     {
-        $this->configurationFilename = $configurationFilename;
+        $this->responseSender = \Phake::mock(ResponseSenderInterface::class);
+        $this->container->set('response_sender', $this->responseSender);
+    }
+
+    protected function registerFakeHttpClient(): void
+    {
+        $this->httpClient = \Phake::mock(HttpClientInterface::class);
+        $httpClientFactory = $this->givenHttpClientFactory();
+        $this->container->set('guzzle_client_factory', $httpClientFactory);
+    }
+
+    protected function loadConfigurationToContainer(Configuration $configuration): void
+    {
+        $this->container->setParameter('access_control_token', $configuration->getAccessControlToken());
+        $this->container->setParameter('cached_image_quality', $configuration->getCachedImageQuality());
+        $this->container->setParameter('image_sources', $configuration->getSourceCollection());
     }
 
     protected function setBearerAccessToken(string $bearerAccessToken): void
@@ -62,27 +83,16 @@ class ApplicationTestCase extends FunctionalTestCase
 
     protected function sendRequest(string $httpMethod, string $uri, StreamInterface $stream = null): ResponseInterface
     {
-        $responseSender = \Phake::mock(ResponseSenderInterface::class);
         $request = $this->createRequest($httpMethod, $uri, $stream);
-        $httpClientFactory = $this->givenHttpClientFactory();
+        $this->container->set('request', $request);
 
-        $containerModifierCallable = function (ContainerBuilder $container) use (
-            $responseSender,
-            $request,
-            $httpClientFactory
-        ) {
-            $container->set('response_sender', $responseSender);
-            $container->set('request', $request);
-            $container->set('guzzle_client_factory', $httpClientFactory);
-        };
-
-        $application = $this->createApplication($containerModifierCallable);
+        $application = $this->createApplication($this->container);
         $application->run();
 
-        return $this->response = $this->captureResponse($responseSender);
+        return $this->captureResponse();
     }
 
-    protected function createApplication(\Closure $containerModifierCallable): Application
+    protected function createApplication(ContainerInterface $container): Application
     {
         return new Application(
             new ApplicationParameters(
@@ -90,8 +100,8 @@ class ApplicationTestCase extends FunctionalTestCase
                 []
             ),
             new NullErrorHandler(),
-            new TestingServiceContainerLoader($this->configurationFilename),
-            new TestingSequentialServiceRunner($containerModifierCallable)
+            new ServiceContainerLoaderFake($container),
+            new SequentialServiceRunner()
         );
     }
 
@@ -159,12 +169,12 @@ class ApplicationTestCase extends FunctionalTestCase
         return $request;
     }
 
-    private function captureResponse(ResponseSenderInterface $responseSender): ResponseInterface
+    private function captureResponse(): ResponseInterface
     {
-        \Phake::verify($responseSender, \Phake::times(1))
-            ->sendResponse(\Phake::capture($response));
+        \Phake::verify($this->responseSender, \Phake::times(1))
+            ->sendResponse(\Phake::capture($this->response));
 
-        return $response;
+        return $this->response;
     }
 
     private function givenHttpClientFactory(): HttpClientFactoryInterface

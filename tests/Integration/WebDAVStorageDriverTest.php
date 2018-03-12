@@ -34,7 +34,6 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
 
     /** @var ClientInterface */
     private $client;
-
     /** @var WebDAVStorageDriver */
     private $driver;
 

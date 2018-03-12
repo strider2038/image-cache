@@ -10,6 +10,9 @@
 
 namespace Strider2038\ImgCache\Tests\Functional\Application;
 
+use Strider2038\ImgCache\Configuration\Configuration;
+use Strider2038\ImgCache\Configuration\ImageSource\GeoMapImageSource;
+use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
 use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -32,7 +35,16 @@ class YandexMapImageCacheTest extends ApplicationTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->setConfigurationFilename('application/yandex-map-image-cache-parameters.yml');
+
+        $this->loadConfigurationToContainer(new Configuration(
+            'test-token',
+            85,
+            new ImageSourceCollection([
+                new GeoMapImageSource('/', 'yandex', '')
+            ])
+        ));
+
+        $this->registerFakeHttpClient();
         $this->setBearerAccessToken('test-token');
     }
 

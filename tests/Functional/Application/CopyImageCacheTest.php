@@ -10,6 +10,9 @@
 
 namespace Strider2038\ImgCache\Tests\Functional\Application;
 
+use Strider2038\ImgCache\Configuration\Configuration;
+use Strider2038\ImgCache\Configuration\ImageSource\FilesystemImageSource;
+use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
 use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
@@ -30,7 +33,19 @@ class CopyImageCacheTest extends ApplicationTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->setConfigurationFilename('application/copy-image-cache-parameters.yml');
+
+        $this->loadConfigurationToContainer(new Configuration(
+            'test-token',
+            85,
+            new ImageSourceCollection([
+                new FilesystemImageSource(
+                    '/',
+                    self::FILESOURCE_DIRECTORY,
+                    'copy'
+                )
+            ])
+        ));
+
         $this->setBearerAccessToken('test-token');
     }
 

@@ -6,4 +6,6 @@ services:
         class: Psr\Log\NullLogger
 
 parameters:
+    server_configuration:
+        - ~
     web_directory: '%application.directory%/runtime/tests/web'
