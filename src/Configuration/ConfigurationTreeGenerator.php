@@ -48,14 +48,14 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                                 ->isRequired()
                                 ->cannotBeEmpty()
                                 ->validate()
-                                    ->ifTrue(function ($value) {
+                                    ->ifTrue(function($value) {
                                         return !ConfigurationValidator::isValidDirectoryName($value);
                                     })
                                     ->thenInvalid(ConfigurationValidator::INVALID_DIRECTORY_NAME_MESSAGE)
                                 ->end()
                                 ->validate()
                                     ->always()
-                                    ->then(function ($value) {
+                                    ->then(function($value) {
                                         if ($value !== '/') {
                                             $value = sprintf('/%s/', trim($value, '/'));
                                         }
@@ -67,14 +67,14 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                             ->scalarNode('storage_directory')
                                 ->defaultValue('/')
                                 ->validate()
-                                    ->ifTrue(function (string $value) {
+                                    ->ifTrue(function(string $value) {
                                         return !ConfigurationValidator::isValidDirectoryName($value);
                                     })
                                     ->thenInvalid(ConfigurationValidator::INVALID_DIRECTORY_NAME_MESSAGE)
                                 ->end()
                                 ->validate()
                                     ->always()
-                                    ->then(function (string $value) {
+                                    ->then(function(string $value) {
                                         if ($value !== '/') {
                                             $value = sprintf('/%s/', trim($value, '/'));
                                         }
@@ -102,7 +102,7 @@ class ConfigurationTreeGenerator implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->validate()
-                            ->ifTrue(function (array $imageSource) {
+                            ->ifTrue(function(array $imageSource) {
                                 return (
                                     $imageSource['type'] === 'webdav'
                                     && (

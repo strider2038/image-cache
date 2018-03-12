@@ -8,19 +8,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Integration;
+namespace Strider2038\ImgCache\Tests\Integration\Services;
 
 use GuzzleHttp\Client;
 use Strider2038\ImgCache\Core\Http\Response;
 use Strider2038\ImgCache\Core\Streaming\StreamFactory;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
+use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
 use Strider2038\ImgCache\Utility\GuzzleClientAdapter;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class GuzzleClientAdapterTest extends IntegrationTestCase
+class GuzzleClientAdapterTest extends FunctionalTestCase
 {
     private const URI = 'https://example.com';
 

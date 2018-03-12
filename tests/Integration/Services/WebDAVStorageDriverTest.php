@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Integration;
+namespace Strider2038\ImgCache\Tests\Integration\Services;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
@@ -19,12 +19,13 @@ use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilename;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAVStorageDriver;
+use Strider2038\ImgCache\Tests\Support\FunctionalTestCase;
 use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class WebDAVStorageDriverTest extends IntegrationTestCase
+class WebDAVStorageDriverTest extends FunctionalTestCase
 {
     private const BASE_DIRECTORY = '/imgcache-test/';
     private const FILENAME = self::BASE_DIRECTORY . 'file.json';
@@ -41,7 +42,7 @@ class WebDAVStorageDriverTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $container = $this->loadContainer('webdav-storage-driver.yml');
+        $container = $this->loadContainer('services/webdav-storage-driver.yml');
         $tokenHeader = 'OAuth ' . getenv('YANDEX_DISK_ACCESS_TOKEN');
         $container->setParameter('token', $tokenHeader);
         $container->setParameter('storage.directory', self::BASE_DIRECTORY);

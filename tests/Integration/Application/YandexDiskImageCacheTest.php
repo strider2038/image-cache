@@ -8,26 +8,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Integration;
+namespace Strider2038\ImgCache\Tests\Integration\Application;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
-use Strider2038\ImgCache\Core\Http\RequestInterface;
-use Strider2038\ImgCache\Core\Http\UriInterface;
+use Strider2038\ImgCache\Configuration\Configuration;
+use Strider2038\ImgCache\Configuration\ImageSource\ImageSourceCollection;
+use Strider2038\ImgCache\Configuration\ImageSource\WebDAVImageSource;
 use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
 use Strider2038\ImgCache\Enum\WebDAVMethodEnum;
-use Strider2038\ImgCache\Service\ImageController;
-use Strider2038\ImgCache\Tests\Support\IntegrationTestCase;
+use Strider2038\ImgCache\Tests\Support\ApplicationTestCase;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class YandexDiskImageCacheTest extends IntegrationTestCase
+class YandexDiskImageCacheTest extends ApplicationTestCase
 {
+    private const WEBDAV_DRIVER_URI = 'https://webdav.yandex.ru/v1';
     private const STORAGE_ROOT = '/imgcache-test';
     private const FILE_NOT_EXIST = '/not-exist.jpg';
     private const IMAGE_JPEG_FILENAME = '/image.jpg';
@@ -47,65 +49,61 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     /** @var ClientInterface */
     private $client;
 
-    /** @var ImageController */
-    private $controller;
-
-    /** @var RequestInterface */
-    private $request;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $token = getenv('YANDEX_DISK_ACCESS_TOKEN') ?? '';
 
-        $container = $this->loadContainer('yandex-disk-image-cache.yml');
-        $container->setParameter('test.storage_root_directory', self::STORAGE_ROOT);
-        $container->setParameter('yandex_disk_client.token', $token);
+        $this->loadConfigurationToContainer(new Configuration(
+            'test-token',
+            85,
+            new ImageSourceCollection([
+                new WebDAVImageSource(
+                    '/',
+                    self::STORAGE_ROOT,
+                    'thumbnail',
+                    self::WEBDAV_DRIVER_URI,
+                    $token
+                )
+            ])
+        ));
 
-        $this->client = $container->get('yandex_disk_client');
-        $this->request = \Phake::mock(RequestInterface::class);
-        $container->set('request', $this->request);
+        $this->client = $this->createWebDAVHttpClient($token);
 
-        $this->controller = $container->get('yandex_disk_cache_image_controller');
+        $this->setBearerAccessToken('test-token');
 
         $this->deleteStorageDirectory(self::STORAGE_ROOT);
         $this->givenStorageDirectory(self::STORAGE_ROOT);
     }
 
-    /**
-     * @test
-     * @expectedException \Strider2038\ImgCache\Exception\FileNotFoundException
-     * @expectedExceptionCode 404
-     */
-    public function get_givenImageNotExistInStorage_notFoundExceptionThrown(): void
+    /** @test */
+    public function GET_givenImageNotExistInStorage_notFoundExceptionThrown(): void
     {
-        $this->givenRequest_getUri_getPath_returnsPath(self::FILE_NOT_EXIST);
+        $this->sendGET(self::FILE_NOT_EXIST);
 
-        $this->controller->runAction('get', $this->request);
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::NOT_FOUND);
     }
 
     /** @test */
-    public function get_givenImageInRootOfStorage_imageCreatedInCacheAndCreatedResponseReturned(): void
+    public function GET_givenImageInRootOfStorage_imageCreatedInCacheAndCreatedResponseReturned(): void
     {
         $this->givenJpegImageInStorage(self::IMAGE_JPEG_STORAGE_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_FILENAME);
 
-        $response = $this->controller->runAction('get', $this->request);
+        $this->sendGET(self::IMAGE_JPEG_FILENAME);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
     }
 
     /** @test */
-    public function get_givenImageInRootOfStorageAndThumbnailRequested_thumbnailCreatedAndCreatedResponseReturned(): void
+    public function GET_givenImageInRootOfStorageAndThumbnailRequested_thumbnailCreatedAndCreatedResponseReturned(): void
     {
         $this->givenJpegImageInStorage(self::IMAGE_JPEG_STORAGE_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_THUMBNAIL_CACHE_FILENAME);
 
-        $response = $this->controller->runAction('get', $this->request);
+        $this->sendGET(self::IMAGE_JPEG_THUMBNAIL_CACHE_FILENAME);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
         [$width, $height, $type] = getimagesize(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
         $this->assertEquals(self::IMAGE_JPEG_THUMBNAIL_WIDTH, $width);
@@ -114,73 +112,55 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
     }
 
     /** @test */
-    public function get_givenImageInSubdirectoryRequested_imageCreatedAndCreatedResponseReturned(): void
+    public function GET_givenImageInSubdirectoryRequested_imageCreatedAndCreatedResponseReturned(): void
     {
-        $this->givenStorageDirectory(self::STORAGE_ROOT . '/' . self::SUBDIRECTORY_LEVEL1_NAME);
-        $this->givenStorageDirectory(self::STORAGE_ROOT . '/' . self::SUBDIRECTORY_LEVEL2_NAME);
+        $this->givenStorageDirectory(self::STORAGE_ROOT . self::SUBDIRECTORY_LEVEL1_NAME);
+        $this->givenStorageDirectory(self::STORAGE_ROOT . self::SUBDIRECTORY_LEVEL2_NAME);
         $this->givenJpegImageInStorage(self::IMAGE_JPEG_IN_SUBDIRECTORY_STORAGE_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
-        $response = $this->controller->runAction('get', $this->request);
+        $this->sendGET(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
     }
 
     /** @test */
-    public function replace_givenStream_imageIsCreatedAndCreatedResponseReturned(): void
+    public function PUT_givenStream_imageIsCreatedAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_FILENAME);
-        $this->givenRequest_getBody_returns($stream);
 
-        $response = $this->controller->runAction('replace', $this->request);
+        $this->sendPUT(self::IMAGE_JPEG_FILENAME, $stream);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertStorageFileExists(self::IMAGE_JPEG_STORAGE_FILENAME);
     }
 
     /** @test */
-    public function replace_givenStream_imageIsCreatedInCacheSubdirectoryAndCreatedResponseReturned(): void
+    public function PUT_givenStream_imageIsCreatedInCacheSubdirectoryAndCreatedResponseReturned(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
-        $this->givenRequest_getBody_returns($stream);
 
-        $response = $this->controller->runAction('replace', $this->request);
+        $this->sendPUT(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY, $stream);
 
-        $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertStorageFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_STORAGE_FILENAME);
     }
 
     /** @test */
-    public function delete_imageExistsInStorageAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
+    public function DELETE_imageExistsInStorageAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
     {
         $this->givenJpegImageInStorage(self::IMAGE_JPEG_STORAGE_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
-        $this->givenRequest_getUri_getPath_returnsPath(self::IMAGE_JPEG_FILENAME);
 
-        $response = $this->controller->runAction('delete', $this->request);
+        $this->sendDELETE(self::IMAGE_JPEG_FILENAME);
 
-        $this->assertEquals(HttpStatusCodeEnum::OK, $response->getStatusCode()->getValue());
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::OK);
         $this->assertStorageFileNotExists(self::IMAGE_JPEG_STORAGE_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
-    }
-
-    private function givenRequest_getUri_getPath_returnsPath(string $path): void
-    {
-        $uri = \Phake::mock(UriInterface::class);
-        \Phake::when($this->request)->getUri()->thenReturn($uri);
-        \Phake::when($uri)->getPath()->thenReturn($path);
-    }
-
-    private function givenRequest_getBody_returns(StreamInterface $stream): void
-    {
-        \Phake::when($this->request)->getBody()->thenReturn($stream);
     }
 
     private function givenStream(string $filename): StreamInterface
@@ -257,5 +237,18 @@ class YandexDiskImageCacheTest extends IntegrationTestCase
         }
 
         return $response;
+    }
+
+    private function createWebDAVHttpClient(string $token): Client
+    {
+        return new Client([
+            'base_uri' => self::WEBDAV_DRIVER_URI,
+            'headers' => [
+                'Authorization' => 'OAuth ' . $token,
+                'Host' => 'webdav.yandex.ru',
+                'User-Agent' => 'Image Caching Microservice',
+                'Accept' => '*/*'
+            ],
+        ]);
     }
 }
