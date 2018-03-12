@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestFactory;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
@@ -23,6 +24,7 @@ class RequestFactoryTest extends TestCase
 {
     private const PHP_INPUT = 'php://input';
     private const REQUEST_URI_VALUE = 'http://example.org';
+    private const AUTHORIZATION_HEADER_VALUE = 'Bearer {token}';
 
     /** @var StreamFactoryInterface */
     private $streamFactory;
@@ -38,6 +40,7 @@ class RequestFactoryTest extends TestCase
         $serverConfiguration = [
             'REQUEST_METHOD' => HttpMethodEnum::GET,
             'REQUEST_URI' => self::REQUEST_URI_VALUE,
+            'HTTP_AUTHORIZATION' => self::AUTHORIZATION_HEADER_VALUE,
         ];
         $factory = $this->createRequestFactory();
         $stream = $this->givenStreamFactory_createStreamByParameters_returnsStream();
@@ -53,6 +56,7 @@ class RequestFactoryTest extends TestCase
         );
         $this->assertSame($stream, $request->getBody());
         $this->assertEquals(HttpProtocolVersionEnum::V1_1, $request->getProtocolVersion()->getValue());
+        $this->assertRequestHeadersAreValid($request);
     }
 
     /**
@@ -122,5 +126,14 @@ class RequestFactoryTest extends TestCase
         \Phake::when($this->streamFactory)->createStreamByParameters(\Phake::anyParameters())->thenReturn($stream);
 
         return $stream;
+    }
+
+    private function assertRequestHeadersAreValid(RequestInterface $request): void
+    {
+        $headers = $request->getHeaders();
+        $this->assertCount(1, $headers);
+        $authorizationHeader = $headers->get('Authorization');
+        $this->assertCount(1, $authorizationHeader);
+        $this->assertEquals(self::AUTHORIZATION_HEADER_VALUE, $authorizationHeader->first());
     }
 }
