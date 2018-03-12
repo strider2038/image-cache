@@ -35,16 +35,15 @@ Image caching microservice with connection to cloud hostings
 - [x] Multipurpose interface to request geographical map images
 - [x] Make user-friendly configuration of microservice
 - [x] Move all todos to github issues
-- [ ] Automatically create cache directories
-- [ ] Make root nginx directory web/cache
+- [x] Automatically create cache directories
 - [ ] Simplify nginx configuration
 - [ ] Support for building docker containers in Travis
-- [ ] Fix tests codestyle
 - [ ] Acceptance testing
 - [ ] Rename project to "Image caching microservice"
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1
+- [ ] Make nginx and php-fpm run from www-data user (inspect POST image.jpg problem)
 - [ ] Performance optimization: configuration caching and/or compiling
 - [ ] Performance optimization: composer cache 
 - [ ] Performance optimization: compiling to PHAR archive
@@ -63,6 +62,6 @@ Image caching microservice with connection to cloud hostings
 - Yandex map marker
 - Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php
 - Add referrer control to Security component
-- Facade ImageCachingSystem for ImageCache and ImageStorage
 - rename ImageExtractor and ImageWriter?
 - rename ImageExtractor::extractImage() and ImageWriter::insertImage()?
+- rename project to Image Caching Proxy Service?
