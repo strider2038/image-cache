@@ -33,18 +33,15 @@ Image caching microservice with connection to cloud hostings
 - [x] Rotate transformation
 - [x] Flip and flop transformations
 - [x] Multipurpose interface to request geographical map images
-- [ ] Make user-friendly configuration of microservice
-    - configuration setter to container
-    - refactoring controller and actions to request handlers 
+- [x] Make user-friendly configuration of microservice
+- [x] Move all todos to github issues
 - [ ] Automatically create cache directories
 - [ ] Make root nginx directory web/cache
 - [ ] Simplify nginx configuration
 - [ ] Support for building docker containers in Travis
 - [ ] Fix tests codestyle
 - [ ] Acceptance testing
-- [ ] Move all todos to github issues
 - [ ] Rename project to "Image caching microservice"
-- [ ] Refactor ImageParameters to be ignored while saving
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1
@@ -52,6 +49,7 @@ Image caching microservice with connection to cloud hostings
 - [ ] Performance optimization: composer cache 
 - [ ] Performance optimization: compiling to PHAR archive
 - [ ] Performance optimization: lazy services, validation cache
+- [ ] Refactor ImageParameters to be ignored while saving
 - [ ] Cache mechanism for source accessor
 - [ ] Add log level to configuration
 - [ ] Add application runtime counter to logger
