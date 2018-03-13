@@ -1,5 +1,6 @@
-dist: xenial
 sudo: enabled
+dist: precise
+group: stable
 
 language: php
 php:
