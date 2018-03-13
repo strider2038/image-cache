@@ -18,25 +18,24 @@ RUN apk --no-cache add --update \
     chown -R www-data:www-data /var/log && \
     chown -R www-data:www-data /tmp
 
-WORKDIR /imgcache
+WORKDIR /app
 
 ENV COMPOSER_HOME=/var/run/composer
 
 COPY ./.docker/nginx.conf /etc/nginx/nginx.conf
-COPY ./.docker/nginx/service.conf /etc/nginx/conf.d/service.conf
 COPY ./.docker/supervisord.conf /etc/supervisord.conf
 COPY ./.docker/supervisor/nginx.conf /etc/supervisord/nginx.conf
 COPY ./.docker/supervisor/php-fpm.conf /etc/supervisord/php-fpm.conf
 COPY ./.docker/composer/auth.json /var/run/composer/auth.json
-COPY . /imgcache
+COPY . /app
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer install --no-dev && \
     rm -rf /var/run/composer && \
     rm /usr/local/bin/composer && \
-    rm -rf /imgcache/.docker && \
+    rm -rf /app/.docker && \
     rm -rf /tmp/* && \
-    chown -R www-data:www-data /imgcache
+    chown -R www-data:www-data /app
 
 EXPOSE 80
 

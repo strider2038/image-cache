@@ -8,7 +8,7 @@ for i in $@; do
 done
 
 container_name="image-cache"
-container_tag="strider2038:image-cache"
+container_tag="strider2038/image-cache"
 
 echo "Starting to build image $container_tag..."
 echo "========================================================================="

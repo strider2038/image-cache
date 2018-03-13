@@ -1,18 +1,27 @@
-language: php
-
-php:
-  - '7.1'
-
+dist: xenial
 sudo: enabled
 
-dist: xenial
+language: php
+php:
+    - '7.2'
+
+services:
+    - docker
 
 install:
-  - printf "\n" | pecl install imagick
-  - composer install
+    - printf "\n" | pecl install imagick
+    - composer install
 
 script:
-  - ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
+    - ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
+    - ./build.sh
+    - docker images
+
+deploy:
+    provider: script
+    script: bash deploy.sh
+        on:
+            branch: master
 
 after_success:
-  - travis_retry ./vendor/bin/coveralls -v
+    - travis_retry ./vendor/bin/coveralls -v

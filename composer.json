@@ -1,12 +1,12 @@
 {
-    "name": "strider2038/imgcache-service",
-    "description": "Image caching microservice with connection to cloud hostings",
-    "type": "project",
+    "name": "strider2038/image-cache",
+    "description": "Microservice for caching images from external storages (WebDAV or API). It can process images by applying simple transformations such as resizing, cropping and shifting.",
+    "type": "microservice",
     "license": "MIT",
     "authors": [
         {
             "name": "Igor Lazarev",
-            "email": "strider2038@rambler.ru"
+            "email": "strider2038@yandex.ru"
         }
     ],
     "minimum-stability": "stable",
