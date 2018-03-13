@@ -14,7 +14,7 @@ install:
     - composer install
 
 before_script:
-    - echo '{"github-oauth": {"github.com": "$GITHUB_OAUTH"}}' >> .docker/composer/auth.json
+    - ./build/before.sh
 
 script:
     - ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
