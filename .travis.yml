@@ -27,7 +27,6 @@ deploy:
     on:
         branch:
             - master
-            - docker-in-ci
 
 after_success:
     - travis_retry ./vendor/bin/coveralls -v
