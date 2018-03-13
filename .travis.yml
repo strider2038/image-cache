@@ -1,5 +1,5 @@
-sudo: enabled
-dist: precise
+sudo: required
+dist: xenial
 group: stable
 
 language: php
