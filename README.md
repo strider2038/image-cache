@@ -1,10 +1,10 @@
 # Image caching microservice
 
-[![Build Status](https://travis-ci.org/strider2038/imgcache-service.svg?branch=master)](https://travis-ci.org/strider2038/imgcache-service) [![Coverage Status](https://coveralls.io/repos/github/strider2038/imgcache-service/badge.svg?branch=master)](https://coveralls.io/github/strider2038/imgcache-service?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/strider2038/imgcache-service/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/strider2038/imgcache-service/?branch=master)
+[![Build Status](https://travis-ci.org/strider2038/imgacache-service.svg?branch=master)](https://travis-ci.org/strider2038/image-cache) [![Coverage Status](https://coveralls.io/repos/github/strider2038/image-cache/badge.svg?branch=master)](https://coveralls.io/github/strider2038/image-cache?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/strider2038/image-cache/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/strider2038/image-cache/?branch=master)
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/cfe1201a-7dab-4eeb-9b00-f0edd63a1690/big.png)](https://insight.sensiolabs.com/projects/cfe1201a-7dab-4eeb-9b00-f0edd63a1690)
 
-Image caching microservice with connection to cloud hostings
+Microservice for caching images from external storages (WebDAV or API). It can process images by applying simple transformations such as resizing, cropping and shifting.
 
 ## Goals for version v1.0
 

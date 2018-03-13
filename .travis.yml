@@ -1,18 +1,32 @@
+sudo: required
+dist: trusty
+group: stable
+
 language: php
-
 php:
-  - '7.1'
+    - '7.2'
 
-sudo: enabled
-
-dist: xenial
+services:
+    - docker
 
 install:
-  - printf "\n" | pecl install imagick
-  - composer install
+    - printf "\n" | pecl install imagick
+    - composer install
+
+before_script:
+    - ./build/before.sh
 
 script:
-  - ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
+    - ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
+    - ./build.sh
+    - docker images
+
+deploy:
+    provider: script
+    script: bash deploy.sh
+    on:
+        branch:
+            - master
 
 after_success:
-  - travis_retry ./vendor/bin/coveralls -v
+    - travis_retry ./vendor/bin/coveralls -v

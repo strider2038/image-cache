@@ -7,8 +7,8 @@ for i in $@; do
     fi
 done
 
-container_name="imgcache"
-container_tag="strider2038:imgcache-service-dev"
+container_name="image-cache"
+container_tag="strider2038/image-cache:dev"
 
 echo "Cleaning old images $container_name..."
 echo "========================================================================="
@@ -35,5 +35,5 @@ docker run \
     --detach \
     --name "$container_name" \
     --stop-signal SIGKILL \
-    --volume $PWD:/imgcache \
+    --volume $PWD:/app \
     "$container_tag"
