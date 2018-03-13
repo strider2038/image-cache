@@ -2,6 +2,7 @@ services:
     logger_factory:
         class: Strider2038\ImgCache\Utility\LoggerFactory
         arguments:
+            - '%application.start_up_time%'
             - '%log.directory%'
 
     logger:

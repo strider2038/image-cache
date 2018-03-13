@@ -36,13 +36,13 @@ Image caching microservice with connection to cloud hostings
 - [x] Make user-friendly configuration of microservice
 - [x] Move all todos to github issues
 - [x] Automatically create cache directories
-- [ ] Simplify nginx configuration
 - [ ] Support for building docker containers in Travis
 - [ ] Acceptance testing
 - [ ] Rename project to "Image caching microservice"
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1
+- [ ] Simplify nginx configuration
 - [ ] Make nginx and php-fpm run from www-data user (inspect POST image.jpg problem)
 - [ ] Performance optimization: configuration caching and/or compiling
 - [ ] Performance optimization: composer cache 
@@ -51,7 +51,6 @@ Image caching microservice with connection to cloud hostings
 - [ ] Refactor ImageParameters to be ignored while saving
 - [ ] Cache mechanism for source accessor
 - [ ] Add log level to configuration
-- [ ] Add application runtime counter to logger
 - [ ] Support for phpDocumentor
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor HttpClientInterface to use object-based options

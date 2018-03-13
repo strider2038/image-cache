@@ -55,7 +55,7 @@ class CreateImageHandler implements RequestHandlerInterface
             $response = $this->responseFactory->createMessageResponse(
                 new HttpStatusCodeEnum(HttpStatusCodeEnum::CONFLICT),
                 sprintf(
-                    'File "%s" already exists in image storage. Use PUT method to replace image there.',
+                    'File "%s" already exists in image storage. Use PUT method to replace it.',
                     $filename
                 )
             );
