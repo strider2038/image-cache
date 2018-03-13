@@ -13,6 +13,9 @@ install:
     - printf "\n" | pecl install imagick
     - composer install
 
+before_script:
+    - echo '{"github-oauth": {"github.com": "$GITHUB_OAUTH"}}' >> .docker/composer/auth.json
+
 script:
     - ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
     - ./build.sh
