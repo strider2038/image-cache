@@ -1,5 +1,5 @@
-FROM php:7.1-fpm-alpine
-MAINTAINER Igor Lazarev <strider2038@rambler.ru>
+FROM php:fpm-alpine
+MAINTAINER Igor Lazarev <strider2038@yandex.ru>
 
 RUN apk --no-cache add --update \
     curl \
