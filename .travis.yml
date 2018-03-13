@@ -21,7 +21,9 @@ deploy:
     provider: script
     script: bash deploy.sh
         on:
-            branch: master
+            branch:
+                - master
+                - docker-in-ci
 
 after_success:
     - travis_retry ./vendor/bin/coveralls -v
