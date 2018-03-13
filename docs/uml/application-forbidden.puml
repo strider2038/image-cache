@@ -1,0 +1,14 @@
+@startuml
+
+Application -> RequestHandler : handleRequest(request)
+
+RequestHandler -> AccessControl : canHandleRequest(request)
+RequestHandler <-- AccessControl : false
+
+RequestHandler -> ResponseFactory : createMessageResponse(403, 'Access denied')
+RequestHandler <-- ResponseFactory : response
+
+Application <-- RequestHandler : response
+Application -> ResponseSender : sendResponse(response)
+
+@enduml

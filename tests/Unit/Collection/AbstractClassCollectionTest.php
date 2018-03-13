@@ -12,17 +12,23 @@ namespace Strider2038\ImgCache\Tests\Unit\Collection;
 
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Collection\AbstractClassCollection;
+use Strider2038\ImgCache\Tests\Support\DummyClass;
 
 class AbstractClassCollectionTest extends TestCase
 {
     /**
      * @test
      * @expectedException \DomainException
-     * @expectedExceptionMessageRegExp /Class .* does not exist/
+     * @expectedExceptionMessageRegExp /Collection element class .* does not exist/
      */
     public function construct_givenInvalidClassName_exceptionThrown(): void
     {
-        new class ([], '') extends AbstractClassCollection {};
+        new class ([]) extends AbstractClassCollection {
+            protected function getElementClassName(): string
+            {
+                return '';
+            }
+        };
     }
 
     /**
@@ -32,7 +38,12 @@ class AbstractClassCollectionTest extends TestCase
      */
     public function construct_givenInvalidClassInstance_exceptionThrown(): void
     {
-        new class ([''], self::class) extends AbstractClassCollection {};
+        new class (['']) extends AbstractClassCollection {
+            protected function getElementClassName(): string
+            {
+                return self::class;
+            }
+        };
     }
 
     /**
@@ -52,10 +63,10 @@ class AbstractClassCollectionTest extends TestCase
     {
         $collection = $this->createCollection();
 
-        $collection->set(0, new static());
+        $collection->set(0, new DummyClass());
 
         $this->assertCount(1, $collection);
-        $this->assertInstanceOf(self::class, $collection->first());
+        $this->assertInstanceOf(DummyClass::class, $collection->first());
     }
 
     /**
@@ -75,19 +86,19 @@ class AbstractClassCollectionTest extends TestCase
     {
         $collection = $this->createCollection();
 
-        $collection->add(new static());
+        $collection->add(new DummyClass());
 
         $this->assertCount(1, $collection);
-        $this->assertInstanceOf(self::class, $collection->first());
+        $this->assertInstanceOf(DummyClass::class, $collection->first());
     }
 
     /** @test */
     public function append_givenCollection_collectionMergedWithGivenCollection(): void
     {
         $collection = $this->createCollection();
-        $collection->set('first', new static());
+        $collection->set('first', new DummyClass());
         $mergingCollection = $this->createCollection();
-        $mergingCollection->set('second', new static());
+        $mergingCollection->set('second', new DummyClass());
 
         $collection->merge($mergingCollection);
 
@@ -100,9 +111,9 @@ class AbstractClassCollectionTest extends TestCase
     public function merge_givenCollection_collectionAppendedToGivenCollection(): void
     {
         $collection = $this->createCollection();
-        $collection->add(new static());
+        $collection->add(new DummyClass());
         $appendingCollection = $this->createCollection();
-        $appendingCollection->add(new static());
+        $appendingCollection->add(new DummyClass());
 
         $collection->append($appendingCollection);
 
@@ -111,6 +122,11 @@ class AbstractClassCollectionTest extends TestCase
 
     private function createCollection(): AbstractClassCollection
     {
-        return new class ([], self::class) extends AbstractClassCollection {};
+        return new class ([]) extends AbstractClassCollection {
+            protected function getElementClassName(): string
+            {
+                return DummyClass::class;
+            }
+        };
     }
 }

@@ -1,0 +1,31 @@
+parameters:
+    app.debug: true
+    security.access_token: 'sample-security-token-must-be-replaced-with-real'
+    log.directory: '%application.directory%/runtime'
+    log.name: 'app.log'
+    log.level: 100
+    image_parameters.quality: 90
+
+    filesystem_image_cache.base_directory: '%application.directory%/web/i'
+    filesystem_storage_driver.base_directory: '%application.directory%/tests/assets'
+
+    yandex_map_image_cache.base_directory: '%application.directory%/web/yandex_map'
+    yandex_map_client.parameters:
+        base_uri: 'https://static-maps.yandex.ru/1.x/'
+        handler: '@guzzle_logger_handler_stack'
+
+    yandex_disk_image_cache.base_directory: '%application.directory%/web/yandex_disk'
+    yandex_disk_storage_driver.base_directory: '/imgcache'
+    yandex_disk_client.parameters:
+        base_uri: 'https://webdav.yandex.ru/v1'
+        handler: '@guzzle_logger_handler_stack'
+        headers:
+            Authorization: 'OAuth %yandex_disk_client.token%'
+            Host: 'webdav.yandex.ru'
+            User-Agent: 'Image Caching Microservice'
+            Accept: '*/*'
+
+    routing_map:
+        /i: 'filesystem_cache_image_controller'
+        /yandex_map: 'yandex_map_cache_image_controller'
+        /yandex_disk: 'yandex_disk_cache_image_controller'

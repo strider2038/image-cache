@@ -18,8 +18,8 @@ use Strider2038\ImgCache\Collection\AbstractClassCollection;
  */
 class TransformationCollection extends AbstractClassCollection
 {
-    public function __construct(array $elements = [])
+    protected function getElementClassName(): string
     {
-        parent::__construct($elements, TransformationInterface::class);
+        return TransformationInterface::class;
     }
 }

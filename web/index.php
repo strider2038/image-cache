@@ -1,18 +1,16 @@
 <?php
 
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Strider2038\ImgCache\ApplicationFactory;
+use Strider2038\ImgCache\Core\ApplicationParameters;
 
 $applicationDirectory = __DIR__ . '/..';
 
 require $applicationDirectory . '/vendor/autoload.php';
 
-$container = new ContainerBuilder();
-$loader = new YamlFileLoader($container, new FileLocator($applicationDirectory));
-$loader->load('config/web.yml');
-$container->setParameter('app.directory', $applicationDirectory);
-$container->setParameter('server_configuration', $_SERVER);
+$parameters = new ApplicationParameters(
+    $applicationDirectory,
+    $_SERVER
+);
 
-$app = new \Strider2038\ImgCache\Application($container);
-$app->run();
+$application = ApplicationFactory::createApplication($parameters);
+$application->run();

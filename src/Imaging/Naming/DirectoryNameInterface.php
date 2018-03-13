@@ -20,14 +20,13 @@ interface DirectoryNameInterface extends EntityInterface
 {
     /**
      * @Assert\NotBlank()
-     * @Assert\NotIdenticalTo("/")
      * @Assert\Regex(
      *     pattern="/^[a-z0-9_\-\.\/]+$/i",
      *     message="Directory name can contain only latin symbols, digits, dots, slashes and '_', '-'"
      * )
      * @Assert\Regex(
-     *     pattern="/.*\/$/i",
-     *     message="Directory name must end with slash"
+     *     pattern="/^(\/|\/.*\/)$/i",
+     *     message="Directory name must be started and ended with slash"
      * )
      * @Assert\Regex(
      *     pattern="/\/{2,}/",

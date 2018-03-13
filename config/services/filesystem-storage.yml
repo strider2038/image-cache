@@ -1,105 +1,18 @@
 services:
-    # controller
-    filesystem_cache_image_controller:
-        class: Strider2038\ImgCache\Service\ImageController
+    filesystem_image_storage_factory:
+        class: Strider2038\ImgCache\Imaging\FilesystemImageStorageFactory
         arguments:
-            - '@response_factory'
-            - '@filesystem_cache_action_factory'
-            - '@security'
-    filesystem_cache_action_factory:
-        class: Strider2038\ImgCache\Service\Image\ImageActionFactory
-        arguments:
-            - '@filesystem_cache_action_get'
-            - '@filesystem_cache_action_create'
-            - '@filesystem_cache_action_replace'
-            - '@filesystem_cache_action_delete'
-    filesystem_cache_action_get:
-        class: Strider2038\ImgCache\Service\Image\GetAction
-        arguments:
-            - '@response_factory'
-            - '@image_filename_factory'
-            - '@filesystem_image_storage'
-            - '@filesystem_image_cache'
-    filesystem_cache_action_create:
-        class: Strider2038\ImgCache\Service\Image\CreateAction
-        arguments:
-            - '@response_factory'
-            - '@image_filename_factory'
-            - '@filesystem_image_storage'
+            - '@filesystem_storage_driver_factory'
+            - '@entity_validator'
             - '@image_factory'
-    filesystem_cache_action_replace:
-        class: Strider2038\ImgCache\Service\Image\ReplaceAction
-        arguments:
-            - '@response_factory'
-            - '@image_filename_factory'
-            - '@filesystem_image_storage'
-            - '@filesystem_image_cache'
-            - '@image_factory'
-    filesystem_cache_action_delete:
-        class: Strider2038\ImgCache\Service\Image\DeleteAction
-        arguments:
-            - '@response_factory'
-            - '@image_filename_factory'
-            - '@filesystem_image_storage'
-            - '@filesystem_image_cache'
-
-    filesystem_image_storage:
-        class: Strider2038\ImgCache\Imaging\ImageStorage
-        arguments:
-            - '@filesystem_image_extractor'
-            - '@filesystem_image_writer'
-
-    filesystem_image_cache_web_directory:
-        factory:
-            - '@directory_name_factory'
-            - 'createDirectoryName'
-        arguments:
-            - '%filesystem_image_cache.base_directory%'
-            - 'true'
-
-    filesystem_image_cache:
-        class: Strider2038\ImgCache\Imaging\ImageCache
-        arguments:
-            - '@filesystem_image_cache_web_directory'
-            - '@file_operations'
-            - '@image_processor'
-
-    filesystem_image_extractor:
-        class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageExtractor
-        arguments:
-            - '@thumbnail_filename_parser'
-            - '@filesystem_storage_accessor'
             - '@thumbnail_image_creator'
-
-    filesystem_image_writer:
-        class: Strider2038\ImgCache\Imaging\Insertion\ThumbnailImageWriter
-        arguments:
-            - '@thumbnail_filename_parser'
-            - '@filesystem_storage_accessor'
-
-    filesystem_storage_accessor:
-        class: Strider2038\ImgCache\Imaging\Storage\Accessor\FilesystemStorageAccessor
-        arguments:
-            - '@filesystem_storage_driver'
-            - '@image_factory'
-            - '@filesystem_storage_filename_factory'
+            - '@directory_name_factory'
         calls:
             - [setLogger, ['@logger']]
 
-    filesystem_storage_filename_factory:
-        class: Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameFactory
-        arguments:
-            - '@filesystem_storage_driver_directory'
-
-    filesystem_storage_driver_directory:
-        factory:
-            - '@directory_name_factory'
-            - 'createDirectoryName'
-        arguments:
-            - '%filesystem_storage_driver.base_directory%'
-            - 'true'
-
-    filesystem_storage_driver:
-        class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriver
+    filesystem_storage_driver_factory:
+        class: Strider2038\ImgCache\Imaging\Storage\Driver\FilesystemStorageDriverFactory
         arguments:
             - '@file_operations'
+            - '@guzzle_client_factory'
+            - '@metadata_reader'

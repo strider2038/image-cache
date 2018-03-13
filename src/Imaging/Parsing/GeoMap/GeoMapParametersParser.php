@@ -24,13 +24,10 @@ class GeoMapParametersParser implements GeoMapParametersParserInterface
 
     /** @var StringList */
     private $parsingPatterns;
-
     /** @var StringParametersParserInterface */
     private $parametersParser;
-
     /** @var GeoMapParametersFactoryInterface */
     private $parametersFactory;
-
     /** @var EntityValidatorInterface */
     private $validator;
 

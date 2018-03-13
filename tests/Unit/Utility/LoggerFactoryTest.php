@@ -16,6 +16,7 @@ use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Utility\LoggerFactory;
+use Strider2038\ImgCache\Utility\RuntimeLoggerProcessor;
 
 class LoggerFactoryTest extends TestCase
 {
@@ -31,7 +32,7 @@ class LoggerFactoryTest extends TestCase
     /** @test */
     public function createLogger_givenDefaultLogNameAndDirectoryAndLevel_logNameAndDirectoryAreSet(): void
     {
-        $loggerFactory = new LoggerFactory();
+        $loggerFactory = new LoggerFactory(0);
 
         /** @var Logger $logger */
         $logger = $loggerFactory->createLogger();
@@ -42,7 +43,7 @@ class LoggerFactoryTest extends TestCase
     /** @test */
     public function createLogger_givenCustomLogNameAndDirectoryAndLevel_logNameAndDirectoryAreSet(): void
     {
-        $loggerFactory = new LoggerFactory(self::LOG_DIRECTORY_CUSTOM);
+        $loggerFactory = new LoggerFactory(0, self::LOG_DIRECTORY_CUSTOM);
 
         /** @var Logger $logger */
         $logger = $loggerFactory->createLogger(self::LOG_NAME_CUSTOM, self::LOG_LEVEL_CUSTOM);
@@ -53,7 +54,7 @@ class LoggerFactoryTest extends TestCase
     /** @test */
     public function createLogger_givenDefaultParametersAndDryRunIsOn_LoggerHasNullHandler(): void
     {
-        $loggerFactory = new LoggerFactory(self::LOG_DIRECTORY_DEFAULT, true);
+        $loggerFactory = new LoggerFactory(0, self::LOG_DIRECTORY_DEFAULT, true);
 
         /** @var Logger $logger */
         $logger = $loggerFactory->createLogger();
@@ -75,7 +76,8 @@ class LoggerFactoryTest extends TestCase
         $this->assertEquals($filename, $handler->getUrl());
 
         $processors = $logger->getProcessors();
-        $this->assertCount(1, $processors);
-        $this->assertInstanceOf(UidProcessor::class, $processors[0]);
+        $this->assertCount(2, $processors);
+        $this->assertInstanceOf(RuntimeLoggerProcessor::class, $processors[0]);
+        $this->assertInstanceOf(UidProcessor::class, $processors[1]);
     }
 }

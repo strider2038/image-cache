@@ -42,6 +42,11 @@ class Request extends Message implements RequestInterface
 
     public function withUri(UriInterface $uri): RequestInterface
     {
-        return new self($this->method, $uri);
+        $request = new self($this->method, $uri);
+        $request->setProtocolVersion($this->protocolVersion);
+        $request->setHeaders($this->headers);
+        $request->setBody($this->body);
+
+        return $request;
     }
 }

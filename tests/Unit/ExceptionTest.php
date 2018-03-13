@@ -16,6 +16,7 @@ use Strider2038\ImgCache\Exception\ApplicationException;
 use Strider2038\ImgCache\Exception\BadApiResponseException;
 use Strider2038\ImgCache\Exception\FileNotFoundException;
 use Strider2038\ImgCache\Exception\FileOperationException;
+use Strider2038\ImgCache\Exception\ImageSourceNotFoundException;
 use Strider2038\ImgCache\Exception\InvalidConfigurationException;
 use Strider2038\ImgCache\Exception\InvalidImageException;
 use Strider2038\ImgCache\Exception\InvalidMediaTypeException;
@@ -51,6 +52,7 @@ class ExceptionTest extends TestCase
             [BadApiResponseException::class, HttpStatusCodeEnum::BAD_GATEWAY],
             [FileNotFoundException::class, HttpStatusCodeEnum::NOT_FOUND],
             [FileOperationException::class, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR],
+            [ImageSourceNotFoundException::class, HttpStatusCodeEnum::NOT_FOUND],
             [InvalidConfigurationException::class, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR],
             [InvalidImageException::class, HttpStatusCodeEnum::INTERNAL_SERVER_ERROR],
             [InvalidMediaTypeException::class, HttpStatusCodeEnum::UNSUPPORTED_MEDIA_TYPE],

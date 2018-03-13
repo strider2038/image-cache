@@ -33,20 +33,24 @@ Image caching microservice with connection to cloud hostings
 - [x] Rotate transformation
 - [x] Flip and flop transformations
 - [x] Multipurpose interface to request geographical map images
-- [ ] Make user-friendly configuration of microservice 
-- [ ] Automatically create cache directories
-- [ ] Make root nginx directory web/cache
+- [x] Make user-friendly configuration of microservice
+- [x] Move all todos to github issues
+- [x] Automatically create cache directories
 - [ ] Support for building docker containers in Travis
-- [ ] Fix tests codestyle
 - [ ] Acceptance testing
-- [ ] Move all todos to github issues
 - [ ] Rename project to "Image caching microservice"
-- [ ] Refactor ImageParameters to be ignored while saving
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1
+- [ ] Simplify nginx configuration
+- [ ] Make nginx and php-fpm run from www-data user (inspect POST image.jpg problem)
+- [ ] Performance optimization: configuration caching and/or compiling
+- [ ] Performance optimization: composer cache 
+- [ ] Performance optimization: compiling to PHAR archive
+- [ ] Performance optimization: lazy services, validation cache
+- [ ] Refactor ImageParameters to be ignored while saving
 - [ ] Cache mechanism for source accessor
-- [ ] Performance optimization (lazy services, validation cache)
+- [ ] Add log level to configuration
 - [ ] Support for phpDocumentor
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor HttpClientInterface to use object-based options
@@ -57,6 +61,6 @@ Image caching microservice with connection to cloud hostings
 - Yandex map marker
 - Layer support for GIF and PNG http://php.net/manual/ru/imagick.coalesceimages.php
 - Add referrer control to Security component
-- Facade ImageCachingSystem for ImageCache and ImageStorage
 - rename ImageExtractor and ImageWriter?
 - rename ImageExtractor::extractImage() and ImageWriter::insertImage()?
+- rename project to Image Caching Proxy Service?

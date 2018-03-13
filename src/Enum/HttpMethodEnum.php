@@ -17,9 +17,24 @@ use MyCLabs\Enum\Enum;
  */
 class HttpMethodEnum extends Enum
 {
+    public const OPTIONS = 'OPTIONS';
+    public const HEAD = 'HEAD';
     public const GET = 'GET';
     public const POST = 'POST';
     public const PUT = 'PUT';
     public const PATCH = 'PATCH';
     public const DELETE = 'DELETE';
+
+    public function isReadMethod(): bool
+    {
+        return \in_array(
+            $this->value,
+            [
+                self::OPTIONS,
+                self::HEAD,
+                self::GET,
+            ],
+            true
+        );
+    }
 }

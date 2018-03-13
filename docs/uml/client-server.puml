@@ -1,11 +1,20 @@
 @startuml
 
-Client -> Application: GET /image.jpg
+Client -> nginx: GET /image.jpg
+nginx -> Filesystem: try_files /web_cache/image.jpg
+nginx <-- Filesystem: file does not exist
+nginx -> Application: GET /image.jpg
 Application -> ImageStorage: getImage('/image.jpg')
 Application <-- ImageStorage: Image
-Application -> ImageCache: putImage('/image.jpg', Image)
-Application -> ImageCache: getImage('/image.jpg')
+Application -> ImageCache: putImage('/web_cache/image.jpg', Image)
+Application -> ImageCache: getImage('/web_cache/image.jpg')
 Application <-- ImageCache: ImageFile
-Client <-- Application: 201 image/jpeg /image.jpg
+nginx <-- Application: 201 image/jpeg /image.jpg
+Client <-- nginx: 201 image/jpeg /image.jpg
+
+Client -> nginx: GET /image.jpg
+nginx -> Filesystem: try_files /web_cache/image.jpg
+nginx <-- Filesystem: /web_cache/image.jpg
+Client <-- nginx: 200 image/jpeg /image.jpg
 
 @enduml

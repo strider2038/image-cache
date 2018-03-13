@@ -1,0 +1,54 @@
+services:
+    client_request_processor:
+        class: Strider2038\ImgCache\Core\Service\ClientRequestProcessor
+        arguments:
+            - '@request'
+            - '@http_request_handler'
+            - '@response_sender'
+        calls:
+            - [setLogger, ['@logger']]
+
+    http_request_handler:
+        class: Strider2038\ImgCache\Core\HttpRequestHandler
+        arguments:
+            - '@access_control'
+            - '@response_factory'
+            - '@intermediate_request_handler'
+        calls:
+            - [setLogger, ['@logger']]
+
+    access_control_factory:
+        class: Strider2038\ImgCache\Core\AccessControlFactory
+        calls:
+            - [setLogger, ['@logger']]
+
+    access_control:
+        factory:
+            - '@access_control_factory'
+            - 'createAccessControlByToken'
+        arguments:
+            - '%access_control_token%'
+
+    intermediate_request_handler:
+        class: Strider2038\ImgCache\Service\Image\IntermediateRequestHandler
+        arguments:
+            - '@image_source_detector'
+            - '@image_request_handler_factory'
+            - '@image_request_uri_reducer'
+
+    image_source_detector:
+        class: Strider2038\ImgCache\Service\Image\ImageSourceDetector
+        arguments:
+            - '%image_sources%'
+
+    image_request_handler_factory:
+        class: Strider2038\ImgCache\Service\Image\ImageRequestHandlerFactory
+        arguments:
+            - '@image_storage_factory'
+            - '@image_cache_factory'
+            - '@response_factory'
+            - '@image_filename_factory'
+            - '@image_factory'
+
+    image_request_uri_reducer:
+        class: Strider2038\ImgCache\Service\Image\ImageRequestUriReducer

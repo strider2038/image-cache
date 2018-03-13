@@ -2,6 +2,7 @@ services:
     logger_factory:
         class: Strider2038\ImgCache\Utility\LoggerFactory
         arguments:
+            - '%application.start_up_time%'
             - '%log.directory%'
 
     logger:
@@ -12,8 +13,8 @@ services:
             - '%log.name%'
             - '%log.level%'
 
-    request_logger:
-        class: Strider2038\ImgCache\Utility\RequestLogger
+    client_request_logger:
+        class: Strider2038\ImgCache\Utility\ClientRequestLogger
         arguments:
             - '@logger'
             - '%server_configuration%'
@@ -27,6 +28,12 @@ services:
         factory:
             - '@guzzle_handler_stack_factory'
             - 'createLoggerStack'
+
+    guzzle_client_factory:
+        class: Strider2038\ImgCache\Utility\GuzzleClientFactory
+        arguments:
+            - '@stream_factory'
+            - '@guzzle_logger_handler_stack'
 
     metadata_reader:
         class: Strider2038\ImgCache\Utility\MetadataReader

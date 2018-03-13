@@ -26,14 +26,19 @@ class LoggerFactory
     private const LOG_NAME_DEFAULT = 'runtime.log';
     private const LOG_DIRECTORY_DEFAULT = '/var/log/imgcache/';
 
+    /** @var float */
+    private $applicationStartUpTime;
     /** @var string */
     private $logDirectory;
-
     /** @var bool */
     private $dryRun;
 
-    public function __construct(string $logDirectory = self::LOG_DIRECTORY_DEFAULT, bool $dryRun = false)
-    {
+    public function __construct(
+        float $applicationStartUpTime,
+        string $logDirectory = self::LOG_DIRECTORY_DEFAULT,
+        bool $dryRun = false
+    ) {
+        $this->applicationStartUpTime = $applicationStartUpTime;
         $this->logDirectory = rtrim($logDirectory, '/') . '/';
         $this->dryRun = $dryRun;
     }
@@ -43,6 +48,7 @@ class LoggerFactory
         $logger = new Logger($logName);
         $logger->pushHandler($this->createFileHandler($logName, $logLevel));
         $logger->pushProcessor(new UidProcessor(8));
+        $logger->pushProcessor(new RuntimeLoggerProcessor($this->applicationStartUpTime));
 
         return $logger;
     }
@@ -55,7 +61,7 @@ class LoggerFactory
             $handler = new StreamHandler($this->logDirectory . $logName, $logLevel);
 
             $lineFormatter = new LineFormatter(
-                "[%datetime%] [UID: %extra.uid%] %level_name%: %message%\n",
+                "[%datetime%] [runtime: %extra.runtime% ms] [UID: %extra.uid%] %level_name%: %message%\n",
                 'Y-m-d H:i:s.u',
                 true
             );

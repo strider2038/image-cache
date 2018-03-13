@@ -25,13 +25,10 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
 {
     /** @var FilesystemStorageDriverInterface */
     private $storageDriver;
-
     /** @var ImageFactoryInterface */
     private $imageFactory;
-
     /** @var StorageFilenameFactoryInterface */
     private $filenameFactory;
-
     /** @var LoggerInterface */
     private $logger;
 
@@ -57,7 +54,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $stream = $this->storageDriver->getFileContents($storageFilename);
         $image = $this->imageFactory->createImageFromStream($stream);
 
-        $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s"', $filename));
+        $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s".', $filename));
 
         return $image;
     }
@@ -68,7 +65,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $exists = $this->storageDriver->fileExists($storageFilename);
 
         $this->logger->info(sprintf(
-            'Image with key "%s" %s in filesystem source',
+            'Image with key "%s" %s in filesystem source.',
             $filename,
             $exists ? 'exists' : 'does not exist'
         ));
@@ -83,7 +80,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $this->storageDriver->createFile($storageFilename, $data);
 
         $this->logger->info(sprintf(
-            "Image is successfully putted to source under key '%s'",
+            "Image is successfully putted to source under key '%s'.",
             $filename
         ));
     }
@@ -94,7 +91,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $this->storageDriver->deleteFile($storageFilename);
 
         $this->logger->info(sprintf(
-            "Image with key '%s' is successfully deleted from source",
+            "Image with key '%s' is successfully deleted from source.",
             $filename
         ));
     }
@@ -105,7 +102,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
 
         $this->logger->info(
             sprintf(
-                'Storage filename "%s" created for filename "%s"',
+                'Storage filename "%s" created for filename "%s".',
                 $storageFilename->getValue(),
                 $filename
             )

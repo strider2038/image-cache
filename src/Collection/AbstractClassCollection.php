@@ -25,19 +25,24 @@ abstract class AbstractClassCollection extends ArrayCollection
      * @param string $className
      * @throws \DomainException
      */
-    public function __construct(array $elements = [], string $className)
+    public function __construct(array $elements = [])
     {
-        if (!class_exists($className) && !interface_exists($className)) {
-            throw new \DomainException(sprintf('Class "%s" does not exist', $className));
+        $this->className = $this->getElementClassName();
+
+        if (!class_exists($this->className) && !interface_exists($this->className)) {
+            throw new \DomainException(
+                sprintf('Collection element class "%s" does not exist', $this->className)
+            );
         }
 
-        $this->className = $className;
         foreach ($elements as $element) {
             $this->validateElement($element);
         }
 
         parent::__construct($elements);
     }
+
+    abstract protected function getElementClassName(): string;
 
     /**
      * @inheritdoc

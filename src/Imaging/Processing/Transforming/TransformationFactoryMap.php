@@ -17,8 +17,8 @@ use Strider2038\ImgCache\Collection\AbstractClassCollection;
  */
 class TransformationFactoryMap extends AbstractClassCollection
 {
-    public function __construct(array $elements = [])
+    protected function getElementClassName(): string
     {
-        parent::__construct($elements, TransformationFactoryInterface::class);
+        return TransformationFactoryInterface::class;
     }
 }

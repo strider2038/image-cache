@@ -13,6 +13,7 @@ namespace Strider2038\ImgCache\Tests\Unit\Core\Http;
 use PHPUnit\Framework\TestCase;
 use Strider2038\ImgCache\Core\Http\Request;
 use Strider2038\ImgCache\Core\Http\RequestFactory;
+use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamFactoryInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpMethodEnum;
@@ -23,6 +24,8 @@ class RequestFactoryTest extends TestCase
 {
     private const PHP_INPUT = 'php://input';
     private const REQUEST_URI_VALUE = 'http://example.org';
+    private const AUTHORIZATION_HEADER_VALUE = 'Bearer {token}';
+    private const INPUT_STREAM_CONTENTS = 'input_stream_contents';
 
     /** @var StreamFactoryInterface */
     private $streamFactory;
@@ -38,9 +41,12 @@ class RequestFactoryTest extends TestCase
         $serverConfiguration = [
             'REQUEST_METHOD' => HttpMethodEnum::GET,
             'REQUEST_URI' => self::REQUEST_URI_VALUE,
+            'HTTP_AUTHORIZATION' => self::AUTHORIZATION_HEADER_VALUE,
         ];
         $factory = $this->createRequestFactory();
-        $stream = $this->givenStreamFactory_createStreamByParameters_returnsStream();
+        $inputStream = $this->givenStreamFactory_createStreamByParameters_returnsStream();
+        $this->givenStream_getContents_returnsString($inputStream, self::INPUT_STREAM_CONTENTS);
+        $streamCopy = $this->givenStreamFactory_createStreamFromData_returnsStream();
 
         $request = $factory->createRequest($serverConfiguration);
 
@@ -51,8 +57,11 @@ class RequestFactoryTest extends TestCase
             self::PHP_INPUT,
             new ResourceStreamModeEnum(ResourceStreamModeEnum::READ_ONLY)
         );
-        $this->assertSame($stream, $request->getBody());
+        $this->assertStream_getContents_isCalledOnce($inputStream);
+        $this->assertStreamFactory_createStreamFromData_isCalledOnceWithData(self::INPUT_STREAM_CONTENTS);
+        $this->assertSame($streamCopy, $request->getBody());
         $this->assertEquals(HttpProtocolVersionEnum::V1_1, $request->getProtocolVersion()->getValue());
+        $this->assertRequestHeadersAreValid($request);
     }
 
     /**
@@ -72,6 +81,7 @@ class RequestFactoryTest extends TestCase
         ];
         $factory = $this->createRequestFactory();
         $this->givenStreamFactory_createStreamByParameters_returnsStream();
+        $this->givenStreamFactory_createStreamFromData_returnsStream();
 
         $request = $factory->createRequest($serverConfiguration);
 
@@ -120,6 +130,44 @@ class RequestFactoryTest extends TestCase
     {
         $stream = \Phake::mock(StreamInterface::class);
         \Phake::when($this->streamFactory)->createStreamByParameters(\Phake::anyParameters())->thenReturn($stream);
+
+        return $stream;
+    }
+
+    private function assertRequestHeadersAreValid(RequestInterface $request): void
+    {
+        $headers = $request->getHeaders();
+        $this->assertCount(1, $headers);
+        $authorizationHeader = $headers->get('Authorization');
+        $this->assertCount(1, $authorizationHeader);
+        $this->assertEquals(self::AUTHORIZATION_HEADER_VALUE, $authorizationHeader->first());
+    }
+
+    private function assertStream_getContents_isCalledOnce(StreamInterface $inputStream): void
+    {
+        \Phake::verify($inputStream, \Phake::times(1))
+            ->getContents();
+    }
+
+    private function givenStream_getContents_returnsString(StreamInterface $inputStream, string $contents): void
+    {
+        \Phake::when($inputStream)
+            ->getContents()
+            ->thenReturn($contents);
+    }
+
+    private function assertStreamFactory_createStreamFromData_isCalledOnceWithData(string $data): void
+    {
+        \Phake::verify($this->streamFactory, \Phake::times(1))
+            ->createStreamFromData($data);
+    }
+
+    private function givenStreamFactory_createStreamFromData_returnsStream(): StreamInterface
+    {
+        $stream = \Phake::mock(StreamInterface::class);
+        \Phake::when($this->streamFactory)
+            ->createStreamFromData(\Phake::anyParameters())
+            ->thenReturn($stream);
 
         return $stream;
     }

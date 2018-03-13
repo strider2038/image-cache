@@ -1,7 +1,28 @@
 parameters:
     image_parameters.quality: 90
+    transformation_factory_map:
+        /^(s|size)(?P<parameters>\d.*)$/: '@resizing_transformation_factory'
+        /^(r|rotate)(?P<parameters>-?\d.*)$/: '@rotating_transformation_factory'
+        /^(s|shift)(?P<parameters>(x|y).*)$/: '@shifting_transformation_factory'
+        /^flip$/: '@flip_transformation_factory'
+        /^flop$/: '@flop_transformation_factory'
 
 services:
+    # dependency management
+    image_storage_factory:
+        class: Strider2038\ImgCache\Imaging\ImageStorageFactory
+        arguments:
+            - '@filesystem_image_storage_factory'
+            - '@geo_map_image_storage_factory'
+
+    image_cache_factory:
+        class: Strider2038\ImgCache\Imaging\ImageCacheFactory
+        arguments:
+            - '@file_operations'
+            - '@image_processor'
+            - '@directory_name_factory'
+            - '%web_directory%'
+
     # imaging/extraction
     thumbnail_image_creator:
         class: Strider2038\ImgCache\Imaging\Extraction\ThumbnailImageCreator
@@ -72,12 +93,7 @@ services:
     transformation_factory_map:
         class: Strider2038\ImgCache\Imaging\Processing\Transforming\TransformationFactoryMap
         arguments:
-            -
-                /^(s|size)(?P<parameters>\d.*)$/: '@resizing_transformation_factory'
-                /^(r|rotate)(?P<parameters>-?\d.*)$/: '@rotating_transformation_factory'
-                /^(s|shift)(?P<parameters>(x|y).*)$/: '@shifting_transformation_factory'
-                /^flip$/: '@flip_transformation_factory'
-                /^flop$/: '@flop_transformation_factory'
+            - '%transformation_factory_map%'
 
     resizing_transformation_factory:
         class: Strider2038\ImgCache\Imaging\Processing\Transforming\ResizingTransformationFactory

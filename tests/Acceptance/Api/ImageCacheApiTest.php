@@ -19,10 +19,11 @@ use Strider2038\ImgCache\Tests\Support\ApiTestCase;
  */
 class ImageCacheApiTest extends ApiTestCase
 {
-    const URL_NOT_EXIST = '/i/not-exist.jpg';
-    const URL_INCORRECT_EXTENSION = '/index.php';
+    private const URL_NOT_EXIST = '/i/not-exist.jpg';
+    private const URL_INCORRECT_EXTENSION = '/index.php';
 
-    public function testGet_GivenUrlWithIncorrectExtension_400BadRequestIsReturned(): void
+    /** @test */
+    public function GET_givenUrlWithIncorrectExtension_400BadRequestIsReturned(): void
     {
         /** @var \GuzzleHttp\Psr7\Response */
         $response = $this->client->request('GET', self::URL_INCORRECT_EXTENSION);
@@ -30,7 +31,8 @@ class ImageCacheApiTest extends ApiTestCase
         $this->assertEquals(HttpStatusCodeEnum::BAD_REQUEST, $response->getStatusCode());
     }
 
-    public function testGet_ImageDoesNotExist_404NotFoundIsReturned(): void
+    /** @test */
+    public function GET_imageDoesNotExist_404NotFoundIsReturned(): void
     {
         /** @var \GuzzleHttp\Psr7\Response */
         $response = $this->client->request('GET', self::URL_NOT_EXIST);
