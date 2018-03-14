@@ -55,6 +55,7 @@ Microservice for caching images from external storages (WebDAV or API). It can p
 - [ ] JPEG optimization by https://github.com/tjko/jpegoptim
 - [ ] Refactor HttpClientInterface to use object-based options
 - [ ] Migrate from supervisor to systemd daemons
+- [ ] Migrate to PHPUnit 7 when Phake will be updated
 
 ## Ideas
 - Google map source (inspect licensing problems)
