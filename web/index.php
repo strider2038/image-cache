@@ -12,5 +12,10 @@ $parameters = new ApplicationParameters(
     $_SERVER
 );
 
-$application = ApplicationFactory::createApplication($parameters);
-$application->run();
+try {
+    $application = ApplicationFactory::createApplication($parameters);
+    $application->run();
+} catch (\Throwable $exception) {
+    header('HTTP/1.1 500 Internal server error');
+    echo $exception;
+}
