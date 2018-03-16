@@ -29,6 +29,9 @@ use Symfony\Component\Config\FileLocator;
  */
 class ApplicationFactory
 {
+    private const DEFAULT_CONTAINER_FILENAME = 'config/main.yml';
+    private const DEFAULT_CONFIGURATION_FILENAME = 'config/parameters.yml';
+
     public static function createApplication(ApplicationParameters $parameters): Application
     {
         $errorHandler = new ErrorHandler();
@@ -46,6 +49,9 @@ class ApplicationFactory
 
     private static function createServiceContainerLoader(FileLocator $fileLocator): ServiceContainerLoader
     {
+        $containerFilename = getenv('APP_CONTAINER_FILENAME') ?: self::DEFAULT_CONTAINER_FILENAME;
+        $configurationFilename = getenv('APP_CONFIGURATION_FILENAME') ?: self::DEFAULT_CONFIGURATION_FILENAME;
+
         return new ServiceContainerLoader(
             new YamlContainerLoader($fileLocator),
             new ConfigurationLoader(
@@ -55,7 +61,9 @@ class ApplicationFactory
                 new ConfigurationFactory(
                     new ImageSourceFactory()
                 )
-            )
+            ),
+            $containerFilename,
+            $configurationFilename
         );
     }
 }
