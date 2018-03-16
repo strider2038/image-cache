@@ -3,7 +3,7 @@
 use Strider2038\ImgCache\ApplicationFactory;
 use Strider2038\ImgCache\Core\ApplicationParameters;
 
-$applicationDirectory = __DIR__ . '/..';
+$applicationDirectory = __DIR__;
 
 require $applicationDirectory . '/vendor/autoload.php';
 

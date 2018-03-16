@@ -42,7 +42,6 @@ Microservice for caching images from external storages (WebDAV or API). It can p
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1
-- [ ] Simplify nginx configuration
 - [ ] Make nginx and php-fpm run from www-data user (inspect POST image.jpg problem)
 - [ ] Performance optimization: configuration caching and/or compiling
 - [ ] Performance optimization: composer cache 
