@@ -9,33 +9,31 @@
  * file that was distributed with this source code.
  */
 
-namespace Strider2038\ImgCache\Tests\Acceptance\Api;
+namespace Strider2038\ImgCache\Tests\Acceptance;
 
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
-use Strider2038\ImgCache\Tests\Support\ApiTestCase;
+use Strider2038\ImgCache\Tests\Support\HttpTestCase;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ImageCacheApiTest extends ApiTestCase
+class FilesystemSourceApplicationTest extends HttpTestCase
 {
     private const URL_NOT_EXIST = '/i/not-exist.jpg';
     private const URL_INCORRECT_EXTENSION = '/index.php';
 
     /** @test */
-    public function GET_givenUrlWithIncorrectExtension_400BadRequestIsReturned(): void
+    public function GET_givenUrlWithIncorrectExtension_400BadRequest(): void
     {
-        /** @var \GuzzleHttp\Psr7\Response */
-        $response = $this->client->request('GET', self::URL_INCORRECT_EXTENSION);
+        $response = $this->sendGET(self::URL_INCORRECT_EXTENSION);
 
         $this->assertEquals(HttpStatusCodeEnum::BAD_REQUEST, $response->getStatusCode());
     }
 
     /** @test */
-    public function GET_imageDoesNotExist_404NotFoundIsReturned(): void
+    public function GET_imageDoesNotExist_404NotFound(): void
     {
-        /** @var \GuzzleHttp\Psr7\Response */
-        $response = $this->client->request('GET', self::URL_NOT_EXIST);
+        $response = $this->sendGET(self::URL_NOT_EXIST);
 
         $this->assertEquals(HttpStatusCodeEnum::NOT_FOUND, $response->getStatusCode());
     }

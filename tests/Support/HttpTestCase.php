@@ -13,11 +13,12 @@ namespace Strider2038\ImgCache\Tests\Support;
 
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class ApiTestCase extends TestCase
+class HttpTestCase extends TestCase
 {
     /** @var \GuzzleHttp\Client */
     protected $client;
@@ -25,7 +26,7 @@ class ApiTestCase extends TestCase
     /** @var string */
     protected $host;
     
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,5 +38,10 @@ class ApiTestCase extends TestCase
             'allow_redirects' => false,
             'http_errors' => false,
         ]);
+    }
+
+    protected function sendGET(string $uri): ResponseInterface
+    {
+        return $this->client->request('GET', $uri);
     }
 }
