@@ -24,8 +24,8 @@ class ServiceContainerLoaderTest extends TestCase
 {
     private const ROOT_DIRECTORY = 'root_directory';
     private const SERVER_CONFIGURATION = ['server_configuration'];
-    private const CONTAINER_FILENAME = 'config/main.yml';
-    private const CONFIGURATION_FILENAME = 'config/parameters.yml';
+    private const CONTAINER_FILENAME = 'container_filename';
+    private const CONFIGURATION_FILENAME = 'configuration_filename';
     private const ACCESS_CONTROL_TOKEN = 'access_control_token';
     private const CACHED_IMAGE_QUALITY = 85;
 
@@ -62,7 +62,9 @@ class ServiceContainerLoaderTest extends TestCase
     {
         return new ServiceContainerLoader(
             $this->containerLoader,
-            $this->configurationLoader
+            $this->configurationLoader,
+            self::CONTAINER_FILENAME,
+            self::CONFIGURATION_FILENAME
         );
     }
 

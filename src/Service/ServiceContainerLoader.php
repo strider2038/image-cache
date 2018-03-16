@@ -23,27 +23,34 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
  */
 class ServiceContainerLoader implements ServiceContainerLoaderInterface
 {
-    private const CONTAINER_FILENAME = 'config/main.yml';
-    private const CONFIGURATION_FILENAME = 'config/parameters.yml';
+    private const DEFAULT_CONTAINER_FILENAME = 'config/main.yml';
+    private const DEFAULT_CONFIGURATION_FILENAME = 'config/parameters.yml';
 
     /** @var FileContainerLoaderInterface */
     private $containerLoader;
-
     /** @var ConfigurationLoaderInterface */
     private $configurationLoader;
+    /** @var string */
+    private $containerFilename;
+    /** @var string */
+    private $configurationFilename;
 
     public function __construct(
         FileContainerLoaderInterface $containerLoader,
-        ConfigurationLoaderInterface $configurationLoader
+        ConfigurationLoaderInterface $configurationLoader,
+        string $containerFilename = self::DEFAULT_CONTAINER_FILENAME,
+        string $configurationFilename = self::DEFAULT_CONFIGURATION_FILENAME
     ) {
         $this->containerLoader = $containerLoader;
         $this->configurationLoader = $configurationLoader;
+        $this->containerFilename = $containerFilename;
+        $this->configurationFilename = $configurationFilename;
     }
 
     public function loadServiceContainerWithApplicationParameters(ApplicationParameters $parameters): ContainerInterface
     {
-        $container = $this->containerLoader->loadContainerFromFile(self::CONTAINER_FILENAME);
-        $configuration = $this->configurationLoader->loadConfigurationFromFile(self::CONFIGURATION_FILENAME);
+        $container = $this->containerLoader->loadContainerFromFile($this->containerFilename);
+        $configuration = $this->configurationLoader->loadConfigurationFromFile($this->configurationFilename);
 
         $containerParameters = $this->createContainerParameters($parameters, $configuration);
         $this->setParametersToContainer($container, $containerParameters);
