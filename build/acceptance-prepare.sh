@@ -14,7 +14,7 @@ chmod 0777 ./runtime/tests/acceptance/storage
 
 echo "Starting container..."
 docker run \
-    --publish 127.0.0.1:80:80 \
+    --publish 127.0.0.1:1234:80 \
     --detach \
     --name "$container_name" \
     --stop-signal SIGKILL \
@@ -26,7 +26,7 @@ docker run \
 docker ps
 docker logs "$container_name"
 
-curl -v localhost:80
-curl -v 0.0.0.0:80
-nc -zv localhost 80
-nc -zv 0.0.0.0 80
+curl -v localhost:1234
+curl -v 0.0.0.0:1234
+nc -zv localhost 1234
+nc -zv 0.0.0.0 1234

@@ -10,7 +10,7 @@ services:
     - docker
 
 env:
-    - ACCEPTANCE_HOST="http://127.0.0.1:80/"
+    - ACCEPTANCE_HOST="http://0.0.0.0:1234/"
 
 install:
     - printf "\n" | pecl install imagick
