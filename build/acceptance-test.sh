@@ -20,8 +20,13 @@ docker run \
     --volume $PWD/runtime/tests/acceptance/storage:/tmp/storage \
     "$container_tag"
 
+docker ps
+docker logs "$container_name"
+
 echo "Starting acceptance testing..."
 ./vendor/bin/phpunit --testsuite acceptance
+
+echo "Removing containers..."
 
 docker stop "$container_name"
 docker rm "$container_name"
