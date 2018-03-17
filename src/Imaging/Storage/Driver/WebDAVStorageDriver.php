@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Imaging\Storage\Driver;
 
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
+use Strider2038\ImgCache\Exception\InvalidRequestException;
 use Strider2038\ImgCache\Imaging\Storage\Data\StorageFilenameInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceCheckerInterface;
 use Strider2038\ImgCache\Imaging\Storage\Driver\WebDAV\ResourceManipulatorInterface;
@@ -22,7 +23,6 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
 {
     /** @var ResourceManipulatorInterface */
     private $resourceManipulator;
-
     /** @var ResourceCheckerInterface */
     private $resourceChecker;
 
@@ -62,6 +62,18 @@ class WebDAVStorageDriver implements FilesystemStorageDriverInterface
     public function deleteFile(StorageFilenameInterface $filename): void
     {
         $this->resourceManipulator->deleteResource($filename);
+    }
+
+    public function deleteDirectoryContents(StorageFilenameInterface $directory): void
+    {
+        if ($this->resourceChecker->isDirectory($directory)) {
+            $this->resourceManipulator->deleteResource($directory);
+            $this->resourceManipulator->createDirectory($directory);
+        } else {
+            throw new InvalidRequestException(
+                sprintf('Given resource name "%s" is not a directory', $directory)
+            );
+        }
     }
 
     private function createDirectoriesRecursively(array $directories): void

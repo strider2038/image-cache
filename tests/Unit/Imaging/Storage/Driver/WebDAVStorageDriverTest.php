@@ -30,7 +30,6 @@ class WebDAVStorageDriverTest extends TestCase
 
     /** @var ResourceManipulatorInterface */
     private $resourceManipulator;
-
     /** @var ResourceCheckerInterface */
     private $resourceChecker;
 
@@ -119,6 +118,35 @@ class WebDAVStorageDriverTest extends TestCase
         $driver->deleteFile($storageFilename);
 
         $this->assertResourceManipulator_deleteResource_isCalledOnceWithResourceUri(self::FILENAME);
+    }
+
+    /** @test */
+    public function deleteDirectoryContents_givenStorageFilename_directoryDeletedAndCreatedByResourceManipulator(): void
+    {
+        $driver = $this->createWebDAVStorageDriver();
+        $storageFilename = $this->givenStorageFilename();
+        $this->givenResourceChecker_isDirectory_returnsBool(true);
+
+        $driver->deleteDirectoryContents($storageFilename);
+
+        $this->assertResourceChecker_isDirectory_isCalledOnceWithDirectoryName(self::FILENAME);
+        $this->assertResourceManipulator_deleteResource_isCalledOnceWithResourceUri(self::FILENAME);
+        $this->assertResourceManipulator_createDirectory_isCalledOnceWithDirectoryUri(self::FILENAME);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessageRegExp /Given resource name .* is not a directory/
+     */
+    public function deleteDirectoryContents_givenStorageFilenameNotADirectory_invalidRequestExceptionThrown(): void
+    {
+        $driver = $this->createWebDAVStorageDriver();
+        $storageFilename = $this->givenStorageFilename();
+        $this->givenResourceChecker_isDirectory_returnsBool(false);
+
+        $driver->deleteDirectoryContents($storageFilename);
     }
 
     private function createWebDAVStorageDriver(): WebDAVStorageDriver
