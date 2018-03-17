@@ -27,3 +27,6 @@ docker ps
 docker logs "$container_name"
 
 curl -v localhost:81
+curl -v 0.0.0.0:81
+nc -zv localhost 81
+nc -zv 0.0.0.0 81
