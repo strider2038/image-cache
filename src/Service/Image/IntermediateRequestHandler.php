@@ -22,10 +22,8 @@ class IntermediateRequestHandler implements RequestHandlerInterface
 {
     /** @var ImageSourceDetectorInterface */
     private $imageSourceDetector;
-
     /** @var ImageRequestHandlerFactoryInterface */
     private $requestHandlerFactory;
-
     /** @var ImageRequestTransformerInterface */
     private $requestTransformer;
 
