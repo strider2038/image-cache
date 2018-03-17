@@ -20,6 +20,7 @@ script:
     - ./vendor/bin/phpunit --testsuite unit,functional --coverage-clover ./build/logs/clover.xml
     - ./build.sh
     - docker images
+    - ./build/acceptance-test.sh
 
 deploy:
     provider: script
