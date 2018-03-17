@@ -21,7 +21,6 @@ class SourceImageWriter implements ImageWriterInterface
 {
     /** @var PlainFilenameParserInterface */
     private $filenameParser;
-
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
@@ -50,6 +49,11 @@ class SourceImageWriter implements ImageWriterInterface
     {
         $parsedFilename = $this->filenameParser->getParsedFilename($filename);
         $this->storageAccessor->deleteImage($parsedFilename->getValue());
+    }
+
+    public function deleteDirectoryContents(string $directory): void
+    {
+        $this->storageAccessor->deleteDirectoryContents($directory);
     }
 
     public function getImageFileNameMask(string $filename): string

@@ -21,4 +21,5 @@ interface StorageAccessorInterface
     public function imageExists(string $filename): bool;
     public function putImage(string $filename, Image $image): void;
     public function deleteImage(string $filename): void;
+    public function deleteDirectoryContents(string $directory): void;
 }

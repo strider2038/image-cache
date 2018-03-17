@@ -22,13 +22,13 @@ class ThumbnailImageWriterTest extends TestCase
 {
     use ProviderTrait;
 
+    private const DIRECTORY = 'directory';
     private const FILENAME = 'key';
     private const PARSED_FILENAME_VALUE = 'public_filename';
     private const PARSED_FILENAME_MASK = 'thumbnail_mask';
 
     /** @var ThumbnailFilenameParserInterface */
     private $filenameParser;
-
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
@@ -90,6 +90,16 @@ class ThumbnailImageWriterTest extends TestCase
 
         $this->assertFilenameParser_getParsedFilename_isCalledOnceWithFilename(self::FILENAME);
         $this->assertEquals(self::PARSED_FILENAME_MASK, $filename);
+    }
+
+    /** @test */
+    public function deleteDirectoryContents_givenDirectory_storageAccessorDeletesContentsOfDirectory(): void
+    {
+        $writer = $this->createThumbnailImageWriter();
+
+        $writer->deleteDirectoryContents(self::DIRECTORY);
+
+        $this->assertStorageDirectory_deleteDirectoryContents_isCalledOnceWithDirectory(self::DIRECTORY);
     }
 
     /**
@@ -158,5 +168,11 @@ class ThumbnailImageWriterTest extends TestCase
     private function createThumbnailImageWriter(): ThumbnailImageWriter
     {
         return new ThumbnailImageWriter($this->filenameParser, $this->storageAccessor);
+    }
+
+    private function assertStorageDirectory_deleteDirectoryContents_isCalledOnceWithDirectory(string $directory): void
+    {
+        \Phake::verify($this->storageAccessor, \Phake::times(1))
+            ->deleteDirectoryContents($directory);
     }
 }

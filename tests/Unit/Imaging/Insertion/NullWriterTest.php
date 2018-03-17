@@ -41,6 +41,7 @@ class NullWriterTest extends TestCase
             ['insertImage', [self::KEY, \Phake::mock(Image::class)]],
             ['deleteImage', [self::KEY]],
             ['getImageFileNameMask', [self::KEY]],
+            ['deleteDirectoryContents', [self::KEY]],
         ];
     }
 }

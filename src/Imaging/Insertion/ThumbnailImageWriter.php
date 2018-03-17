@@ -23,7 +23,6 @@ class ThumbnailImageWriter implements ImageWriterInterface
 {
     /** @var ThumbnailFilenameParserInterface */
     private $filenameParser;
-
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
@@ -52,6 +51,11 @@ class ThumbnailImageWriter implements ImageWriterInterface
     {
         $parsedFilename = $this->getParsedFilename($filename);
         $this->storageAccessor->deleteImage($parsedFilename->getValue());
+    }
+
+    public function deleteDirectoryContents(string $directory): void
+    {
+        $this->storageAccessor->deleteDirectoryContents($directory);
     }
 
     public function getImageFileNameMask(string $filename): string
