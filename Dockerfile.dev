@@ -4,7 +4,8 @@ MAINTAINER Igor Lazarev <strider2038@yandex.ru>
 ENV XDEBUG_CONFIG="remote_enable=1 remote_mode=req remote_port=9001 remote_host=172.17.0.1 remote_log=/var/log/xdebug/remote.log"
 ENV PHP_IDE_CONFIG="serverName=default"
 
-COPY ./.docker/composer/auth.json /var/run/composer/auth.json
+COPY .docker/files/var/run/composer /var/run/composer/auth.json
+COPY .docker/files-dev/ /
 
 RUN apk add --update \
     nano \
@@ -14,9 +15,5 @@ RUN apk add --update \
     mkdir -p /var/log/xdebug && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer install
-
-COPY ./.docker/composer/auth.json /var/run/composer/auth.json
-COPY ./.docker/php/* /usr/local/etc/php/conf.d/
-COPY ./.docker/env/aliases.sh /etc/profile.d/aliases.sh
 
 EXPOSE 80 9001
