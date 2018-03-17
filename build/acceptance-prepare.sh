@@ -14,7 +14,7 @@ chmod 0777 ./runtime/tests/acceptance/storage
 
 echo "Starting container..."
 docker run \
-    --publish 80:80 \
+    --publish 81:80 \
     --detach \
     --name "$container_name" \
     --stop-signal SIGKILL \
