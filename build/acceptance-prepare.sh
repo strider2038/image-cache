@@ -14,7 +14,6 @@ chmod 0777 ./runtime/tests/acceptance/storage
 
 echo "Starting container..."
 docker run \
-    --publish 81:80 \
     --network host \
     --detach \
     --name "$container_name" \
