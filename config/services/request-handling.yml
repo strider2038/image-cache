@@ -13,7 +13,7 @@ services:
         arguments:
             - '@access_control'
             - '@response_factory'
-            - '@intermediate_request_handler'
+            - '@routing_request_handler'
         calls:
             - [setLogger, ['@logger']]
 
@@ -29,6 +29,12 @@ services:
         arguments:
             - '%access_control_token%'
 
+    routing_request_handler:
+        class: Strider2038\ImgCache\Service\RoutingRequestHandler
+        arguments:
+            - '@clear_all_request_handler'
+            - '@intermediate_request_handler'
+
     intermediate_request_handler:
         class: Strider2038\ImgCache\Service\Image\IntermediateRequestHandler
         arguments:
@@ -40,6 +46,14 @@ services:
         class: Strider2038\ImgCache\Service\Image\ImageSourceDetector
         arguments:
             - '%image_sources%'
+
+    clear_all_request_handler:
+        class: Strider2038\ImgCache\Service\Image\ClearAllRequestHandler
+        arguments:
+            - '%image_sources%'
+            - '@image_storage_factory'
+            - '@image_cache_factory'
+            - '@response_factory'
 
     image_request_handler_factory:
         class: Strider2038\ImgCache\Service\Image\ImageRequestHandlerFactory
