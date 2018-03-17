@@ -16,10 +16,8 @@ class FileOperations implements FileOperationsInterface
 {
     /** @var Filesystem */
     private $filesystem;
-
     /** @var StreamFactoryInterface */
     private $streamFactory;
-
     /** @var LoggerInterface */
     private $logger;
 
@@ -57,10 +55,10 @@ class FileOperations implements FileOperationsInterface
         try {
             $this->filesystem->copy($source, $destination);
 
-            $this->logger->info(sprintf('File copied from "%s" to "%s"', $source, $destination));
+            $this->logger->info(sprintf('File copied from "%s" to "%s".', $source, $destination));
         } catch (IOException $exception) {
             throw new FileOperationException(
-                sprintf('Cannot copy file from "%s" to "%s"', $source, $destination),
+                sprintf('Cannot copy file from "%s" to "%s".', $source, $destination),
                 $exception
             );
         }
@@ -71,14 +69,14 @@ class FileOperations implements FileOperationsInterface
         try {
             $contents = file_get_contents($filename);
         } catch (\Exception $exception) {
-            throw new FileOperationException(sprintf('Cannot read file "%s"', $filename), $exception);
+            throw new FileOperationException(sprintf('Cannot read file "%s".', $filename), $exception);
         }
 
         if (empty($contents)) {
-            throw new FileOperationException(sprintf('File "%s" is empty', $filename));
+            throw new FileOperationException(sprintf('File "%s" is empty.', $filename));
         }
 
-        $this->logger->info(sprintf('Contents of file "%s" was read', $filename));
+        $this->logger->info(sprintf('Contents of file "%s" was read.', $filename));
 
         return $contents;
     }
@@ -88,27 +86,62 @@ class FileOperations implements FileOperationsInterface
         try {
             $this->filesystem->dumpFile($filename, $data);
 
-            $this->logger->info(sprintf('File "%s" was created', $filename));
+            $this->logger->info(sprintf('File "%s" was created.', $filename));
         } catch (IOException $exception) {
-            throw new FileOperationException(sprintf('Cannot create file "%s"', $filename), $exception);
+            throw new FileOperationException(sprintf('Cannot create file "%s".', $filename), $exception);
         }
     }
 
     public function deleteFile(string $filename): void
     {
         if (!$this->isFile($filename)) {
-            throw new FileOperationException(sprintf('Cannot delete file "%s": it does not exist', $filename));
+            throw new FileOperationException(sprintf('Cannot delete file "%s": it does not exist.', $filename));
         }
 
         try {
             $this->filesystem->remove($filename);
-
-            $this->logger->info(sprintf('File "%s" was deleted', $filename));
+            $this->logger->info(sprintf('File "%s" was deleted.', $filename));
         } catch (IOException $exception) {
             throw new FileOperationException(
-                sprintf('Cannot delete file "%s" because of unexpected error', $filename),
+                sprintf('Cannot delete file "%s" because of unexpected error.', $filename),
                 $exception
             );
+        }
+    }
+
+    public function deleteDirectory(string $directory): void
+    {
+        if (!$this->isDirectory($directory)) {
+            throw new FileOperationException(sprintf('Cannot delete directory "%s": it does not exist.', $directory));
+        }
+
+        try {
+            $this->filesystem->remove($directory);
+            $this->logger->info(sprintf('Directory "%s" was deleted with all contents.', $directory));
+        } catch (IOException $exception) {
+            throw new FileOperationException(
+                sprintf('Cannot delete directory "%s" because of unexpected error.', $directory),
+                $exception
+            );
+        }
+    }
+
+    public function deleteDirectoryContents(string $directory): void
+    {
+        if (!$this->isDirectory($directory)) {
+            throw new FileOperationException(
+                sprintf('Cannot delete directory contents "%s": it does not exist.', $directory)
+            );
+        }
+
+        $files = $this->findByMask($directory . '/*');
+
+        foreach ($files as $file) {
+            if ($this->isFile($file)) {
+                $this->deleteFile($file);
+            } else if ($this->isDirectory($file)) {
+                $this->deleteDirectory($file);
+            }
         }
     }
 
@@ -118,12 +151,12 @@ class FileOperations implements FileOperationsInterface
             $this->filesystem->mkdir($directory, $mode);
 
             $this->logger->info(sprintf(
-                'Directory "%s" was created recursively with mode %s',
+                'Directory "%s" was created recursively with mode %s.',
                 $directory,
                 decoct($mode)
             ));
         } catch (IOException $exception) {
-            throw new FileOperationException(sprintf('Cannot create directory "%s"', $directory), $exception);
+            throw new FileOperationException(sprintf('Cannot create directory "%s".', $directory), $exception);
         }
     }
 
@@ -133,7 +166,7 @@ class FileOperations implements FileOperationsInterface
             $stream = $this->streamFactory->createStreamByParameters($filename, $mode);
 
             $this->logger->info(sprintf(
-                'File "%s" is successfully opened in mode "%s"',
+                'File "%s" is successfully opened in mode "%s".',
                 $filename,
                 $mode
             ));
@@ -141,7 +174,7 @@ class FileOperations implements FileOperationsInterface
             return $stream;
         } catch (\Exception $exception) {
             throw new FileOperationException(
-                sprintf('Cannot open file "%s" in mode "%s"', $filename, $mode),
+                sprintf('Cannot open file "%s" in mode "%s".', $filename, $mode),
                 $exception
             );
         }
