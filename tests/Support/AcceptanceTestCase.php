@@ -20,6 +20,8 @@ use Strider2038\ImgCache\Enum\HttpMethodEnum;
  */
 class AcceptanceTestCase extends FunctionalTestCase
 {
+    protected const ACCESS_CONTROL_TOKEN = 'acceptance-testing-token';
+
     /** @var \GuzzleHttp\Client */
     private $client;
     /** @var string */
@@ -29,11 +31,6 @@ class AcceptanceTestCase extends FunctionalTestCase
     {
         parent::setUp();
 
-        exec('rm -rf ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/storage/*');
-        exec('rm -rf ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/web/*');
-        exec('chown www-data:www-data ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/storage');
-        exec('chown www-data:www-data ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/web');
-
         $host = getenv('ACCEPTANCE_HOST');
 
         $this->client = new Client([
@@ -42,6 +39,10 @@ class AcceptanceTestCase extends FunctionalTestCase
             'allow_redirects' => false,
             'http_errors' => false,
         ]);
+
+        $this->givenAccessToken(self::ACCESS_CONTROL_TOKEN);
+        $this->sendDELETE('');
+        $this->givenAccessToken('');
     }
 
     protected function givenAccessToken(string $accessToken): void

@@ -19,7 +19,6 @@ use Strider2038\ImgCache\Tests\Support\AcceptanceTestCase;
  */
 class FilesystemSourceApplicationTest extends AcceptanceTestCase
 {
-    private const ACCESS_CONTROL_TOKEN = 'acceptance-testing-token';
     private const URL_NOT_EXIST = '/i/not-exist.jpg';
     private const URL_INCORRECT_EXTENSION = '/index.php';
     private const URL_IMAGE_JPEG = '/sub/dir/image.jpg';
