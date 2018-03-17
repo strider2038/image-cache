@@ -9,6 +9,8 @@ echo "========================================================================="
 echo "Preparing folders..."
 mkdir -p ./runtime/tests/acceptance/web
 mkdir -p ./runtime/tests/acceptance/storage
+chmod 0777 ./runtime/tests/acceptance/web
+chmod 0777 ./runtime/tests/acceptance/storage
 
 echo "Starting container..."
 docker run \
@@ -22,11 +24,3 @@ docker run \
 
 docker ps
 docker logs "$container_name"
-
-echo "Starting acceptance testing..."
-./vendor/bin/phpunit --testsuite acceptance
-
-echo "Removing containers..."
-
-docker stop "$container_name"
-docker rm "$container_name"
