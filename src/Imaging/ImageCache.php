@@ -70,6 +70,12 @@ class ImageCache implements ImageCacheInterface
         }
     }
 
+    public function cleanDirectory(string $directory): void
+    {
+        $destinationDirectoryName = $this->composeDestinationFileName(ltrim('/', $directory));
+        $this->fileOperations->deleteDirectoryContents($destinationDirectoryName);
+    }
+
     private function composeDestinationFileName(string $fileName): string
     {
         return $this->webDirectory . $fileName;

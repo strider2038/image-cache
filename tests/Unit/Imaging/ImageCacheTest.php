@@ -31,10 +31,8 @@ class ImageCacheTest extends TestCase
 
     /** @var DirectoryNameInterface */
     private $webDirectory;
-
     /** @var FileOperationsInterface */
     private $fileOperations;
-
     /** @var ImageProcessorInterface */
     private $imageProcessor;
 
@@ -95,6 +93,16 @@ class ImageCacheTest extends TestCase
 
         $this->assertFileOperations_findByMask_isCalledOnceWith($this->fileOperations, self::CACHE_FILE_NAME);
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FOUND_FILE_NAME);
+    }
+
+    /** @test */
+    public function cleanDirectory_givenDirectory_deleteDirectoryContentsCalled(): void
+    {
+        $cache = $this->createImageCache();
+
+        $cache->cleanDirectory('/');
+
+        $this->assertFileOperations_deleteDirectoryContents_isCalledOnceWith($this->fileOperations, self::WEB_DIRECTORY);
     }
 
     private function givenDirectoryName(): DirectoryNameInterface
