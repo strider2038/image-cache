@@ -14,10 +14,14 @@ use Strider2038\ImgCache\Core\Http\RequestHandlerInterface;
 use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
+use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
+use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Exception\InvalidRequestException;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
  * Handles POST request for creating resource. If resource already exists then response with
@@ -35,6 +39,9 @@ class CreateImageHandler implements RequestHandlerInterface
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
+    /** @var ImageFilenameInterface */
+    private $filename;
+
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         ImageFilenameFactoryInterface $filenameFactory,
@@ -49,27 +56,46 @@ class CreateImageHandler implements RequestHandlerInterface
 
     public function handleRequest(RequestInterface $request): ResponseInterface
     {
-        $filename = $this->filenameFactory->createImageFilenameFromRequest($request);
+        $this->filename = $this->filenameFactory->createImageFilenameFromRequest($request);
 
-        if ($this->imageStorage->imageExists($filename)) {
-            $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCodeEnum(HttpStatusCodeEnum::CONFLICT),
-                sprintf(
-                    'File "%s" already exists in image storage. Use PUT method to replace it.',
-                    $filename
-                )
-            );
+        if ($this->imageStorage->imageExists($this->filename)) {
+            $response = $this->createConflictResponse();
         } else {
             $stream = $request->getBody();
-            $image = $this->imageFactory->createImageFromStream($stream);
-            $this->imageStorage->putImage($filename, $image);
-
-            $response = $this->responseFactory->createMessageResponse(
-                new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
-                sprintf('File "%s" was successfully put to storage.', $filename)
-            );
+            $this->putImageWithFilenameToStorage($stream);
+            $response = $this->createCreatedResponse();
         }
 
         return $response;
+    }
+
+    private function createConflictResponse(): ResponseInterface
+    {
+        return $this->responseFactory->createMessageResponse(
+            new HttpStatusCodeEnum(HttpStatusCodeEnum::CONFLICT),
+            sprintf(
+                'File "%s" already exists in image storage. Use PUT method to replace it.',
+                $this->filename
+            )
+        );
+    }
+
+    private function createCreatedResponse(): ResponseInterface
+    {
+        return $this->responseFactory->createMessageResponse(
+            new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
+            sprintf('File "%s" was successfully put to storage.', $this->filename)
+        );
+    }
+
+    private function putImageWithFilenameToStorage(StreamInterface $stream): void
+    {
+        try {
+            $image = $this->imageFactory->createImageFromStream($stream);
+        } catch (InvalidImageException $exception) {
+            throw new InvalidRequestException($exception->getMessage());
+        }
+
+        $this->imageStorage->putImage($this->filename, $image);
     }
 }
