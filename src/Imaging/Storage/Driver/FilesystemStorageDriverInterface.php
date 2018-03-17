@@ -22,4 +22,5 @@ interface FilesystemStorageDriverInterface
     public function fileExists(StorageFilenameInterface $filename): bool;
     public function createFile(StorageFilenameInterface $filename, StreamInterface $data): void;
     public function deleteFile(StorageFilenameInterface $filename): void;
+    public function deleteDirectoryContents(StorageFilenameInterface $directory): void;
 }
