@@ -23,6 +23,6 @@ interface ImageStorageInterface
     public function putImage(ImageFilenameInterface $filename, Image $image): void;
     public function imageExists(ImageFilenameInterface $filename): bool;
     public function deleteImage(ImageFilenameInterface $filename): void;
-    public function deleteDirectory(DirectoryNameInterface $directoryName): void;
+    public function cleanDirectory(DirectoryNameInterface $directoryName): void;
     public function getImageFileNameMask(ImageFilenameInterface $filename): string;
 }
