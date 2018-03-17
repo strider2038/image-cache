@@ -27,7 +27,7 @@ trait ResponseFactoryTrait
         $this->responseFactory = \Phake::mock(ResponseFactoryInterface::class);
     }
 
-    protected function givenResponseFactory_createMessageResponse_returnsResponseWithCode(int $code): void
+    protected function givenResponseFactory_createMessageResponse_returnsResponseWithCode(int $code): ResponseInterface
     {
         $response = \Phake::mock(ResponseInterface::class);
 
@@ -38,6 +38,8 @@ trait ResponseFactoryTrait
         \Phake::when($this->responseFactory)
             ->createMessageResponse(\Phake::anyParameters())
             ->thenReturn($response);
+
+        return $response;
     }
 
     protected function givenResponseFactory_createFileResponse_returnsResponse(): void

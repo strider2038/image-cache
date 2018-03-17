@@ -11,6 +11,7 @@
 namespace Strider2038\ImgCache\Imaging;
 
 use Strider2038\ImgCache\Imaging\Image\Image;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
@@ -22,5 +23,6 @@ interface ImageStorageInterface
     public function putImage(ImageFilenameInterface $filename, Image $image): void;
     public function imageExists(ImageFilenameInterface $filename): bool;
     public function deleteImage(ImageFilenameInterface $filename): void;
+    public function deleteDirectory(DirectoryNameInterface $directoryName): void;
     public function getImageFileNameMask(ImageFilenameInterface $filename): string;
 }
