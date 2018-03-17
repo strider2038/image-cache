@@ -9,6 +9,9 @@ php:
 services:
     - docker
 
+env:
+    - ACCEPTANCE_HOST="http://localhost:81/"
+
 install:
     - printf "\n" | pecl install imagick
     - composer install
