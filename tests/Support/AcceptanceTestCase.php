@@ -12,14 +12,15 @@
 namespace Strider2038\ImgCache\Tests\Support;
 
 use GuzzleHttp\Client;
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Strider2038\ImgCache\Enum\HttpMethodEnum;
 
 /**
  * @author Igor Lazarev <strider2038@rambler.ru>
  */
-class HttpTestCase extends TestCase
+class AcceptanceTestCase extends FunctionalTestCase
 {
+    private const ACCESS_CONTROL_TOKEN = 'Bearer acceptance-testing-token';
     /** @var \GuzzleHttp\Client */
     protected $client;
 
@@ -42,6 +43,16 @@ class HttpTestCase extends TestCase
 
     protected function sendGET(string $uri): ResponseInterface
     {
-        return $this->client->request('GET', $uri);
+        return $this->client->request(HttpMethodEnum::GET, $uri);
+    }
+
+    protected function sendPOST(string $uri, $body = null): ResponseInterface
+    {
+        return $this->client->request(HttpMethodEnum::POST, $uri, [
+            'body' => $body,
+            'headers' => [
+                'Authorization' => self::ACCESS_CONTROL_TOKEN,
+            ],
+        ]);
     }
 }

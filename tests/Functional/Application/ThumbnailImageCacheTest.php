@@ -17,14 +17,13 @@ use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Tests\Support\ApplicationTestCase;
 
 class ThumbnailImageCacheTest extends ApplicationTestCase
 {
     private const FILE_NOT_EXIST = '/not-exist.jpg';
     private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
-    private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::STORAGE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
@@ -32,7 +31,7 @@ class ThumbnailImageCacheTest extends ApplicationTestCase
     private const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
     private const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
-    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::STORAGE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
 
     protected function setUp(): void
@@ -45,7 +44,7 @@ class ThumbnailImageCacheTest extends ApplicationTestCase
             new ImageSourceCollection([
                 new FilesystemImageSource(
                     '/',
-                    self::FILESOURCE_DIRECTORY,
+                    self::STORAGE_DIRECTORY,
                     'thumbnail'
                 )
             ])

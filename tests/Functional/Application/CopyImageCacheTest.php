@@ -23,11 +23,11 @@ class CopyImageCacheTest extends ApplicationTestCase
 {
     private const FILE_NOT_EXIST = '/not-exist.jpg';
     private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
-    private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::STORAGE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
-    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::STORAGE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
     private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
 
     protected function setUp(): void
@@ -40,7 +40,7 @@ class CopyImageCacheTest extends ApplicationTestCase
             new ImageSourceCollection([
                 new FilesystemImageSource(
                     '/',
-                    self::FILESOURCE_DIRECTORY,
+                    self::STORAGE_DIRECTORY,
                     'copy'
                 )
             ])
