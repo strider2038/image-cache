@@ -96,11 +96,11 @@ class ImageCacheTest extends TestCase
     }
 
     /** @test */
-    public function cleanDirectory_givenDirectory_deleteDirectoryContentsCalled(): void
+    public function deleteDirectoryContents_givenDirectory_deleteDirectoryContentsCalled(): void
     {
         $cache = $this->createImageCache();
 
-        $cache->cleanDirectory('/');
+        $cache->deleteDirectoryContents('/');
 
         $this->assertFileOperations_deleteDirectoryContents_isCalledOnceWith($this->fileOperations, self::WEB_DIRECTORY);
     }

@@ -62,10 +62,10 @@ class ClearAllRequestHandlerTest extends TestCase
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertImageStorageFactory_createImageStorageForImageSource_isCalledOnceWithImageSource($imageSource);
-        $this->assertImageStorage_cleanDirectory_isCalledOnceWithRootDirectory();
+        $this->assertImageStorage_deleteDirectoryContents_isCalledOnceWithRootDirectory();
         $this->assertImageSource_getCacheDirectory_isCalledOnce($imageSource);
         $this->assertImageCacheFactory_createImageCacheForWebDirectory_isCalledOnceWithCacheDirectory();
-        $this->assertImageCache_cleanDirectory_isCalledOnceWithRootDirectory();
+        $this->assertImageCache_deleteDirectoryContents_isCalledOnceWithRootDirectory();
     }
 
     /** @test  */
@@ -112,10 +112,10 @@ class ClearAllRequestHandlerTest extends TestCase
             ->thenReturn($this->imageStorage);
     }
 
-    private function assertImageStorage_cleanDirectory_isCalledOnceWithRootDirectory(): void
+    private function assertImageStorage_deleteDirectoryContents_isCalledOnceWithRootDirectory(): void
     {
         \Phake::verify($this->imageStorage, \Phake::times(1))
-            ->cleanDirectory(\Phake::capture($directoryName));
+            ->deleteDirectoryContents(\Phake::capture($directoryName));
         $this->assertEquals('/', $directoryName);
     }
 
@@ -145,9 +145,9 @@ class ClearAllRequestHandlerTest extends TestCase
             ->thenReturn($this->imageCache);
     }
 
-    private function assertImageCache_cleanDirectory_isCalledOnceWithRootDirectory(): void
+    private function assertImageCache_deleteDirectoryContents_isCalledOnceWithRootDirectory(): void
     {
         \Phake::verify($this->imageCache, \Phake::times(1))
-            ->cleanDirectory('/');
+            ->deleteDirectoryContents('/');
     }
 }

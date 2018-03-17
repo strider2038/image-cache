@@ -22,5 +22,5 @@ interface ImageCacheInterface
     public function getImage(ImageFilenameInterface $filename): ImageFile;
     public function putImage(ImageFilenameInterface $filename, Image $image): void;
     public function deleteImagesByMask(string $fileNameMask): void;
-    public function cleanDirectory(string $directory): void;
+    public function deleteDirectoryContents(string $directory): void;
 }

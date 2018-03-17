@@ -14,6 +14,7 @@ use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
 use Strider2038\ImgCache\Imaging\Insertion\NullWriter;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryNameInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
@@ -23,7 +24,6 @@ class ImageStorage implements ImageStorageInterface
 {
     /** @var ImageExtractorInterface */
     private $imageExtractor;
-
     /** @var ImageWriterInterface */
     private $imageWriter;
 
@@ -51,6 +51,11 @@ class ImageStorage implements ImageStorageInterface
     public function deleteImage(ImageFilenameInterface $filename): void
     {
         $this->imageWriter->deleteImage($filename);
+    }
+
+    public function deleteDirectoryContents(DirectoryNameInterface $directoryName): void
+    {
+        $this->imageWriter->deleteDirectoryContents($directoryName);
     }
 
     public function getImageFileNameMask(ImageFilenameInterface $filename): string

@@ -69,13 +69,13 @@ class ClearAllRequestHandler implements RequestHandlerInterface
     private function clearAllStorageImages(AbstractImageSource $imageSource): void
     {
         $imageStorage = $this->imageStorageFactory->createImageStorageForImageSource($imageSource);
-        $imageStorage->cleanDirectory(new DirectoryName('/'));
+        $imageStorage->deleteDirectoryContents(new DirectoryName('/'));
     }
 
     private function clearAllCacheImages(AbstractImageSource $imageSource): void
     {
         $cacheDirectory = $imageSource->getCacheDirectory();
         $imageCache = $this->imageCacheFactory->createImageCacheForWebDirectory($cacheDirectory);
-        $imageCache->cleanDirectory('/');
+        $imageCache->deleteDirectoryContents('/');
     }
 }
