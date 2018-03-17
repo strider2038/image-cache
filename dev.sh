@@ -60,8 +60,8 @@ else
     docker network create "$container_dev_network"
 
     echo "Preparing folders..."
-    mkdir -p ./runtime/tests/web
-    mkdir -p ./runtime/tests/storage
+    mkdir -p ./runtime/tests/acceptance/web
+    mkdir -p ./runtime/tests/acceptance/storage
 
     echo "Starting containers..."
     docker run \
@@ -71,8 +71,9 @@ else
         --name "$container_name" \
         --stop-signal SIGKILL \
         --env APP_CONFIGURATION_FILENAME=config/testing/acceptance-parameters.yml \
-        --volume $PWD/runtime/tests/web:/app/web \
-        --volume $PWD/runtime/tests/storage:/tmp/storage \
+        --volume $PWD/src:/app/src \
+        --volume $PWD/runtime/tests/acceptance/web:/app/web \
+        --volume $PWD/runtime/tests/acceptance/storage:/tmp/storage \
         "$container_tag"
 
     docker run \

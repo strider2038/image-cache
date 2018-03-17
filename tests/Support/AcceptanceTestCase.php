@@ -20,24 +20,42 @@ use Strider2038\ImgCache\Enum\HttpMethodEnum;
  */
 class AcceptanceTestCase extends FunctionalTestCase
 {
-    private const ACCESS_CONTROL_TOKEN = 'Bearer acceptance-testing-token';
     /** @var \GuzzleHttp\Client */
-    protected $client;
-
+    private $client;
     /** @var string */
-    protected $host;
-    
+    private $accessToken = '';
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->host = getenv('ACCEPTANCE_HOST');
+        exec('rm -rf ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/storage/*');
+        exec('rm -rf ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/web/*');
+        exec('chown www-data:www-data ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/storage');
+        exec('chown www-data:www-data ' . self::RUNTIME_DIRECTORY . '/tests/acceptance/web');
+
+        $host = getenv('ACCEPTANCE_HOST');
 
         $this->client = new Client([
-            'base_uri' => $this->host,
+            'base_uri' => $host,
             'timeout' => 5,
             'allow_redirects' => false,
             'http_errors' => false,
+        ]);
+    }
+
+    protected function givenAccessToken(string $accessToken): void
+    {
+        $this->accessToken = $accessToken;
+    }
+
+    protected function sendRequest(string $method, string $uri, $body = null)
+    {
+        return $this->client->request($method, $uri, [
+            'body' => $body,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->accessToken,
+            ],
         ]);
     }
 
@@ -48,11 +66,16 @@ class AcceptanceTestCase extends FunctionalTestCase
 
     protected function sendPOST(string $uri, $body = null): ResponseInterface
     {
-        return $this->client->request(HttpMethodEnum::POST, $uri, [
-            'body' => $body,
-            'headers' => [
-                'Authorization' => self::ACCESS_CONTROL_TOKEN,
-            ],
-        ]);
+        return $this->sendRequest(HttpMethodEnum::POST, $uri, $body);
+    }
+
+    protected function sendPUT(string $uri, $body = null): ResponseInterface
+    {
+        return $this->sendRequest(HttpMethodEnum::PUT, $uri, $body);
+    }
+
+    protected function sendDELETE(string $uri): ResponseInterface
+    {
+        return $this->sendRequest(HttpMethodEnum::DELETE, $uri);
     }
 }
