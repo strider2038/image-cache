@@ -38,7 +38,6 @@ Microservice for caching images from external storages (WebDAV or API). It can p
 - [x] Automatically create cache directories
 - [x] Support for building docker containers in Travis
 - [x] Acceptance testing
-- [ ] Rename project to "Image caching microservice"
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1

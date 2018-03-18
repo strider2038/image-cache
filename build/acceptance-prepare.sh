@@ -8,7 +8,7 @@ echo "========================================================================="
 
 echo "Starting container..."
 docker run \
-    --publish 127.0.0.1:1234:80 \
+    --publish 80:80 \
     --detach \
     --name "$container_name" \
     --stop-signal SIGKILL \
