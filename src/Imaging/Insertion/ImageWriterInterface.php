@@ -20,5 +20,6 @@ interface ImageWriterInterface
     public function imageExists(string $filename): bool;
     public function insertImage(string $filename, Image $image): void;
     public function deleteImage(string $filename): void;
+    public function deleteDirectoryContents(string $directory): void;
     public function getImageFileNameMask(string $filename): string;
 }

@@ -108,6 +108,14 @@ trait FileOperationsTrait
         \Phake::verify($fileOperations, \Phake::times(1))->findByMask($mask);
     }
 
+    protected function assertFileOperations_deleteDirectoryContents_isCalledOnceWith(
+        FileOperationsInterface $fileOperations,
+        string $directory
+    ): void {
+        \Phake::verify($fileOperations, \Phake::times(1))
+            ->deleteDirectoryContents($directory);
+    }
+
     protected function givenFileOperations_findByMask_returnsStringListWithValues(
         FileOperationsInterface $fileOperations,
         array $list

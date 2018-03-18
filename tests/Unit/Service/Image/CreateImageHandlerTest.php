@@ -15,6 +15,7 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
+use Strider2038\ImgCache\Exception\InvalidImageException;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
@@ -29,10 +30,8 @@ class CreateImageHandlerTest extends TestCase
 
     /** @var ImageFilenameFactoryInterface */
     private $filenameFactory;
-
     /** @var ImageStorageInterface */
     private $imageStorage;
-
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
@@ -83,6 +82,25 @@ class CreateImageHandlerTest extends TestCase
         $this->assertImageStorage_putImage_isCalledOnceWithFilenameAndImage($filename, $image);
         $this->assertResponseFactory_createMessageResponse_isCalledOnceWithCode(HttpStatusCodeEnum::CREATED);
         $this->assertEquals(HttpStatusCodeEnum::CREATED, $response->getStatusCode()->getValue());
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\InvalidRequestException
+     * @expectedExceptionCode 400
+     * @expectedExceptionMessage Invalid image
+     */
+    public function handleRequest_invalidImageInRequest_invalidRequestExceptionThrown(): void
+    {
+        $handler = $this->createCreateImageHandler();
+        $request = $this->givenRequest();
+        $this->givenFilenameFactory_createImageFilenameFromRequest_returnsImageFilename();
+        $this->givenImageStorage_imageExists_returns(false);
+        $this->givenRequest_getBody_returnsStream($request);
+        $exception = new InvalidImageException('Invalid image');
+        $this->givenImageFactory_createImageFromStream_throwsException($exception);
+
+        $handler->handleRequest($request);
     }
 
     private function createCreateImageHandler(): CreateImageHandler
@@ -157,5 +175,12 @@ class CreateImageHandlerTest extends TestCase
         \Phake::when($this->imageFactory)->createImageFromStream(\Phake::anyParameters())->thenReturn($image);
 
         return $image;
+    }
+
+    private function givenImageFactory_createImageFromStream_throwsException(\Throwable $exception): void
+    {
+        \Phake::when($this->imageFactory)
+            ->createImageFromStream(\Phake::anyParameters())
+            ->thenThrow($exception);
     }
 }

@@ -36,10 +36,8 @@ class FileOperationsTest extends FileTestCase
 
     /** @var Filesystem */
     private $filesystem;
-
     /** @var StreamFactoryInterface */
     private $streamFactory;
-
     /** @var LoggerInterface */
     private $logger;
 
@@ -229,7 +227,7 @@ class FileOperationsTest extends FileTestCase
 
         $fileOperations->deleteFile($filename);
 
-        \Phake::verify($this->filesystem, \Phake::times(1))->remove($filename);
+        $this->assertFilesystem_remove_isCalledOnceWithName($filename);
         $this->assertLogger_info_isCalledOnce($this->logger);
     }
 
@@ -256,7 +254,7 @@ class FileOperationsTest extends FileTestCase
     {
         $fileOperations = $this->createFileOperations();
         $filename = $this->givenFile();
-        \Phake::when($this->filesystem)->remove(\Phake::anyParameters())->thenThrow(new IOException(('')));
+        $this->givenFilesystem_remove_throwsException(new IOException(('')));
 
         $fileOperations->deleteFile($filename);
     }
@@ -284,6 +282,75 @@ class FileOperationsTest extends FileTestCase
         \Phake::when($this->filesystem)->mkdir(\Phake::anyParameters())->thenThrow(new IOException(''));
 
         $fileOperations->createDirectory(self::CREATE_DIRECTORY_NAME);
+    }
+
+    /** @test */
+    public function deleteDirectory_givenDirectoryExists_filesystemRemoveIsCalled(): void
+    {
+        $fileOperations = $this->createFileOperations();
+        $directory = $this->givenDirectory();
+
+        $fileOperations->deleteDirectory($directory);
+
+        $this->assertFilesystem_remove_isCalledOnceWithName($directory);
+        $this->assertLogger_info_isCalledOnce($this->logger);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileOperationException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessageRegExp /Cannot delete directory .* it does not exist/
+     */
+    public function deleteDirectory_givenDirectoryDoesNotExist_exceptionThrown(): void
+    {
+        $fileOperations = $this->createFileOperations();
+
+        $fileOperations->deleteDirectory('/not.exist');
+    }
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileOperationException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessageRegExp /Cannot delete directory .* because of unexpected error/
+     */
+    public function deleteDirectory_givenDirectoryExistsAndCannotBeDeleted_exceptionThrown(): void
+    {
+        $fileOperations = $this->createFileOperations();
+        $directory = $this->givenDirectory();
+        $this->givenFilesystem_remove_throwsException(new IOException(('')));
+
+        $fileOperations->deleteDirectory($directory);
+    }
+
+    /**
+     * @test
+     * @expectedException \Strider2038\ImgCache\Exception\FileOperationException
+     * @expectedExceptionCode 500
+     * @expectedExceptionMessageRegExp /Cannot delete directory contents .* it does not exist/
+     */
+    public function deleteDirectoryContents_givenDirectoryDoesNotExist_exceptionThrown(): void
+    {
+        $fileOperations = $this->createFileOperations();
+
+        $fileOperations->deleteDirectoryContents('/not.exist');
+    }
+
+    /** @test */
+    public function deleteDirectoryContents_givenDirectoryWithContents_allContentsRemoved(): void
+    {
+        $directory = $this->givenDirectory();
+        $filename = $this->givenFile();
+        $filename2 = $directory . '/file.json';
+        $this->givenAssetFilename(self::FILE_JSON, $filename2);
+        $fileOperations = $this->createFileOperations(new Filesystem());
+
+        $fileOperations->deleteDirectoryContents(self::TEST_CACHE_DIR);
+
+        $this->assertFileNotExists($filename);
+        $this->assertFileNotExists($filename2);
+        $this->assertFileNotExists($directory);
+        $this->assertFileExists(self::TEST_CACHE_DIR);
     }
 
     /** @test */
@@ -317,9 +384,12 @@ class FileOperationsTest extends FileTestCase
         $fileOperations->openFile($filename, $mode);
     }
 
-    private function createFileOperations(): FileOperations
+    private function createFileOperations(Filesystem $filesystem = null): FileOperations
     {
-        $fileOperations = new FileOperations($this->filesystem, $this->streamFactory);
+        $fileOperations = new FileOperations(
+            $filesystem ?? $this->filesystem,
+            $this->streamFactory
+        );
         $fileOperations->setLogger($this->logger);
 
         return $fileOperations;
@@ -345,5 +415,18 @@ class FileOperationsTest extends FileTestCase
         \Phake::when($this->streamFactory)
             ->createStreamByParameters(\Phake::anyParameters())
             ->thenThrow(new \Exception());
+    }
+
+    private function assertFilesystem_remove_isCalledOnceWithName(string $filename): void
+    {
+        \Phake::verify($this->filesystem, \Phake::times(1))
+            ->remove($filename);
+    }
+
+    private function givenFilesystem_remove_throwsException(\Throwable $exception): void
+    {
+        \Phake::when($this->filesystem)
+            ->remove(\Phake::anyParameters())
+            ->thenThrow($exception);
     }
 }

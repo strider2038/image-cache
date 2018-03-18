@@ -1,0 +1,7 @@
+access_control_token: 'acceptance-testing-token'
+image_sources:
+    filesystem:
+        type: 'filesystem'
+        cache_directory: '/'
+        storage_directory: '/tmp/storage'
+        processor_type: 'thumbnail'

@@ -33,6 +33,11 @@ class NullWriter implements ImageWriterInterface
         throw new NotAllowedException('Method is not allowed');
     }
 
+    public function deleteDirectoryContents(string $directory): void
+    {
+        throw new NotAllowedException('Method is not allowed');
+    }
+
     public function getImageFileNameMask(string $filename): string
     {
         throw new NotAllowedException('Method is not allowed');

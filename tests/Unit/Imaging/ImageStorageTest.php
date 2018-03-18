@@ -15,11 +15,13 @@ use Strider2038\ImgCache\Imaging\Extraction\ImageExtractorInterface;
 use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\ImageStorage;
 use Strider2038\ImgCache\Imaging\Insertion\ImageWriterInterface;
+use Strider2038\ImgCache\Imaging\Naming\DirectoryName;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 use Strider2038\ImgCache\Tests\Support\Phake\ProviderTrait;
 
 class ImageStorageTest extends TestCase
 {
+    private const DIRECTORY_NAME = '/directory_name';
     use ProviderTrait;
 
     private const IMAGE_FILENAME_VALUE = 'image_filename.jpg';
@@ -27,7 +29,6 @@ class ImageStorageTest extends TestCase
 
     /** @var ImageExtractorInterface */
     private $imageExtractor;
-
     /** @var ImageWriterInterface */
     private $imageWriter;
 
@@ -89,6 +90,17 @@ class ImageStorageTest extends TestCase
         $storage->deleteImage($filename);
 
         $this->assertImageWriter_deleteImage_isCalledOnceWith(self::IMAGE_FILENAME_VALUE);
+    }
+
+    /** @test */
+    public function deleteDirectoryContents_givenDirectoryName_imageWriterMethodCalled(): void
+    {
+        $storage = $this->createImageStorage();
+        $directory = new DirectoryName(self::DIRECTORY_NAME);
+
+        $storage->deleteDirectoryContents($directory);
+
+        $this->assertImageWriter_deleteDirectoryContents_isCalledOnceWithDirectory(self::DIRECTORY_NAME);
     }
 
     /** @test */
@@ -163,5 +175,11 @@ class ImageStorageTest extends TestCase
     private function givenImage(): Image
     {
         return \Phake::mock(Image::class);
+    }
+
+    private function assertImageWriter_deleteDirectoryContents_isCalledOnceWithDirectory(string $directoryName): void
+    {
+        \Phake::verify($this->imageWriter, \Phake::times(1))
+            ->deleteDirectoryContents($directoryName);
     }
 }

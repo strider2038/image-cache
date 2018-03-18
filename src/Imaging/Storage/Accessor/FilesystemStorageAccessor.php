@@ -54,7 +54,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $stream = $this->storageDriver->getFileContents($storageFilename);
         $image = $this->imageFactory->createImageFromStream($stream);
 
-        $this->logger->info(sprintf('Image was extracted from filesystem source by key "%s".', $filename));
+        $this->logger->info(sprintf('Image "%s" was extracted from filesystem source.', $filename));
 
         return $image;
     }
@@ -65,7 +65,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $exists = $this->storageDriver->fileExists($storageFilename);
 
         $this->logger->info(sprintf(
-            'Image with key "%s" %s in filesystem source.',
+            'Image with filename "%s" %s in filesystem source.',
             $filename,
             $exists ? 'exists' : 'does not exist'
         ));
@@ -80,7 +80,7 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $this->storageDriver->createFile($storageFilename, $data);
 
         $this->logger->info(sprintf(
-            "Image is successfully putted to source under key '%s'.",
+            'Image is successfully putted to source under filename "%s".',
             $filename
         ));
     }
@@ -91,8 +91,19 @@ class FilesystemStorageAccessor implements StorageAccessorInterface
         $this->storageDriver->deleteFile($storageFilename);
 
         $this->logger->info(sprintf(
-            "Image with key '%s' is successfully deleted from source.",
+            'Image with filename "%s" is successfully deleted from source.',
             $filename
+        ));
+    }
+
+    public function deleteDirectoryContents(string $directory): void
+    {
+        $storageFilename = $this->getStorageFilename($directory);
+        $this->storageDriver->deleteDirectoryContents($storageFilename);
+
+        $this->logger->info(sprintf(
+            'Directory "%s" contents was successfully deleted from source.',
+            $directory
         ));
     }
 

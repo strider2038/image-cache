@@ -28,7 +28,7 @@ class FunctionalTestCase extends TestCase
     protected const CONFIGURATION_DIRECTORY = self::APPLICATION_DIRECTORY . '/config';
     protected const RUNTIME_DIRECTORY = self::APPLICATION_DIRECTORY . '/runtime';
 
-    protected const FILESOURCE_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/filesource';
+    protected const STORAGE_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/storage';
     protected const WEB_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/web';
     protected const TEMPORARY_DIRECTORY = self::RUNTIME_DIRECTORY . '/tests/tmp';
 
@@ -41,8 +41,8 @@ class FunctionalTestCase extends TestCase
     {
         parent::setUp();
 
-        exec('rm -rf ' . self::FILESOURCE_DIRECTORY);
-        if (!mkdir(self::FILESOURCE_DIRECTORY, 0777, true)) {
+        exec('rm -rf ' . self::STORAGE_DIRECTORY);
+        if (!mkdir(self::STORAGE_DIRECTORY, 0777, true)) {
             throw new \Exception('Cannot create test filesource directory');
         }
 
@@ -68,7 +68,7 @@ class FunctionalTestCase extends TestCase
         $container->setParameter('application.directory', self::APPLICATION_DIRECTORY);
         $container->setParameter('configuration_directory', self::CONFIGURATION_DIRECTORY);
         $container->setParameter('test.web_directory', self::WEB_DIRECTORY);
-        $container->setParameter('test.filesource_directory', self::FILESOURCE_DIRECTORY);
+        $container->setParameter('test.filesource_directory', self::STORAGE_DIRECTORY);
 
         return $container;
     }

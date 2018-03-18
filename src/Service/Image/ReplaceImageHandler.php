@@ -15,10 +15,14 @@ use Strider2038\ImgCache\Core\Http\RequestInterface;
 use Strider2038\ImgCache\Core\Http\ResponseFactoryInterface;
 use Strider2038\ImgCache\Core\Http\ResponseInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
+use Strider2038\ImgCache\Exception\InvalidImageException;
+use Strider2038\ImgCache\Exception\InvalidRequestException;
+use Strider2038\ImgCache\Imaging\Image\Image;
 use Strider2038\ImgCache\Imaging\Image\ImageFactoryInterface;
 use Strider2038\ImgCache\Imaging\ImageCacheInterface;
 use Strider2038\ImgCache\Imaging\ImageStorageInterface;
 use Strider2038\ImgCache\Imaging\Naming\ImageFilenameFactoryInterface;
+use Strider2038\ImgCache\Imaging\Naming\ImageFilenameInterface;
 
 /**
  * Handles PUT request for creating new resource or replacing old one. If resource is already
@@ -39,6 +43,9 @@ class ReplaceImageHandler implements RequestHandlerInterface
     /** @var ImageFactoryInterface */
     private $imageFactory;
 
+    /** @var ImageFilenameInterface */
+    private $filename;
+
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         ImageFilenameFactoryInterface $filenameFactory,
@@ -55,21 +62,43 @@ class ReplaceImageHandler implements RequestHandlerInterface
 
     public function handleRequest(RequestInterface $request): ResponseInterface
     {
-        $filename = $this->filenameFactory->createImageFilenameFromRequest($request);
+        $this->filename = $this->filenameFactory->createImageFilenameFromRequest($request);
+        $image = $this->getImageFromRequest($request);
 
-        if ($this->imageStorage->imageExists($filename)) {
-            $this->imageStorage->deleteImage($filename);
-            $fileNameMask = $this->imageStorage->getImageFileNameMask($filename);
-            $this->imageCache->deleteImagesByMask($fileNameMask);
+        if ($this->imageStorage->imageExists($this->filename)) {
+            $this->deleteExistingImageFromStorageAndCache();
         }
 
-        $stream = $request->getBody();
-        $image = $this->imageFactory->createImageFromStream($stream);
-        $this->imageStorage->putImage($filename, $image);
+        $this->imageStorage->putImage($this->filename, $image);
 
+        return $this->createCreatedResponse();
+    }
+
+    private function deleteExistingImageFromStorageAndCache(): void
+    {
+        $this->imageStorage->deleteImage($this->filename);
+        $fileNameMask = $this->imageStorage->getImageFileNameMask($this->filename);
+        $this->imageCache->deleteImagesByMask($fileNameMask);
+    }
+
+    private function createCreatedResponse(): ResponseInterface
+    {
         return $this->responseFactory->createMessageResponse(
             new HttpStatusCodeEnum(HttpStatusCodeEnum::CREATED),
-            sprintf('Image "%s" successfully put to storage.', $filename)
+            sprintf('Image "%s" successfully put to storage.', $this->filename)
         );
+    }
+
+    private function getImageFromRequest(RequestInterface $request): Image
+    {
+        $stream = $request->getBody();
+
+        try {
+            $image = $this->imageFactory->createImageFromStream($stream);
+        } catch (InvalidImageException $exception) {
+            throw new InvalidRequestException($exception->getMessage());
+        }
+
+        return $image;
     }
 }

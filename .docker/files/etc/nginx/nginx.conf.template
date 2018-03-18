@@ -1,0 +1,53 @@
+user www-data;
+worker_processes 2;
+
+error_log /var/log/nginx/error.log;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include           mime.types;
+    default_type      application/octet-stream;
+    sendfile          on;
+    keepalive_timeout 65;
+
+    server {
+        listen 80 default_server;
+        server_name default;
+        charset utf-8;
+        client_max_body_size __NGINX_CLIENT_MAX_BODY_SIZE__;
+
+        root /app;
+        index main.php;
+
+        access_log /var/log/nginx/server-access.log;
+        error_log /var/log/nginx/server-error.log;
+
+        location / {
+            return 404;
+        }
+
+        # redirecting master requests to application
+        location = / {
+            return 405;
+        }
+
+        # if static files not exist then handling request by application
+        location ~* \.(png|jpg|jpeg)$ {
+            try_files /web/$uri /web/$uri/ @app;
+        }
+
+        # if it is not a GET request then nginx will not allow to process it, redirecting it to application
+        error_page 405 =200 @app;
+
+        location @app {
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME /app/main.php;
+            fastcgi_param APP_CONFIGURATION_FILENAME __APP_CONFIGURATION_FILENAME__;
+            fastcgi_pass unix:/var/run/php.sock;
+        }
+    }
+}

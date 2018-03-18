@@ -22,12 +22,12 @@ class SourceImageWriterTest extends TestCase
 {
     use ProviderTrait;
 
+    private const DIRECTORY = 'directory';
     private const FILENAME = 'key';
     private const PARSED_FILENAME_VALUE = 'public_filename';
 
     /** @var PlainFilenameParserInterface */
     private $filenameParser;
-
     /** @var StorageAccessorInterface */
     private $storageAccessor;
 
@@ -92,6 +92,16 @@ class SourceImageWriterTest extends TestCase
         $this->assertEquals(self::PARSED_FILENAME_VALUE, $filename);
     }
 
+    /** @test */
+    public function deleteDirectoryContents_givenDirectory_storageAccessorDeletesContentsOfDirectory(): void
+    {
+        $writer = $this->createSourceImageWriter();
+
+        $writer->deleteDirectoryContents(self::DIRECTORY);
+
+        $this->assertStorageDirectory_deleteDirectoryContents_isCalledOnceWithDirectory(self::DIRECTORY);
+    }
+
     private function givenFilenameParser_getParsedFilename_returnsPlainFilename(): PlainFilename
     {
         $parsedKey = \Phake::mock(PlainFilename::class);
@@ -126,5 +136,11 @@ class SourceImageWriterTest extends TestCase
     private function createSourceImageWriter(): SourceImageWriter
     {
         return new SourceImageWriter($this->filenameParser, $this->storageAccessor);
+    }
+
+    private function assertStorageDirectory_deleteDirectoryContents_isCalledOnceWithDirectory(string $directory): void
+    {
+        \Phake::verify($this->storageAccessor, \Phake::times(1))
+            ->deleteDirectoryContents($directory);
     }
 }

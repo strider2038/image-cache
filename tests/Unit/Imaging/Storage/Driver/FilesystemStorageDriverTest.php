@@ -131,6 +131,17 @@ class FilesystemStorageDriverTest extends TestCase
         $this->assertFileOperations_deleteFile_isCalledOnce($this->fileOperations, self::FILENAME_EXISTS);
     }
 
+    /** @test */
+    public function deleteDirectoryContents_givenStorageFilename_contentsDeletedByFileOperations(): void
+    {
+        $driver = $this->createFilesystemStorageDriver();
+        $storageFilename = $this->givenStorageFilename(self::FILENAME_EXISTS);
+
+        $driver->deleteDirectoryContents($storageFilename);
+
+        $this->assertFileOperations_deleteDirectoryContents_isCalledOnceWith($this->fileOperations, self::FILENAME_EXISTS);
+    }
+
     private function createFilesystemStorageDriver(): FilesystemStorageDriver
     {
         $this->givenFileOperations_isDirectory_returns($this->fileOperations, self::BASE_DIRECTORY, true);

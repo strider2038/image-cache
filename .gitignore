@@ -10,8 +10,8 @@
 !/build/logs/.gitkeep
 
 # web directories
-/web/*
-!/web/index.php
+/web/
+!/web/.gitkeep
 
 # runtime directory
 /runtime

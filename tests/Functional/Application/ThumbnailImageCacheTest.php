@@ -17,23 +17,22 @@ use Strider2038\ImgCache\Core\Streaming\ResourceStream;
 use Strider2038\ImgCache\Core\Streaming\StreamInterface;
 use Strider2038\ImgCache\Enum\HttpStatusCodeEnum;
 use Strider2038\ImgCache\Enum\ResourceStreamModeEnum;
-use Strider2038\ImgCache\Service\ImageController;
 use Strider2038\ImgCache\Tests\Support\ApplicationTestCase;
 
 class ThumbnailImageCacheTest extends ApplicationTestCase
 {
     private const FILE_NOT_EXIST = '/not-exist.jpg';
-    private const IMAGE_JPEG_CACHE_KEY = '/image.jpg';
-    private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    private const IMAGE_JPEG_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
-    private const IMAGE_JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . self::IMAGE_JPEG_CACHE_KEY;
+    private const IMAGE_JPEG_WEB_FILENAME = '/image.jpg';
+    private const IMAGE_JPEG_FILESYSTEM_FILENAME = self::STORAGE_DIRECTORY . self::IMAGE_JPEG_WEB_FILENAME;
+    private const IMAGE_JPEG_CACHE_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_WEB_FILENAME;
+    private const IMAGE_JPEG_TEMPORARY_FILENAME = self::TEMPORARY_DIRECTORY . self::IMAGE_JPEG_WEB_FILENAME;
     private const IMAGE_JPEG_THUMBNAIL_CACHE_KEY = '/image_s50x75.jpg';
     private const IMAGE_JPEG_THUMBNAIL_WIDTH = 50;
     private const IMAGE_JPEG_THUMBNAIL_HEIGHT = 75;
     private const IMAGE_JPEG_THUMBNAIL_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_THUMBNAIL_CACHE_KEY;
-    private const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY = '/sub/dir/image.jpg';
-    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::FILESOURCE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
-    private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY;
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME = '/sub/dir/image.jpg';
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME = self::STORAGE_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME;
+    private const IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_FILENAME = self::WEB_DIRECTORY . self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME;
 
     protected function setUp(): void
     {
@@ -45,7 +44,7 @@ class ThumbnailImageCacheTest extends ApplicationTestCase
             new ImageSourceCollection([
                 new FilesystemImageSource(
                     '/',
-                    self::FILESOURCE_DIRECTORY,
+                    self::STORAGE_DIRECTORY,
                     'thumbnail'
                 )
             ])
@@ -67,10 +66,10 @@ class ThumbnailImageCacheTest extends ApplicationTestCase
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
 
-        $this->sendGET(self::IMAGE_JPEG_CACHE_KEY);
+        $this->sendGET(self::IMAGE_JPEG_WEB_FILENAME);
 
         $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
-        $this->assertFileExists(self::IMAGE_JPEG_WEB_FILENAME);
+        $this->assertFileExists(self::IMAGE_JPEG_CACHE_FILENAME);
     }
 
     /** @test */
@@ -93,10 +92,10 @@ class ThumbnailImageCacheTest extends ApplicationTestCase
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
 
-        $this->sendGET(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY);
+        $this->sendGET(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
 
         $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
-        $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME);
+        $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_FILENAME);
     }
 
     /** @test */
@@ -105,7 +104,7 @@ class ThumbnailImageCacheTest extends ApplicationTestCase
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
 
-        $this->sendPUT(self::IMAGE_JPEG_CACHE_KEY, $stream);
+        $this->sendPUT(self::IMAGE_JPEG_WEB_FILENAME, $stream);
 
         $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
@@ -117,25 +116,44 @@ class ThumbnailImageCacheTest extends ApplicationTestCase
         $this->givenImageJpeg(self::IMAGE_JPEG_TEMPORARY_FILENAME);
         $stream = $this->givenStream(self::IMAGE_JPEG_TEMPORARY_FILENAME);
 
-        $this->sendPUT(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_KEY, $stream);
+        $this->sendPUT(self::IMAGE_JPEG_IN_SUBDIRECTORY_WEB_FILENAME, $stream);
 
         $this->assertResponseHasStatusCode(HttpStatusCodeEnum::CREATED);
         $this->assertFileExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
     }
 
     /** @test */
-    public function delete_imageExistsInStorageAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
+    public function DELETE_imageExistsInStorageAndIsCachedAndThumbnailExists_imageAndThumbnailDeleted(): void
     {
         $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
-        $this->givenImageJpeg(self::IMAGE_JPEG_WEB_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_CACHE_FILENAME);
         $this->givenImageJpeg(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
 
-        $this->sendDELETE(self::IMAGE_JPEG_CACHE_KEY);
+        $this->sendDELETE(self::IMAGE_JPEG_WEB_FILENAME);
 
         $this->assertResponseHasStatusCode(HttpStatusCodeEnum::OK);
         $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
-        $this->assertFileNotExists(self::IMAGE_JPEG_WEB_FILENAME);
+        $this->assertFileNotExists(self::IMAGE_JPEG_CACHE_FILENAME);
         $this->assertFileNotExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
+    }
+
+    /** @test */
+    public function DELETE_givenRootDirectoryAndStorageAndCacheContainsFilesAndDirectories_allFilesAndDirectoriesDeleted(): void
+    {
+        $this->givenImageJpeg(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_CACHE_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
+        $this->givenImageJpeg(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_FILENAME);
+
+        $this->sendDELETE('');
+
+        $this->assertResponseHasStatusCode(HttpStatusCodeEnum::OK);
+        $this->assertFileNotExists(self::IMAGE_JPEG_FILESYSTEM_FILENAME);
+        $this->assertFileNotExists(self::IMAGE_JPEG_CACHE_FILENAME);
+        $this->assertFileNotExists(self::IMAGE_JPEG_THUMBNAIL_WEB_FILENAME);
+        $this->assertFileNotExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_FILESYSTEM_FILENAME);
+        $this->assertFileNotExists(self::IMAGE_JPEG_IN_SUBDIRECTORY_CACHE_FILENAME);
     }
 
     private function givenStream(string $filename): StreamInterface

@@ -62,4 +62,9 @@ class FilesystemStorageDriver implements FilesystemStorageDriverInterface
     {
         $this->fileOperations->deleteFile($filename);
     }
+
+    public function deleteDirectoryContents(StorageFilenameInterface $directory): void
+    {
+        $this->fileOperations->deleteDirectoryContents($directory);
+    }
 }
