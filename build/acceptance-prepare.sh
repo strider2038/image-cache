@@ -17,10 +17,8 @@ docker run \
 
 docker ps
 docker logs "$container_name"
-docker exec -it "$container_name" sh -c "supervisorctl status"
-sleep 5
 
-curl -v localhost:1234
-curl -v 0.0.0.0:1234
-nc -zv localhost 1234
-nc -zv 0.0.0.0 1234
+echo "Waiting for container services to start..."
+sleep 5
+docker exec -it "$container_name" sh -c "supervisorctl status"
+curl -v localhost

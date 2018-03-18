@@ -36,13 +36,12 @@ Microservice for caching images from external storages (WebDAV or API). It can p
 - [x] Make user-friendly configuration of microservice
 - [x] Move all todos to github issues
 - [x] Automatically create cache directories
-- [ ] Support for building docker containers in Travis
-- [ ] Acceptance testing
+- [x] Support for building docker containers in Travis
+- [x] Acceptance testing
 - [ ] Rename project to "Image caching microservice"
 - [ ] Write project description in README.md
 
 ## Goals for version v1.1
-- [ ] Make nginx and php-fpm run from www-data user (inspect POST image.jpg problem)
 - [ ] Performance optimization: configuration caching and/or compiling
 - [ ] Performance optimization: composer cache 
 - [ ] Performance optimization: compiling to PHAR archive
