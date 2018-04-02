@@ -12,6 +12,8 @@ Microservice for caching images from remote storages (WebDAV or API) on local se
 
 Main purpose of this service is to cache images from remote storage and save it to local filesystem. Thus a new request to the same URI will be quickly processed by nginx as a file server (see the picture below).
 
+Besides image caching the application can process images by applying sequence of transformations: resizing, cropping ans shifting. Also it can be used as a proxy service to handle images in remote storages.
+
 ![Client server sequence UML diagram][client-server-uml]
 
 Currently, the application can work with the following storages:
