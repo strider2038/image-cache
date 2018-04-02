@@ -12,6 +12,8 @@ Application <-- ImageCache: ImageFile
 nginx <-- Application: 201 image/jpeg /image.jpg
 Client <-- nginx: 201 image/jpeg /image.jpg
 
+...
+
 Client -> nginx: GET /image.jpg
 nginx -> Filesystem: try_files /web_cache/image.jpg
 nginx <-- Filesystem: /web_cache/image.jpg

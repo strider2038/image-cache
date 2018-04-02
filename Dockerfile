@@ -1,5 +1,5 @@
 FROM php:fpm-alpine
-MAINTAINER Igor Lazarev <strider2038@yandex.ru>
+LABEL maintainer="Igor Lazarev <strider2038@yandex.ru>"
 
 ENV APPLICATION_NAME=image-cache
 ENV APPLICATION_VERSION=dev

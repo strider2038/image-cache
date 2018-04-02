@@ -4,17 +4,29 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/cfe1201a-7dab-4eeb-9b00-f0edd63a1690/big.png)](https://insight.sensiolabs.com/projects/cfe1201a-7dab-4eeb-9b00-f0edd63a1690)
 
-Microservice for caching images from external storages (WebDAV or API). It can process images by applying simple transformations such as resizing, cropping and shifting.
+Microservice for caching images from remote storages (WebDAV or API) on local server. It can process images by applying simple transformations such as resizing, cropping and shifting.
 
-## Description
+## Getting started
 
-## Installation
+### Capabilities
 
-You can use this application as a docker microservice. 
+Main purpose of this service is to cache images from remote storage and save it to local filesystem. Thus a new request to the same URI will be quickly processed by nginx as a file server (see the picture below).
+
+![Client server sequence UML diagram][client-server-uml]
+
+Currently, the application can work with the following storages:
+
+* local file storage;
+* remote WebDAV storage with OAuth authentication (tested only for Yandex.Disk);
+* Yandex static map API.
+
+### Installation
+
+Simplest way to use this project is to run it like a docker microservice.
 
 ```bash
 docker pull strider2038/image-cache
-``` 
+```
 
 ## Authors
 
@@ -23,3 +35,5 @@ Code written by [Igor Lazarev](https://github.com/strider2038).
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+[client-server-uml]: http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/strider2038/image-cache/master/docs/uml/client-server.puml
